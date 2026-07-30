@@ -1,0 +1,210 @@
+:root {
+  --text: #3f3d45;
+  --text-h: #08060d;
+  --bg: #fdfdfd;
+  --bg-alt: #f4f3f6;
+  --border: #e0dfe3;
+  --accent: #7c3aed;
+  --accent-bg: rgba(124, 58, 237, 0.1);
+  --danger: #b91c1c;
+
+  font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #d4d2d8;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --bg-alt: #1f2028;
+    --border: #2e303a;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --danger: #f87171;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.muted {
+  color: var(--text);
+  opacity: 0.65;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.app-header nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.app-header nav a {
+  color: var(--text);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.app-header nav a.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+input[type="search"] {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  margin: 0.5rem 0 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+}
+
+table thead,
+table tbody {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: break-word;
+}
+
+th {
+  color: var(--text-h);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+a {
+  color: var(--accent);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.pagination button {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-alt);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.promotion-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: help;
+}
+
+.product-image {
+  max-width: 200px;
+  max-height: 200px;
+  display: block;
+  margin: 0.75rem 0;
+  border-radius: 6px;
+}
+
+.recipe-list {
+  list-style: none;
+  padding: 0;
+}
+
+.recipe-list li {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.event-timeline {
+  list-style: none;
+  padding: 0;
+}
+
+.event-timeline li {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.event-timeline summary {
+  cursor: pointer;
+}
+
+.event-timeline pre {
+  background: var(--bg-alt);
+  padding: 0.6rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+}

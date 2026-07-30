@@ -1,0 +1,54 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { searchRecipes } from "../api/client";
+import { recipeDifficultyLabels, type RecipeSummaryDto } from "../api/types";
+import { Pagination } from "../components/Pagination";
+
+export function RecipesPage() {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [recipes, setRecipes] = useState<RecipeSummaryDto[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    searchRecipes(search, page)
+      .then((result) => {
+        setRecipes(result.items);
+        setTotal(result.total);
+      })
+      .finally(() => setLoading(false));
+  }, [search, page]);
+
+  return (
+    <div>
+      <h1>Receitas</h1>
+      <input
+        type="search"
+        placeholder="Pesquisar receitas…"
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setPage(1);
+        }}
+      />
+
+      {loading && <p className="muted">A carregar…</p>}
+
+      <ul className="recipe-list">
+        {recipes.map((recipe) => (
+          <li key={recipe.recipeId}>
+            <Link to={`/receitas/${recipe.recipeId}`}>{recipe.title}</Link>
+            <span className="muted"> · {recipeDifficultyLabels[recipe.difficulty]}</span>
+            {recipe.tags.length > 0 && <span className="muted"> · {recipe.tags.join(", ")}</span>}
+          </li>
+        ))}
+      </ul>
+
+      {!loading && recipes.length === 0 && <p className="muted">Sem resultados.</p>}
+
+      <Pagination page={page} pageSize={20} total={total} onPageChange={setPage} />
+    </div>
+  );
+}

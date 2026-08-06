@@ -28,7 +28,7 @@ npm run dev
 
 `VITE_API_BASE_URL` é gravada no bundle em **build-time** (Vite, não
 runtime) — omissão: a mesma Api de produção já usada pelo
-`domios-scraper` (`http://100.119.150.79:8080/api/v1`).
+`domios-scraper` (`https://lavi-system-product-name.taild88dae.ts.net/domiosapi/api/v1`).
 
 ## CORS
 

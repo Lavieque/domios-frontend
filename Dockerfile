@@ -4,7 +4,7 @@ WORKDIR /app
 # VITE_API_BASE_URL é gravada no bundle em build-time (Vite, não runtime) —
 # por isso é um build arg, não uma variável de ambiente do container final.
 # Omissão: a mesma Api de produção já usada pelo domios-scraper.
-ARG VITE_API_BASE_URL=http://100.119.150.79:8080/api/v1
+ARG VITE_API_BASE_URL=https://lavi-system-product-name.taild88dae.ts.net/domiosapi/api/v1
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 COPY package*.json .

@@ -9,7 +9,29 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="app-title">DomiOS</h1>
+        <NavLink to="/produtos" className="brand">
+          <svg className="brand-mark" viewBox="0 0 120 120" aria-hidden="true">
+            <polyline
+              points="30,72 30,46 60,20 90,46 90,72"
+              fill="none"
+              stroke="var(--accent)"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <polyline
+              points="52,88 52,62 82,36 112,62 112,88"
+              fill="none"
+              stroke="var(--accent-2)"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="wordmark">
+            Domi<em>OS</em>
+          </span>
+        </NavLink>
         <nav>
           <NavLink to="/produtos">Produtos</NavLink>
           <NavLink to="/promocoes">Promoções</NavLink>

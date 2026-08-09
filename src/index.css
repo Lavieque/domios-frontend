@@ -183,13 +183,40 @@ table thead,
 table tbody {
   display: table;
   width: 100%;
+  /* thead/tbody como "table" próprias (por causa do overflow-x no
+     elemento table pai) — cada uma faz o seu próprio layout de colunas.
+     table-layout: fixed com larguras explícitas por nth-child (ver
+     .products-table) garante que as duas ficam alinhadas; auto fá-las
+     divergir (o cabeçalho, com texto curto, calcula larguras diferentes
+     do corpo, com nomes de produto longos). */
   table-layout: fixed;
+}
+
+.products-table th:nth-child(1),
+.products-table td:nth-child(1) {
+  width: 42%;
+}
+
+.products-table th:nth-child(2),
+.products-table td:nth-child(2) {
+  width: 18%;
+}
+
+.products-table th:nth-child(3),
+.products-table td:nth-child(3) {
+  width: 25%;
+}
+
+.products-table th:nth-child(4),
+.products-table td:nth-child(4) {
+  width: 15%;
 }
 
 th,
 td {
   text-align: left;
-  padding: 0.65rem 0.85rem;
+  font-size: 14.5px;
+  padding: 0.6rem 0.85rem;
   border-bottom: 1px solid var(--line);
   overflow-wrap: break-word;
 }
@@ -257,13 +284,38 @@ th {
 }
 
 .product-image {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 280px;
+  max-height: 280px;
   display: block;
-  margin: 0.85rem 0;
+  margin: 1rem 0;
   border-radius: 8px;
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
+}
+
+/* Ingredientes / Preparação nas páginas de detalhe — sem isto ficam com o
+   marcador/numeração e espaçamento por omissão do browser, destoando do
+   resto da página. */
+main ul:not(.recipe-list):not(.event-timeline),
+main ol {
+  padding-left: 1.35rem;
+  margin: 0.5rem 0 0;
+}
+
+main ul:not(.recipe-list):not(.event-timeline) li,
+main ol li {
+  padding: 0.3rem 0;
+  line-height: 1.5;
+}
+
+main ul:not(.recipe-list):not(.event-timeline) li::marker {
+  color: var(--accent);
+}
+
+main ol li::marker {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 600;
 }
 
 .recipe-list {
@@ -272,17 +324,23 @@ th {
 }
 
 .recipe-list li {
-  padding: 0.65rem 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--line);
 }
 
-.recipe-list a {
+.recipe-list .recipe-title {
+  display: block;
   font-weight: 600;
   text-decoration: none;
+  margin-bottom: 0.15rem;
 }
 
-.recipe-list a:hover {
+.recipe-list .recipe-title:hover {
   text-decoration: underline;
+}
+
+.recipe-list .recipe-meta {
+  font-size: 13.5px;
 }
 
 .event-timeline {

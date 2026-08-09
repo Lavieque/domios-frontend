@@ -36,7 +36,7 @@ export function ProductsPage() {
 
       {loading && <p className="muted">A carregar…</p>}
 
-      <table>
+      <table className="products-table">
         <thead>
           <tr>
             <th>Nome</th>

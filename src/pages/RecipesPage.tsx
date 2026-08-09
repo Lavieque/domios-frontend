@@ -39,9 +39,13 @@ export function RecipesPage() {
       <ul className="recipe-list">
         {recipes.map((recipe) => (
           <li key={recipe.recipeId}>
-            <Link to={`/receitas/${recipe.recipeId}`}>{recipe.title}</Link>
-            <span className="muted"> · {recipeDifficultyLabels[recipe.difficulty]}</span>
-            {recipe.tags.length > 0 && <span className="muted"> · {recipe.tags.join(", ")}</span>}
+            <Link to={`/receitas/${recipe.recipeId}`} className="recipe-title">
+              {recipe.title}
+            </Link>
+            <span className="muted recipe-meta">
+              {recipeDifficultyLabels[recipe.difficulty]}
+              {recipe.tags.length > 0 && <> · {recipe.tags.join(", ")}</>}
+            </span>
           </li>
         ))}
       </ul>

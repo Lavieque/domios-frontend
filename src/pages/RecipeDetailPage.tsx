@@ -13,10 +13,10 @@ export function RecipeDetailPage() {
   }, [id]);
 
   if (!id) return null;
-  if (!recipe) return <p className="muted">A carregar…</p>;
+  if (!recipe) return <p className="muted loading">A carregar…</p>;
 
   return (
-    <div>
+    <div className="page">
       <p>
         <Link to="/receitas">&larr; Receitas</Link>
       </p>

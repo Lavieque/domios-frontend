@@ -20,35 +20,37 @@ export function PromotionsPage() {
   }, [page]);
 
   return (
-    <div>
+    <div className="page">
       <h1>Promoções ativas</h1>
 
-      {loading && <p className="muted">A carregar…</p>}
+      {loading && <p className="muted loading">A carregar…</p>}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Descrição</th>
-            <th>Início</th>
-            <th>Fim</th>
-            <th>Exige cartão</th>
-          </tr>
-        </thead>
-        <tbody>
-          {promotions.map((promotion) => (
-            <tr key={promotion.promotionId}>
-              <td>{promotionTypeLabels[promotion.type]}</td>
-              <td>{promotion.description}</td>
-              <td>{new Date(promotion.startsAt).toLocaleDateString("pt-PT")}</td>
-              <td>{new Date(promotion.endsAt).toLocaleDateString("pt-PT")}</td>
-              <td>{promotion.requiresCard ? "Sim" : "Não"}</td>
+      {!loading && promotions.length === 0 ? (
+        <p className="empty-state">Sem promoções ativas neste momento.</p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Descrição</th>
+              <th>Início</th>
+              <th>Fim</th>
+              <th>Exige cartão</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {!loading && promotions.length === 0 && <p className="muted">Sem promoções ativas neste momento.</p>}
+          </thead>
+          <tbody>
+            {promotions.map((promotion) => (
+              <tr key={promotion.promotionId}>
+                <td>{promotionTypeLabels[promotion.type]}</td>
+                <td>{promotion.description}</td>
+                <td className="num">{new Date(promotion.startsAt).toLocaleDateString("pt-PT")}</td>
+                <td className="num">{new Date(promotion.endsAt).toLocaleDateString("pt-PT")}</td>
+                <td>{promotion.requiresCard ? "Sim" : "Não"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <Pagination page={page} pageSize={20} total={total} onPageChange={setPage} />
     </div>

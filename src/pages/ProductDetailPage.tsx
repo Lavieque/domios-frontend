@@ -17,10 +17,10 @@ export function ProductDetailPage() {
   }, [id]);
 
   if (!id) return null;
-  if (!product) return <p className="muted">A carregar…</p>;
+  if (!product) return <p className="muted loading">A carregar…</p>;
 
   return (
-    <div>
+    <div className="page">
       <p>
         <Link to="/produtos">&larr; Produtos</Link>
       </p>
@@ -33,33 +33,35 @@ export function ProductDetailPage() {
       {product.imageUrl && <img className="product-image" src={product.imageUrl} alt={product.name} />}
 
       <h2>Preços por cadeia</h2>
-      {offers === null && <p className="muted">A carregar preços…</p>}
-      {offers !== null && offers.length === 0 && <p className="muted">Sem ofertas registadas.</p>}
+      {offers === null && <p className="muted loading">A carregar preços…</p>}
+      {offers !== null && offers.length === 0 && <p className="empty-state">Sem ofertas registadas.</p>}
       {offers !== null && offers.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Cadeia</th>
-              <th>Loja</th>
-              <th>Preço</th>
-              <th>Observado em</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {offers.map((offer) => (
-              <tr key={offer.storeOfferId}>
-                <td>{offer.chainName}</td>
-                <td>{offer.storeName}</td>
-                <td>
-                  {offer.latestPrice ? `${offer.latestPrice.price.amount.toFixed(2)} ${offer.latestPrice.price.currency}` : "—"}
-                </td>
-                <td>{offer.latestPrice ? new Date(offer.latestPrice.observedAt).toLocaleDateString("pt-PT") : "—"}</td>
-                <td>{offer.latestPrice?.promotionId && <PromotionBadge promotionId={offer.latestPrice.promotionId} />}</td>
+        <div className="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Cadeia</th>
+                <th>Loja</th>
+                <th>Preço</th>
+                <th>Observado em</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {offers.map((offer) => (
+                <tr key={offer.storeOfferId}>
+                  <td>{offer.chainName}</td>
+                  <td>{offer.storeName}</td>
+                  <td className={`price${offer.latestPrice?.promotionId ? " is-promo" : ""}`}>
+                    {offer.latestPrice ? `${offer.latestPrice.price.amount.toFixed(2)} ${offer.latestPrice.price.currency}` : "—"}
+                  </td>
+                  <td className="num">{offer.latestPrice ? new Date(offer.latestPrice.observedAt).toLocaleDateString("pt-PT") : "—"}</td>
+                  <td>{offer.latestPrice?.promotionId && <PromotionBadge promotionId={offer.latestPrice.promotionId} />}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <h2>Histórico</h2>

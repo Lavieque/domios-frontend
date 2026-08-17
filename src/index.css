@@ -10,7 +10,11 @@
   --accent-2: #1e3a5c;
   --accent-2-soft: #dfe6ec;
   --danger: #b91c1c;
+  --danger-soft: rgba(185, 28, 28, 0.1);
   --shadow: 0 1px 2px rgba(22, 36, 31, 0.06), 0 8px 24px -12px rgba(22, 36, 31, 0.18);
+  --shadow-lift: 0 4px 10px rgba(22, 36, 31, 0.08), 0 16px 32px -16px rgba(22, 36, 31, 0.24);
+  --radius-sm: 6px;
+  --radius: 10px;
 
   --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -37,7 +41,18 @@
     --accent-2: #6e9bc7;
     --accent-2-soft: rgba(110, 155, 199, 0.16);
     --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.14);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px -12px rgba(0, 0, 0, 0.55);
+    --shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.35), 0 20px 40px -16px rgba(0, 0, 0, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
   }
 }
 
@@ -70,6 +85,29 @@ h2 {
   color: var(--ink-dim);
 }
 
+.loading {
+  animation: pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.empty-state {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+
 a {
   color: var(--accent);
 }
@@ -84,9 +122,9 @@ a {
 }
 
 .app {
-  max-width: 960px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 0 1rem 3rem;
+  padding: 0 1.25rem 4rem;
 }
 
 .app-header {
@@ -97,7 +135,7 @@ a {
   flex-wrap: wrap;
   padding: 1.5rem 0;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 1.75rem;
+  margin-bottom: 2rem;
 }
 
 .brand {
@@ -111,6 +149,11 @@ a {
   width: 30px;
   height: 30px;
   flex: none;
+  transition: transform 0.25s ease;
+}
+
+.brand:hover .brand-mark {
+  transform: translateY(-1px) scale(1.05);
 }
 
 .wordmark {
@@ -128,15 +171,18 @@ a {
 
 .app-header nav {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.75rem;
 }
 
 .app-header nav a {
+  position: relative;
   color: var(--ink-dim);
   text-decoration: none;
-  font-size: 14.5px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 0.25rem 0;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.3rem 0;
   border-bottom: 2px solid transparent;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
@@ -150,22 +196,68 @@ a {
   border-bottom-color: var(--accent);
 }
 
+.page {
+  animation: page-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-wrap {
+  position: relative;
+  max-width: 24rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.search-wrap::before {
+  content: "";
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  border: 1.5px solid var(--ink-dim);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.search-wrap::after {
+  content: "";
+  position: absolute;
+  left: 1.72rem;
+  top: 0.95rem;
+  width: 6px;
+  height: 1.5px;
+  background: var(--ink-dim);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
 input[type="search"] {
   display: block;
   width: 100%;
-  max-width: 24rem;
-  padding: 0.6rem 0.85rem;
+  padding: 0.65rem 0.85rem 0.65rem 2.35rem;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  margin: 0.5rem 0 1.25rem;
   box-shadow: var(--shadow);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 input[type="search"]:focus-visible {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 table {
@@ -174,7 +266,7 @@ table {
   overflow-x: auto;
   display: block;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow);
 }
@@ -225,8 +317,29 @@ tbody tr:last-child td {
   border-bottom: none;
 }
 
+tbody tr {
+  transition: background-color 0.12s ease;
+}
+
 tbody tr:hover td {
   background: var(--accent-soft);
+}
+
+td.num {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+td.price {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+td.price.is-promo {
+  color: var(--accent-2);
 }
 
 th {
@@ -249,30 +362,40 @@ th {
 }
 
 .pagination button {
-  padding: 0.4rem 0.85rem;
+  padding: 0.45rem 0.9rem;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .pagination button:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.pagination button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .pagination button:disabled {
   opacity: 0.4;
   cursor: default;
+  box-shadow: none;
 }
 
 .promotion-badge {
-  display: inline-block;
-  padding: 0.15rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem 0.2rem 0.5rem;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
@@ -283,14 +406,46 @@ th {
   cursor: help;
 }
 
+.promotion-badge::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
 .product-image {
   max-width: 280px;
   max-height: 280px;
   display: block;
   margin: 1rem 0;
-  border-radius: 8px;
+  border-radius: var(--radius);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.product-image:hover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.25rem 1.5rem 1.5rem;
+  margin: 0 0 1.5rem;
+}
+
+.panel > h2:first-child {
+  margin-top: 0;
+}
+
+.panel table,
+.panel .event-timeline {
+  box-shadow: none;
 }
 
 /* Ingredientes / Preparação nas páginas de detalhe — sem isto ficam com o
@@ -326,6 +481,11 @@ main ol li::marker {
 .recipe-list li {
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--line);
+  transition: padding-left 0.15s ease;
+}
+
+.recipe-list li:hover {
+  padding-left: 0.4rem;
 }
 
 .recipe-list .recipe-title {
@@ -347,14 +507,14 @@ main ol li::marker {
   list-style: none;
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
 
 .event-timeline li {
-  padding: 0.65rem 0.85rem;
+  padding: 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -362,18 +522,52 @@ main ol li::marker {
   border-bottom: none;
 }
 
+.event-timeline details[open] summary {
+  color: var(--accent);
+}
+
 .event-timeline summary {
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--ink);
+  list-style: none;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: color 0.12s ease, background-color 0.12s ease;
+}
+
+.event-timeline summary:hover {
+  background: var(--accent-soft);
+}
+
+.event-timeline summary::-webkit-details-marker {
+  display: none;
+}
+
+.event-timeline summary::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--ink-dim);
+  border-bottom: 1.5px solid var(--ink-dim);
+  transform: rotate(-45deg);
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.event-timeline details[open] summary::before {
+  transform: rotate(45deg);
+  border-color: var(--accent);
 }
 
 .event-timeline pre {
   background: var(--surface-2);
-  padding: 0.75rem;
-  border-radius: 6px;
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--radius-sm);
   overflow-x: auto;
   font-size: 12.5px;
-  margin-top: 0.6rem;
+  margin: 0 0.85rem 0.75rem;
 }

@@ -16,11 +16,11 @@ export function EventTimeline({ aggregateType, aggregateId }: EventTimelineProps
   }, [aggregateType, aggregateId]);
 
   if (events === null) {
-    return <p className="muted">A carregar histórico…</p>;
+    return <p className="muted loading">A carregar histórico…</p>;
   }
 
   if (events.length === 0) {
-    return <p className="muted">Sem eventos registados.</p>;
+    return <p className="empty-state">Sem eventos registados.</p>;
   }
 
   return (

@@ -22,35 +22,39 @@ export function RecipesPage() {
   }, [search, page]);
 
   return (
-    <div>
+    <div className="page">
       <h1>Receitas</h1>
-      <input
-        type="search"
-        placeholder="Pesquisar receitas…"
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-      />
+      <div className="search-wrap">
+        <input
+          type="search"
+          placeholder="Pesquisar receitas…"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+        />
+      </div>
 
-      {loading && <p className="muted">A carregar…</p>}
+      {loading && <p className="muted loading">A carregar…</p>}
 
-      <ul className="recipe-list">
-        {recipes.map((recipe) => (
-          <li key={recipe.recipeId}>
-            <Link to={`/receitas/${recipe.recipeId}`} className="recipe-title">
-              {recipe.title}
-            </Link>
-            <span className="muted recipe-meta">
-              {recipeDifficultyLabels[recipe.difficulty]}
-              {recipe.tags.length > 0 && <> · {recipe.tags.join(", ")}</>}
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      {!loading && recipes.length === 0 && <p className="muted">Sem resultados.</p>}
+      {!loading && recipes.length === 0 ? (
+        <p className="empty-state">Sem resultados.</p>
+      ) : (
+        <ul className="recipe-list">
+          {recipes.map((recipe) => (
+            <li key={recipe.recipeId}>
+              <Link to={`/receitas/${recipe.recipeId}`} className="recipe-title">
+                {recipe.title}
+              </Link>
+              <span className="muted recipe-meta">
+                {recipeDifficultyLabels[recipe.difficulty]}
+                {recipe.tags.length > 0 && <> · {recipe.tags.join(", ")}</>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <Pagination page={page} pageSize={20} total={total} onPageChange={setPage} />
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
 import { measurementUnitLabels, type CategoryDto, type ProductDto } from "../api/types";
@@ -13,9 +13,35 @@ export function ProductsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const chipRowRef = useRef<HTMLDivElement>(null);
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+  const [categoriesOverflow, setCategoriesOverflow] = useState(false);
+  const [chipRowHeight, setChipRowHeight] = useState<number | null>(null);
+
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
+
+  useLayoutEffect(() => {
+    const container = chipRowRef.current;
+    if (!container) return;
+
+    function measure() {
+      const firstChip = container!.querySelector<HTMLElement>(".chip");
+      if (!firstChip) {
+        setChipRowHeight(null);
+        setCategoriesOverflow(false);
+        return;
+      }
+      setChipRowHeight(firstChip.offsetHeight);
+      setCategoriesOverflow(container!.scrollHeight > firstChip.offsetHeight + 4);
+    }
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [categories]);
 
   useEffect(() => {
     setLoading(true);
@@ -43,7 +69,11 @@ export function ProductsPage() {
         />
       </div>
 
-      <div className="chip-row">
+      <div
+        className="chip-row"
+        ref={chipRowRef}
+        style={categoriesExpanded || chipRowHeight === null ? undefined : { maxHeight: chipRowHeight, overflow: "hidden" }}
+      >
         <button
           type="button"
           className={`chip${categoryId === null ? " chip-active" : ""}`}
@@ -68,6 +98,11 @@ export function ProductsPage() {
           </button>
         ))}
       </div>
+      {categoriesOverflow && (
+        <button type="button" className="chip-toggle" onClick={() => setCategoriesExpanded((v) => !v)}>
+          {categoriesExpanded ? "Mostrar menos" : "Mostrar mais categorias"}
+        </button>
+      )}
 
       <p className="results-count">{total} resultados</p>
 
@@ -90,7 +125,9 @@ export function ProductsPage() {
               {products.map((product) => (
                 <tr key={product.productId}>
                   <td>
-                    <Link to={`/produtos/${product.productId}`}>{product.name}</Link>
+                    <Link to={`/produtos/${product.productId}`} className="table-link">
+                      {product.name}
+                    </Link>
                   </td>
                   <td>{product.brand ?? "—"}</td>
                   <td>

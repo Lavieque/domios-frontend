@@ -1,4 +1,5 @@
-import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { NavLink, Route, Routes } from "react-router-dom";
+import { OverviewPage } from "./pages/OverviewPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { PromotionsPage } from "./pages/PromotionsPage";
@@ -9,7 +10,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <NavLink to="/produtos" className="brand">
+        <NavLink to="/" className="brand">
           <svg className="brand-mark" viewBox="0 0 120 120" aria-hidden="true">
             <polyline
               points="30,72 30,46 60,20 90,46 90,72"
@@ -33,6 +34,9 @@ function App() {
           </span>
         </NavLink>
         <nav>
+          <NavLink to="/" end>
+            Visão geral
+          </NavLink>
           <NavLink to="/produtos">Produtos</NavLink>
           <NavLink to="/promocoes">Promoções</NavLink>
           <NavLink to="/receitas">Receitas</NavLink>
@@ -41,7 +45,7 @@ function App() {
 
       <main className="app-main">
         <Routes>
-          <Route path="/" element={<Navigate to="/produtos" replace />} />
+          <Route path="/" element={<OverviewPage />} />
           <Route path="/produtos" element={<ProductsPage />} />
           <Route path="/produtos/:id" element={<ProductDetailPage />} />
           <Route path="/promocoes" element={<PromotionsPage />} />

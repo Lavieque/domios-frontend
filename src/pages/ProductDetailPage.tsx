@@ -19,17 +19,44 @@ export function ProductDetailPage() {
   if (!id) return null;
   if (!product) return <p className="muted loading">A carregar…</p>;
 
+  const lowestPrice =
+    offers && offers.length > 0
+      ? Math.min(...offers.filter((o) => o.latestPrice).map((o) => o.latestPrice!.price.amount))
+      : null;
+
   return (
     <div className="page">
       <p>
         <Link to="/produtos">&larr; Produtos</Link>
       </p>
-      <h1>{product.name}</h1>
-      <p className="muted">
-        {product.brand ?? "Sem marca"} · {product.category.name} · {product.packageQuantity}{" "}
-        {measurementUnitLabels[product.packageUnit]}
-        {product.barcode && <> · EAN {product.barcode}</>}
+      <p className="eyebrow" style={{ margin: "0.75rem 0 0.5rem" }}>
+        Produto
       </p>
+      <h1>{product.name}</h1>
+
+      <div className="meta-grid">
+        <div className="meta-field">
+          <div className="meta-field-label">Marca</div>
+          <div className="meta-field-value">{product.brand ?? "Sem marca"}</div>
+        </div>
+        <div className="meta-field">
+          <div className="meta-field-label">Categoria</div>
+          <div className="meta-field-value">{product.category.name}</div>
+        </div>
+        <div className="meta-field">
+          <div className="meta-field-label">Embalagem</div>
+          <div className="meta-field-value" style={{ fontFamily: "var(--font-mono)" }}>
+            {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
+          </div>
+        </div>
+        <div className="meta-field">
+          <div className="meta-field-label">EAN</div>
+          <div className="meta-field-value" style={{ fontFamily: "var(--font-mono)" }}>
+            {product.barcode ?? "—"}
+          </div>
+        </div>
+      </div>
+
       {product.imageUrl && <img className="product-image" src={product.imageUrl} alt={product.name} />}
 
       <h2>Preços por cadeia</h2>
@@ -48,17 +75,21 @@ export function ProductDetailPage() {
               </tr>
             </thead>
             <tbody>
-              {offers.map((offer) => (
-                <tr key={offer.storeOfferId}>
-                  <td>{offer.chainName}</td>
-                  <td>{offer.storeName}</td>
-                  <td className={`price${offer.latestPrice?.promotionId ? " is-promo" : ""}`}>
-                    {offer.latestPrice ? `${offer.latestPrice.price.amount.toFixed(2)} ${offer.latestPrice.price.currency}` : "—"}
-                  </td>
-                  <td className="num">{offer.latestPrice ? new Date(offer.latestPrice.observedAt).toLocaleDateString("pt-PT") : "—"}</td>
-                  <td>{offer.latestPrice?.promotionId && <PromotionBadge promotionId={offer.latestPrice.promotionId} />}</td>
-                </tr>
-              ))}
+              {offers.map((offer) => {
+                const isLowest = offer.latestPrice !== null && offer.latestPrice.price.amount === lowestPrice;
+                return (
+                  <tr key={offer.storeOfferId} className={isLowest ? "offer-lowest" : undefined}>
+                    <td>{offer.chainName}</td>
+                    <td>{offer.storeName}</td>
+                    <td className={`price${offer.latestPrice?.promotionId ? " is-promo" : ""}`}>
+                      {offer.latestPrice ? `${offer.latestPrice.price.amount.toFixed(2)} ${offer.latestPrice.price.currency}` : "—"}
+                      {isLowest && <span className="lowest-tag">mais barato</span>}
+                    </td>
+                    <td className="num">{offer.latestPrice ? new Date(offer.latestPrice.observedAt).toLocaleDateString("pt-PT") : "—"}</td>
+                    <td>{offer.latestPrice?.promotionId && <PromotionBadge promotionId={offer.latestPrice.promotionId} />}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

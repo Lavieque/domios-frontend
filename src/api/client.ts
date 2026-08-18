@@ -1,4 +1,5 @@
 import type {
+  CategoryDto,
   DomainEventLogEntryDto,
   PagedResult,
   ProductDto,
@@ -30,8 +31,17 @@ async function get<T>(path: string, params: Record<string, string | number | boo
   return (await response.json()) as T;
 }
 
-export function searchProducts(search: string, page = 1, pageSize = 20): Promise<PagedResult<ProductDto>> {
-  return get<PagedResult<ProductDto>>("/products", { search, page, pageSize });
+export function searchProducts(
+  search: string,
+  page = 1,
+  pageSize = 20,
+  categoryId?: string,
+): Promise<PagedResult<ProductDto>> {
+  return get<PagedResult<ProductDto>>("/products", { search, categoryId, page, pageSize });
+}
+
+export function getCategories(): Promise<CategoryDto[]> {
+  return get<CategoryDto[]>("/categories");
 }
 
 export function getProduct(productId: string): Promise<ProductDto> {

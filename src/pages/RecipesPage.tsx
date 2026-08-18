@@ -23,6 +23,7 @@ export function RecipesPage() {
 
   return (
     <div className="page">
+      <p className="eyebrow">Cozinha</p>
       <h1>Receitas</h1>
       <div className="search-wrap">
         <input
@@ -41,19 +42,23 @@ export function RecipesPage() {
       {!loading && recipes.length === 0 ? (
         <p className="empty-state">Sem resultados.</p>
       ) : (
-        <ul className="recipe-list">
-          {recipes.map((recipe) => (
-            <li key={recipe.recipeId}>
-              <Link to={`/receitas/${recipe.recipeId}`} className="recipe-title">
-                {recipe.title}
+        !loading && (
+          <div className="recipe-grid">
+            {recipes.map((recipe) => (
+              <Link key={recipe.recipeId} to={`/receitas/${recipe.recipeId}`} className="recipe-card">
+                <div className="recipe-card-title">{recipe.title}</div>
+                <div className="recipe-card-pills">
+                  <span className="pill pill-accent2">{recipeDifficultyLabels[recipe.difficulty]}</span>
+                  {recipe.tags.map((tag) => (
+                    <span key={tag} className="pill pill-muted">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </Link>
-              <span className="muted recipe-meta">
-                {recipeDifficultyLabels[recipe.difficulty]}
-                {recipe.tags.length > 0 && <> · {recipe.tags.join(", ")}</>}
-              </span>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        )
       )}
 
       <Pagination page={page} pageSize={20} total={total} onPageChange={setPage} />

@@ -3,6 +3,10 @@ import { searchActivePromotions } from "../api/client";
 import { promotionTypeLabels, type PromotionDto } from "../api/types";
 import { Pagination } from "../components/Pagination";
 
+function daysLeft(promotion: PromotionDto): number {
+  return Math.ceil((new Date(promotion.endsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+}
+
 export function PromotionsPage() {
   const [page, setPage] = useState(1);
   const [promotions, setPromotions] = useState<PromotionDto[]>([]);
@@ -21,6 +25,7 @@ export function PromotionsPage() {
 
   return (
     <div className="page">
+      <p className="eyebrow">Oportunidades</p>
       <h1>Promoções ativas</h1>
 
       {loading && <p className="muted loading">A carregar…</p>}
@@ -28,28 +33,29 @@ export function PromotionsPage() {
       {!loading && promotions.length === 0 ? (
         <p className="empty-state">Sem promoções ativas neste momento.</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Descrição</th>
-              <th>Início</th>
-              <th>Fim</th>
-              <th>Exige cartão</th>
-            </tr>
-          </thead>
-          <tbody>
-            {promotions.map((promotion) => (
-              <tr key={promotion.promotionId}>
-                <td>{promotionTypeLabels[promotion.type]}</td>
-                <td>{promotion.description}</td>
-                <td className="num">{new Date(promotion.startsAt).toLocaleDateString("pt-PT")}</td>
-                <td className="num">{new Date(promotion.endsAt).toLocaleDateString("pt-PT")}</td>
-                <td>{promotion.requiresCard ? "Sim" : "Não"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        !loading && (
+          <div className="promo-list">
+            {promotions.map((promotion) => {
+              const remaining = daysLeft(promotion);
+              return (
+                <div key={promotion.promotionId} className="promo-card">
+                  <div>
+                    <span className="promo-type">{promotionTypeLabels[promotion.type]}</span>
+                    <div className="promo-description">{promotion.description}</div>
+                    <div className="promo-meta">
+                      {new Date(promotion.startsAt).toLocaleDateString("pt-PT")} —{" "}
+                      {new Date(promotion.endsAt).toLocaleDateString("pt-PT")}
+                      {promotion.requiresCard && <> · exige cartão</>}
+                    </div>
+                  </div>
+                  <div className={`promo-days${remaining <= 2 ? " is-urgent" : ""}`}>
+                    {remaining <= 1 ? "termina amanhã" : `termina em ${remaining} dias`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
       )}
 
       <Pagination page={page} pageSize={20} total={total} onPageChange={setPage} />

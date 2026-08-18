@@ -14,27 +14,36 @@ export function ProductsPage() {
   const [loading, setLoading] = useState(false);
 
   const chipRowRef = useRef<HTMLDivElement>(null);
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
-  const [categoriesOverflow, setCategoriesOverflow] = useState(false);
-  const [chipRowHeight, setChipRowHeight] = useState<number | null>(null);
+  const [visibleCategoryRows, setVisibleCategoryRows] = useState(1);
+  const [categoryRowTops, setCategoryRowTops] = useState<number[]>([]);
 
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
+
+  useEffect(() => {
+    setVisibleCategoryRows(1);
+  }, [categories]);
 
   useLayoutEffect(() => {
     const container = chipRowRef.current;
     if (!container) return;
 
     function measure() {
-      const firstChip = container!.querySelector<HTMLElement>(".chip");
-      if (!firstChip) {
-        setChipRowHeight(null);
-        setCategoriesOverflow(false);
+      const chips = Array.from(container!.querySelectorAll<HTMLElement>(".chip"));
+      if (chips.length === 0) {
+        setCategoryRowTops([]);
         return;
       }
-      setChipRowHeight(firstChip.offsetHeight);
-      setCategoriesOverflow(container!.scrollHeight > firstChip.offsetHeight + 4);
+      const containerTop = container!.getBoundingClientRect().top;
+      const tops = chips.map((chip) => chip.getBoundingClientRect().top - containerTop).sort((a, b) => a - b);
+      const rowTops: number[] = [];
+      for (const top of tops) {
+        if (rowTops.length === 0 || top - rowTops[rowTops.length - 1] > 4) {
+          rowTops.push(top);
+        }
+      }
+      setCategoryRowTops(rowTops.map((top) => Math.round(top)));
     }
 
     measure();
@@ -42,6 +51,11 @@ export function ProductsPage() {
     observer.observe(container);
     return () => observer.disconnect();
   }, [categories]);
+
+  const totalCategoryRows = categoryRowTops.length;
+  const shownCategoryRows = Math.min(visibleCategoryRows, totalCategoryRows);
+  const categoriesFullyExpanded = totalCategoryRows === 0 || shownCategoryRows >= totalCategoryRows;
+  const categoryRowMaxHeight = categoriesFullyExpanded ? undefined : categoryRowTops[shownCategoryRows];
 
   useEffect(() => {
     setLoading(true);
@@ -72,7 +86,7 @@ export function ProductsPage() {
       <div
         className="chip-row"
         ref={chipRowRef}
-        style={categoriesExpanded || chipRowHeight === null ? undefined : { maxHeight: chipRowHeight, overflow: "hidden" }}
+        style={categoryRowMaxHeight === undefined ? undefined : { maxHeight: categoryRowMaxHeight, overflow: "hidden" }}
       >
         <button
           type="button"
@@ -98,9 +112,13 @@ export function ProductsPage() {
           </button>
         ))}
       </div>
-      {categoriesOverflow && (
-        <button type="button" className="chip-toggle" onClick={() => setCategoriesExpanded((v) => !v)}>
-          {categoriesExpanded ? "Mostrar menos" : "Mostrar mais categorias"}
+      {totalCategoryRows > 1 && (
+        <button
+          type="button"
+          className="chip-toggle"
+          onClick={() => setVisibleCategoryRows((rows) => (categoriesFullyExpanded ? 1 : rows + 1))}
+        >
+          {categoriesFullyExpanded ? "Mostrar menos" : "Mostrar mais categorias"}
         </button>
       )}
 

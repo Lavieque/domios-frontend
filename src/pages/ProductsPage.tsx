@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
 import { measurementUnitLabels, type CategoryDto, type ProductDto } from "../api/types";
@@ -13,49 +13,21 @@ export function ProductsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const chipRowRef = useRef<HTMLDivElement>(null);
-  const [visibleCategoryRows, setVisibleCategoryRows] = useState(1);
-  const [categoryRowTops, setCategoryRowTops] = useState<number[]>([]);
-
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
 
-  useEffect(() => {
-    setVisibleCategoryRows(1);
-  }, [categories]);
-
-  useLayoutEffect(() => {
-    const container = chipRowRef.current;
-    if (!container) return;
-
-    function measure() {
-      const chips = Array.from(container!.querySelectorAll<HTMLElement>(".chip"));
-      if (chips.length === 0) {
-        setCategoryRowTops([]);
-        return;
-      }
-      const containerTop = container!.getBoundingClientRect().top;
-      const tops = chips.map((chip) => chip.getBoundingClientRect().top - containerTop).sort((a, b) => a - b);
-      const rowTops: number[] = [];
-      for (const top of tops) {
-        if (rowTops.length === 0 || top - rowTops[rowTops.length - 1] > 4) {
-          rowTops.push(top);
-        }
-      }
-      setCategoryRowTops(rowTops.map((top) => Math.round(top)));
-    }
-
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [categories]);
-
-  const totalCategoryRows = categoryRowTops.length;
-  const shownCategoryRows = Math.min(visibleCategoryRows, totalCategoryRows);
-  const categoriesFullyExpanded = totalCategoryRows === 0 || shownCategoryRows >= totalCategoryRows;
-  const categoryRowMaxHeight = categoriesFullyExpanded ? undefined : categoryRowTops[shownCategoryRows];
+  // O catálogo real tem milhares de categorias (incluindo subcategorias
+  // profundas) — mostrar todas num filtro rápido não é utilizável. Só as
+  // de topo (sem parentCategoryId) vão para o dropdown; pesquisa por texto
+  // continua a cobrir o resto.
+  const topLevelCategories = useMemo(
+    () =>
+      categories
+        .filter((category) => category.parentCategoryId === null)
+        .sort((a, b) => a.name.localeCompare(b.name, "pt")),
+    [categories],
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -83,44 +55,21 @@ export function ProductsPage() {
         />
       </div>
 
-      <div
-        className="chip-row"
-        ref={chipRowRef}
-        style={categoryRowMaxHeight === undefined ? undefined : { maxHeight: categoryRowMaxHeight, overflow: "hidden" }}
+      <select
+        className="category-select"
+        value={categoryId ?? ""}
+        onChange={(e) => {
+          setCategoryId(e.target.value || null);
+          setPage(1);
+        }}
       >
-        <button
-          type="button"
-          className={`chip${categoryId === null ? " chip-active" : ""}`}
-          onClick={() => {
-            setCategoryId(null);
-            setPage(1);
-          }}
-        >
-          Todas
-        </button>
-        {categories.map((category) => (
-          <button
-            key={category.categoryId}
-            type="button"
-            className={`chip${categoryId === category.categoryId ? " chip-active" : ""}`}
-            onClick={() => {
-              setCategoryId(category.categoryId);
-              setPage(1);
-            }}
-          >
+        <option value="">Todas as categorias</option>
+        {topLevelCategories.map((category) => (
+          <option key={category.categoryId} value={category.categoryId}>
             {category.name}
-          </button>
+          </option>
         ))}
-      </div>
-      {totalCategoryRows > 1 && (
-        <button
-          type="button"
-          className="chip-toggle"
-          onClick={() => setVisibleCategoryRows((rows) => (categoriesFullyExpanded ? 1 : rows + 1))}
-        >
-          {categoriesFullyExpanded ? "Mostrar menos" : "Mostrar mais categorias"}
-        </button>
-      )}
+      </select>
 
       <p className="results-count">{total} resultados</p>
 

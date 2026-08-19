@@ -40,8 +40,8 @@ export function searchProducts(
   return get<PagedResult<ProductDto>>("/products", { search, categoryId, page, pageSize });
 }
 
-export function getCategories(): Promise<CategoryDto[]> {
-  return get<CategoryDto[]>("/categories");
+export function getCategories(hasProducts?: boolean): Promise<CategoryDto[]> {
+  return get<CategoryDto[]>("/categories", { hasProducts });
 }
 
 export function getProduct(productId: string): Promise<ProductDto> {

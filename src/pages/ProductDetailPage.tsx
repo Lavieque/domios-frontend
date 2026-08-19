@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getProduct, getProductStoreOffers } from "../api/client";
 import { measurementUnitLabels, type ProductDto, type ProductStoreOfferDto } from "../api/types";
 import { PromotionBadge } from "../components/PromotionBadge";
@@ -7,6 +7,7 @@ import { EventTimeline } from "../components/EventTimeline";
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDto | null>(null);
   const [offers, setOffers] = useState<ProductStoreOfferDto[] | null>(null);
 
@@ -27,7 +28,9 @@ export function ProductDetailPage() {
   return (
     <div className="page">
       <p>
-        <Link to="/produtos">&larr; Produtos</Link>
+        <button type="button" className="back-link" onClick={() => navigate(-1)}>
+          &larr; Produtos
+        </button>
       </p>
       <p className="eyebrow" style={{ margin: "0.75rem 0 0.5rem" }}>
         Produto

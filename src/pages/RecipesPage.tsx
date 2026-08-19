@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { searchRecipes } from "../api/client";
 import { recipeDifficultyLabels, type RecipeSummaryDto } from "../api/types";
 import { Pagination } from "../components/Pagination";
 
 export function RecipesPage() {
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search") ?? "";
+  const page = Number(searchParams.get("page") ?? "1") || 1;
+
   const [recipes, setRecipes] = useState<RecipeSummaryDto[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  function applyFilters(next: { search?: string; page?: number }) {
+    const nextSearch = next.search ?? search;
+    const nextPage = next.page ?? page;
+
+    const params = new URLSearchParams();
+    if (nextSearch) params.set("search", nextSearch);
+    if (nextPage > 1) params.set("page", String(nextPage));
+    setSearchParams(params, { replace: true });
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -30,10 +42,7 @@ export function RecipesPage() {
           type="search"
           placeholder="Pesquisar receitas…"
           value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
+          onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
         />
       </div>
 
@@ -61,7 +70,7 @@ export function RecipesPage() {
         )
       )}
 
-      <Pagination page={page} pageSize={20} total={total} onPageChange={setPage} />
+      <Pagination page={page} pageSize={20} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
     </div>
   );
 }

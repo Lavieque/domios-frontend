@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
 import { measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
 
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [recipe, setRecipe] = useState<RecipeDto | null>(null);
 
   useEffect(() => {
@@ -18,7 +19,9 @@ export function RecipeDetailPage() {
   return (
     <div className="page">
       <p>
-        <Link to="/receitas">&larr; Receitas</Link>
+        <button type="button" className="back-link" onClick={() => navigate(-1)}>
+          &larr; Receitas
+        </button>
       </p>
       <p className="eyebrow" style={{ margin: "0.75rem 0 0.5rem" }}>
         Receita

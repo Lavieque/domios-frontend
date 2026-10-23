@@ -24,6 +24,11 @@ export function addDays(date: IsoDate, days: number): IsoDate {
   return format(d);
 }
 
+/** Dias de `from` até `to` (negativo se `to` for antes). */
+export function daysBetween(from: IsoDate, to: IsoDate): number {
+  return Math.round((parse(to).getTime() - parse(from).getTime()) / 86_400_000);
+}
+
 /** Segunda-feira da semana de `date`. */
 export function startOfWeek(date: IsoDate): IsoDate {
   const weekday = parse(date).getUTCDay(); // 0 = domingo

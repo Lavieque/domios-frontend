@@ -3,12 +3,14 @@ import { RequireAuth } from "./auth/RequireAuth";
 import { useSession } from "./auth/useSession";
 import { EmailVerificationNotice } from "./components/EmailVerificationNotice";
 import { AccountPage } from "./pages/AccountPage";
+import { AddPantryItemPage } from "./pages/AddPantryItemPage";
 import { CreateHouseholdPage } from "./pages/CreateHouseholdPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { HouseholdPage } from "./pages/HouseholdPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MealPlanTemplateDetailPage } from "./pages/MealPlanTemplateDetailPage";
 import { MealPlanTemplatesPage } from "./pages/MealPlanTemplatesPage";
+import { PantryPage } from "./pages/PantryPage";
 import { PlanPage } from "./pages/PlanPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { ProductsPage } from "./pages/ProductsPage";
@@ -66,6 +68,7 @@ function App() {
               <NavLink to="/receitas">Receitas</NavLink>
               <NavLink to="/ementas">Ementas</NavLink>
               <NavLink to="/plano">Plano</NavLink>
+              <NavLink to="/despensa">Despensa</NavLink>
               <NavLink to="/casa">Casa</NavLink>
               <NavLink to="/conta" className="nav-account" title={session.email}>
                 Conta
@@ -94,6 +97,8 @@ function App() {
             <Route path="/ementas" element={<MealPlanTemplatesPage />} />
             <Route path="/ementas/:id" element={<MealPlanTemplateDetailPage />} />
             <Route path="/plano" element={<PlanPage />} />
+            <Route path="/despensa" element={<PantryPage />} />
+            <Route path="/despensa/adicionar" element={<AddPantryItemPage />} />
             <Route path="/casa" element={<HouseholdPage />} />
             <Route path="/casa/nova" element={<CreateHouseholdPage />} />
             <Route path="/conta" element={<AccountPage />} />

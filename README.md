@@ -23,6 +23,9 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 - **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta.
 - **`/reset-password`**, **`/verify-email`** — destino dos links dos emails
   (caminhos fixados pela Api, token no fragmento `#token=`).
+- **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,
+  adenda 2026-10-23 da Api), escolha da casa atual (guardada neste browser,
+  por utilizador), membros; criar casa (Europe/Lisbon, EUR).
 - **`/conta`** — email, estado da confirmação, sair, sair em
   todos os dispositivos.
 

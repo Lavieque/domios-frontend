@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
 import type { PlannedMealDto } from "../api/planning";
+import { addItemsFromRecipe, getShoppingList } from "../api/shopping";
 import { measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
+import { SendToListForm } from "../components/SendToListForm";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { longDate, startOfWeek, today } from "../plan/dates";
 
@@ -12,6 +14,7 @@ export function RecipeDetailPage() {
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<RecipeDto | null>(null);
   const [added, setAdded] = useState<PlannedMealDto | null>(null);
+  const [onlyMissing, setOnlyMissing] = useState(true);
 
   useEffect(() => {
     if (!id) return;
@@ -67,6 +70,29 @@ export function RecipeDetailPage() {
           )}
         </HouseholdGate>
       </section>
+
+      <HouseholdGate withoutHousehold={null}>
+        {(household) => (
+          <section className="panel">
+            <h2>Pôr na lista de compras</h2>
+            <SendToListForm
+              householdId={household.householdId}
+              newListName={recipe.title}
+              submitLabel="Acrescentar ingredientes"
+              send={async (listId) => {
+                const before = await getShoppingList(household.householdId, listId);
+                const list = await addItemsFromRecipe(household.householdId, listId, recipe.recipeId, onlyMissing);
+                return { list, added: list.items.length - before.items.length };
+              }}
+            >
+              <label className="checkbox-field">
+                <input type="checkbox" checked={onlyMissing} onChange={(e) => setOnlyMissing(e.target.checked)} />
+                Só o que não há na despensa
+              </label>
+            </SendToListForm>
+          </section>
+        )}
+      </HouseholdGate>
 
       <div className="recipe-detail-grid">
         <div>

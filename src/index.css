@@ -1379,3 +1379,103 @@ a.meal-title:hover {
 .product-results .muted {
   font-size: 13px;
 }
+
+/* Listas de compras. */
+.new-list-form {
+  margin-bottom: 1rem;
+}
+
+.inline-form input[type="text"] {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+
+.add-item-form {
+  margin-bottom: 1.25rem;
+}
+
+.add-item-form input[aria-label="Item"] {
+  flex: 1 1 14rem;
+}
+
+.amount-input {
+  width: 5rem;
+}
+
+.list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.list-row:last-child {
+  border-bottom: none;
+}
+
+.list-row > :first-child {
+  flex: 1 1 12rem;
+}
+
+.list-row.is-purchased .meal-title {
+  text-decoration: line-through;
+  color: var(--ink-dim);
+}
+
+.item-check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.item-check input,
+.checkbox-field input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--accent);
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 14px;
+}
+
+.list-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+}
+
+.list-title .link-button {
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.list-status-actions {
+  margin: 1.5rem 0;
+}
+
+.comparison-panel table {
+  margin-bottom: 1rem;
+}
+
+.comparison-note {
+  font-size: 13px;
+  margin-bottom: 0;
+}
+
+.inline-notice {
+  flex-basis: 100%;
+  margin: 0;
+}

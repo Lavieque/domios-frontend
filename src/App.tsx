@@ -19,6 +19,8 @@ import { PromotionsPage } from "./pages/PromotionsPage";
 import { RecipesPage } from "./pages/RecipesPage";
 import { RecipeDetailPage } from "./pages/RecipeDetailPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { ShoppingListPage } from "./pages/ShoppingListPage";
+import { ShoppingListsPage } from "./pages/ShoppingListsPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/VerifyEmailPage";
 
@@ -69,6 +71,7 @@ function App() {
               <NavLink to="/ementas">Ementas</NavLink>
               <NavLink to="/plano">Plano</NavLink>
               <NavLink to="/despensa">Despensa</NavLink>
+              <NavLink to="/listas">Listas</NavLink>
               <NavLink to="/casa">Casa</NavLink>
               <NavLink to="/conta" className="nav-account" title={session.email}>
                 Conta
@@ -99,6 +102,8 @@ function App() {
             <Route path="/plano" element={<PlanPage />} />
             <Route path="/despensa" element={<PantryPage />} />
             <Route path="/despensa/adicionar" element={<AddPantryItemPage />} />
+            <Route path="/listas" element={<ShoppingListsPage />} />
+            <Route path="/listas/:id" element={<ShoppingListPage />} />
             <Route path="/casa" element={<HouseholdPage />} />
             <Route path="/casa/nova" element={<CreateHouseholdPage />} />
             <Route path="/conta" element={<AccountPage />} />

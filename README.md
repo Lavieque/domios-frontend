@@ -23,6 +23,14 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 - **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta.
 - **`/reset-password`**, **`/verify-email`** — destino dos links dos emails
   (caminhos fixados pela Api, token no fragmento `#token=`).
+- **`/plano`** (`?semana=` segunda-feira) — plano da semana da casa atual
+  (`GET .../planned-meals`), saltar/repor/remover, o que falta na despensa
+  (`.../planned-meals/availability`) e sugestões (`.../planned-meals/suggestions`,
+  vazias sem despensa) com "Adicionar ao plano". As receitas também se
+  adicionam a partir do detalhe.
+- **`/ementas`**, **`/ementas/:id`** — ementas prontas (`GET /meal-plan-templates`)
+  e aplicar ao plano a partir de um dia (`.../planned-meals/from-template`),
+  com a política para refeições já planeadas.
 - **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,
   adenda 2026-10-23 da Api), escolha da casa atual (guardada neste browser,
   por utilizador), membros; criar casa (Europe/Lisbon, EUR).

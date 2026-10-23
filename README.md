@@ -31,6 +31,14 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 - **`/ementas`**, **`/ementas/:id`** — ementas prontas (`GET /meal-plan-templates`)
   e aplicar ao plano a partir de um dia (`.../planned-meals/from-template`),
   com a política para refeições já planeadas.
+- **`/despensa`** — itens da casa atual: por omissão o que há pela ordem em
+  que deve ser usado (`sort=fifo`: abertos primeiro, depois validade), ou
+  por estado e local; abrir, usar parte ou tudo, deitar fora com motivo,
+  mudar de local. Os itens só trazem `productId`: os nomes vêm de
+  `GET /products/{id}`, com cache.
+- **`/despensa/adicionar`** (`?produto=`) — pesquisa no catálogo, quantidade
+  (uma embalagem por omissão), local, validade e preço opcionais. Também a
+  partir do detalhe do produto.
 - **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,
   adenda 2026-10-23 da Api), escolha da casa atual (guardada neste browser,
   por utilizador), membros; criar casa (Europe/Lisbon, EUR).

@@ -1,13 +1,13 @@
 # DomiOS Frontend
 
-Dashboard de dados, só de leitura, sobre o catálogo global do DomiOS
-(produtos/preços das cadeias reais, promoções ativas, receitas). Fala com
-a DomiOS.Api só por HTTP, nunca acede à base de dados.
+Frontend do DomiOS: catálogo global (produtos/preços das cadeias reais,
+promoções ativas, receitas) e conta de utilizador. Fala com a DomiOS.Api só
+por HTTP, nunca acede à base de dados.
 
-Sem login — os dados mostrados (Products, Promotions, Recipes canónicas,
-Stores, History) são todos catálogos globais, sem restrição de leitura
-desde a Fase 3 da Api (só rotas `/households/{id}/...` exigem posse de
-household, e este frontend não as usa).
+Os catálogos são de leitura anónima. A conta (login, registo, recuperação de
+password, confirmação de email) segue a adenda 2026-10-22 de
+`DomiOS_API_Fase3.md`; as rotas `/households/{id}/...` ainda não são usadas.
+Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 
 ## Páginas
 
@@ -17,18 +17,39 @@ household, e este frontend não as usa).
 - **`/promocoes`** — promoções ativas (`GET /promotions?activeNow=true`).
 - **`/receitas`** — pesquisa, lista paginada, detalhe com ingredientes e
   passos.
+- **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta.
+- **`/reset-password`**, **`/verify-email`** — destino dos links dos emails
+  (caminhos fixados pela Api, token no fragmento `#token=`).
+- **`/conta`** — protegida: email, estado da confirmação, sair, sair em
+  todos os dispositivos.
+
+## Sessão
+
+Access token e refresh token em `localStorage` (`domios.session`),
+partilhados entre separadores. O access token é renovado quando falta menos
+de um minuto para expirar, ou depois de um `401`. A Api roda o refresh token
+em cada uso e termina a sessão se um token já usado voltar: por isso o
+refresh é um só pedido em voo por separador, serializado entre separadores
+com um Web Lock, e dentro do lock relê-se o storage antes de gastar o token
+(`src/auth/session.ts`).
 
 ## Preparar o ambiente
 
 ```bash
 npm install
-cp .env.example .env.local   # ajustar VITE_API_BASE_URL se necessário
+cp .env.example .env.local   # Api local em http://localhost:5028/api/v1
 npm run dev
+npm test                     # Vitest
 ```
 
 `VITE_API_BASE_URL` é gravada no bundle em **build-time** (Vite, não
-runtime) — omissão: a mesma Api de produção já usada pelo
-`domios-scraper` (`https://lavi-system-product-name.taild88dae.ts.net/domiosapi/api/v1`).
+runtime). `.env.example` aponta para a Api local (`dotnet run --project
+src/DomiOS.Api` no repositório `DomiOS`, Postgres de desenvolvimento em
+`localhost:5436`): **nunca usar a Api de produção em desenvolvimento**, o
+login cria contas e sessões reais. Em desenvolvimento a Api não envia
+emails: escreve-os no log, com os links de reset e de confirmação.
+A URL de produção (`https://lavi-system-product-name.taild88dae.ts.net/domiosapi/api/v1`)
+fica só nas variáveis do projeto no Vercel e no build arg do `Dockerfile`.
 
 ## CORS
 
@@ -36,12 +57,10 @@ A `DomiOS.Api` só aceita pedidos cross-origin de origens explicitamente
 configuradas em `Cors:AllowedOrigins` (nunca `AllowAnyOrigin`) — ver
 `Program.cs` no repositório `DomiOS`. Em desenvolvimento local, a origem
 do Vite (`http://localhost:5173`) já está autorizada em
-`appsettings.Development.json`. **Em produção, a origem real de deploy
-deste frontend ainda não está configurada na Api** — assim que o destino
-de deploy estiver decidido, adicionar essa origem a
-`Cors:AllowedOrigins` (via `appsettings.json`/variável de ambiente
-`Cors__AllowedOrigins__0`) no repositório `DomiOS`, senão os pedidos em
-produção falham com erro de CORS.
+`appsettings.Development.json`. Em produção, a origem do Vercel
+(`https://domios-frontend.vercel.app`) está em `Cors__AllowedOrigins__0` no
+`docker-compose.prod.yml` do repositório `DomiOS`; outra origem de deploy
+tem de ser acrescentada lá, senão os pedidos falham com erro de CORS.
 
 ## Build e deploy
 
@@ -51,6 +70,12 @@ docker build -t domios-frontend --build-arg VITE_API_BASE_URL=<url-da-api> .
 docker run --rm -p 8080:8080 domios-frontend
 ```
 
+Em produção o frontend está no Vercel (`https://domios-frontend.vercel.app`,
+origem já autorizada no CORS da Api e usada como `Frontend:BaseUrl` nos
+links dos emails). `vercel.json` reescreve qualquer caminho para
+`index.html`, para os links `/reset-password` e `/verify-email` abrirem
+diretamente.
+
 `Dockerfile` é multi-stage: `node:20-alpine` faz o build, `nginx:alpine`
 serve `dist/` com fallback de SPA (`nginx.conf`) para o React Router
 funcionar em qualquer rota, incluindo depois de recarregar a página.
@@ -59,7 +84,10 @@ funcionar em qualquer rota, incluindo depois de recarregar a página.
 
 ```
 src/api/types.ts      DTOs TypeScript, à mão, a espelhar os DTOs reais da DomiOS.Api
-src/api/client.ts      fetch wrapper fino, uma função por endpoint usado
+src/api/http.ts        fetch + erros Problem Details (ApiError com type e Retry-After)
+src/api/client.ts      catálogos, uma função por endpoint usado
+src/api/auth.ts        rotas /auth anónimas; account.ts as que levam Bearer
+src/auth/              sessão (session.ts, testada), hooks, RequireAuth, mensagens de erro
 src/pages/             uma página por rota
 src/components/        Pagination, PromotionBadge (busca a Promotion só quando existe badge), EventTimeline
 src/App.tsx             rotas (React Router) + navegação

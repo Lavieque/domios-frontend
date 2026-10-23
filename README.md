@@ -39,6 +39,13 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 - **`/despensa/adicionar`** (`?produto=`) — pesquisa no catálogo, quantidade
   (uma embalagem por omissão), local, validade e preço opcionais. Também a
   partir do detalhe do produto.
+- **`/listas`**, **`/listas/:id`** — listas de compras por estado; itens
+  (acrescentar, marcar comprado, remover), mudar nome, concluir, cancelar e
+  reabrir; "Comparar lojas" (`.../store-comparison`: total por loja, com
+  cartão, e divisão da compra; só preços dos últimos 3 dias, e só se mostram
+  lojas com algum item). O que falta no plano da semana e os ingredientes de
+  uma receita (todos ou só o que falta na despensa) vão para uma lista aberta
+  ou para uma nova.
 - **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,
   adenda 2026-10-23 da Api), escolha da casa atual (guardada neste browser,
   por utilizador), membros; criar casa (Europe/Lisbon, EUR).

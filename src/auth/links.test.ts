@@ -9,8 +9,8 @@ describe("links", () => {
 
   it("só aceita caminhos deste site como destino depois do login", () => {
     expect(safeNextPath("/produtos?search=leite")).toBe("/produtos?search=leite");
-    expect(safeNextPath("//evil.example")).toBe("/conta");
-    expect(safeNextPath("https://evil.example")).toBe("/conta");
-    expect(safeNextPath(null)).toBe("/conta");
+    expect(safeNextPath("//evil.example")).toBe("/");
+    expect(safeNextPath("https://evil.example")).toBe("/");
+    expect(safeNextPath(null)).toBe("/");
   });
 });

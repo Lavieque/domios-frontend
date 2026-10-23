@@ -51,16 +51,18 @@ function App() {
           </span>
         </NavLink>
         <nav>
-          <NavLink to="/" end>
-            Visão geral
-          </NavLink>
-          <NavLink to="/produtos">Produtos</NavLink>
-          <NavLink to="/promocoes">Promoções</NavLink>
-          <NavLink to="/receitas">Receitas</NavLink>
           {session ? (
-            <NavLink to="/conta" className="nav-account" title={session.email}>
-              Conta
-            </NavLink>
+            <>
+              <NavLink to="/" end>
+                Visão geral
+              </NavLink>
+              <NavLink to="/produtos">Produtos</NavLink>
+              <NavLink to="/promocoes">Promoções</NavLink>
+              <NavLink to="/receitas">Receitas</NavLink>
+              <NavLink to="/conta" className="nav-account" title={session.email}>
+                Conta
+              </NavLink>
+            </>
           ) : (
             <NavLink to="/entrar" className="nav-account">
               Entrar
@@ -73,26 +75,22 @@ function App() {
 
       <main className="app-main">
         <Routes>
-          <Route path="/" element={<OverviewPage />} />
-          <Route path="/produtos" element={<ProductsPage />} />
-          <Route path="/produtos/:id" element={<ProductDetailPage />} />
-          <Route path="/promocoes" element={<PromotionsPage />} />
-          <Route path="/receitas" element={<RecipesPage />} />
-          <Route path="/receitas/:id" element={<RecipeDetailPage />} />
+          {/* Nada do DomiOS é visível sem sessão, catálogos incluídos. */}
+          <Route element={<RequireAuth />}>
+            <Route path="/" element={<OverviewPage />} />
+            <Route path="/produtos" element={<ProductsPage />} />
+            <Route path="/produtos/:id" element={<ProductDetailPage />} />
+            <Route path="/promocoes" element={<PromotionsPage />} />
+            <Route path="/receitas" element={<RecipesPage />} />
+            <Route path="/receitas/:id" element={<RecipeDetailPage />} />
+            <Route path="/conta" element={<AccountPage />} />
+          </Route>
           <Route path="/entrar" element={<LoginPage />} />
           <Route path="/registar" element={<RegisterPage />} />
           <Route path="/esqueci-password" element={<ForgotPasswordPage />} />
           {/* Caminhos fixados pela Api nos links dos emails (AuthEmails.cs). */}
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
-          <Route
-            path="/conta"
-            element={
-              <RequireAuth>
-                <AccountPage />
-              </RequireAuth>
-            }
-          />
         </Routes>
       </main>
     </div>

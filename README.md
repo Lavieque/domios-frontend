@@ -4,7 +4,10 @@ Frontend do DomiOS: catálogo global (produtos/preços das cadeias reais,
 promoções ativas, receitas) e conta de utilizador. Fala com a DomiOS.Api só
 por HTTP, nunca acede à base de dados.
 
-Os catálogos são de leitura anónima. A conta (login, registo, recuperação de
+Nada é visível sem sessão: todas as páginas, catálogos incluídos, ficam
+atrás do login (`RequireAuth` em `src/App.tsx`); sem sessão, só as páginas
+de conta. A Api continua a servir os catálogos sem autenticação — o bloqueio
+é só neste frontend. A conta (login, registo, recuperação de
 password, confirmação de email) segue a adenda 2026-10-22 de
 `DomiOS_API_Fase3.md`; as rotas `/households/{id}/...` ainda não são usadas.
 Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
@@ -20,7 +23,7 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 - **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta.
 - **`/reset-password`**, **`/verify-email`** — destino dos links dos emails
   (caminhos fixados pela Api, token no fragmento `#token=`).
-- **`/conta`** — protegida: email, estado da confirmação, sair, sair em
+- **`/conta`** — email, estado da confirmação, sair, sair em
   todos os dispositivos.
 
 ## Sessão

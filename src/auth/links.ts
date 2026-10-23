@@ -3,7 +3,7 @@ export function tokenFromHash(hash: string): string | null {
   return new URLSearchParams(hash.replace(/^#/, "")).get("token");
 }
 
-/** Só caminhos deste site: `?next=//outro.site` ou `https://...` voltam à conta. */
+/** Só caminhos deste site: `?next=//outro.site` ou `https://...` voltam à visão geral. */
 export function safeNextPath(next: string | null): string {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/conta";
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
 }

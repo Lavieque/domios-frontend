@@ -7,6 +7,7 @@ import { CreateHouseholdPage } from "./pages/CreateHouseholdPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { HouseholdPage } from "./pages/HouseholdPage";
 import { LoginPage } from "./pages/LoginPage";
+import { PlanPage } from "./pages/PlanPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
@@ -61,6 +62,7 @@ function App() {
               <NavLink to="/produtos">Produtos</NavLink>
               <NavLink to="/promocoes">Promoções</NavLink>
               <NavLink to="/receitas">Receitas</NavLink>
+              <NavLink to="/plano">Plano</NavLink>
               <NavLink to="/casa">Casa</NavLink>
               <NavLink to="/conta" className="nav-account" title={session.email}>
                 Conta
@@ -86,6 +88,7 @@ function App() {
             <Route path="/promocoes" element={<PromotionsPage />} />
             <Route path="/receitas" element={<RecipesPage />} />
             <Route path="/receitas/:id" element={<RecipeDetailPage />} />
+            <Route path="/plano" element={<PlanPage />} />
             <Route path="/casa" element={<HouseholdPage />} />
             <Route path="/casa/nova" element={<CreateHouseholdPage />} />
             <Route path="/conta" element={<AccountPage />} />

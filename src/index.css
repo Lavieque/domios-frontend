@@ -1053,3 +1053,178 @@ main ol li::marker {
 .app-header nav .nav-account {
   color: var(--accent);
 }
+
+/* Plano da semana e ementas prontas. */
+.week-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.week-range {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.week-nav-link {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.day-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 0.9rem 1rem 1rem;
+}
+
+.day-card.is-today {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow);
+}
+
+.day-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  font-size: 17px;
+}
+
+.day-title .muted {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.day-empty {
+  margin: 0;
+  font-size: 14px;
+}
+
+.day-meals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.day-meals li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.day-meals li.is-skipped .meal-title {
+  text-decoration: line-through;
+  color: var(--ink-dim);
+}
+
+.meal-type {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.meal-title {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a.meal-title:hover {
+  text-decoration: underline;
+}
+
+.meal-meta {
+  font-size: 13px;
+}
+
+.meal-actions {
+  display: flex;
+  gap: 0.9rem;
+  font-size: 13px;
+}
+
+.plan-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem;
+}
+
+.suggestion-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.suggestion-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.suggestion-missing {
+  margin: 0;
+  font-size: 13px;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-form .category-select {
+  margin-bottom: 0;
+}
+
+.inline-form input[type="date"],
+.form-field input[type="date"] {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+
+.inline-form .form-error {
+  flex-basis: 100%;
+}
+
+.apply-form {
+  max-width: 28rem;
+}
+
+.apply-form .category-select {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.template-card-description {
+  margin: 0;
+  font-size: 14px;
+}

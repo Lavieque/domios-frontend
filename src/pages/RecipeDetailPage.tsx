@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
+import type { PlannedMealDto } from "../api/planning";
 import { measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
+import { AddToPlanForm } from "../components/AddToPlanForm";
+import { HouseholdGate } from "../household/HouseholdGate";
+import { longDate, startOfWeek, today } from "../plan/dates";
 
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<RecipeDto | null>(null);
+  const [added, setAdded] = useState<PlannedMealDto | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -34,6 +39,34 @@ export function RecipeDetailPage() {
       </p>
       {recipe.imageUrl && <img className="product-image" src={recipe.imageUrl} alt={recipe.title} />}
       {recipe.description && <p style={{ maxWidth: "42rem" }}>{recipe.description}</p>}
+
+      <section className="panel">
+        <h2>Adicionar ao plano</h2>
+        <HouseholdGate
+          withoutHousehold={
+            <p className="muted">
+              Para planear refeições, <Link to="/casa/nova">cria primeiro a tua casa</Link>.
+            </p>
+          }
+        >
+          {(household) => (
+            <>
+              <AddToPlanForm
+                householdId={household.householdId}
+                recipeId={recipe.recipeId}
+                defaultDate={today()}
+                onAdded={setAdded}
+              />
+              {added && (
+                <p className="notice">
+                  Adicionada a {longDate(added.date)}.{" "}
+                  <Link to={`/plano?semana=${startOfWeek(added.date)}`}>Ver o plano dessa semana</Link>
+                </p>
+              )}
+            </>
+          )}
+        </HouseholdGate>
+      </section>
 
       <div className="recipe-detail-grid">
         <div>

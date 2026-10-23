@@ -176,6 +176,52 @@ export const RecipeSource = {
 } as const;
 export type RecipeSource = (typeof RecipeSource)[keyof typeof RecipeSource];
 
+export const DishType = {
+  MainCourse: 0,
+  Soup: 1,
+  Starter: 2,
+  SideDish: 3,
+  Salad: 4,
+  Dessert: 5,
+  Breakfast: 6,
+  Snack: 7,
+  Drink: 8,
+  Sauce: 9,
+  Preserve: 10,
+  Other: 11,
+} as const;
+export type DishType = (typeof DishType)[keyof typeof DishType];
+
+export const dishTypeLabels: Record<DishType, string> = {
+  [DishType.MainCourse]: "Prato principal",
+  [DishType.Soup]: "Sopa",
+  [DishType.Starter]: "Entrada",
+  [DishType.SideDish]: "Acompanhamento",
+  [DishType.Salad]: "Salada",
+  [DishType.Dessert]: "Sobremesa",
+  [DishType.Breakfast]: "Pequeno-almoço",
+  [DishType.Snack]: "Lanche",
+  [DishType.Drink]: "Bebida",
+  [DishType.Sauce]: "Molho",
+  [DishType.Preserve]: "Conserva",
+  [DishType.Other]: "Outro",
+};
+
+export const MainProtein = {
+  Meat: 0,
+  Fish: 1,
+  Seafood: 2,
+  Vegetarian: 3,
+} as const;
+export type MainProtein = (typeof MainProtein)[keyof typeof MainProtein];
+
+export const mainProteinLabels: Record<MainProtein, string> = {
+  [MainProtein.Meat]: "Carne",
+  [MainProtein.Fish]: "Peixe",
+  [MainProtein.Seafood]: "Marisco",
+  [MainProtein.Vegetarian]: "Vegetariano",
+};
+
 export interface QuantityDto {
   amount: number;
   unit: MeasurementUnit;

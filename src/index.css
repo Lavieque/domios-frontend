@@ -181,7 +181,8 @@ a {
 
 .app-header nav {
   display: flex;
-  gap: 1.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
 }
 
 .app-header nav a {

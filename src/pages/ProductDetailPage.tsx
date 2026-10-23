@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct, getProductStoreOffers } from "../api/client";
-import { measurementUnitLabels, type ProductDto, type ProductStoreOfferDto } from "../api/types";
+import { measurementUnitLabels, ProductStatus, type ProductDto, type ProductStoreOfferDto } from "../api/types";
 import { PromotionBadge } from "../components/PromotionBadge";
 import { EventTimeline } from "../components/EventTimeline";
 
@@ -36,6 +36,13 @@ export function ProductDetailPage() {
         Produto
       </p>
       <h1>{product.name}</h1>
+      {product.status === ProductStatus.Active ? (
+        <p>
+          <Link to={`/despensa/adicionar?produto=${product.productId}`}>Adicionar à despensa</Link>
+        </p>
+      ) : (
+        <p className="muted">Produto descontinuado: já não se vende nas lojas acompanhadas.</p>
+      )}
 
       <div className="meta-grid">
         <div className="meta-field">

@@ -8,27 +8,10 @@ import type {
   RecipeDto,
   RecipeSummaryDto,
 } from "./types";
+import { send, type QueryParams } from "./http";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
-if (!BASE_URL) {
-  throw new Error("VITE_API_BASE_URL não está definida — ver .env.example.");
-}
-
-async function get<T>(path: string, params: Record<string, string | number | boolean | undefined> = {}): Promise<T> {
-  const url = new URL(`${BASE_URL}${path}`);
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== "") {
-      url.searchParams.set(key, String(value));
-    }
-  }
-
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`${response.status} ao pedir ${url.pathname}${url.search}`);
-  }
-
-  return (await response.json()) as T;
+function get<T>(path: string, params: QueryParams = {}): Promise<T> {
+  return send<T>(path, { params });
 }
 
 export function searchProducts(

@@ -1475,6 +1475,42 @@ a.meal-title:hover {
   margin-bottom: 0;
 }
 
+.store-breakdown {
+  margin: 0 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.store-breakdown summary {
+  cursor: pointer;
+  padding: 0.6rem 0.85rem;
+  font-weight: 600;
+}
+
+.store-breakdown summary:hover,
+.store-breakdown[open] summary {
+  background: var(--accent-soft);
+}
+
+.store-breakdown > table,
+.store-breakdown > p {
+  margin: 0.75rem 0.85rem;
+  width: calc(100% - 1.7rem);
+}
+
+.breakdown-table td {
+  vertical-align: top;
+}
+
+.breakdown-table .muted {
+  font-size: 13px;
+}
+
+.notice .split-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+}
+
 .inline-notice {
   flex-basis: 100%;
   margin: 0;

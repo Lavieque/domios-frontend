@@ -17,6 +17,7 @@ import {
   type ShoppingListDto,
   type ShoppingListItemDto,
   type StoreComparisonDto,
+  type StoreComparisonStoreDto,
 } from "../api/shopping";
 import { MeasurementUnit, measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
@@ -267,15 +268,29 @@ function ItemList({
   );
 }
 
+/** Unidade base da Api (g, ml) passa a kg/l a partir de 1000. */
+function formatQuantity(amount: number, unit: MeasurementUnit): string {
+  if (unit === MeasurementUnit.Gram && amount >= 1000) return `${quantityFormat.format(amount / 1000)} kg`;
+  if (unit === MeasurementUnit.Milliliter && amount >= 1000) return `${quantityFormat.format(amount / 1000)} l`;
+  return `${quantityFormat.format(amount)} ${measurementUnitLabels[unit]}`;
+}
+
 function Comparison({ comparison, items }: { comparison: StoreComparisonDto; items: ShoppingListItemDto[] }) {
   const labelOf = (itemId: string) => items.find((i) => i.shoppingListItemId === itemId)?.label ?? "?";
   const { split } = comparison;
-  const storeName = (storeId: string) => comparison.stores.find((s) => s.storeId === storeId)?.chainName ?? "?";
   const best = comparison.stores[0];
 
   // A Api devolve todas as lojas abertas, mesmo sem nenhum item; só interessam as que têm algum.
   const stores = comparison.stores.filter((s) => s.coveredItemCount > 0);
   const anyPrice = stores.length > 0;
+
+  // Divisão agrupada por loja, pela ordem do ranking: "No Lidl: Leite, Massa".
+  const splitByStore = comparison.stores
+    .map((store) => ({
+      chainName: store.chainName,
+      labels: split.items.filter((line) => line.storeId === store.storeId).flatMap((line) => line.itemIds.map(labelOf)),
+    }))
+    .filter((group) => group.labels.length > 0);
 
   return (
     <div>
@@ -305,15 +320,22 @@ function Comparison({ comparison, items }: { comparison: StoreComparisonDto; ite
       </table>
       )}
 
+      {stores.map((store) => (
+        <StoreBreakdown key={store.storeId} store={store} labelOf={labelOf} isBest={store.storeId === best?.storeId} />
+      ))}
+
       {split.storeCount > 1 && split.savingVsBestStore > 0 && (
-        <p className="notice">
+        <div className="notice">
           Dividindo a compra por {split.storeCount} lojas: {money.format(split.total)} ({money.format(split.cardTotal)} com cartão),
           menos {money.format(split.savingVsBestStore)} do que tudo no {best?.chainName}.
-          <br />
-          <span className="muted">
-            {split.items.map((line) => `${labelOf(line.itemId)} → ${storeName(line.storeId)}`).join(" · ")}
-          </span>
-        </p>
+          <ul className="split-list">
+            {splitByStore.map((group) => (
+              <li key={group.chainName}>
+                <strong>{group.chainName}:</strong> {group.labels.join(", ")}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {comparison.unpricedItems.length > 0 && (
@@ -325,7 +347,63 @@ function Comparison({ comparison, items }: { comparison: StoreComparisonDto; ite
           . Itens escritos à mão só têm preço quando ligados a um produto ou ingrediente.
         </p>
       )}
-      <p className="muted comparison-note">Preços dos últimos 3 dias nas lojas online; as embalagens são arredondadas para cima.</p>
+      <p className="muted comparison-note">
+        Os preços são das embalagens inteiras que tens de comprar, não da parte que a receita usa: 20 g de arroz contam como um pacote de 1 kg.
+        Itens iguais de várias receitas contam juntos. Preços dos últimos 3 dias nas lojas online.
+      </p>
     </div>
+  );
+}
+
+function StoreBreakdown({
+  store,
+  labelOf,
+  isBest,
+}: {
+  store: StoreComparisonStoreDto;
+  labelOf: (itemId: string) => string;
+  isBest: boolean;
+}) {
+  return (
+    <details className="store-breakdown" open={isBest}>
+      <summary>
+        O que comprar no {store.chainName} · {money.format(store.total)}
+      </summary>
+      <table className="comparison-table breakdown-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Precisas</th>
+            <th>Compras</th>
+            <th className="num">Preço</th>
+          </tr>
+        </thead>
+        <tbody>
+          {store.items.map((line) => (
+            <tr key={line.itemId}>
+              <td>
+                {line.itemIds.map(labelOf).join(" + ")}
+              </td>
+              <td>{formatQuantity(line.requiredAmount, line.requiredUnit)}</td>
+              <td>
+                {line.productName}
+                <div className="muted">
+                  {line.packageCount} × {line.packageQuantity > 0 ? formatQuantity(line.packageQuantity, line.packageUnit) : "embalagem"} a{" "}
+                  {money.format(line.packagePrice)}
+                  {!line.quantityComparable && " · quantidade não comparável, conta 1 embalagem"}
+                </div>
+              </td>
+              <td className="num">
+                {money.format(line.lineTotal)}
+                {line.cardLineTotal < line.lineTotal && <div className="muted">{money.format(line.cardLineTotal)} com cartão</div>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {store.missingItemIds.length > 0 && (
+        <p className="muted">Sem preço no {store.chainName}: {store.missingItemIds.map(labelOf).join(", ")}.</p>
+      )}
+    </details>
   );
 }

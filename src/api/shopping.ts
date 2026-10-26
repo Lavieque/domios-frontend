@@ -5,7 +5,7 @@
 import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
 import type { QuantityDto } from "./pantry";
-import type { PagedResult } from "./types";
+import type { MeasurementUnit, PagedResult } from "./types";
 
 export const ShoppingListStatus = {
   Open: 0,
@@ -160,11 +160,20 @@ export const UnpricedItemReason = {
 } as const;
 export type UnpricedItemReason = (typeof UnpricedItemReason)[keyof typeof UnpricedItemReason];
 
+/** Um grupo de itens iguais (mesmo produto, ou mesmo ingrediente, na mesma dimensão), contado junto. */
 export interface StoreComparisonItemDto {
+  /** Primeiro de `itemIds`. */
   itemId: string;
+  itemIds: string[];
   label: string;
+  /** Soma do grupo, na unidade base (g, ml, un). */
+  requiredAmount: number;
+  requiredUnit: MeasurementUnit;
   productId: string;
   productName: string;
+  /** Embalagem do produto escolhido; 0 quando a loja não a diz. */
+  packageQuantity: number;
+  packageUnit: MeasurementUnit;
   packageCount: number;
   quantityComparable: boolean;
   packagePrice: number;
@@ -202,7 +211,7 @@ export interface StoreComparisonDto {
     bestStoreId: string | null;
     savingVsBestStore: number;
     cardSavingVsBestStore: number;
-    items: { itemId: string; storeId: string; productId: string; lineTotal: number }[];
+    items: { itemId: string; itemIds: string[]; storeId: string; productId: string; lineTotal: number }[];
   };
 }
 

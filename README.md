@@ -42,8 +42,11 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 - **`/listas`**, **`/listas/:id`** — listas de compras por estado; itens
   (acrescentar, marcar comprado, remover), mudar nome, concluir, cancelar e
   reabrir; "Comparar lojas" (`.../store-comparison`: total por loja, com
-  cartão, e divisão da compra; só preços dos últimos 3 dias, e só se mostram
-  lojas com algum item). O que falta no plano da semana e os ingredientes de
+  cartão, e divisão da compra agrupada por loja; só preços dos últimos 3 dias,
+  e só se mostram lojas com algum item). Por loja, "O que comprar no …" mostra
+  cada linha com a quantidade pedida, o produto e as embalagens a comprar; itens
+  iguais de várias receitas vêm juntos numa linha (adenda 2026-10-26 de
+  `DomiOS_API_Fase5.md`). O que falta no plano da semana e os ingredientes de
   uma receita (todos ou só o que falta na despensa) vão para uma lista aberta
   ou para uma nova.
 - **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,

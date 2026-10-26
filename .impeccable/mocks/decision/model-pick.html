@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f0f3f5;--surface:#fafbfc;--ink:#16241f;--dim:#5b6e71;--line:rgba(22,36,31,.14);--a:#2a6a78;--as:#dde8ea;--b:#1e3a5c;--bs:#dfe6ec;--d:#b91c1c}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.4 "Schibsted Grotesk",sans-serif}
+header{display:flex;align-items:center;gap:32px;padding:16px 40px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{font-weight:800;font-size:22px}.brand em{font-style:normal;color:var(--b)}
+nav a{margin-right:22px;color:var(--dim);text-decoration:none;font-weight:500}nav a.on{color:var(--b);font-weight:700}
+main{padding:28px 40px}
+h1{font-size:36px;font-weight:800;margin-bottom:6px}
+.sub{color:var(--dim);margin-bottom:20px}
+.search{display:flex;gap:10px;margin-bottom:22px}.search input{width:420px;padding:10px 14px;border:1px solid var(--line);background:var(--surface);font:inherit}
+.chip{padding:8px 12px;border:1px solid var(--line);background:var(--surface)}.chip.on{background:var(--b);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.tag{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--b);padding:14px 16px 0;display:flex;flex-direction:column;gap:6px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+.tag .name{font-weight:700;min-height:42px}
+.tag .brandn{color:var(--dim);font-size:13px}
+.price{font-size:44px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}.price small{font-size:20px}
+.unit{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.store{font-size:13px}
+.band{margin:8px -16px 0;padding:7px 16px;font-size:12.5px;font-weight:700;background:var(--bs);color:var(--b)}
+.band.low{background:var(--a);color:#fff}.band.hi{background:rgba(185,28,28,.1);color:var(--d)}
+.card{font-size:12px;color:var(--a);font-weight:700}
+</style></head><body>
+<header><div class="brand">Domi<em>OS</em></div><nav><a href="#">Visão geral</a><a class="on" href="#">Produtos</a><a href="#">Promoções</a><a href="#">Receitas</a><a href="#">Plano</a><a href="#">Despensa</a><a href="#">Listas</a></nav></header>
+<main>
+<h1>Produtos</h1><p class="sub">3 214 produtos · preços observados nas lojas</p>
+<div class="search"><input value="leite meio gordo"><span class="chip on">Laticínios</span><span class="chip">Mercearia</span><span class="chip">Frescos</span></div>
+<div class="grid">
+<div class="tag"><div class="name">Leite UHT meio gordo 1 L</div><div class="brandn">Mimosa</div><div class="price">0,89<small> €</small></div><div class="unit">0,89 €/L · Continente</div><div class="card">0,79 € com cartão</div><div class="band low">Mínimo dos últimos 90 dias</div></div>
+<div class="tag"><div class="name">Leite UHT meio gordo 6×1 L</div><div class="brandn">Agros</div><div class="price">5,34<small> €</small></div><div class="unit">0,89 €/L · Pingo Doce</div><div class="card">&nbsp;</div><div class="band">Preço habitual</div></div>
+<div class="tag"><div class="name">Leite meio gordo sem lactose 1 L</div><div class="brandn">Matinal</div><div class="price">1,19<small> €</small></div><div class="unit">1,19 €/L · Auchan</div><div class="card">&nbsp;</div><div class="band hi">Acima da média</div></div>
+<div class="tag"><div class="name">Leite meio gordo 1 L</div><div class="brandn">Milbona</div><div class="price">0,75<small> €</small></div><div class="unit">0,75 €/L · Lidl</div><div class="card">&nbsp;</div><div class="band">Abaixo da média</div></div>
+<div class="tag"><div class="name">Leite meio gordo bio 1 L</div><div class="brandn">Continente Bio</div><div class="price">1,39<small> €</small></div><div class="unit">1,39 €/L · Continente</div><div class="card">&nbsp;</div><div class="band">Histórico insuficiente</div></div>
+<div class="tag"><div class="name">Leite achocolatado 6×200 ml</div><div class="brandn">Ucal</div><div class="price">2,99<small> €</small></div><div class="unit">2,49 €/L · Pingo Doce</div><div class="card">&nbsp;</div><div class="band">Preço habitual</div></div>
+<div class="tag"><div class="name">Bebida de aveia 1 L</div><div class="brandn">Alpro</div><div class="price">2,29<small> €</small></div><div class="unit">2,29 €/L · Auchan</div><div class="card">1,99 € com cartão</div><div class="band low">Mínimo dos últimos 90 dias</div></div>
+<div class="tag"><div class="name">Leite magro 1 L</div><div class="brandn">Gresso</div><div class="price">0,85<small> €</small></div><div class="unit">0,85 €/L · Intermarché</div><div class="card">&nbsp;</div><div class="band">Preço habitual</div></div>
+</div></main></body></html>

@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Impeccable: capturas e scripts locais de revisão
+.impeccable/review/
+.impeccable/scripts/

@@ -1,0 +1,12 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      ".impeccable/mocks/decision/assigned.html",
+      ".impeccable/mocks/decision/model-pick.html",
+      ".impeccable/mocks/decision/challenger-boarding.html",
+      ".impeccable/mocks/decision/canon.html"
+    ],
+    "ignoreValues": []
+  }
+}

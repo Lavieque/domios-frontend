@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="utf-8">
+<style>
+:root{--bg:#f0f3f5;--surface:#fafbfc;--ink:#16241f;--dim:#5b6e71;--line:rgba(22,36,31,.14);--a:#2a6a78;--as:#dde8ea;--b:#1e3a5c}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",sans-serif;display:grid;grid-template-columns:240px 1fr}
+aside{background:var(--surface);border-right:1px solid var(--line);padding:22px 14px}
+.brand{font-weight:700;font-size:20px;padding:0 10px 20px}.brand em{font-style:normal;color:var(--b)}
+aside a{display:block;padding:8px 10px;border-radius:8px;color:var(--dim);text-decoration:none}aside a.on{background:var(--as);color:var(--a);font-weight:600}
+main{padding:28px 36px}
+.top{display:flex;justify-content:space-between;margin-bottom:24px}h1{font-size:28px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 1px 2px rgba(22,36,31,.06),0 8px 24px -12px rgba(22,36,31,.18)}
+.v{font-size:30px;font-weight:700}.l{color:var(--dim);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card h2{font-size:16px;margin-bottom:10px}
+.r{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+</style></head><body>
+<aside><div class="brand">Domi<em>OS</em></div><a class="on" href="#">Visão geral</a><a href="#">Produtos</a><a href="#">Promoções</a><a href="#">Receitas</a><a href="#">Ementas</a><a href="#">Plano</a><a href="#">Despensa</a><a href="#">Listas</a><a href="#">Casa</a><a href="#">Conta</a></aside>
+<main><div class="top"><h1>Visão geral</h1><span>Casa Lavieque ▾</span></div>
+<div class="stats"><div class="card"><div class="v">3 214</div><div class="l">Produtos</div></div><div class="card"><div class="v">412</div><div class="l">Promoções ativas</div></div><div class="card"><div class="v">5 987</div><div class="l">Receitas</div></div><div class="card"><div class="v">37</div><div class="l">Itens na despensa</div></div></div>
+<div class="two"><div class="card"><h2>Promoções a terminar</h2><div class="r"><span>Leite UHT -30%</span><span>termina em 1 dia</span></div><div class="r"><span>Azeite 2 por 1</span><span>termina em 2 dias</span></div><div class="r"><span>Café em grão -25%</span><span>termina em 4 dias</span></div></div>
+<div class="card"><h2>Esta semana</h2><div class="r"><span>Seg · Jantar</span><span>Bacalhau à Brás</span></div><div class="r"><span>Ter · Almoço</span><span>Sopa de legumes</span></div><div class="r"><span>Qua · Jantar</span><span>Frango assado</span></div></div></div>
+</main></body></html>

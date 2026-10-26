@@ -39,7 +39,6 @@ export function HouseholdPage() {
 
   return (
     <div className="page">
-      <p className="eyebrow">Casa</p>
       <h1>{current?.name}</h1>
       {current && <p className="muted">És {memberRoleLabels[current.role].toLowerCase()} desta casa.</p>}
 
@@ -67,6 +66,7 @@ export function HouseholdPage() {
       {household && (
         <>
           <h2>Membros</h2>
+          <div className="table-wrap">
           <table>
             <thead>
               <tr>
@@ -88,6 +88,7 @@ export function HouseholdPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </>
       )}
 

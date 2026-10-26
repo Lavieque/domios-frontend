@@ -58,7 +58,6 @@ export function RegisterPage() {
 
   return (
     <div className="page auth-page">
-      <p className="eyebrow">Conta</p>
       <h1>Criar conta</h1>
 
       <form className="auth-form" onSubmit={handleSubmit}>

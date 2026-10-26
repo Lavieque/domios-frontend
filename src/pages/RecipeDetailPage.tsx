@@ -3,11 +3,21 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
 import type { PlannedMealDto } from "../api/planning";
 import { addItemsFromRecipe, getShoppingList } from "../api/shopping";
-import { measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
+import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
 import { SendToListForm } from "../components/SendToListForm";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { longDate, startOfWeek, today } from "../plan/dates";
+
+const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
+
+function sourceHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www./, "");
+  } catch {
+    return "site de origem";
+  }
+}
 
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -28,21 +38,100 @@ export function RecipeDetailPage() {
     <div className="page">
       <p>
         <button type="button" className="back-link" onClick={() => navigate(-1)}>
-          &larr; Receitas
+          Voltar
         </button>
       </p>
-      <p className="eyebrow" style={{ margin: "0.75rem 0 0.5rem" }}>
-        Receita
-      </p>
-      <h1>{recipe.title}</h1>
-      <p className="muted">
-        {recipeDifficultyLabels[recipe.difficulty]} · {recipe.servings} porções
-        {recipe.prepTimeMinutes && <> · preparação {recipe.prepTimeMinutes} min</>}
-        {recipe.cookTimeMinutes && <> · cozedura {recipe.cookTimeMinutes} min</>}
-      </p>
-      {recipe.imageUrl && <img className="product-image" src={recipe.imageUrl} alt={recipe.title} />}
-      {recipe.description && <p style={{ maxWidth: "42rem" }}>{recipe.description}</p>}
+      <div className={recipe.imageUrl ? "product-hero" : undefined}>
+        {recipe.imageUrl && <img className="product-image" src={recipe.imageUrl} alt={recipe.title} />}
+        <div>
+          <h1>{recipe.title}</h1>
+          <ul className="spec-line">
+            {recipe.dishType !== null && (
+              <li>
+                <span>Prato</span>
+                <strong>{dishTypeLabels[recipe.dishType]}</strong>
+              </li>
+            )}
+            {recipe.mainProtein !== null && (
+              <li>
+                <span>Proteína</span>
+                <strong>{mainProteinLabels[recipe.mainProtein]}</strong>
+              </li>
+            )}
+            <li>
+              <span>Dificuldade</span>
+              <strong>{recipeDifficultyLabels[recipe.difficulty]}</strong>
+            </li>
+            <li>
+              <span>Porções</span>
+              <strong>{recipe.servings}</strong>
+            </li>
+            {recipe.prepTimeMinutes !== null && (
+              <li>
+                <span>Preparação</span>
+                <strong>{recipe.prepTimeMinutes} min</strong>
+              </li>
+            )}
+            {recipe.cookTimeMinutes !== null && (
+              <li>
+                <span>Cozedura</span>
+                <strong>{recipe.cookTimeMinutes} min</strong>
+              </li>
+            )}
+          </ul>
+          {recipe.description && <p className="page-lede">{recipe.description}</p>}
+          {recipe.sourceUrl && (
+            <p>
+              <a href={recipe.sourceUrl} target="_blank" rel="noreferrer">
+                Receita original em {sourceHost(recipe.sourceUrl)}
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
 
+      <div className="recipe-detail-grid">
+        <div>
+          <h2>Ingredientes</h2>
+          <ul className="ingredient-list">
+            {recipe.ingredients
+              .slice()
+              .sort((a, b) => a.sortOrder - b.sortOrder)
+              .map((ingredient) => (
+                <li key={ingredient.recipeIngredientId}>
+                  {/* notes é a linha original da receita, quando a Api a guardou: substitui o resto. */}
+                  <span>
+                    {ingredient.notes ?? ingredient.ingredientName}
+                    {ingredient.isOptional && <span className="muted"> (opcional)</span>}
+                  </span>
+                  {!ingredient.notes && (
+                    <span className="qty">
+                      {quantityFormat.format(ingredient.quantity.amount)} {measurementUnitLabels[ingredient.quantity.unit]}
+                    </span>
+                  )}
+                </li>
+              ))}
+          </ul>
+        </div>
+        <div>
+          <h2>Preparação</h2>
+          <ol className="step-list">
+            {recipe.steps
+              .slice()
+              .sort((a, b) => a.stepNumber - b.stepNumber)
+              .map((step) => (
+                <li key={step.recipeStepId}>
+                  <span>
+                    {step.instruction}
+                    {step.durationMinutes !== null && <span className="step-minutes">{step.durationMinutes} min</span>}
+                  </span>
+                </li>
+              ))}
+          </ol>
+        </div>
+      </div>
+
+      <div className="recipe-actions">
       <section className="panel">
         <h2>Adicionar ao plano</h2>
         <HouseholdGate
@@ -94,32 +183,6 @@ export function RecipeDetailPage() {
         )}
       </HouseholdGate>
 
-      <div className="recipe-detail-grid">
-        <div>
-          <h2 style={{ margin: "0 0 0.85rem", fontSize: "19px" }}>Ingredientes</h2>
-          <ul className="ingredient-list">
-            {recipe.ingredients
-              .slice()
-              .sort((a, b) => a.sortOrder - b.sortOrder)
-              .map((ingredient) => (
-                <li key={ingredient.recipeIngredientId}>
-                  {ingredient.notes ??
-                    `${ingredient.quantity.amount} ${measurementUnitLabels[ingredient.quantity.unit]} ${ingredient.ingredientName}`}
-                </li>
-              ))}
-          </ul>
-        </div>
-        <div>
-          <h2 style={{ margin: "0 0 0.85rem", fontSize: "19px" }}>Preparação</h2>
-          <ol>
-            {recipe.steps
-              .slice()
-              .sort((a, b) => a.stepNumber - b.stepNumber)
-              .map((step) => (
-                <li key={step.recipeStepId}>{step.instruction}</li>
-              ))}
-          </ol>
-        </div>
       </div>
     </div>
   );

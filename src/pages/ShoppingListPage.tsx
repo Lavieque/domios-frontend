@@ -21,6 +21,7 @@ import {
 } from "../api/shopping";
 import { MeasurementUnit, measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
+import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
 import { HouseholdGate } from "../household/HouseholdGate";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
@@ -84,18 +85,26 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   }
 
   const open = list.status === ShoppingListStatus.Open;
+  // Depois de comparar: onde cada item fica mais barato, pela divisão da Api.
+  const cheapestByItem = new Map<string, { chainName: string; lineTotal: number }>();
+  for (const line of comparison?.split.items ?? []) {
+    const store = comparison?.stores.find((st) => st.storeId === line.storeId);
+    if (!store) continue;
+    for (const itemId of line.itemIds) cheapestByItem.set(itemId, { chainName: store.chainName, lineTotal: line.lineTotal });
+  }
   const pending = list.items.filter((item) => !item.isPurchased);
   const purchased = list.items.filter((item) => item.isPurchased);
 
   return (
     <div className="page">
       <Link to="/listas" className="back-link">
-        ← Listas de compras
+        Listas de compras
       </Link>
-      <p className="eyebrow">
-        {household.name} · {shoppingListStatusLabels[list.status]}
-      </p>
       <ListName list={list} onRename={(name) => act(() => renameShoppingList(householdId, listId, name))} />
+      <p className="page-sub">
+        <span className={`status-tag status-${list.status}`}>{shoppingListStatusLabels[list.status]}</span>
+        {household.name} · {pending.length} por comprar de {list.items.length}
+      </p>
 
       {error && (
         <p className="form-error" role="alert">
@@ -104,6 +113,19 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
       )}
 
       {open && <AddItemForm onAdd={(label, amount, unit) => act(() => addShoppingListItem(householdId, listId, { label, quantity: { amount, unit } }))} />}
+
+      {pending.length > 0 && (
+        <section className="panel comparison-panel">
+          <h2>Onde fica mais barato</h2>
+          {!comparison ? (
+            <button type="button" className="button-secondary" onClick={compare} disabled={comparing}>
+              {comparing ? "A comparar…" : "Comparar lojas"}
+            </button>
+          ) : (
+            <Comparison comparison={comparison} items={list.items} />
+          )}
+        </section>
+      )}
 
       {list.items.length === 0 ? (
         <p className="empty-state">
@@ -115,7 +137,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
           {pending.length === 0 ? (
             <p className="muted">Tudo comprado.</p>
           ) : (
-            <ItemList items={pending} open={open} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
+            <ItemList items={pending} open={open} cheapest={cheapestByItem} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
           )}
           {purchased.length > 0 && (
             <>
@@ -143,18 +165,6 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
         )}
       </div>
 
-      {pending.length > 0 && (
-        <section className="panel comparison-panel">
-          <h2>Onde fica mais barato</h2>
-          {!comparison ? (
-            <button type="button" className="button-secondary" onClick={compare} disabled={comparing}>
-              {comparing ? "A comparar…" : "Comparar lojas"}
-            </button>
-          ) : (
-            <Comparison comparison={comparison} items={list.items} />
-          )}
-        </section>
-      )}
     </div>
   );
 }
@@ -238,11 +248,13 @@ function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: M
 function ItemList({
   items,
   open,
+  cheapest,
   onToggle,
   onDelete,
 }: {
   items: ShoppingListItemDto[];
   open: boolean;
+  cheapest?: Map<string, { chainName: string; lineTotal: number }>;
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
 }) {
@@ -257,6 +269,11 @@ function ItemList({
           <span className="muted">
             {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]}
           </span>
+          {cheapest?.get(item.shoppingListItemId) && (
+            <span className="pill pill-good">
+              {cheapest.get(item.shoppingListItemId)!.chainName} · {money.format(cheapest.get(item.shoppingListItemId)!.lineTotal)}
+            </span>
+          )}
           {open && (
             <button type="button" className="link-button" onClick={() => onDelete(item)}>
               Remover
@@ -294,34 +311,41 @@ function Comparison({ comparison, items }: { comparison: StoreComparisonDto; ite
 
   return (
     <div>
-      {!anyPrice && <p className="muted">Nenhuma loja tem preço recente para estes itens.</p>}
+      {!anyPrice && (
+        <p className="muted">
+          Nenhuma loja tem preço recente para {comparison.itemCount === 1 ? "este item" : `estes ${comparison.itemCount} itens`}.
+        </p>
+      )}
       {anyPrice && (
-      <table className="comparison-table">
-        <thead>
-          <tr>
-            <th>Loja</th>
-            <th>Itens com preço</th>
-            <th className="num">Total</th>
-            <th className="num">Com cartão</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stores.map((store) => (
-            <tr key={store.storeId} className={store.storeId === best?.storeId ? "offer-lowest" : ""}>
-              <td>{store.chainName}</td>
-              <td>
-                {store.coveredItemCount} de {comparison.itemCount}
-              </td>
-              <td className="num">{money.format(store.total)}</td>
-              <td className="num">{money.format(store.cardTotal)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <div className="store-grid">
+          {stores.map((store, index) => {
+            const isBest = store.storeId === best?.storeId;
+            const complete = store.coveredItemCount === comparison.itemCount;
+            return (
+              <ShelfLabel
+                key={store.storeId}
+                index={index}
+                best={isBest}
+                band={
+                  <VerdictBand tone={isBest ? "1" : complete ? "3" : "none"}>
+                    {isBest ? "Mais barato" : complete ? "Tem tudo" : `Falta ${comparison.itemCount - store.coveredItemCount}`}
+                  </VerdictBand>
+                }
+              >
+                <div className="label-name">{store.chainName}</div>
+                <div className="label-meta">
+                  {store.coveredItemCount} de {comparison.itemCount} itens com preço
+                </div>
+                <LabelPrice amount={store.total} />
+                {store.cardTotal < store.total && <div className="label-card">{money.format(store.cardTotal)} com cartão</div>}
+              </ShelfLabel>
+            );
+          })}
+        </div>
       )}
 
       {stores.map((store) => (
-        <StoreBreakdown key={store.storeId} store={store} labelOf={labelOf} isBest={store.storeId === best?.storeId} />
+        <StoreBreakdown key={store.storeId} store={store} labelOf={labelOf} />
       ))}
 
       {split.storeCount > 1 && split.savingVsBestStore > 0 && (
@@ -338,19 +362,31 @@ function Comparison({ comparison, items }: { comparison: StoreComparisonDto; ite
         </div>
       )}
 
+      {/* Detalhe recolhido: no corredor a lista de compras tem de caber no primeiro ecrã. */}
       {comparison.unpricedItems.length > 0 && (
-        <p className="muted">
-          Sem preço:{" "}
-          {comparison.unpricedItems
-            .map((item) => `${item.label} (${item.reason === UnpricedItemReason.NoProduct ? "sem produto ligado" : "nenhuma loja vende"})`)
-            .join(", ")}
-          . Itens escritos à mão só têm preço quando ligados a um produto ou ingrediente.
+        <details className="comparison-details">
+          <summary>
+            {comparison.unpricedItems.length === 1 ? "1 item sem preço" : `${comparison.unpricedItems.length} itens sem preço`}
+          </summary>
+          <ul className="unpriced-list">
+            {comparison.unpricedItems.map((item) => (
+              <li key={item.itemId}>
+                {item.label}{" "}
+                <span className="muted">
+                  {item.reason === UnpricedItemReason.NoProduct ? "sem produto ligado" : "nenhuma loja vende"}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="muted">Itens escritos à mão só têm preço quando ligados a um produto ou ingrediente.</p>
+        </details>
+      )}
+      {anyPrice && (
+        <p className="muted comparison-note">
+          Os preços são das embalagens inteiras que tens de comprar, não da parte que a receita usa: 20 g de arroz contam como um pacote de 1 kg.
+          Itens iguais de várias receitas contam juntos. Preços dos últimos 3 dias nas lojas online.
         </p>
       )}
-      <p className="muted comparison-note">
-        Os preços são das embalagens inteiras que tens de comprar, não da parte que a receita usa: 20 g de arroz contam como um pacote de 1 kg.
-        Itens iguais de várias receitas contam juntos. Preços dos últimos 3 dias nas lojas online.
-      </p>
     </div>
   );
 }
@@ -358,17 +394,17 @@ function Comparison({ comparison, items }: { comparison: StoreComparisonDto; ite
 function StoreBreakdown({
   store,
   labelOf,
-  isBest,
 }: {
   store: StoreComparisonStoreDto;
   labelOf: (itemId: string) => string;
-  isBest: boolean;
 }) {
+  // Fechado por defeito: cada item já diz onde é mais barato, e a lista tem de caber no ecrã do corredor.
   return (
-    <details className="store-breakdown" open={isBest}>
+    <details className="store-breakdown">
       <summary>
         O que comprar no {store.chainName} · {money.format(store.total)}
       </summary>
+      <div className="table-wrap">
       <table className="comparison-table breakdown-table">
         <thead>
           <tr>
@@ -401,8 +437,15 @@ function StoreBreakdown({
           ))}
         </tbody>
       </table>
+      </div>
       {store.missingItemIds.length > 0 && (
-        <p className="muted">Sem preço no {store.chainName}: {store.missingItemIds.map(labelOf).join(", ")}.</p>
+        <p className="muted">
+          Sem preço no {store.chainName}:{" "}
+          {store.missingItemIds.length > 3
+            ? `${store.missingItemIds.length} itens`
+            : store.missingItemIds.map(labelOf).join(", ")}
+          .
+        </p>
       )}
     </details>
   );

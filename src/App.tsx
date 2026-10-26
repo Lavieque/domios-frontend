@@ -59,19 +59,27 @@ function App() {
             Domi<em>OS</em>
           </span>
         </NavLink>
-        <nav>
-          {session ? (
-            <>
+        {session && (
+          <nav className="app-nav" aria-label="Principal">
+            <div className="nav-group">
               <NavLink to="/" end>
-                Visão geral
+                Hoje
               </NavLink>
+              <NavLink to="/plano">Plano</NavLink>
+              <NavLink to="/despensa">Despensa</NavLink>
+              <NavLink to="/listas">Listas</NavLink>
+            </div>
+            <div className="nav-group">
               <NavLink to="/produtos">Produtos</NavLink>
               <NavLink to="/promocoes">Promoções</NavLink>
               <NavLink to="/receitas">Receitas</NavLink>
               <NavLink to="/ementas">Ementas</NavLink>
-              <NavLink to="/plano">Plano</NavLink>
-              <NavLink to="/despensa">Despensa</NavLink>
-              <NavLink to="/listas">Listas</NavLink>
+            </div>
+          </nav>
+        )}
+        <nav className="app-nav nav-end" aria-label="Conta">
+          {session ? (
+            <>
               <NavLink to="/casa">Casa</NavLink>
               <NavLink to="/conta" className="nav-account" title={session.email}>
                 Conta
@@ -85,7 +93,11 @@ function App() {
         </nav>
       </header>
 
-      {showVerificationNotice && <EmailVerificationNotice />}
+      {showVerificationNotice && (
+        <div className="app-notice">
+          <EmailVerificationNotice />
+        </div>
+      )}
 
       <main className="app-main">
         <Routes>

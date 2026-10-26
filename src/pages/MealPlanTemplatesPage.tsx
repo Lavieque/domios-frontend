@@ -37,7 +37,6 @@ export function MealPlanTemplatesPage() {
 
   return (
     <div className="page">
-      <p className="eyebrow">Cozinha</p>
       <h1>Ementas prontas</h1>
       <p className="muted">Planos de uma semana, quinzena ou mês para aplicar ao teu plano a partir de um dia.</p>
       <div className="search-wrap">

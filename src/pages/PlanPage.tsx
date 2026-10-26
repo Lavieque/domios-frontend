@@ -90,17 +90,17 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <div className="page">
-      <p className="eyebrow">{household.name}</p>
       <h1>Plano da semana</h1>
+      <p className="page-sub">{household.name}</p>
       <div className="week-nav">
         <button type="button" className="button-secondary" onClick={() => goToWeek(addDays(monday, -7))}>
-          ← Anterior
+          Semana anterior
         </button>
         <span className="week-range">
           {shortDate(monday)} – {longDate(sunday)}
         </span>
         <button type="button" className="button-secondary" onClick={() => goToWeek(addDays(monday, 7))}>
-          Seguinte →
+          Semana seguinte
         </button>
         <Link to="/ementas" className="week-nav-link">
           Aplicar uma ementa pronta

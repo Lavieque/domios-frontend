@@ -25,7 +25,6 @@ export function ForgotPasswordPage() {
 
   return (
     <div className="page auth-page">
-      <p className="eyebrow">Conta</p>
       <h1>Recuperar password</h1>
 
       {sentTo ? (

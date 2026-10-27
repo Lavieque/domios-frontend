@@ -37,7 +37,6 @@ export function LoginPage() {
 
   return (
     <div className="page auth-page">
-      <p className="eyebrow">Conta</p>
       <h1>Entrar</h1>
       {notice && <p className="notice">{notice}</p>}
 

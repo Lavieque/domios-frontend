@@ -59,7 +59,6 @@ export function ResetPasswordPage() {
 
   return (
     <div className="page auth-page">
-      <p className="eyebrow">Conta</p>
       <h1>Definir password nova</h1>
 
       {linkInvalid ? (

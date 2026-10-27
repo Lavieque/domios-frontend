@@ -34,7 +34,6 @@ export function AccountPage() {
 
   return (
     <div className="page auth-page">
-      <p className="eyebrow">Conta</p>
       <h1>A tua conta</h1>
       {notice && <p className="notice">{notice}</p>}
 

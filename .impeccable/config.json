@@ -1,0 +1,18 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      ".impeccable/mocks/decision/assigned.html",
+      ".impeccable/mocks/decision/model-pick.html",
+      ".impeccable/mocks/decision/challenger-boarding.html",
+      ".impeccable/mocks/decision/canon.html"
+    ],
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "rgb(0 0 0 / 0.42)",
+        "createdAt": "2026-10-27T12:01:08.851Z"
+      }
+    ]
+  }
+}

@@ -45,7 +45,6 @@ export function VerifyEmailPage() {
 
   return (
     <div className="page auth-page">
-      <p className="eyebrow">Conta</p>
       <h1>Confirmar email</h1>
 
       {status === "verifying" && <p className="muted loading">A confirmar…</p>}

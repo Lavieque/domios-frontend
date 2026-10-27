@@ -1,12 +1,16 @@
-import type {
-  CategoryDto,
-  DomainEventLogEntryDto,
-  PagedResult,
-  ProductDto,
-  ProductStoreOfferDto,
-  PromotionDto,
-  RecipeDto,
-  RecipeSummaryDto,
+import {
+  dishTypeNames,
+  mainProteinNames,
+  type CategoryDto,
+  type DishType,
+  type DomainEventLogEntryDto,
+  type MainProtein,
+  type PagedResult,
+  type ProductDto,
+  type ProductStoreOfferDto,
+  type PromotionDto,
+  type RecipeDto,
+  type RecipeSummaryDto,
 } from "./types";
 import { send, type QueryParams } from "./http";
 
@@ -39,8 +43,24 @@ export function searchActivePromotions(page = 1, pageSize = 20): Promise<PagedRe
   return get<PagedResult<PromotionDto>>("/promotions", { activeNow: true, page, pageSize });
 }
 
-export function searchRecipes(search: string, page = 1, pageSize = 20): Promise<PagedResult<RecipeSummaryDto>> {
-  return get<PagedResult<RecipeSummaryDto>>("/recipes", { search, page, pageSize });
+export interface RecipeFilters {
+  dishType?: DishType;
+  mainProtein?: MainProtein;
+}
+
+export function searchRecipes(
+  search: string,
+  page = 1,
+  pageSize = 20,
+  filters: RecipeFilters = {},
+): Promise<PagedResult<RecipeSummaryDto>> {
+  return get<PagedResult<RecipeSummaryDto>>("/recipes", {
+    search,
+    page,
+    pageSize,
+    dishType: filters.dishType === undefined ? undefined : dishTypeNames[filters.dishType],
+    mainProtein: filters.mainProtein === undefined ? undefined : mainProteinNames[filters.mainProtein],
+  });
 }
 
 export function getRecipe(recipeId: string): Promise<RecipeDto> {

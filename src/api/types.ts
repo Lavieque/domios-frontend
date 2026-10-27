@@ -76,6 +76,8 @@ export interface ProductDto {
   status: ProductStatus;
   source: ProductSource;
   ingredientId: string | null;
+  /** Produto que substitui este (descontinuado), se a Api o souber. */
+  substitutedByProductId: string | null;
 }
 
 export const StoreOfferAvailability = {
@@ -106,6 +108,110 @@ export interface PriceObservationDto {
   promotionId: string | null;
 }
 
+/** Preço por kg, L ou unidade, calculado pela Api a partir da embalagem. */
+export interface UnitPriceDto {
+  amount: number;
+  currency: string;
+  per: MeasurementUnit;
+}
+
+/** Preço com cartão de cliente (promoção com `requiresCard`). */
+export interface CardPriceDto {
+  amount: number;
+  currency: string;
+  discountPercent: number;
+  promotionId: string;
+  endsAt: string;
+}
+
+// Price Intelligence (DomiOS_API_Fase2.md, adendas 2026-10-15 e 2026-10-22).
+
+export const PriceLabel = {
+  InsufficientHistory: 0,
+  HistoricLow: 1,
+  BelowAverage: 2,
+  Usual: 3,
+  AboveAverage: 4,
+} as const;
+export type PriceLabel = (typeof PriceLabel)[keyof typeof PriceLabel];
+
+export const priceLabelLabels: Record<PriceLabel, string> = {
+  [PriceLabel.InsufficientHistory]: "Histórico insuficiente",
+  [PriceLabel.HistoricLow]: "Mínimo do período",
+  [PriceLabel.BelowAverage]: "Abaixo da média",
+  [PriceLabel.Usual]: "Preço habitual",
+  [PriceLabel.AboveAverage]: "Acima da média",
+};
+
+export const PromotionVerdict = {
+  InsufficientHistory: 0,
+  NoRealDiscount: 1,
+  InflatedReference: 2,
+  Genuine: 3,
+} as const;
+export type PromotionVerdict = (typeof PromotionVerdict)[keyof typeof PromotionVerdict];
+
+export const promotionVerdictLabels: Record<PromotionVerdict, string> = {
+  [PromotionVerdict.InsufficientHistory]: "Sem histórico para verificar o desconto",
+  [PromotionVerdict.NoRealDiscount]: "Sem desconto real face aos 30 dias anteriores",
+  [PromotionVerdict.InflatedReference]: "Preço de referência inflacionado",
+  [PromotionVerdict.Genuine]: "Desconto verdadeiro",
+};
+
+export const PromotionPattern = {
+  InsufficientHistory: 0,
+  Never: 1,
+  Rare: 2,
+  Occasional: 3,
+  Frequent: 4,
+  AlmostAlways: 5,
+} as const;
+export type PromotionPattern = (typeof PromotionPattern)[keyof typeof PromotionPattern];
+
+export const promotionPatternLabels: Record<PromotionPattern, string> = {
+  [PromotionPattern.InsufficientHistory]: "Histórico insuficiente",
+  [PromotionPattern.Never]: "Nunca em promoção",
+  [PromotionPattern.Rare]: "Raramente em promoção",
+  [PromotionPattern.Occasional]: "Em promoção de vez em quando",
+  [PromotionPattern.Frequent]: "Em promoção com frequência",
+  [PromotionPattern.AlmostAlways]: "Quase sempre em promoção",
+};
+
+/** Promoção sem cartão contra o mínimo dos 30 dias anteriores (Diretiva Omnibus). */
+export interface PromotionCheckDto {
+  promotionId: string;
+  announcedDiscountPercent: number | null;
+  priceBefore: number | null;
+  lowest30Days: number | null;
+  realDiscountPercent: number | null;
+  verdict: PromotionVerdict;
+}
+
+/** Semanas ISO observadas em promoção; descreve o passado, não prevê. */
+export interface PromotionFrequencyDto {
+  pattern: PromotionPattern;
+  weeksObserved: number;
+  weeksOnPromotion: number;
+  completePromotions: number;
+  typicalIntervalDays: number | null;
+  since: string | null;
+  windowDays: number;
+}
+
+/** O último preço contra o histórico da própria oferta. Estatísticas a null com InsufficientHistory. */
+export interface PriceInsightDto {
+  label: PriceLabel;
+  current: number;
+  lowest: number | null;
+  highest: number | null;
+  average: number | null;
+  observationCount: number;
+  since: string | null;
+  windowDays: number;
+  promotionCheck: PromotionCheckDto | null;
+  promotionFrequency: PromotionFrequencyDto;
+}
+
 export interface ProductStoreOfferDto {
   storeOfferId: string;
   storeId: string;
@@ -114,6 +220,9 @@ export interface ProductStoreOfferDto {
   chainName: string;
   availability: StoreOfferAvailability;
   latestPrice: PriceObservationDto | null;
+  unitPrice: UnitPriceDto | null;
+  cardPrice: CardPriceDto | null;
+  priceInsight: PriceInsightDto | null;
 }
 
 export const PromotionType = {
@@ -147,6 +256,8 @@ export interface PromotionDto {
   maxQuantity: number | null;
   requiresCard: boolean;
   status: PromotionStatus;
+  /** Percentagem anunciada, quando a Api a conhece (null fora de PercentageOff, em geral). */
+  discountPercent: number | null;
 }
 
 export const RecipeDifficulty = {
@@ -244,6 +355,36 @@ export interface RecipeStepDto {
   durationMinutes: number | null;
 }
 
+/** Como a classificação (dishType/mainProtein) foi obtida. */
+export const ClassificationSource = {
+  Mapped: 0,
+  Inferred: 1,
+  Reviewed: 2,
+} as const;
+export type ClassificationSource = (typeof ClassificationSource)[keyof typeof ClassificationSource];
+
+/** Os nomes que a query string de GET /recipes aceita (`dishType=`, `mainProtein=`). */
+export const dishTypeNames: Record<DishType, string> = {
+  [DishType.MainCourse]: "MainCourse",
+  [DishType.Soup]: "Soup",
+  [DishType.Starter]: "Starter",
+  [DishType.SideDish]: "SideDish",
+  [DishType.Salad]: "Salad",
+  [DishType.Dessert]: "Dessert",
+  [DishType.Breakfast]: "Breakfast",
+  [DishType.Snack]: "Snack",
+  [DishType.Drink]: "Drink",
+  [DishType.Sauce]: "Sauce",
+  [DishType.Preserve]: "Preserve",
+  [DishType.Other]: "Other",
+};
+export const mainProteinNames: Record<MainProtein, string> = {
+  [MainProtein.Meat]: "Meat",
+  [MainProtein.Fish]: "Fish",
+  [MainProtein.Seafood]: "Seafood",
+  [MainProtein.Vegetarian]: "Vegetarian",
+};
+
 export interface RecipeSummaryDto {
   recipeId: string;
   ownerHouseholdId: string | null;
@@ -251,6 +392,11 @@ export interface RecipeSummaryDto {
   difficulty: RecipeDifficulty;
   status: RecipeStatus;
   tags: string[];
+  sourceUrl: string | null;
+  sourceCategory: string | null;
+  dishType: DishType | null;
+  mainProtein: MainProtein | null;
+  classificationSource: ClassificationSource | null;
 }
 
 export interface RecipeDto {
@@ -266,6 +412,11 @@ export interface RecipeDto {
   imageUrl: string | null;
   tags: string[];
   source: RecipeSource;
+  sourceUrl: string | null;
+  sourceCategory: string | null;
+  dishType: DishType | null;
+  mainProtein: MainProtein | null;
+  classificationSource: ClassificationSource | null;
   ingredients: RecipeIngredientDto[];
   steps: RecipeStepDto[];
 }

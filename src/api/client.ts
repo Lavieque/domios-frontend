@@ -73,13 +73,17 @@ export function getEvents(aggregateType: string, aggregateId: string): Promise<D
   return get<DomainEventLogEntryDto[]>("/events", { aggregateType, aggregateId });
 }
 
-/** Uma entrada por oferta em promoção, mais recente primeiro; `chainId` filtra por cadeia. */
+/**
+ * Uma entrada por oferta em promoção, mais recente primeiro; `chainId` filtra
+ * por cadeia e `categoryId` por categoria (com as subcategorias).
+ */
 export function searchCurrentPromotions(
   chainId?: string,
   page = 1,
   pageSize = 20,
+  categoryId?: string,
 ): Promise<PagedResult<CurrentPromotionDto>> {
-  return get<PagedResult<CurrentPromotionDto>>("/promotions/current", { chainId, page, pageSize });
+  return get<PagedResult<CurrentPromotionDto>>("/promotions/current", { chainId, categoryId, page, pageSize });
 }
 
 /** Todas as cadeias, incluindo as fechadas. */

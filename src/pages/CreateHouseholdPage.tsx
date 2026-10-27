@@ -39,7 +39,6 @@ export function CreateHouseholdPage() {
 
   return (
     <div className="page auth-page">
-      <p className="eyebrow">Casa</p>
       <h1>Criar casa</h1>
       <p className="muted">
         A casa junta a despensa, as listas de compras e o plano de refeições. Ficas como administrador e podes

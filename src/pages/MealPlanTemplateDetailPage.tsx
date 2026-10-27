@@ -40,9 +40,8 @@ export function MealPlanTemplateDetailPage() {
   return (
     <div className="page">
       <Link to="/ementas" className="back-link">
-        ← Ementas prontas
+        Ementas prontas
       </Link>
-      <p className="eyebrow">Ementa pronta</p>
       <h1>{template.name}</h1>
       {template.description && <p className="muted">{template.description}</p>}
 

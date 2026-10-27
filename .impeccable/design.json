@@ -1,0 +1,592 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T20:15:29.053Z",
+  "title": "Design System: DomiOS",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "canonical": "#f0f3f5",
+        "tonalRamp": [
+          "oklch(15% 0.004 236.5)",
+          "oklch(26% 0.004 236.5)",
+          "oklch(37% 0.004 236.5)",
+          "oklch(48% 0.004 236.5)",
+          "oklch(59% 0.004 236.5)",
+          "oklch(70% 0.004 236.5)",
+          "oklch(82% 0.004 236.5)",
+          "oklch(95% 0.004 236.5)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Label White",
+        "canonical": "#fafbfc",
+        "tonalRamp": [
+          "oklch(15% 0.002 247.8)",
+          "oklch(26% 0.002 247.8)",
+          "oklch(37% 0.002 247.8)",
+          "oklch(48% 0.002 247.8)",
+          "oklch(59% 0.002 247.8)",
+          "oklch(70% 0.002 247.8)",
+          "oklch(82% 0.002 247.8)",
+          "oklch(95% 0.002 247.8)"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Shelf Grey",
+        "canonical": "#e3e9eb",
+        "tonalRamp": [
+          "oklch(15% 0.007 219.6)",
+          "oklch(26% 0.007 219.6)",
+          "oklch(37% 0.007 219.6)",
+          "oklch(48% 0.007 219.6)",
+          "oklch(59% 0.007 219.6)",
+          "oklch(70% 0.007 219.6)",
+          "oklch(82% 0.007 219.6)",
+          "oklch(95% 0.007 219.6)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#16241f",
+        "tonalRamp": [
+          "oklch(15% 0.022 170.3)",
+          "oklch(26% 0.022 170.3)",
+          "oklch(37% 0.022 170.3)",
+          "oklch(48% 0.022 170.3)",
+          "oklch(59% 0.022 170.3)",
+          "oklch(70% 0.022 170.3)",
+          "oklch(82% 0.022 170.3)",
+          "oklch(95% 0.022 170.3)"
+        ]
+      },
+      "ink-dim": {
+        "role": "neutral",
+        "displayName": "Dim Ink",
+        "canonical": "#5b6e71",
+        "tonalRamp": [
+          "oklch(15% 0.023 208.1)",
+          "oklch(26% 0.023 208.1)",
+          "oklch(37% 0.023 208.1)",
+          "oklch(48% 0.023 208.1)",
+          "oklch(59% 0.023 208.1)",
+          "oklch(70% 0.023 208.1)",
+          "oklch(82% 0.023 208.1)",
+          "oklch(95% 0.023 208.1)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(22, 36, 31, 0.14)",
+        "tonalRamp": [
+          "oklch(15% 0.022 170.3)",
+          "oklch(26% 0.022 170.3)",
+          "oklch(37% 0.022 170.3)",
+          "oklch(48% 0.022 170.3)",
+          "oklch(59% 0.022 170.3)",
+          "oklch(70% 0.022 170.3)",
+          "oklch(82% 0.022 170.3)",
+          "oklch(95% 0.022 170.3)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Shelf Teal",
+        "canonical": "#2a6a78",
+        "tonalRamp": [
+          "oklch(15% 0.068 214.5)",
+          "oklch(26% 0.068 214.5)",
+          "oklch(37% 0.068 214.5)",
+          "oklch(48% 0.068 214.5)",
+          "oklch(59% 0.068 214.5)",
+          "oklch(70% 0.068 214.5)",
+          "oklch(82% 0.068 214.5)",
+          "oklch(95% 0.068 214.5)"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Shelf Teal Tint",
+        "canonical": "#dde8ea",
+        "tonalRamp": [
+          "oklch(15% 0.012 209.8)",
+          "oklch(26% 0.012 209.8)",
+          "oklch(37% 0.012 209.8)",
+          "oklch(48% 0.012 209.8)",
+          "oklch(59% 0.012 209.8)",
+          "oklch(70% 0.012 209.8)",
+          "oklch(82% 0.012 209.8)",
+          "oklch(95% 0.012 209.8)"
+        ]
+      },
+      "accent-2": {
+        "role": "secondary",
+        "displayName": "Label Navy",
+        "canonical": "#1e3a5c",
+        "tonalRamp": [
+          "oklch(15% 0.069 254.3)",
+          "oklch(26% 0.069 254.3)",
+          "oklch(37% 0.069 254.3)",
+          "oklch(48% 0.069 254.3)",
+          "oklch(59% 0.069 254.3)",
+          "oklch(70% 0.069 254.3)",
+          "oklch(82% 0.069 254.3)",
+          "oklch(95% 0.069 254.3)"
+        ]
+      },
+      "accent-2-soft": {
+        "role": "secondary",
+        "displayName": "Label Navy Tint",
+        "canonical": "#dfe6ec",
+        "tonalRamp": [
+          "oklch(15% 0.011 243.7)",
+          "oklch(26% 0.011 243.7)",
+          "oklch(37% 0.011 243.7)",
+          "oklch(48% 0.011 243.7)",
+          "oklch(59% 0.011 243.7)",
+          "oklch(70% 0.011 243.7)",
+          "oklch(82% 0.011 243.7)",
+          "oklch(95% 0.011 243.7)"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Price Red",
+        "canonical": "#b91c1c",
+        "tonalRamp": [
+          "oklch(15% 0.150 27.5)",
+          "oklch(26% 0.150 27.5)",
+          "oklch(37% 0.150 27.5)",
+          "oklch(48% 0.150 27.5)",
+          "oklch(59% 0.150 27.5)",
+          "oklch(70% 0.150 27.5)",
+          "oklch(82% 0.150 27.5)",
+          "oklch(95% 0.150 27.5)"
+        ]
+      },
+      "danger-soft": {
+        "role": "tertiary",
+        "displayName": "Price Red Tint",
+        "canonical": "rgba(185, 28, 28, 0.1)",
+        "tonalRamp": [
+          "oklch(15% 0.150 27.5)",
+          "oklch(26% 0.150 27.5)",
+          "oklch(37% 0.150 27.5)",
+          "oklch(48% 0.150 27.5)",
+          "oklch(59% 0.150 27.5)",
+          "oklch(70% 0.150 27.5)",
+          "oklch(82% 0.150 27.5)",
+          "oklch(95% 0.150 27.5)"
+        ]
+      },
+      "bg-dark": {
+        "role": "neutral",
+        "displayName": "Cool Paper (dark)",
+        "canonical": "#0f3f34",
+        "tonalRamp": [
+          "oklch(15% 0.054 174.4)",
+          "oklch(26% 0.054 174.4)",
+          "oklch(37% 0.054 174.4)",
+          "oklch(48% 0.054 174.4)",
+          "oklch(59% 0.054 174.4)",
+          "oklch(70% 0.054 174.4)",
+          "oklch(82% 0.054 174.4)",
+          "oklch(95% 0.054 174.4)"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Label White (dark)",
+        "canonical": "#17453a",
+        "tonalRamp": [
+          "oklch(15% 0.054 174.6)",
+          "oklch(26% 0.054 174.6)",
+          "oklch(37% 0.054 174.6)",
+          "oklch(48% 0.054 174.6)",
+          "oklch(59% 0.054 174.6)",
+          "oklch(70% 0.054 174.6)",
+          "oklch(82% 0.054 174.6)",
+          "oklch(95% 0.054 174.6)"
+        ]
+      },
+      "surface-2-dark": {
+        "role": "neutral",
+        "displayName": "Shelf Grey (dark)",
+        "canonical": "#1f4f43",
+        "tonalRamp": [
+          "oklch(15% 0.056 174.3)",
+          "oklch(26% 0.056 174.3)",
+          "oklch(37% 0.056 174.3)",
+          "oklch(48% 0.056 174.3)",
+          "oklch(59% 0.056 174.3)",
+          "oklch(70% 0.056 174.3)",
+          "oklch(82% 0.056 174.3)",
+          "oklch(95% 0.056 174.3)"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Ink (dark)",
+        "canonical": "#e7eeec",
+        "tonalRamp": [
+          "oklch(15% 0.008 177.3)",
+          "oklch(26% 0.008 177.3)",
+          "oklch(37% 0.008 177.3)",
+          "oklch(48% 0.008 177.3)",
+          "oklch(59% 0.008 177.3)",
+          "oklch(70% 0.008 177.3)",
+          "oklch(82% 0.008 177.3)",
+          "oklch(95% 0.008 177.3)"
+        ]
+      },
+      "ink-dim-dark": {
+        "role": "neutral",
+        "displayName": "Dim Ink (dark)",
+        "canonical": "#9fb3b0",
+        "tonalRamp": [
+          "oklch(15% 0.023 185.8)",
+          "oklch(26% 0.023 185.8)",
+          "oklch(37% 0.023 185.8)",
+          "oklch(48% 0.023 185.8)",
+          "oklch(59% 0.023 185.8)",
+          "oklch(70% 0.023 185.8)",
+          "oklch(82% 0.023 185.8)",
+          "oklch(95% 0.023 185.8)"
+        ]
+      },
+      "line-dark": {
+        "role": "neutral",
+        "displayName": "Hairline (dark)",
+        "canonical": "rgba(231, 238, 236, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.008 177.3)",
+          "oklch(26% 0.008 177.3)",
+          "oklch(37% 0.008 177.3)",
+          "oklch(48% 0.008 177.3)",
+          "oklch(59% 0.008 177.3)",
+          "oklch(70% 0.008 177.3)",
+          "oklch(82% 0.008 177.3)",
+          "oklch(95% 0.008 177.3)"
+        ]
+      },
+      "accent-dark": {
+        "role": "primary",
+        "displayName": "Shelf Teal (dark)",
+        "canonical": "#5fa9a0",
+        "tonalRamp": [
+          "oklch(15% 0.076 185.5)",
+          "oklch(26% 0.076 185.5)",
+          "oklch(37% 0.076 185.5)",
+          "oklch(48% 0.076 185.5)",
+          "oklch(59% 0.076 185.5)",
+          "oklch(70% 0.076 185.5)",
+          "oklch(82% 0.076 185.5)",
+          "oklch(95% 0.076 185.5)"
+        ]
+      },
+      "accent-soft-dark": {
+        "role": "primary",
+        "displayName": "Shelf Teal Tint (dark)",
+        "canonical": "rgba(95, 169, 160, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.076 185.5)",
+          "oklch(26% 0.076 185.5)",
+          "oklch(37% 0.076 185.5)",
+          "oklch(48% 0.076 185.5)",
+          "oklch(59% 0.076 185.5)",
+          "oklch(70% 0.076 185.5)",
+          "oklch(82% 0.076 185.5)",
+          "oklch(95% 0.076 185.5)"
+        ]
+      },
+      "accent-2-dark": {
+        "role": "secondary",
+        "displayName": "Label Navy (dark)",
+        "canonical": "#6e9bc7",
+        "tonalRamp": [
+          "oklch(15% 0.082 248.6)",
+          "oklch(26% 0.082 248.6)",
+          "oklch(37% 0.082 248.6)",
+          "oklch(48% 0.082 248.6)",
+          "oklch(59% 0.082 248.6)",
+          "oklch(70% 0.082 248.6)",
+          "oklch(82% 0.082 248.6)",
+          "oklch(95% 0.082 248.6)"
+        ]
+      },
+      "accent-2-soft-dark": {
+        "role": "secondary",
+        "displayName": "Label Navy Tint (dark)",
+        "canonical": "rgba(110, 155, 199, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.082 248.6)",
+          "oklch(26% 0.082 248.6)",
+          "oklch(37% 0.082 248.6)",
+          "oklch(48% 0.082 248.6)",
+          "oklch(59% 0.082 248.6)",
+          "oklch(70% 0.082 248.6)",
+          "oklch(82% 0.082 248.6)",
+          "oklch(95% 0.082 248.6)"
+        ]
+      },
+      "danger-dark": {
+        "role": "tertiary",
+        "displayName": "Price Red (dark)",
+        "canonical": "#f87171",
+        "tonalRamp": [
+          "oklch(15% 0.150 22.2)",
+          "oklch(26% 0.150 22.2)",
+          "oklch(37% 0.150 22.2)",
+          "oklch(48% 0.150 22.2)",
+          "oklch(59% 0.150 22.2)",
+          "oklch(70% 0.150 22.2)",
+          "oklch(82% 0.150 22.2)",
+          "oklch(95% 0.150 22.2)"
+        ]
+      },
+      "danger-soft-dark": {
+        "role": "tertiary",
+        "displayName": "Price Red Tint (dark)",
+        "canonical": "rgba(248, 113, 113, 0.14)",
+        "tonalRamp": [
+          "oklch(15% 0.150 22.2)",
+          "oklch(26% 0.150 22.2)",
+          "oklch(37% 0.150 22.2)",
+          "oklch(48% 0.150 22.2)",
+          "oklch(59% 0.150 22.2)",
+          "oklch(70% 0.150 22.2)",
+          "oklch(82% 0.150 22.2)",
+          "oklch(95% 0.150 22.2)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles only."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "The shelf-label price; 34px in the store grid, 32px under 720px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section heads."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Label names, row titles, buttons."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text; ledes 62ch, recipe steps 70ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Verdict bands, pills, meta lines, table headers. Sentence case, no tracking."
+      }
+    },
+    "shadows": [
+      {
+        "name": "float",
+        "value": "0 1px 2px rgba(22, 36, 31, 0.06), 0 8px 24px -12px rgba(22, 36, 31, 0.18)",
+        "purpose": "Floating product search results only. Dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px -12px rgba(0, 0, 0, 0.55)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Page, label and band entrances; label hover lift."
+      },
+      {
+        "name": "page-in",
+        "value": "0.4s; opacity 0 and translateY(6px) to rest",
+        "purpose": "Each page on mount."
+      },
+      {
+        "name": "label-in",
+        "value": "0.45s; opacity 0 and translateY(8px) to rest; delay index x 30ms, index capped at 12",
+        "purpose": "Shelf labels settle in, staggered."
+      },
+      {
+        "name": "band-in",
+        "value": "0.5s; clip-path inset(0 100% 0 0) to inset(0); delay index x 30ms + 120ms",
+        "purpose": "Verdict bands fill left to right."
+      },
+      {
+        "name": "state",
+        "value": "0.15s ease",
+        "purpose": "Colour and border transitions on controls; press translateY(1px) at 0.1s."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.001ms",
+        "purpose": "All animation and transition durations under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "720px"
+      },
+      {
+        "name": "product-hero",
+        "value": "640px"
+      },
+      {
+        "name": "recipe-detail",
+        "value": "760px"
+      },
+      {
+        "name": "overview",
+        "value": "900px"
+      },
+      {
+        "name": "nav-wrap",
+        "value": "1100px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action on a view: teal, turning navy on hover.",
+      "html": "<button class=\"ds-btn-primary\">Adicionar à despensa</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;min-height:42px;padding:.5rem 1.05rem;border:1px solid var(--accent);border-radius:3px;background:var(--accent);color:var(--surface);font:700 15px/1.2 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,transform .1s ease}.ds-btn-primary:hover{background:var(--accent-2);border-color:var(--accent-2)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}@media (prefers-color-scheme:dark){.ds-btn-primary{color:var(--bg)}}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Alternative actions: white with a hairline, ink border on hover.",
+      "html": "<button class=\"ds-btn-secondary\">Cancelar lista</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;min-height:42px;padding:.5rem 1.05rem;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink);font:700 15px/1.2 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;cursor:pointer;transition:border-color .15s ease,transform .1s ease}.ds-btn-secondary:hover{border-color:var(--ink)}.ds-btn-secondary:active{transform:translateY(1px)}.ds-btn-secondary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Search with a drawn magnifier; teal border and soft ring on focus.",
+      "html": "<div class=\"ds-search\"><svg viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8.5\" cy=\"8.5\" r=\"5.75\" stroke=\"currentColor\" stroke-width=\"1.6\"/><path d=\"m13 13 4.5 4.5\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg><input type=\"search\" placeholder=\"Procurar produtos\" aria-label=\"Procurar\"></div>",
+      "css": ".ds-search{position:relative;max-width:30rem}.ds-search svg{position:absolute;left:.8rem;top:50%;width:17px;height:17px;transform:translateY(-50%);color:var(--ink-dim);pointer-events:none}.ds-search input{display:block;width:100%;min-height:42px;padding:.5rem .8rem .5rem 2.4rem;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink);font:450 15px/1.5 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;transition:border-color .15s ease,box-shadow .15s ease}.ds-search input::placeholder{color:var(--ink-dim)}.ds-search input:hover{border-color:color-mix(in srgb,var(--ink) 30%,transparent)}.ds-search input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}"
+    },
+    {
+      "name": "Top Navigation",
+      "kind": "nav",
+      "refersTo": "top-bar",
+      "description": "62px bar with a 6px navy top rail that scrolls away with the page: wordmark, two nav groups split by a hairline, navy active underline. Under 1100px a Menu button opens the groups in a side drawer from the right, over a dimmed page.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-wordmark\">Domi<em>OS</em></span><div class=\"ds-nav-group\"><a href=\"#\" class=\"active\">Hoje</a><a href=\"#\">Plano</a><a href=\"#\">Despensa</a><a href=\"#\">Listas</a></div><div class=\"ds-nav-group\"><a href=\"#\">Produtos</a><a href=\"#\">Promoções</a><a href=\"#\">Receitas</a></div></nav>",
+      "css": ".ds-nav{display:flex;align-items:stretch;gap:1.75rem;height:60px;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--line);font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif}.ds-wordmark{align-self:center;font-weight:800;font-size:21px;letter-spacing:-.03em;color:var(--ink)}.ds-wordmark em{font-style:normal;color:var(--accent-2)}.ds-nav-group{display:flex;gap:1.1rem}.ds-nav-group+.ds-nav-group{padding-left:1.75rem;border-left:1px solid var(--line);margin:14px 0}.ds-nav-group+.ds-nav-group a{margin:-14px 0}.ds-nav a{display:flex;align-items:center;color:var(--ink-dim);text-decoration:none;font-size:14.5px;font-weight:600;border-top:3px solid transparent;border-bottom:3px solid transparent;transition:color .15s ease,border-color .15s ease}.ds-nav a:hover{color:var(--ink)}.ds-nav a.active{color:var(--accent-2);border-bottom-color:var(--accent-2)}.ds-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filter toggles; pressed state fills navy.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\">Peixe</button><button class=\"ds-chip\" aria-pressed=\"false\">Carne</button><button class=\"ds-chip\" aria-pressed=\"false\">Vegetariano</button></div>",
+      "css": ".ds-chips{display:flex;gap:.4rem}.ds-chip{min-height:34px;padding:.3rem .8rem;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink);font:600 14px/1.2 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,color .15s ease}.ds-chip:hover{border-color:var(--ink)}.ds-chip[aria-pressed=\"true\"]{background:var(--accent-2);border-color:var(--accent-2);color:var(--surface)}.ds-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+    },
+    {
+      "name": "Shelf Label",
+      "kind": "card",
+      "refersTo": "shelf-label",
+      "description": "The signature container for anything with a price: navy rail, big price, verdict band.",
+      "html": "<a href=\"#\" class=\"ds-label\"><div class=\"ds-label-body\"><div class=\"ds-label-name\">Arroz Agulha 1 kg</div><div class=\"ds-label-meta\">Sem marca</div><div class=\"ds-label-price\">1,19<small>€</small></div><div class=\"ds-label-unit\"><strong>1,19 €/kg</strong> no Lidl</div><div class=\"ds-label-card\">1,09 € com cartão</div></div><div class=\"ds-verdict\">Preço habitual</div></a>",
+      "css": ".ds-label{display:flex;flex-direction:column;width:15.5rem;background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--accent-2);border-radius:3px;color:inherit;text-decoration:none;overflow:hidden;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;font-variant-numeric:lining-nums proportional-nums;transition:border-color .15s ease,transform .15s cubic-bezier(.16,1,.3,1)}.ds-label:hover{border-color:color-mix(in srgb,var(--ink) 35%,transparent);border-top-color:var(--accent-2);transform:translateY(-2px)}.ds-label:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.ds-label-body{display:flex;flex-direction:column;gap:.2rem;padding:.85rem 1rem .9rem}.ds-label-name{font-weight:700;font-size:15.5px;line-height:1.3;color:var(--ink)}.ds-label-meta,.ds-label-unit{font-size:13.5px;color:var(--ink-dim)}.ds-label-unit strong{color:var(--ink);font-weight:650}.ds-label-price{display:flex;align-items:baseline;gap:.25rem;padding-top:.6rem;font-weight:800;font-size:40px;line-height:1;letter-spacing:-.035em;color:var(--ink)}.ds-label-price small{font-size:.45em;font-weight:700;letter-spacing:0}.ds-label-card{font-size:13.5px;font-weight:700;color:var(--accent)}.ds-verdict{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;font-size:13px;font-weight:700;line-height:1.3;color:var(--ink);background:var(--accent-2-soft)}.ds-verdict::before{content:\"\";width:8px;height:8px;flex:none;background:var(--accent-2)}"
+    },
+    {
+      "name": "Verdict Bands",
+      "kind": "custom",
+      "refersTo": "verdict-historic-low",
+      "description": "PriceLabel 0-4 plus none and urgent tones, each with an 8px square marker; fills left to right.",
+      "html": "<div class=\"ds-bands\"><div class=\"ds-band ds-band-1\">Mínimo dos últimos 90 dias</div><div class=\"ds-band ds-band-2\">Abaixo da média</div><div class=\"ds-band ds-band-3\">Preço habitual</div><div class=\"ds-band ds-band-4\">Acima da média</div><div class=\"ds-band ds-band-0\">Histórico insuficiente</div><div class=\"ds-band ds-band-urgent\">Termina amanhã</div></div>",
+      "css": ".ds-bands{display:flex;flex-direction:column;gap:6px;width:16rem;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif}.ds-band{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;font-size:13px;font-weight:700;line-height:1.3;color:var(--ink);background:var(--surface-2);animation:ds-band-in .5s cubic-bezier(.16,1,.3,1) both}.ds-band::before{content:\"\";width:8px;height:8px;flex:none;background:var(--ink-dim)}.ds-band-1{background:var(--accent);color:var(--surface)}.ds-band-1::before{background:var(--surface)}.ds-band-2{background:var(--accent-soft)}.ds-band-2::before{background:var(--accent)}.ds-band-3{background:var(--accent-2-soft)}.ds-band-3::before{background:var(--accent-2)}.ds-band-4,.ds-band-urgent{background:var(--danger-soft)}.ds-band-4::before,.ds-band-urgent::before{background:var(--danger)}.ds-band-0{color:var(--ink-dim)}@keyframes ds-band-in{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}@media (prefers-color-scheme:dark){.ds-band-1{background:var(--accent-soft);color:var(--ink)}.ds-band-1::before{background:var(--accent)}}@media (prefers-reduced-motion:reduce){.ds-band{animation-duration:.001ms}}"
+    },
+    {
+      "name": "Pills",
+      "kind": "chip",
+      "refersTo": "pill-good",
+      "description": "Small 2px tags; on the shopping list the good pill names the cheapest store and its price.",
+      "html": "<div class=\"ds-pills\"><span class=\"ds-pill ds-pill-good\">Lidl · 1,19 €</span><span class=\"ds-pill ds-pill-navy\">Em 2 dias</span><span class=\"ds-pill ds-pill-danger\">Expira hoje</span><span class=\"ds-pill ds-pill-muted\">Peixe</span></div>",
+      "css": ".ds-pills{display:flex;gap:.4rem;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif}.ds-pill{display:inline-flex;align-items:center;border-radius:2px;padding:.12rem .45rem;font-size:12.5px;font-weight:650;line-height:1.4;white-space:nowrap;font-variant-numeric:lining-nums proportional-nums}.ds-pill-good{background:var(--accent-soft);color:var(--accent)}.ds-pill-navy{background:var(--accent-2-soft);color:var(--accent-2)}.ds-pill-danger{background:var(--danger-soft);color:var(--danger)}.ds-pill-muted{background:var(--surface-2);color:var(--ink-dim)}"
+    },
+    {
+      "name": "Table",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "Hairline rows, 2px ink header rule, numbers right-aligned in proportional figures.",
+      "html": "<div class=\"ds-table-wrap\"><table class=\"ds-table\"><thead><tr><th>Item</th><th>Precisas</th><th class=\"num\">Preço</th></tr></thead><tbody><tr><td>Arroz Agulha</td><td>1 kg</td><td class=\"num\">1,19 €</td></tr><tr><td>Leite meio-gordo</td><td>6 l</td><td class=\"num\">5,34 €</td></tr></tbody></table></div>",
+      "css": ".ds-table-wrap{border:1px solid var(--line);border-radius:4px;background:var(--surface);overflow-x:auto}.ds-table{width:100%;border-collapse:collapse;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;font-variant-numeric:lining-nums proportional-nums}.ds-table th,.ds-table td{text-align:left;font-size:14.5px;padding:.65rem .9rem;border-bottom:1px solid var(--line);color:var(--ink)}.ds-table th{color:var(--ink-dim);font-weight:700;font-size:12.5px;border-bottom:2px solid var(--ink)}.ds-table .num{text-align:right}.ds-table tbody tr:last-child td{border-bottom:none}.ds-table tbody tr:hover td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Shelf Label",
+    "overview": "Every price, item and offer in DomiOS is drawn as a supermarket shelf label: a white card with a 6px navy rail across the top, the product name in bold, the price as the headline in heavy figures with a small euro sign, the unit price and store under it, and a full-width verdict band at the foot saying what the Api learned from 90 days of history. The rest of the app (panels, tables, row lists, forms) is the plain shelving the labels hang on: flat surfaces, 1px hairlines, almost-square corners.\n\nThis is an Operate tool, dense but legible. Planning happens at a desk and the shopping list is used one-handed in the aisle, so type is large for the price and calm everywhere else, and controls are at least 42px tall (list checkboxes 22px with a 32px hit row). The palette is a fixed brand commitment (see PRODUCT.md): teal and navy on cool paper in light mode, the same roles on deep green in dark mode. Redesigns change layout, type and components, never these values.\n\nThe world rejects the soft-card dashboard: no stat tiles, no pastel status pills as the main voice, no eyebrows above headings, no serif and no monospace costume.",
+    "keyCharacteristics": [
+      "Price is the headline: 800-weight figures at 40px (32px on phone), lining and proportional.",
+      "A 6px navy rail tops every label and day card; teal replaces it only for the best option.",
+      "Verdict bands close each label, filling left to right on load.",
+      "Flat surfaces, 1px hairlines, corners of 2-4px.",
+      "One family, Schibsted Grotesk, at 450 body to 800 display."
+    ],
+    "rules": [
+      {
+        "name": "The Fixed Palette Rule",
+        "body": "The colour tokens in `:root` and the dark block are the user's brand commitment. Do not add, tune or replace them; express new states with the existing tokens and their tints.",
+        "section": "colors"
+      },
+      {
+        "name": "The Good Now Rule",
+        "body": "Teal means \"this is the good choice right now\": historic low, cheapest store, today, the primary action. Structure and neutral emphasis use navy or ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Proportional Figures Rule",
+        "body": "Figures are lining and proportional everywhere (`font-variant-numeric: lining-nums proportional-nums`), including tables, dates and timestamps. Schibsted Grotesk's tabular comma takes a full figure cell and splits \"1,19\" into \"1 , 19\". Tables align numeric columns right instead of relying on tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Eyebrow Rule",
+        "body": "Headings stand alone. No small uppercase kicker or tracked label above a title.",
+        "section": "typography"
+      },
+      {
+        "name": "The Aisle Rule",
+        "body": "The shopping list must fit the first phone screen: the store comparison is compact, per-store breakdowns are closed by default, unpriced items sit behind a single disclosure, and every item row shows a \"Chain · €\" pill for its cheapest store, so no breakdown needs opening to shop.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Shelf Rule",
+        "body": "Surfaces are flat at rest and on hover. Shadow is reserved for something that genuinely floats over other content.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do make the price the largest thing on any label (800, 40px; 32px on phone) with the currency at 0.45em.",
+      "Do end every offer that has a `priceInsight` with a verdict band, and every label with the 6px rail.",
+      "Do use `lining-nums proportional-nums` for every figure, tables and dates included, and right-align numeric table columns.",
+      "Do keep teal for \"good now\" (historic low, cheapest store, today, primary action) and navy for structure.",
+      "Do keep controls at least 42px tall and shopping list rows at least 56px.",
+      "Do keep the shopping list's store breakdowns closed by default and unpriced items behind a disclosure.",
+      "Do draw icons as inline SVG or CSS shapes (magnifier, select chevron, band marker, disclosure chevron)."
+    ],
+    "donts": [
+      "Don't change, add to or tune the colour tokens.",
+      "Don't use tabular figures; the tabular comma splits \"1,19\".",
+      "Don't put eyebrows or kickers above headings.",
+      "Don't use a coloured border-left as an accent; the only side border is the neutral hairline between nav groups.",
+      "Don't use emoji or text glyphs as icons, or gradient text.",
+      "Don't add shadows to labels, panels or cards, or round corners past 4px.",
+      "Don't add a second typeface, a serif or a monospace costume.",
+      "Don't build stat tiles or soft dashboard cards; numbers live on shelf labels or in a plain catalog line."
+    ]
+  }
+}

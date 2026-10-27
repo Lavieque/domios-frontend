@@ -14,12 +14,18 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 
 ## Páginas
 
-- **`/produtos`** — pesquisa, lista paginada, detalhe com preço por
-  cadeia/loja (`GET /products/{id}/store-offers`) e histórico de eventos
+- **`/`** (Hoje) — próximos 7 dias do plano, o que usar primeiro da despensa,
+  listas abertas e promoções a terminar; sem casa, só o catálogo.
+- **`/produtos`** — pesquisa, etiquetas com o preço mais baixo, €/kg, preço com
+  cartão e veredicto do histórico (`priceInsight`); detalhe com uma etiqueta por
+  loja (`GET /products/{id}/store-offers`: régua mínimo/média/máximo, verificação
+  Omnibus, frequência de promoção, produto substituto) e histórico de eventos
   do produto (`GET /events?aggregateType=Product&aggregateId=`).
-- **`/promocoes`** — promoções ativas (`GET /promotions?activeNow=true`).
-- **`/receitas`** — pesquisa, lista paginada, detalhe com ingredientes e
-  passos.
+- **`/promocoes`** — promoções ativas (`GET /promotions?activeNow=true`), com o
+  desconto anunciado (`discountPercent`) e o prazo.
+- **`/receitas`** — pesquisa, filtros por tipo de prato e proteína
+  (`dishType`, `mainProtein`), detalhe com ingredientes, passos e link para a
+  receita original (`sourceUrl`).
 - **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta.
 - **`/reset-password`**, **`/verify-email`** — destino dos links dos emails
   (caminhos fixados pela Api, token no fragmento `#token=`).
@@ -121,11 +127,17 @@ src/api/client.ts      catálogos, uma função por endpoint usado
 src/api/auth.ts        rotas /auth anónimas; account.ts as que levam Bearer
 src/auth/              sessão (session.ts, testada), hooks, RequireAuth, mensagens de erro
 src/pages/             uma página por rota
-src/components/        Pagination, PromotionBadge (busca a Promotion só quando existe badge), EventTimeline
+src/components/        ShelfLabel (etiqueta de preço, faixa do veredicto, régua do histórico), PromotionLabel,
+                       SearchField, Pagination, PromotionBadge (busca a Promotion só quando existe badge), EventTimeline
+src/catalog/offers.ts  ofertas por produto (cache por sessão de página), formatação de preços e €/kg
 src/App.tsx             rotas (React Router) + navegação
 ```
 
 Sem framework de UI/CSS — CSS simples à mão (`src/index.css`), com
-suporte a tema claro/escuro via `prefers-color-scheme`. Sem geração
+suporte a tema claro/escuro via `prefers-color-scheme`. O sistema visual
+(etiqueta de prateleira, Schibsted Grotesk servida pelo bundle via
+`@fontsource-variable`) está em `DESIGN.md`; as cores são os tokens de
+`:root` e não mudam. Na lista de produtos, `GET /products` não traz preços:
+cada etiqueta lê `GET /products/{id}/store-offers` (20 pedidos por página). Sem geração
 automática de cliente Api a partir do OpenAPI — 3 páginas não
 justificam essa máquina.

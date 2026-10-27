@@ -58,8 +58,8 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <div className="page">
-      <p className="eyebrow">{household.name}</p>
       <h1>Listas de compras</h1>
+      <p className="page-sub">{household.name}</p>
 
       <form className="inline-form new-list-form" onSubmit={handleCreate}>
         <input type="text" aria-label="Nome da lista" placeholder="Nome (opcional)" maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />

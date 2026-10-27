@@ -1,8 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
-import { measurementUnitLabels, type CategoryDto, type ProductDto } from "../api/types";
+import { measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
+import { money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { Pagination } from "../components/Pagination";
+import { SearchField } from "../components/SearchField";
+import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
+
+const count = new Intl.NumberFormat("pt-PT");
+const PAGE_SIZE = 20;
 
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,7 +55,7 @@ export function ProductsPage() {
 
   useEffect(() => {
     setLoading(true);
-    searchProducts(search, page, 20, categoryId ?? undefined)
+    searchProducts(search, page, PAGE_SIZE, categoryId ?? undefined)
       .then((result) => {
         setProducts(result.items);
         setTotal(result.total);
@@ -59,70 +65,88 @@ export function ProductsPage() {
 
   return (
     <div className="page">
-      <p className="eyebrow">Catálogo</p>
       <h1>Produtos</h1>
-      <div className="search-wrap">
-        <input
-          type="search"
+      <p className="page-sub">Preços observados nas lojas, com o veredicto do histórico de cada oferta.</p>
+
+      <div className="toolbar">
+        <SearchField
+          label="Pesquisar produtos"
           placeholder="Pesquisar por nome ou marca…"
           value={search}
-          onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
+          onChange={(value) => applyFilters({ search: value, page: 1 })}
         />
+        <select
+          className="category-select"
+          aria-label="Categoria"
+          value={categoryId ?? ""}
+          onChange={(e) => applyFilters({ categoryId: e.target.value || null, page: 1 })}
+        >
+          <option value="">Todas as categorias</option>
+          {topLevelCategories.map((category) => (
+            <option key={category.categoryId} value={category.categoryId}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <select
-        className="category-select"
-        value={categoryId ?? ""}
-        onChange={(e) => applyFilters({ categoryId: e.target.value || null, page: 1 })}
-      >
-        <option value="">Todas as categorias</option>
-        {topLevelCategories.map((category) => (
-          <option key={category.categoryId} value={category.categoryId}>
-            {category.name}
-          </option>
-        ))}
-      </select>
-
-      <p className="results-count">{total} resultados</p>
-
-      {loading && <p className="muted loading">A carregar…</p>}
+      <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} resultados`}</p>
 
       {!loading && products.length === 0 ? (
-        <p className="empty-state">Sem resultados.</p>
+        <p className="empty-state">Sem resultados para esta pesquisa.</p>
       ) : (
         !loading && (
-          <table className="products-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Marca</th>
-                <th>Categoria</th>
-                <th>Embalagem</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product.productId}>
-                  <td>
-                    <Link to={`/produtos/${product.productId}`} className="table-link">
-                      {product.name}
-                    </Link>
-                  </td>
-                  <td>{product.brand ?? "—"}</td>
-                  <td>
-                    <span className="pill pill-muted">{product.category.name}</span>
-                  </td>
-                  <td className="num">
-                    {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="label-grid">
+            {products.map((product, index) => (
+              <ProductLabel key={product.productId} product={product} index={index} />
+            ))}
+          </div>
         )
       )}
 
-      <Pagination page={page} pageSize={20} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+      <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
     </div>
+  );
+}
+
+/** O produto com a oferta mais barata que a Api conhece (GET /products não traz preços). */
+function ProductLabel({ product, index }: { product: ProductDto; index: number }) {
+  const offers = useOffers(product.productId);
+  const priced = offers ? sortOffers(offers).filter((offer) => offer.latestPrice) : [];
+  const cheapest = priced[0];
+  const unit = cheapest ? unitPriceLabel(cheapest) : null;
+
+  let band;
+  if (product.status === ProductStatus.Discontinued) band = <VerdictBand tone="none">Descontinuado</VerdictBand>;
+  else if (offers === undefined) band = <VerdictBand tone="none">A ler histórico…</VerdictBand>;
+  else if (cheapest) band = <VerdictBand insight={cheapest.priceInsight} />;
+  else band = <VerdictBand tone="none">Sem preço observado</VerdictBand>;
+
+  return (
+    <ShelfLabel to={`/produtos/${product.productId}`} index={index} band={band}>
+      <div className="label-head">
+        <div>
+          <div className="label-name">{product.name}</div>
+          <div className="label-meta">
+            {product.brand ?? "Sem marca"} · {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
+          </div>
+        </div>
+        {product.imageUrl && <img className="label-thumb" src={product.imageUrl} alt="" loading="lazy" />}
+      </div>
+      {(offers === undefined || cheapest) && (
+        <LabelPrice amount={offers === undefined ? undefined : cheapest?.latestPrice?.price.amount} from={priced.length > 1} />
+      )}
+      {cheapest && (
+        <div className="label-unit">
+          {unit && <strong>{unit}</strong>}
+          {unit && " · "}
+          {cheapest.chainName}
+          {priced.length > 1 && ` · ${priced.length} lojas`}
+        </div>
+      )}
+      {cheapest?.cardPrice && (
+        <div className="label-card">{money.format(cheapest.cardPrice.amount)} com cartão</div>
+      )}
+    </ShelfLabel>
   );
 }

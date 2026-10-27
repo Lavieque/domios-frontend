@@ -1,0 +1,108 @@
+{
+  "title": "DomiOS: escolher o mundo visual",
+  "question": "Cores fixas (teal, navy, superfícies atuais). Muda tipo, densidade, composição e um gesto próprio. Escolhe, troca ou pede outra mão.",
+  "options": [
+    {
+      "id": "assigned",
+      "kind": "assigned",
+      "label": "Painel de azulejo",
+      "kicker": "THE ROLL",
+      "lineage": "Painéis de azulejo de padrão português, módulo quadrado e cercadura",
+      "thesis": "A casa lida como um painel de azulejos: cada dia é um módulo quadrado e o padrão só se fecha quando a semana está tratada.",
+      "palette": ["#f0f3f5", "#fafbfc", "#1e3a5c", "#2a6a78", "#16241f"],
+      "materials": ["módulo quadrado", "motivo de quartos de círculo", "cercadura em linha fina"],
+      "viewport": "Rail navy à esquerda com cercadura teal; Visão geral abre com a semana como painel de 7 azulejos (quartos = refeições planeadas), depois o que usar primeiro e listas abertas.",
+      "risk": "Se o motivo vira ornamento em vez de estado, lê-se como souvenir; só fica onde carrega dados.",
+      "raised": [
+        {"from": "challenger-splitflap", "raise": "Colunas fixas em células tabulares: preços e quantidades nunca saltam de lugar entre linhas."},
+        {"from": "challenger-wayfinding", "raise": "Uma mensagem por linha e só a próxima decisão: cada módulo diz uma coisa."},
+        {"from": "challenger-metro", "raise": "Escala de tipo com coragem: preços e datas em tamanho de cartaz, legenda pequena ao lado."},
+        {"from": "challenger-orienteering", "raise": "Teal reservado para o agora (hoje, mais barato, ativo); o resto em navy e tinta."}
+      ],
+      "html": ".impeccable/mocks/decision/assigned.html"
+    },
+    {
+      "id": "model-pick",
+      "kind": "pick",
+      "label": "Etiqueta de prateleira",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Etiquetas de preço de supermercado (preço, €/kg obrigatório, código)",
+      "thesis": "Cada produto, item e oferta é uma etiqueta de prateleira: preço grande, €/kg por baixo, veredicto do histórico numa faixa.",
+      "palette": ["#fafbfc", "#16241f", "#2a6a78", "#1e3a5c", "#b91c1c"],
+      "materials": ["etiqueta recortada", "faixa de veredicto", "números tabulares grandes"],
+      "viewport": "Top bar compacta; Produtos e Listas em grelha de etiquetas com preço, €/kg e faixa do histórico de 90 dias.",
+      "risk": "Leitura literal do tema, onde a maioria das apps de preços aterra; cansa nas páginas sem preço.",
+      "html": ".impeccable/mocks/decision/model-pick.html"
+    },
+    {
+      "id": "challenger-boarding",
+      "kind": "challenger",
+      "catalogId": "vernacular-ephemera-boarding-pass-and-gate-board",
+      "label": "Cartão de embarque e painel de partidas",
+      "verdict": "competitive",
+      "lineage": "Boarding pass segmentado e painel de portas",
+      "thesis": "A despensa é um painel de partidas ordenado pela validade (FIFO); cada oferta um cartão segmentado.",
+      "palette": ["#fafbfc", "#16241f", "#5b6e71", "#2a6a78", "#b91c1c"],
+      "materials": ["segmentos rotulados", "grelha de colunas fixa", "cor de alerta só para mudanças"],
+      "viewport": "Top bar; Visão geral como painel do que sai primeiro da despensa.",
+      "case": "Funde bem com FIFO e comparação de lojas; perde em identificação: a casa não se reconhece num aeroporto.",
+      "risk": "Fora da despensa força uma metáfora de viagem em receitas e plano.",
+      "html": ".impeccable/mocks/decision/challenger-boarding.html",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-boarding-pass-and-gate-board-hero.webp"
+    },
+    {
+      "id": "challenger-splitflap", "kind": "challenger", "catalogId": "signals-instruments-split-flap-concourse",
+      "label": "Painel split-flap", "verdict": "declined", "lineage": "Painel de estação",
+      "thesis": "Linhas vivas ordenadas no tempo.", "palette": ["#16241f", "#fafbfc", "#1e3a5c"], "materials": ["flaps", "células fixas"],
+      "viewport": "Tabela em cascata.", "risk": "Costume de estação num ecrã de cozinha.",
+      "case": "Perde nos dois eixos: a casa não se revê e a cascata atrapalha a leitura de preços.",
+      "kept": "Colunas fixas em células tabulares."
+    },
+    {
+      "id": "challenger-wayfinding", "kind": "challenger", "catalogId": "wayfinding-cartography-signage-terminal-yellow-wayfinding",
+      "label": "Sinalética de aeroporto", "verdict": "declined", "lineage": "Faixas amarelas de terminal",
+      "thesis": "Só a próxima decisão.", "palette": ["#1e3a5c", "#fafbfc", "#16241f"], "materials": ["faixas", "pictogramas"],
+      "viewport": "Faixa sticky com o próximo passo.", "risk": "O amarelo é a alma e as cores estão fixas.",
+      "case": "Perde nos dois: sem o amarelo resta pouco, e o terminal não é da casa.",
+      "kept": "Uma mensagem por linha, só a próxima decisão."
+    },
+    {
+      "id": "challenger-metro", "kind": "challenger", "catalogId": "digital-design-canon-metro-typographic-tiles",
+      "label": "Metro, tiles tipográficos", "verdict": "declined", "lineage": "Interface Metro",
+      "thesis": "Tipo gigante como interface.", "palette": ["#16241f", "#2a6a78", "#fafbfc"], "materials": ["tiles planos", "minúsculas gigantes"],
+      "viewport": "Panorama horizontal.", "risk": "O panorama esconde tarefas.",
+      "case": "Perde nos dois: navegação panorâmica prejudica tarefas repetidas.",
+      "kept": "Escala de tipo do rodapé ao cartaz."
+    },
+    {
+      "id": "challenger-orienteering", "kind": "challenger", "catalogId": "notation-diagram-systems-orienteering-map",
+      "label": "Mapa de orientação", "verdict": "declined", "lineage": "Mapas ISOM",
+      "thesis": "Terreno fixo, percurso por cima.", "palette": ["#fafbfc", "#1e3a5c", "#2a6a78"], "materials": ["contornos", "percurso"],
+      "viewport": "Mapa com percurso.", "risk": "Sem relação com comida.",
+      "case": "Perde nos dois: a casa não se revê num mapa de corrida.",
+      "kept": "Uma cor reservada só para o percurso ativo."
+    },
+    {
+      "id": "challenger-feed", "kind": "challenger", "catalogId": "pop-culture-shelf-vertical-video-feed-surface",
+      "label": "Feed vertical", "verdict": "declined", "lineage": "Feed de vídeo",
+      "thesis": "Um item ocupa tudo.", "palette": ["#16241f", "#fafbfc"], "materials": ["media full-bleed", "rail de glifos"],
+      "viewport": "Um item por ecrã.", "risk": "Não há imagens nos dados.",
+      "case": "Perde nos dois: sem media, e a gestão precisa de listas densas.",
+      "kept": "Um foco por momento no telemóvel."
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code" },
+  "canon": true,
+  "canonCard": {
+    "kind": "canon",
+    "label": "O padrão da categoria",
+    "thesis": "App de casa e compras como se espera: sidebar, cards, tabelas limpas.",
+    "palette": ["#f0f3f5", "#fafbfc", "#2a6a78", "#1e3a5c"],
+    "materials": ["grelha limpa", "cards com sombra suave"],
+    "viewport": "Sidebar clara, header com casa atual, cards de resumo e tabelas.",
+    "risk": "Indistinguível de qualquer dashboard por desenho.",
+    "html": ".impeccable/mocks/decision/canon.html"
+  },
+  "steer": true
+}

@@ -98,10 +98,10 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
   return (
     <div className="page auth-page">
       <Link to="/despensa" className="back-link">
-        ← Despensa
+        Despensa
       </Link>
-      <p className="eyebrow">{household.name}</p>
       <h1>Adicionar à despensa</h1>
+      <p className="page-sub">{household.name}</p>
 
       {product ? (
         <p className="notice">

@@ -21,7 +21,7 @@ import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
-import { daysBetween, longDate, today } from "../plan/dates";
+import { daysBetween, longDate, shortDate, today } from "../plan/dates";
 
 const PAGE_SIZE = 50;
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
@@ -52,7 +52,7 @@ function ExpiryLabel({ expiresAt }: { expiresAt: string | null }) {
   if (days < 0) return <span className="pill pill-danger">Expirou a {longDate(expiresAt)}</span>;
   if (days === 0) return <span className="pill pill-danger">Expira hoje</span>;
   if (days <= 3) return <span className="pill pill-warning">Expira em {days} {days === 1 ? "dia" : "dias"}</span>;
-  return <span>{longDate(expiresAt)}</span>;
+  return <span>Até {shortDate(expiresAt)}</span>;
 }
 
 function Pantry({ household }: { household: CallerHouseholdDto }) {
@@ -118,8 +118,8 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <div className="page">
-      <p className="eyebrow">{household.name}</p>
       <h1>Despensa</h1>
+      <p className="page-sub">{household.name}</p>
       {notice && <p className="notice">{notice}</p>}
 
       <div className="filter-row">

@@ -7,6 +7,12 @@
       ".impeccable/mocks/decision/challenger-boarding.html",
       ".impeccable/mocks/decision/canon.html"
     ],
-    "ignoreValues": []
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "rgb(0 0 0 / 0.42)",
+        "createdAt": "2026-10-27T12:01:08.851Z"
+      }
+    ]
   }
 }

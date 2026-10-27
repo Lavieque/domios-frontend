@@ -205,16 +205,15 @@ td.num,
   min-height: 100vh;
 }
 
+/* O cabeçalho é a régua da prateleira: filete navy por cima, sai com a página ao fazer scroll. */
 .app-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   display: flex;
   align-items: center;
   gap: 2rem;
   padding: 0 clamp(16px, 3vw, 40px);
-  height: 60px;
+  height: 62px;
   background: var(--surface);
+  border-top: var(--rail) solid var(--accent-2);
   border-bottom: 1px solid var(--line);
 }
 
@@ -262,13 +261,26 @@ td.num,
 .nav-group + .nav-group {
   padding-left: 1.75rem;
   border-left: 1px solid var(--line);
-  margin: 14px 0;
-  padding-top: 0;
-  align-items: stretch;
+  margin: 16px 0;
 }
 
 .nav-group + .nav-group a {
-  margin: -14px 0;
+  margin: -16px 0;
+}
+
+/* Os títulos dos grupos só se veem no painel; no desktop ficam para leitores de ecrã. */
+.nav-group-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.nav-group-account,
+.menu-toggle {
+  display: none;
 }
 
 .app-nav a {
@@ -279,9 +291,9 @@ td.num,
   font-size: 14.5px;
   font-weight: 600;
   white-space: nowrap;
-  border-bottom: 3px solid transparent;
-  border-top: 3px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  /* Sublinhado em sombra interior, para o link não ter borda. */
+  box-shadow: inset 0 -3px 0 transparent;
+  transition: color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 .app-nav a:hover {
@@ -290,7 +302,7 @@ td.num,
 
 .app-nav a.active {
   color: var(--accent-2);
-  border-bottom-color: var(--accent-2);
+  box-shadow: inset 0 -3px 0 var(--accent-2);
 }
 
 .app-nav.nav-end {
@@ -313,39 +325,124 @@ td.num,
   .app-header {
     flex-wrap: wrap;
     height: auto;
-    gap: 0;
-    padding-top: 10px;
+    min-height: 62px;
+    gap: 0 1rem;
   }
 
-  .app-nav {
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-left: auto;
+    min-height: 40px;
+    padding: 0 0.85rem;
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  .menu-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .menu-toggle[aria-expanded="true"] {
+    background: var(--surface-2);
+  }
+
+  /* Com sessão, Casa e Conta passam para o painel. */
+  .app-nav.nav-end:not(.nav-end-guest) {
+    display: none;
+  }
+
+  .app-nav#app-menu {
+    display: none;
     order: 3;
     flex-basis: 100%;
-    overflow-x: auto;
-    gap: 1.25rem;
-    margin: 6px calc(-1 * clamp(16px, 3vw, 40px)) 0;
-    padding: 0 clamp(16px, 3vw, 40px);
-    scrollbar-width: none;
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+    gap: 1.25rem 1.5rem;
+    margin: 0 calc(-1 * clamp(16px, 3vw, 40px));
+    padding: 1rem clamp(16px, 3vw, 40px) 1.25rem;
+    border-top: 1px solid var(--line);
   }
 
-  .app-nav a {
-    padding: 10px 0 9px;
+  .app-nav#app-menu[data-open="true"] {
+    display: grid;
+    animation: menu-in 0.22s var(--ease-out);
   }
 
+  .nav-group,
   .nav-group + .nav-group {
-    margin: 10px 0;
-    padding-left: 1.25rem;
-  }
-
-  .nav-group + .nav-group a {
-    margin: -10px 0;
-  }
-
-  .app-nav.nav-end {
-    order: 2;
-    flex-basis: auto;
-    margin: 0 0 0 auto;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
     padding: 0;
+    border: none;
+  }
+
+  .nav-group-account {
+    display: flex;
+  }
+
+  .nav-group-title {
+    position: static;
+    width: auto;
+    height: auto;
     overflow: visible;
+    clip-path: none;
+    margin: 0 0 0.35rem;
+    padding: 0 0.75rem;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-dim);
+  }
+
+  .app-nav a,
+  .nav-group + .nav-group a {
+    gap: 0.6rem;
+    min-height: 44px;
+    margin: 0;
+    padding: 0 0.75rem;
+    font-size: 16px;
+    color: var(--ink);
+    box-shadow: none;
+    border-radius: var(--radius-sm);
+  }
+
+  .app-nav a:hover {
+    background: var(--surface-2);
+  }
+
+  /* Página atual: o quadrado da faixa de veredicto, em navy. */
+  .app-nav a.active {
+    color: var(--accent-2);
+    font-weight: 750;
+    background: var(--accent-2-soft);
+    box-shadow: none;
+  }
+
+  .app-nav a.active::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    flex: none;
+    background: currentColor;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 

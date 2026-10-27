@@ -1,6 +1,7 @@
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { useSession } from "./auth/useSession";
+import { AppMenu } from "./components/AppMenu";
 import { EmailVerificationNotice } from "./components/EmailVerificationNotice";
 import { AccountPage } from "./pages/AccountPage";
 import { AddPantryItemPage } from "./pages/AddPantryItemPage";
@@ -59,25 +60,8 @@ function App() {
             Domi<em>OS</em>
           </span>
         </NavLink>
-        {session && (
-          <nav className="app-nav" aria-label="Principal">
-            <div className="nav-group">
-              <NavLink to="/" end>
-                Hoje
-              </NavLink>
-              <NavLink to="/plano">Plano</NavLink>
-              <NavLink to="/despensa">Despensa</NavLink>
-              <NavLink to="/listas">Listas</NavLink>
-            </div>
-            <div className="nav-group">
-              <NavLink to="/produtos">Produtos</NavLink>
-              <NavLink to="/promocoes">Promoções</NavLink>
-              <NavLink to="/receitas">Receitas</NavLink>
-              <NavLink to="/ementas">Ementas</NavLink>
-            </div>
-          </nav>
-        )}
-        <nav className="app-nav nav-end" aria-label="Conta">
+        {session && <AppMenu email={session.email} />}
+        <nav className={session ? "app-nav nav-end" : "app-nav nav-end nav-end-guest"} aria-label="Conta">
           {session ? (
             <>
               <NavLink to="/casa">Casa</NavLink>

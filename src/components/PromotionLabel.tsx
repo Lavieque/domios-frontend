@@ -1,19 +1,7 @@
 import { promotionTypeLabels, type PromotionDto } from "../api/types";
 import { formatPercent } from "../catalog/offers";
-import { daysBetween, today } from "../plan/dates";
+import { daysLeft, daysLeftLabel } from "../catalog/promotions";
 import { ShelfLabel, VerdictBand } from "./ShelfLabel";
-
-/** Dias de calendário até ao fim, no relógio da casa (Europe/Lisbon). */
-function daysLeft(endsAt: string): number {
-  return daysBetween(today(), today(new Date(endsAt)));
-}
-
-function daysLeftLabel(endsAt: string): string {
-  const days = daysLeft(endsAt);
-  if (days <= 0) return "Termina hoje";
-  if (days === 1) return "Termina amanhã";
-  return `Termina em ${days} dias`;
-}
 
 const dateFormat = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short" });
 

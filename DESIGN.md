@@ -245,7 +245,7 @@ A single centered column, max 1320px, with horizontal padding clamp(16px, 3vw, 4
 
 Labels sit in auto-fill grids: products at minmax(15.5rem, 1fr), recipes at 17rem, week days at 14.5rem, stores at 13rem, all with a 1rem gap. Under 720px the product grid tightens to 10.5rem columns (two-up on a phone) with a 0.65rem gap. The home page ("Hoje") is a 1.4fr / 1fr two-column grid that stacks under 900px. Lists (pantry, shopping list) are a single bordered container of rows with hairline dividers; pantry rows are a three-column grid that stacks under 720px.
 
-Under 1100px the top bar wraps: the account links move to the right of the wordmark and the grouped nav becomes a full-width horizontally scrolling tab strip with hidden scrollbar.
+Under 1100px the top bar keeps only the wordmark and a "Menu" button. The button opens the navigation as a panel in the page flow, under the bar, with the groups in columns.
 
 ### Named Rules
 **The Aisle Rule.** The shopping list must fit the first phone screen: the store comparison is compact, per-store breakdowns are closed by default, unpriced items sit behind a single disclosure, and every item row shows a "Chain · €" pill for its cheapest store, so no breakdown needs opening to shop.
@@ -262,7 +262,7 @@ The system is flat. Labels, panels, tables and lists separate from the page by t
 
 ## Shapes
 
-Corners are almost square: 2px for pills, tags and thumbnails; 3px (`sm`) for labels, buttons, inputs, chips and notices; 4px (`md`) for panels, tables and row-list containers. The only round shape is the 12px current-price dot on the price range. Every border is a 1px hairline except three deliberate weights: the 6px top rail on labels and day cards, the 3px active nav underline, and the 2px ink rule under table headers. Verdict bands run edge to edge inside the label (the label clips them) and open with an 8px square marker drawn in CSS.
+Corners are almost square: 2px for pills, tags and thumbnails; 3px (`sm`) for labels, buttons, inputs, chips and notices; 4px (`md`) for panels, tables and row-list containers. The only round shape is the 12px current-price dot on the price range. Every border is a 1px hairline except three deliberate weights: the 6px top rail on labels, day cards and the top bar, the 3px active nav underline (an inset shadow, not a border), and the 2px ink rule under table headers. Verdict bands run edge to edge inside the label (the label clips them) and open with an 8px square marker drawn in CSS.
 
 ## Components
 
@@ -294,7 +294,9 @@ Small 2px-radius tags at 12.5px, 650 weight, tint background with matching text:
 - **Error / Disabled:** errors are a `danger-soft` block with red 600-weight text above the form.
 
 ### Navigation
-Sticky 60px top bar on Label White with a hairline bottom. Wordmark "DomiOS" at 800, 21px, "OS" in navy, beside the two-roof mark (teal and navy polylines). Nav links are 600 weight at 14.5px in dim ink, in two groups (household: Hoje, Plano, Despensa, Listas; catalog: Produtos, Promoções, Receitas, Ementas) split by a hairline divider; account links (Casa, Conta) sit at the far right. Active link is navy with a 3px navy underline at the bar's foot. On mobile the groups become a scrolling tab strip.
+62px top bar on Label White with a 6px navy rail on top and a hairline bottom, like a shelf edge. It is not sticky: it scrolls away with the page, and nothing in the app is pinned to the screen. Wordmark "DomiOS" at 800, 21px, "OS" in navy, beside the two-roof mark (teal and navy polylines). Nav links are 600 weight at 14.5px in dim ink, in two groups (household: Hoje, Plano, Despensa, Listas; catalog: Produtos, Promoções, Receitas, Ementas) split by a hairline divider; account links (Casa, Conta) sit at the far right. Active link is navy with a 3px navy underline at the bar's foot. The group names ("Em casa", "Catálogo") are visually hidden on desktop and kept for screen readers.
+
+Under 1100px a "Menu" button (drawn three-line icon, 40px tall, hairline border) opens the panel in the page flow. The panel shows the groups as columns with visible 13px dim titles, plus "A tua conta" with Casa and Conta. Links are 44px rows at 16px; the current page gets a navy tint and the 8px square marker of the verdict band. The panel closes on navigation and on Escape.
 
 ### Tables
 Label White, 14.5px cells with 0.65rem 0.9rem padding and hairline rows, a 12.5px dim 700-weight header over a 2px ink rule, numeric columns right-aligned, row hover in Shelf Grey at 55%.

@@ -260,6 +260,43 @@ export interface PromotionDto {
   discountPercent: number | null;
 }
 
+/**
+ * Uma oferta em promoção agora, com loja e produto — GET /promotions/current
+ * (DomiOS_API_Fase2.md, adenda 2026-10-26). Só entra quando o último preço,
+ * com no máximo 3 dias, está ligado à promoção.
+ */
+export interface CurrentPromotionDto {
+  storeOfferId: string;
+  storeId: string;
+  storeName: string;
+  chainId: string;
+  chainName: string;
+  productId: string;
+  productName: string;
+  imageUrl: string | null;
+  packageQuantity: number;
+  packageUnit: MeasurementUnit;
+  /** O que se paga sem cartão. */
+  price: MoneyDto;
+  cardPrice: CardPriceDto | null;
+  unitPrice: UnitPriceDto | null;
+  observedAt: string;
+  promotion: PromotionDto;
+}
+
+export const ChainStatus = {
+  Active: 0,
+  Closed: 1,
+} as const;
+export type ChainStatus = (typeof ChainStatus)[keyof typeof ChainStatus];
+
+export interface ChainDto {
+  chainId: string;
+  name: string;
+  logoUrl: string | null;
+  status: ChainStatus;
+}
+
 export const RecipeDifficulty = {
   Easy: 0,
   Medium: 1,

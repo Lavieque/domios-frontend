@@ -2,6 +2,8 @@ import {
   dishTypeNames,
   mainProteinNames,
   type CategoryDto,
+  type ChainDto,
+  type CurrentPromotionDto,
   type DishType,
   type DomainEventLogEntryDto,
   type MainProtein,
@@ -69,6 +71,20 @@ export function getRecipe(recipeId: string): Promise<RecipeDto> {
 
 export function getEvents(aggregateType: string, aggregateId: string): Promise<DomainEventLogEntryDto[]> {
   return get<DomainEventLogEntryDto[]>("/events", { aggregateType, aggregateId });
+}
+
+/** Uma entrada por oferta em promoção, mais recente primeiro; `chainId` filtra por cadeia. */
+export function searchCurrentPromotions(
+  chainId?: string,
+  page = 1,
+  pageSize = 20,
+): Promise<PagedResult<CurrentPromotionDto>> {
+  return get<PagedResult<CurrentPromotionDto>>("/promotions/current", { chainId, page, pageSize });
+}
+
+/** Todas as cadeias, incluindo as fechadas. */
+export function getChains(): Promise<ChainDto[]> {
+  return get<ChainDto[]>("/chains");
 }
 
 export function getPromotion(promotionId: string): Promise<PromotionDto> {

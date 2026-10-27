@@ -24,7 +24,7 @@ const perLabels: Record<MeasurementUnit, string> = {
   [Unit.Liter]: "L",
 };
 
-export function unitPriceLabel(offer: ProductStoreOfferDto): string | null {
+export function unitPriceLabel(offer: Pick<ProductStoreOfferDto, "unitPrice">): string | null {
   if (!offer.unitPrice) return null;
   return `${money.format(offer.unitPrice.amount)}/${perLabels[offer.unitPrice.per] ?? measurementUnitLabels[offer.unitPrice.per]}`;
 }

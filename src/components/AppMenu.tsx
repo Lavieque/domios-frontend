@@ -1,68 +1,67 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
-const groups = [
+interface MenuLink {
+  to: string;
+  label: string;
+  /** Uma linha na gaveta a dizer para que serve a página. */
+  hint: string;
+  end?: boolean;
+}
+
+const groups: { title: string; links: MenuLink[] }[] = [
   {
     title: "Em casa",
     links: [
-      { to: "/", label: "Hoje", end: true },
-      { to: "/plano", label: "Plano" },
-      { to: "/despensa", label: "Despensa" },
-      { to: "/listas", label: "Listas" },
+      { to: "/", label: "Hoje", hint: "O dia de hoje", end: true },
+      { to: "/plano", label: "Plano", hint: "Refeições da semana" },
+      { to: "/despensa", label: "Despensa", hint: "O que há em casa" },
+      { to: "/listas", label: "Listas", hint: "Compras por fazer" },
     ],
   },
   {
     title: "Catálogo",
     links: [
-      { to: "/produtos", label: "Produtos" },
-      { to: "/promocoes", label: "Promoções" },
-      { to: "/receitas", label: "Receitas" },
-      { to: "/ementas", label: "Ementas" },
+      { to: "/produtos", label: "Produtos", hint: "Preços nas lojas" },
+      { to: "/promocoes", label: "Promoções", hint: "Descontos em vigor" },
+      { to: "/receitas", label: "Receitas", hint: "Para cozinhar" },
+      { to: "/ementas", label: "Ementas", hint: "Planos prontos" },
     ],
   },
 ];
 
+const accountGroup: { title: string; links: MenuLink[] } = {
+  title: "A tua conta",
+  links: [
+    { to: "/casa", label: "Casa", hint: "Membros da casa" },
+    { to: "/conta", label: "Conta", hint: "Email e password" },
+  ],
+};
+
 /**
  * Menu principal. No desktop fica em linha no cabeçalho; em ecrãs estreitos um botão abre-o
- * por baixo do cabeçalho, no fluxo da página: nada fica fixo no ecrã.
+ * numa gaveta à direita, por cima da página. Nada fica fixo no ecrã enquanto a gaveta está fechada.
  */
-export function AppMenu({ email }: { email: string }) {
-  const [open, setOpen] = useState(false);
+export function AppMenu() {
+  const drawer = useRef<HTMLDialogElement>(null);
   const { pathname } = useLocation();
 
   // Fecha ao mudar de página.
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => drawer.current?.close(), [pathname]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  function open() {
+    drawer.current?.showModal();
+  }
+
+  function close() {
+    drawer.current?.close();
+  }
 
   return (
     <>
-      <button
-        type="button"
-        className="menu-toggle"
-        aria-expanded={open}
-        aria-controls="app-menu"
-        onClick={() => setOpen((value) => !value)}
-      >
-        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          {open ? (
-            <path d="m5 5 10 10M15 5 5 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          ) : (
-            <path d="M3.5 6h13M3.5 10h13M3.5 14h13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          )}
-        </svg>
-        {open ? "Fechar" : "Menu"}
-      </button>
-
-      <nav id="app-menu" className="app-nav" data-open={open} aria-label="Principal">
+      <nav className="app-nav" aria-label="Principal">
         {groups.map((group) => (
           <div key={group.title} className="nav-group">
-            <h2 className="nav-group-title">{group.title}</h2>
             {group.links.map((link) => (
               <NavLink key={link.to} to={link.to} end={link.end}>
                 {link.label}
@@ -70,15 +69,47 @@ export function AppMenu({ email }: { email: string }) {
             ))}
           </div>
         ))}
-        {/* No desktop, Casa e Conta vivem à direita do cabeçalho; aqui só aparecem no painel. */}
-        <div className="nav-group nav-group-account">
-          <h2 className="nav-group-title">A tua conta</h2>
-          <NavLink to="/casa">Casa</NavLink>
-          <NavLink to="/conta" title={email}>
-            Conta
-          </NavLink>
-        </div>
       </nav>
+
+      <button type="button" className="menu-toggle" aria-haspopup="dialog" onClick={open}>
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M3.5 6h13M3.5 10h13M3.5 14h13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+        Menu
+      </button>
+
+      {/* Um clique no fundo cai no próprio dialog, fora do painel: fecha. */}
+      <dialog
+        ref={drawer}
+        className="menu-drawer"
+        aria-label="Menu"
+        onClick={(e) => e.target === e.currentTarget && close()}
+      >
+        <div className="menu-drawer-panel">
+          <div className="menu-drawer-head">
+            <span className="menu-drawer-title">Menu</span>
+            <button type="button" className="menu-close" onClick={close}>
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="m5 5 10 10M15 5 5 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+              Fechar
+            </button>
+          </div>
+          <nav aria-label="Principal">
+            {[...groups, accountGroup].map((group) => (
+              <section key={group.title} className="drawer-group">
+                <h2 className="drawer-group-title">{group.title}</h2>
+                {group.links.map((link) => (
+                  <NavLink key={link.to} to={link.to} end={link.end} className="drawer-link">
+                    <span className="drawer-link-label">{link.label}</span>
+                    <span className="drawer-link-hint">{link.hint}</span>
+                  </NavLink>
+                ))}
+              </section>
+            ))}
+          </nav>
+        </div>
+      </dialog>
     </>
   );
 }

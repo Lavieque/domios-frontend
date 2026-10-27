@@ -268,17 +268,6 @@ td.num,
   margin: -16px 0;
 }
 
-/* Os títulos dos grupos só se veem no painel; no desktop ficam para leitores de ecrã. */
-.nav-group-title {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.nav-group-account,
 .menu-toggle {
   display: none;
 }
@@ -293,7 +282,7 @@ td.num,
   white-space: nowrap;
   /* Sublinhado em sombra interior, para o link não ter borda. */
   box-shadow: inset 0 -3px 0 transparent;
-  transition: color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  transition: color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .app-nav a:hover {
@@ -323,126 +312,191 @@ td.num,
 
 @media (max-width: 1100px) {
   .app-header {
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 62px;
-    gap: 0 1rem;
+    gap: 1rem;
   }
 
-  .menu-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    margin-left: auto;
-    min-height: 40px;
-    padding: 0 0.85rem;
-    font: inherit;
-    font-size: 14.5px;
-    font-weight: 700;
-    color: var(--ink);
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    cursor: pointer;
-  }
-
-  .menu-toggle svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .menu-toggle[aria-expanded="true"] {
-    background: var(--surface-2);
-  }
-
-  /* Com sessão, Casa e Conta passam para o painel. */
+  .app-nav:not(.nav-end),
   .app-nav.nav-end:not(.nav-end-guest) {
     display: none;
   }
 
-  .app-nav#app-menu {
-    display: none;
-    order: 3;
-    flex-basis: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
-    gap: 1.25rem 1.5rem;
-    margin: 0 calc(-1 * clamp(16px, 3vw, 40px));
-    padding: 1rem clamp(16px, 3vw, 40px) 1.25rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .app-nav#app-menu[data-open="true"] {
-    display: grid;
-    animation: menu-in 0.22s var(--ease-out);
-  }
-
-  .nav-group,
-  .nav-group + .nav-group {
-    flex-direction: column;
-    gap: 2px;
-    margin: 0;
-    padding: 0;
-    border: none;
-  }
-
-  .nav-group-account {
-    display: flex;
-  }
-
-  .nav-group-title {
-    position: static;
-    width: auto;
-    height: auto;
-    overflow: visible;
-    clip-path: none;
-    margin: 0 0 0.35rem;
-    padding: 0 0.75rem;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink-dim);
-  }
-
-  .app-nav a,
-  .nav-group + .nav-group a {
-    gap: 0.6rem;
-    min-height: 44px;
-    margin: 0;
-    padding: 0 0.75rem;
-    font-size: 16px;
-    color: var(--ink);
-    box-shadow: none;
-    border-radius: var(--radius-sm);
-  }
-
-  .app-nav a:hover {
-    background: var(--surface-2);
-  }
-
-  /* Página atual: o quadrado da faixa de veredicto, em navy. */
-  .app-nav a.active {
-    color: var(--accent-2);
-    font-weight: 750;
-    background: var(--accent-2-soft);
-    box-shadow: none;
-  }
-
-  .app-nav a.active::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    flex: none;
-    background: currentColor;
+  .menu-toggle {
+    display: inline-flex;
+    margin-left: auto;
   }
 }
 
-@keyframes menu-in {
+.menu-toggle,
+.menu-close {
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0 0.85rem;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.menu-close {
+  display: inline-flex;
+}
+
+.menu-toggle:hover,
+.menu-close:hover {
+  border-color: var(--ink);
+}
+
+.menu-toggle svg,
+.menu-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Gaveta do menu ---------- */
+
+/* O dialog cobre o ecrã; o painel encosta à direita. Fechado, não ocupa nada. */
+.menu-drawer {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  border: none;
+  background: transparent;
+}
+
+/* Com a gaveta aberta, a página por trás não faz scroll. */
+html:has(.menu-drawer[open]) {
+  overflow: hidden;
+}
+
+.menu-drawer::backdrop {
+  background: rgb(0 0 0 / 0.42);
+}
+
+.menu-drawer[open]::backdrop {
+  animation: drawer-fade 0.2s ease;
+}
+
+.menu-drawer-panel {
+  margin-left: auto;
+  width: min(22rem, 88vw);
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border-top: var(--rail) solid var(--accent-2);
+  border-left: 1px solid var(--line);
+  padding: 0 1rem 2rem;
+}
+
+.menu-drawer[open] .menu-drawer-panel {
+  animation: drawer-in 0.28s var(--ease-out);
+}
+
+.menu-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 62px;
+  margin: 0 -1rem 0.5rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.menu-drawer-title {
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.drawer-group {
+  padding: 0.75rem 0 0.5rem;
+}
+
+.drawer-group + .drawer-group {
+  border-top: 1px solid var(--line);
+}
+
+.drawer-group-title {
+  margin: 0 0 0.35rem;
+  padding: 0 0.75rem;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-dim);
+}
+
+.drawer-link {
+  display: grid;
+  grid-template-columns: 8px 1fr;
+  column-gap: 0.6rem;
+  align-items: center;
+  min-height: 52px;
+  padding: 0.4rem 0.75rem;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease;
+}
+
+.drawer-link:hover {
+  background: var(--surface-2);
+}
+
+.drawer-link-label {
+  grid-column: 2;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.drawer-link-hint {
+  grid-column: 2;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--ink-dim);
+}
+
+/* Página atual: o quadrado da faixa de veredicto, em navy, sobre tinta navy. */
+.drawer-link.active {
+  background: var(--accent-2-soft);
+}
+
+.drawer-link.active .drawer-link-label {
+  color: var(--accent-2);
+}
+
+.drawer-link.active::before {
+  content: "";
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-2);
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes drawer-fade {
   from {
     opacity: 0;
-    transform: translateY(-4px);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 

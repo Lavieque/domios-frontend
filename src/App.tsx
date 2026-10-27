@@ -60,7 +60,7 @@ function App() {
             Domi<em>OS</em>
           </span>
         </NavLink>
-        {session && <AppMenu email={session.email} />}
+        {session && <AppMenu />}
         <nav className={session ? "app-nav nav-end" : "app-nav nav-end nav-end-guest"} aria-label="Conta">
           {session ? (
             <>

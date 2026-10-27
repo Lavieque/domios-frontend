@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getChains, searchCurrentPromotions } from "../api/client";
-import { ChainStatus, type ChainDto, type CurrentPromotionDto } from "../api/types";
+import { getCategories, getChains, searchCurrentPromotions } from "../api/client";
+import { ChainStatus, type CategoryDto, type ChainDto, type CurrentPromotionDto } from "../api/types";
 import { Pagination } from "../components/Pagination";
 import { PromotionOfferLabel } from "../components/PromotionOfferLabel";
 
@@ -14,26 +14,41 @@ const MAX_CHAIN_CHIPS = 8;
 export function PromotionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const chainId = searchParams.get("chainId");
+  const categoryId = searchParams.get("categoryId");
   const page = Number(searchParams.get("page") ?? "1") || 1;
 
   const [chains, setChains] = useState<ChainDto[]>([]);
+  const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [offers, setOffers] = useState<CurrentPromotionDto[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function applyFilters(next: { chainId?: string | null; page?: number }) {
+  function applyFilters(next: { chainId?: string | null; categoryId?: string | null; page?: number }) {
     const nextChainId = next.chainId === undefined ? chainId : next.chainId;
+    const nextCategoryId = next.categoryId === undefined ? categoryId : next.categoryId;
     const nextPage = next.page ?? page;
 
     const params = new URLSearchParams();
     if (nextChainId) params.set("chainId", nextChainId);
+    if (nextCategoryId) params.set("categoryId", nextCategoryId);
     if (nextPage > 1) params.set("page", String(nextPage));
     setSearchParams(params, { replace: true });
   }
 
   useEffect(() => {
     getChains().then(setChains);
+    getCategories(true).then(setCategories);
   }, []);
+
+  // Só as categorias de topo, como em Produtos: a Api inclui as
+  // subcategorias de cada uma.
+  const topLevelCategories = useMemo(
+    () =>
+      categories
+        .filter((category) => category.parentCategoryId === null)
+        .sort((a, b) => a.name.localeCompare(b.name, "pt")),
+    [categories],
+  );
 
   // GET /chains traz também as cadeias de teste fechadas; só as abertas
   // têm lojas com preços.
@@ -44,21 +59,34 @@ export function PromotionsPage() {
 
   useEffect(() => {
     setLoading(true);
-    searchCurrentPromotions(chainId ?? undefined, page, PAGE_SIZE)
+    searchCurrentPromotions(chainId ?? undefined, page, PAGE_SIZE, categoryId ?? undefined)
       .then((result) => {
         setOffers(result.items);
         setTotal(result.total);
       })
       .finally(() => setLoading(false));
-  }, [chainId, page]);
+  }, [chainId, categoryId, page]);
 
   return (
     <div className="page">
       <h1>Promoções ativas</h1>
       <p className="page-sub">Produtos em promoção na última leitura de cada loja, dos últimos 3 dias.</p>
 
-      {openChains.length > MAX_CHAIN_CHIPS && (
-        <div className="toolbar">
+      <div className="toolbar">
+        <select
+          className="category-select"
+          aria-label="Categoria"
+          value={categoryId ?? ""}
+          onChange={(e) => applyFilters({ categoryId: e.target.value || null, page: 1 })}
+        >
+          <option value="">Todas as categorias</option>
+          {topLevelCategories.map((category) => (
+            <option key={category.categoryId} value={category.categoryId}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        {openChains.length > MAX_CHAIN_CHIPS && (
           <select
             className="category-select"
             aria-label="Cadeia"
@@ -72,8 +100,8 @@ export function PromotionsPage() {
               </option>
             ))}
           </select>
-        </div>
-      )}
+        )}
+      </div>
 
       {openChains.length > 1 && openChains.length <= MAX_CHAIN_CHIPS && (
         <div className="chip-row" role="group" aria-label="Cadeia">

@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { searchMealPlanTemplates, type MealPlanTemplateSummaryDto } from "../api/mealPlanTemplates";
 import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
+import { SearchField } from "../components/SearchField";
+import { ShelfLabel } from "../components/ShelfLabel";
+
+const count = new Intl.NumberFormat("pt-PT");
 
 export function MealPlanTemplatesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,13 +42,14 @@ export function MealPlanTemplatesPage() {
   return (
     <div className="page">
       <h1>Ementas prontas</h1>
-      <p className="muted">Planos de uma semana, quinzena ou mês para aplicar ao teu plano a partir de um dia.</p>
-      <div className="search-wrap">
-        <input
-          type="search"
+      <p className="page-sub">Planos de uma semana, quinzena ou mês para aplicar ao teu plano a partir de um dia.</p>
+
+      <div className="toolbar">
+        <SearchField
+          label="Pesquisar ementas"
           placeholder="Pesquisar ementas…"
           value={search}
-          onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
+          onChange={(value) => applyFilters({ search: value, page: 1 })}
         />
       </div>
 
@@ -53,34 +58,39 @@ export function MealPlanTemplatesPage() {
           {error}
         </p>
       )}
-      {loading && <p className="muted loading">A carregar…</p>}
+      <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} ementas`}</p>
 
       {!loading && templates.length === 0 ? (
         <p className="empty-state">Sem ementas.</p>
       ) : (
         !loading && (
           <div className="recipe-grid">
-            {templates.map((template) => (
-              <Link
+            {templates.map((template, index) => (
+              <ShelfLabel
                 key={template.mealPlanTemplateId}
                 to={`/ementas/${template.mealPlanTemplateId}`}
+                index={index}
                 className="recipe-card"
               >
-                <div className="recipe-card-title">{template.name}</div>
-                {template.description && <p className="muted template-card-description">{template.description}</p>}
+                {/* Nomes compridos partem e ficam em 3 linhas; o nome inteiro fica no title. */}
+                <div className="recipe-card-title clamp-3" title={template.name}>
+                  {template.name}
+                </div>
+                {template.description && <p className="template-card-description clamp-3">{template.description}</p>}
                 <div className="recipe-card-pills">
                   <span className="pill pill-accent2">
                     {template.durationDays} {template.durationDays === 1 ? "dia" : "dias"}
                   </span>
                   <span className="pill pill-muted">{template.entryCount} refeições</span>
                   <span className="pill pill-muted">{template.servingsBasis} doses</span>
-                  {template.tags.map((tag) => (
+                  {template.tags.slice(0, 3).map((tag) => (
                     <span key={tag} className="pill pill-muted">
                       {tag}
                     </span>
                   ))}
+                  {template.tags.length > 3 && <span className="muted meal-meta">+{template.tags.length - 3}</span>}
                 </div>
-              </Link>
+              </ShelfLabel>
             ))}
           </div>
         )

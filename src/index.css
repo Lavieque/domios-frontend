@@ -1438,6 +1438,16 @@ a.meal-title:hover {
   line-height: 1.25;
   letter-spacing: -0.01em;
   color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* Corta texto comprido em 3 linhas, para etiquetas vizinhas ficarem com alturas próximas. */
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 
 .recipe-card-pills {
@@ -1628,6 +1638,7 @@ a.meal-title:hover {
   margin: 0;
   font-size: 14px;
   color: var(--ink-dim);
+  overflow-wrap: anywhere;
 }
 
 /* ---------- Despensa: adicionar ---------- */

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
 import { measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
-import { money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
+import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
@@ -112,7 +112,7 @@ export function ProductsPage() {
 /** O produto com a oferta mais barata que a Api conhece (GET /products não traz preços). */
 function ProductLabel({ product, index }: { product: ProductDto; index: number }) {
   const offers = useOffers(product.productId);
-  const priced = offers ? sortOffers(offers).filter((offer) => offer.latestPrice) : [];
+  const priced = offers ? sortOffers(offers).filter(isOnSale) : [];
   const cheapest = priced[0];
   const unit = cheapest ? unitPriceLabel(cheapest) : null;
 

@@ -8,7 +8,7 @@ import {
   type ProductDto,
   type ProductStoreOfferDto,
 } from "../api/types";
-import { money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
+import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { EventTimeline } from "../components/EventTimeline";
 import { PromotionBadge } from "../components/PromotionBadge";
 import { InsightNotes, LabelPrice, PriceRange, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
@@ -31,7 +31,8 @@ export function ProductDetailPage() {
   if (!product) return <p className="muted loading">A carregar…</p>;
 
   const sorted = offers ? sortOffers(offers) : [];
-  const lowest = sorted[0]?.latestPrice?.price.amount;
+  const onSale = sorted.filter(isOnSale);
+  const lowest = onSale[0]?.latestPrice?.price.amount;
 
   return (
     <div className="page">
@@ -90,7 +91,7 @@ export function ProductDetailPage() {
         <h2>Preço por loja</h2>
         {sorted.length > 1 && lowest !== undefined && (
           <span className="muted">
-            {sorted.filter((o) => o.latestPrice).length} lojas com preço
+            {onSale.length} lojas com preço
           </span>
         )}
       </div>
@@ -104,7 +105,7 @@ export function ProductDetailPage() {
               key={offer.storeOfferId}
               offer={offer}
               index={index}
-              best={offer.latestPrice !== null && offer.latestPrice.price.amount === lowest && sorted.length > 1}
+              best={isOnSale(offer) && offer.latestPrice!.price.amount === lowest && onSale.length > 1}
             />
           ))}
         </div>
@@ -119,7 +120,8 @@ export function ProductDetailPage() {
 const availabilityLabels: Record<StoreOfferAvailability, string | null> = {
   [StoreOfferAvailability.Unknown]: null,
   [StoreOfferAvailability.InStock]: "Disponível",
-  [StoreOfferAvailability.OutOfStock]: "Esgotado",
+  // Saiu do site (o scraper marca-a), não necessariamente esgotada.
+  [StoreOfferAvailability.OutOfStock]: "Indisponível",
 };
 
 function OfferLabel({ offer, index, best }: { offer: ProductStoreOfferDto; index: number; best: boolean }) {

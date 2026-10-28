@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { getProductStoreOffers } from "../api/client";
-import { measurementUnitLabels, type MeasurementUnit, MeasurementUnit as Unit, type ProductStoreOfferDto } from "../api/types";
+import {
+  measurementUnitLabels,
+  type MeasurementUnit,
+  MeasurementUnit as Unit,
+  type ProductStoreOfferDto,
+  StoreOfferAvailability,
+} from "../api/types";
 
 export const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
 const plain = new Intl.NumberFormat("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -29,12 +35,24 @@ export function unitPriceLabel(offer: Pick<ProductStoreOfferDto, "unitPrice">): 
   return `${money.format(offer.unitPrice.amount)}/${perLabels[offer.unitPrice.per] ?? measurementUnitLabels[offer.unitPrice.per]}`;
 }
 
-/** Ofertas com preço, da mais barata para a mais cara; as sem preço ficam no fim. */
+/**
+ * Com preço e ainda à venda: o scraper passa a OutOfStock as ofertas que
+ * saíram do site, que guardam o último preço que tiveram.
+ */
+export function isOnSale(offer: ProductStoreOfferDto): boolean {
+  return offer.latestPrice !== null && offer.availability !== StoreOfferAvailability.OutOfStock;
+}
+
+/**
+ * Ofertas à venda, da mais barata para a mais cara; depois as indisponíveis
+ * e por fim as sem preço.
+ */
 export function sortOffers(offers: ProductStoreOfferDto[]): ProductStoreOfferDto[] {
+  const rank = (offer: ProductStoreOfferDto) => (isOnSale(offer) ? 0 : offer.latestPrice ? 1 : 2);
   return [...offers].sort((a, b) => {
-    const pa = a.latestPrice?.price.amount ?? Number.POSITIVE_INFINITY;
-    const pb = b.latestPrice?.price.amount ?? Number.POSITIVE_INFINITY;
-    return pa - pb;
+    const byRank = rank(a) - rank(b);
+    if (byRank !== 0) return byRank;
+    return (a.latestPrice?.price.amount ?? 0) - (b.latestPrice?.price.amount ?? 0);
   });
 }
 

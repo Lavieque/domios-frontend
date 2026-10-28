@@ -45,10 +45,20 @@ export const ProductSource = {
 } as const;
 export type ProductSource = (typeof ProductSource)[keyof typeof ProductSource];
 
+/** De menos a mais supermercado; só as categorias de topo o têm. */
+export const CategoryScope = {
+  Unclassified: 0,
+  NonGrocery: 1,
+  Household: 2,
+  Food: 3,
+} as const;
+export type CategoryScope = (typeof CategoryScope)[keyof typeof CategoryScope];
+
 export interface CategoryDto {
   categoryId: string;
   name: string;
   parentCategoryId: string | null;
+  scope: CategoryScope;
 }
 
 export interface NutritionFactsDto {

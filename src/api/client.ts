@@ -20,13 +20,15 @@ function get<T>(path: string, params: QueryParams = {}): Promise<T> {
   return send<T>(path, { params });
 }
 
+/** `groceryOnly` tira os produtos de categorias que não são de supermercado. */
 export function searchProducts(
   search: string,
   page = 1,
   pageSize = 20,
   categoryId?: string,
+  groceryOnly = false,
 ): Promise<PagedResult<ProductDto>> {
-  return get<PagedResult<ProductDto>>("/products", { search, categoryId, page, pageSize });
+  return get<PagedResult<ProductDto>>("/products", { search, categoryId, groceryOnly, page, pageSize });
 }
 
 export function getCategories(hasProducts?: boolean): Promise<CategoryDto[]> {
@@ -75,15 +77,17 @@ export function getEvents(aggregateType: string, aggregateId: string): Promise<D
 
 /**
  * Uma entrada por oferta em promoção, mais recente primeiro; `chainId` filtra
- * por cadeia e `categoryId` por categoria (com as subcategorias).
+ * por cadeia, `categoryId` por categoria (com as subcategorias) e
+ * `groceryOnly` tira o que não é de supermercado.
  */
 export function searchCurrentPromotions(
   chainId?: string,
   page = 1,
   pageSize = 20,
   categoryId?: string,
+  groceryOnly = false,
 ): Promise<PagedResult<CurrentPromotionDto>> {
-  return get<PagedResult<CurrentPromotionDto>>("/promotions/current", { chainId, categoryId, page, pageSize });
+  return get<PagedResult<CurrentPromotionDto>>("/promotions/current", { chainId, categoryId, groceryOnly, page, pageSize });
 }
 
 /** Todas as cadeias, incluindo as fechadas. */

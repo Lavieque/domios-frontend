@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getCategories, getChains, searchCurrentPromotions } from "../api/client";
-import { ChainStatus, type CategoryDto, type ChainDto, type CurrentPromotionDto } from "../api/types";
+import { CategoryScope, ChainStatus, type CategoryDto, type ChainDto, type CurrentPromotionDto } from "../api/types";
+import { GroceryOnlyToggle } from "../components/GroceryOnlyToggle";
 import { Pagination } from "../components/Pagination";
 import { PromotionOfferLabel } from "../components/PromotionOfferLabel";
 
@@ -15,6 +16,8 @@ export function PromotionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const chainId = searchParams.get("chainId");
   const categoryId = searchParams.get("categoryId");
+  // Ligado por omissão, como em Produtos; `grocery=0` mostra tudo.
+  const groceryOnly = searchParams.get("grocery") !== "0";
   const page = Number(searchParams.get("page") ?? "1") || 1;
 
   const [chains, setChains] = useState<ChainDto[]>([]);
@@ -23,14 +26,16 @@ export function PromotionsPage() {
   const [total, setTotal] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function applyFilters(next: { chainId?: string | null; categoryId?: string | null; page?: number }) {
+  function applyFilters(next: { chainId?: string | null; categoryId?: string | null; groceryOnly?: boolean; page?: number }) {
     const nextChainId = next.chainId === undefined ? chainId : next.chainId;
     const nextCategoryId = next.categoryId === undefined ? categoryId : next.categoryId;
+    const nextGroceryOnly = next.groceryOnly ?? groceryOnly;
     const nextPage = next.page ?? page;
 
     const params = new URLSearchParams();
     if (nextChainId) params.set("chainId", nextChainId);
     if (nextCategoryId) params.set("categoryId", nextCategoryId);
+    if (!nextGroceryOnly) params.set("grocery", "0");
     if (nextPage > 1) params.set("page", String(nextPage));
     setSearchParams(params, { replace: true });
   }
@@ -46,8 +51,9 @@ export function PromotionsPage() {
     () =>
       categories
         .filter((category) => category.parentCategoryId === null)
+        .filter((category) => !groceryOnly || category.scope !== CategoryScope.NonGrocery)
         .sort((a, b) => a.name.localeCompare(b.name, "pt")),
-    [categories],
+    [categories, groceryOnly],
   );
 
   // GET /chains traz também as cadeias de teste fechadas; só as abertas
@@ -59,13 +65,13 @@ export function PromotionsPage() {
 
   useEffect(() => {
     setLoading(true);
-    searchCurrentPromotions(chainId ?? undefined, page, PAGE_SIZE, categoryId ?? undefined)
+    searchCurrentPromotions(chainId ?? undefined, page, PAGE_SIZE, categoryId ?? undefined, groceryOnly)
       .then((result) => {
         setOffers(result.items);
         setTotal(result.total);
       })
       .finally(() => setLoading(false));
-  }, [chainId, categoryId, page]);
+  }, [chainId, categoryId, groceryOnly, page]);
 
   return (
     <div className="page">
@@ -86,6 +92,7 @@ export function PromotionsPage() {
             </option>
           ))}
         </select>
+        <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
         {openChains.length > MAX_CHAIN_CHIPS && (
           <select
             className="category-select"

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
-import { measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
+import { CategoryScope, measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
 import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
+import { GroceryOnlyToggle } from "../components/GroceryOnlyToggle";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
@@ -14,6 +15,9 @@ export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") ?? "";
   const categoryId = searchParams.get("categoryId");
+  // Ligado por omissão: o scraper lê o catálogo inteiro (brinquedos,
+  // decoração); `grocery=0` no URL mostra tudo.
+  const groceryOnly = searchParams.get("grocery") !== "0";
   const page = Number(searchParams.get("page") ?? "1") || 1;
 
   const [categories, setCategories] = useState<CategoryDto[]>([]);
@@ -21,14 +25,16 @@ export function ProductsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  function applyFilters(next: { search?: string; categoryId?: string | null; page?: number }) {
+  function applyFilters(next: { search?: string; categoryId?: string | null; groceryOnly?: boolean; page?: number }) {
     const nextSearch = next.search ?? search;
     const nextCategoryId = next.categoryId === undefined ? categoryId : next.categoryId;
+    const nextGroceryOnly = next.groceryOnly ?? groceryOnly;
     const nextPage = next.page ?? page;
 
     const params = new URLSearchParams();
     if (nextSearch) params.set("search", nextSearch);
     if (nextCategoryId) params.set("categoryId", nextCategoryId);
+    if (!nextGroceryOnly) params.set("grocery", "0");
     if (nextPage > 1) params.set("page", String(nextPage));
     setSearchParams(params, { replace: true });
   }
@@ -49,19 +55,20 @@ export function ProductsPage() {
     () =>
       categories
         .filter((category) => category.parentCategoryId === null)
+        .filter((category) => !groceryOnly || category.scope !== CategoryScope.NonGrocery)
         .sort((a, b) => a.name.localeCompare(b.name, "pt")),
-    [categories],
+    [categories, groceryOnly],
   );
 
   useEffect(() => {
     setLoading(true);
-    searchProducts(search, page, PAGE_SIZE, categoryId ?? undefined)
+    searchProducts(search, page, PAGE_SIZE, categoryId ?? undefined, groceryOnly)
       .then((result) => {
         setProducts(result.items);
         setTotal(result.total);
       })
       .finally(() => setLoading(false));
-  }, [search, page, categoryId]);
+  }, [search, page, categoryId, groceryOnly]);
 
   return (
     <div className="page">
@@ -88,6 +95,7 @@ export function ProductsPage() {
             </option>
           ))}
         </select>
+        <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
       </div>
 
       <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} resultados`}</p>

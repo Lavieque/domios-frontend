@@ -5,8 +5,10 @@ import type { DomainEventLogEntryDto, PagedResult } from "../api/types";
 import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { eventDetail, eventLabel, eventLink, timelineAreas } from "../history/events";
+import { useEventNames } from "../history/useEventNames";
 import { HouseholdGate } from "../household/HouseholdGate";
 
+const NO_EVENTS: DomainEventLogEntryDto[] = [];
 const when = new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeStyle: "short" });
 
 export function HouseholdHistoryPage() {
@@ -14,7 +16,8 @@ export function HouseholdHistoryPage() {
 }
 
 function HouseholdHistory({ householdId, name }: { householdId: string; name: string }) {
-  const [area, setArea] = useState("");
+  const [area, setArea] = useState(timelineAreas[0].label);
+  const areaOption = timelineAreas.find((option) => option.label === area) ?? timelineAreas[0];
   const [page, setPage] = useState(1);
   const [result, setResult] = useState<PagedResult<DomainEventLogEntryDto> | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,13 +26,15 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
     let cancelled = false;
     setResult(null);
     setError(null);
-    getHouseholdTimeline(householdId, area, page)
+    getHouseholdTimeline(householdId, areaOption.aggregateType, areaOption.excludeAggregateType, page)
       .then((loaded) => !cancelled && setResult(loaded))
       .catch((err: unknown) => !cancelled && setError(describeError(err)));
     return () => {
       cancelled = true;
     };
-  }, [householdId, area, page]);
+  }, [householdId, areaOption, page]);
+
+  const names = useEventNames(householdId, result?.items ?? NO_EVENTS);
 
   return (
     <div className="page">
@@ -48,7 +53,7 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
         }}
       >
         {timelineAreas.map((option) => (
-          <option key={option.aggregateType} value={option.aggregateType}>
+          <option key={option.label} value={option.label}>
             {option.label}
           </option>
         ))}
@@ -66,7 +71,7 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
           <ul className="today-list history-list">
             {result.items.map((event) => {
               const link = eventLink(event);
-              const detail = eventDetail(event.payload);
+              const detail = eventDetail(event.payload) ?? names.get(event.eventId);
               const label = detail ? `${eventLabel(event.eventType)}: ${detail}` : eventLabel(event.eventType);
               return (
                 <li key={event.eventId}>

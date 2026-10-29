@@ -63,16 +63,18 @@ export function getHousehold(householdId: string): Promise<HouseholdDto> {
 
 /**
  * Histórico da casa, mais recente primeiro (DomiOS_DataModel_EventLog.md,
- * adenda 2026-10-15). `aggregateType` vazio = todos.
+ * adenda 2026-10-15). `aggregateType` vazio = todos; `excludeAggregateType`
+ * deixa um tipo de fora (adenda 2026-10-29 (b)).
  */
 export function getHouseholdTimeline(
   householdId: string,
   aggregateType: string,
+  excludeAggregateType: string | undefined,
   page: number,
   pageSize = 20,
 ): Promise<PagedResult<DomainEventLogEntryDto>> {
   return authedRequest<PagedResult<DomainEventLogEntryDto>>(`/households/${householdId}/timeline`, {
-    params: { aggregateType, page, pageSize },
+    params: { aggregateType, excludeAggregateType, page, pageSize },
   });
 }
 

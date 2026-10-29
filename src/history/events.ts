@@ -67,9 +67,13 @@ export const eventLabels: Record<string, string> = {
   OpportunityResolved: "Sugestão resolvida",
 };
 
-/** Filtros do histórico da casa: rótulo → `aggregateType` (vazio = todos). */
-export const timelineAreas: { label: string; aggregateType: string }[] = [
-  { label: "Tudo", aggregateType: "" },
+/**
+ * Filtros do histórico da casa: rótulo → `aggregateType` (vazio = todos).
+ * "Tudo" deixa de fora as sugestões (`excludeAggregateType`): um evento por
+ * sugestão mostrada enche-o, e têm a sua área.
+ */
+export const timelineAreas: { label: string; aggregateType: string; excludeAggregateType?: string }[] = [
+  { label: "Tudo", aggregateType: "", excludeAggregateType: "Opportunity" },
   { label: "Despensa", aggregateType: "PantryItem" },
   { label: "Refeições", aggregateType: "Meal" },
   { label: "Listas", aggregateType: "ShoppingList" },

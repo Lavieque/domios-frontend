@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { listOpportunities, type OpportunityListDto } from "../api/opportunities";
+import { getOpportunitySummary, listOpportunities, type OpportunityListDto } from "../api/opportunities";
 
 // Cada leitura corre a geração na Api (o GoodPrice lê até 50 produtos), por
 // isso lê-se uma vez por casa e por sessão de página. Fechar uma oportunidade
@@ -18,9 +18,19 @@ function load(householdId: string): Promise<OpportunityListDto | null> {
   return pending;
 }
 
+/** A frase da síntese; a falha só a esconde, as sugestões não dependem dela. */
+function loadHeadline(householdId: string): Promise<string | null> {
+  return getOpportunitySummary(householdId).then(
+    (summary) => summary.headline,
+    () => null,
+  );
+}
+
 export interface OpportunitiesState {
   /** `null` enquanto carrega ou se falhar. */
   opportunities: OpportunityListDto | null;
+  /** "3 ações podem poupar cerca de 18 €": conta também as que o orçamento reteve. */
+  headline: string | null;
   /**
    * Tira uma oportunidade já fechada (dispensada ou feita). Com `keepVisible`
    * só sai da cópia guardada: o ecrã continua a mostrá-la até se sair dele.
@@ -30,11 +40,17 @@ export interface OpportunitiesState {
 
 export function useOpportunities(householdId: string): OpportunitiesState {
   const [opportunities, setOpportunities] = useState<OpportunityListDto | null>(null);
+  const [headline, setHeadline] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setOpportunities(null);
-    load(householdId).then((loaded) => !cancelled && setOpportunities(loaded));
+    setHeadline(null);
+    load(householdId).then((loaded) => {
+      if (cancelled) return;
+      setOpportunities(loaded);
+      if (loaded) loadHeadline(householdId).then((text) => !cancelled && setHeadline(text));
+    });
     return () => {
       cancelled = true;
     };
@@ -47,9 +63,11 @@ export function useOpportunities(householdId: string): OpportunitiesState {
       const pending = cache.get(householdId);
       if (pending) cache.set(householdId, pending.then(update));
       if (!keepVisible) setOpportunities(update);
+      // Fechar uma muda as contas da síntese.
+      loadHeadline(householdId).then(setHeadline);
     },
     [householdId],
   );
 
-  return { opportunities, remove };
+  return { opportunities, headline, remove };
 }

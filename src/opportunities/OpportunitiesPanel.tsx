@@ -20,13 +20,14 @@ import { useOpportunities } from "./useOpportunities";
  * deixa mostrar. Sem nenhuma, o painel não aparece.
  */
 export function OpportunitiesPanel({ householdId }: { householdId: string }) {
-  const { opportunities, remove } = useOpportunities(householdId);
+  const { opportunities, headline, remove } = useOpportunities(householdId);
 
   if (!opportunities || opportunities.items.length === 0) return null;
 
   return (
     <section className="panel opportunities-panel">
       <h2>Sugestões</h2>
+      {headline && <p className="opportunity-headline">{headline}</p>}
       <ul className="opportunity-list">
         {opportunities.items.map((opportunity) => (
           <OpportunityCard

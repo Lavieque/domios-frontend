@@ -21,8 +21,11 @@ import {
 } from "../api/shopping";
 import { MeasurementUnit, measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
+import { useCategories } from "../catalog/useCategories";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { useProducts } from "../pantry/useProducts";
+import { groupByTopCategory, type ItemGroup } from "../shopping/groups";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
 const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -41,6 +44,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [version, setVersion] = useState(0);
   const [comparison, setComparison] = useState<StoreComparisonDto | null>(null);
   const [comparing, setComparing] = useState(false);
+  const products = useProducts(list?.items.flatMap((item) => (item.productId && !item.isPurchased ? [item.productId] : [])) ?? []);
+  const categories = useCategories();
 
   useEffect(() => {
     let cancelled = false;
@@ -137,7 +142,14 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
           {pending.length === 0 ? (
             <p className="muted">Tudo comprado.</p>
           ) : (
-            <ItemList items={pending} open={open} cheapest={cheapestByItem} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
+            <PendingItems
+              items={pending}
+              groups={categories && (products.size > 0 || !pending.some((item) => item.productId)) ? groupByTopCategory(pending, products, categories) : null}
+              open={open}
+              cheapest={cheapestByItem}
+              onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
+              onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
+            />
           )}
           {purchased.length > 0 && (
             <>
@@ -242,6 +254,34 @@ function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: M
         Acrescentar
       </button>
     </form>
+  );
+}
+
+/** Por comprar, agrupados pela categoria de topo; sem grupos (ou só um), lista simples. */
+function PendingItems({
+  items,
+  groups,
+  ...rest
+}: {
+  items: ShoppingListItemDto[];
+  groups: ItemGroup[] | null;
+  open: boolean;
+  cheapest: Map<string, { chainName: string; lineTotal: number }>;
+  onToggle: (item: ShoppingListItemDto) => void;
+  onDelete: (item: ShoppingListItemDto) => void;
+}) {
+  if (!groups || groups.length < 2) return <ItemList items={items} {...rest} />;
+  return (
+    <>
+      {groups.map((group) => (
+        <section key={group.name} className="item-group">
+          <h3>
+            {group.name} <span className="muted">({group.items.length})</span>
+          </h3>
+          <ItemList items={group.items} {...rest} />
+        </section>
+      ))}
+    </>
   );
 }
 

@@ -1890,6 +1890,15 @@ a.meal-title:hover {
   font-variant-numeric: lining-nums proportional-nums;
 }
 
+/* Grupos por categoria de topo nos itens por comprar. */
+.item-group + .item-group {
+  margin-top: 1.25rem;
+}
+
+.item-group h3 .muted {
+  font-weight: 500;
+}
+
 .list-row.is-purchased .meal-title {
   text-decoration: line-through;
   color: var(--ink-dim);

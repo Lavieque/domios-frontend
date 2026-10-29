@@ -7,6 +7,7 @@ import { AccountPage } from "./pages/AccountPage";
 import { AddPantryItemPage } from "./pages/AddPantryItemPage";
 import { CreateHouseholdPage } from "./pages/CreateHouseholdPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { HouseholdHistoryPage } from "./pages/HouseholdHistoryPage";
 import { HouseholdPage } from "./pages/HouseholdPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MealPlanTemplateDetailPage } from "./pages/MealPlanTemplateDetailPage";
@@ -102,6 +103,7 @@ function App() {
             <Route path="/listas/:id" element={<ShoppingListPage />} />
             <Route path="/casa" element={<HouseholdPage />} />
             <Route path="/casa/nova" element={<CreateHouseholdPage />} />
+            <Route path="/casa/historico" element={<HouseholdHistoryPage />} />
             <Route path="/conta" element={<AccountPage />} />
           </Route>
           <Route path="/entrar" element={<LoginPage />} />

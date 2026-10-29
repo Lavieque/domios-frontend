@@ -93,6 +93,7 @@ export function HouseholdPage() {
       )}
 
       <p className="form-links">
+        <Link to="/casa/historico">Histórico da casa</Link>
         <Link to="/casa/nova">Criar outra casa</Link>
       </p>
     </div>

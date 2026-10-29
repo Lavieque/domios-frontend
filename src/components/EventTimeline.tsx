@@ -1,20 +1,12 @@
 import { useEffect, useState } from "react";
 import { getEvents } from "../api/client";
 import type { DomainEventLogEntryDto } from "../api/types";
+import { eventLabel } from "../history/events";
 
 interface EventTimelineProps {
   aggregateType: string;
   aggregateId: string;
 }
-
-const eventLabels: Record<string, string> = {
-  ProductCreated: "Produto criado",
-  ProductUpdated: "Produto atualizado",
-  ProductDiscontinued: "Produto descontinuado",
-  ProductSubstituted: "Substituído por outro produto",
-  ProductIngredientLinked: "Ligado a um ingrediente",
-  ProductIngredientUnlinked: "Desligado do ingrediente",
-};
 
 export function EventTimeline({ aggregateType, aggregateId }: EventTimelineProps) {
   const [events, setEvents] = useState<DomainEventLogEntryDto[] | null>(null);
@@ -38,7 +30,7 @@ export function EventTimeline({ aggregateType, aggregateId }: EventTimelineProps
         <li key={event.eventId}>
           <details>
             <summary>
-              <strong>{eventLabels[event.eventType] ?? event.eventType}</strong>
+              <strong>{eventLabel(event.eventType)}</strong>
               <span className="muted">{new Date(event.occurredOn).toLocaleString("pt-PT", { dateStyle: "medium", timeStyle: "short" })}</span>
             </summary>
             <pre>{JSON.stringify(JSON.parse(event.payload), null, 2)}</pre>

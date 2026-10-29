@@ -2,6 +2,7 @@
 // exigem sessão; /households/{id}/... exige também ser Member ligado.
 
 import { authedRequest } from "../auth/sessionStore";
+import type { DomainEventLogEntryDto, PagedResult } from "./types";
 
 export const MemberRole = {
   Admin: 0,
@@ -58,6 +59,21 @@ export function listMyHouseholds(): Promise<CallerHouseholdDto[]> {
 
 export function getHousehold(householdId: string): Promise<HouseholdDto> {
   return authedRequest<HouseholdDto>(`/households/${householdId}`);
+}
+
+/**
+ * Histórico da casa, mais recente primeiro (DomiOS_DataModel_EventLog.md,
+ * adenda 2026-10-15). `aggregateType` vazio = todos.
+ */
+export function getHouseholdTimeline(
+  householdId: string,
+  aggregateType: string,
+  page: number,
+  pageSize = 20,
+): Promise<PagedResult<DomainEventLogEntryDto>> {
+  return authedRequest<PagedResult<DomainEventLogEntryDto>>(`/households/${householdId}/timeline`, {
+    params: { aggregateType, page, pageSize },
+  });
 }
 
 /** Cria a casa; quem a cria fica ligado ao membro Admin. */

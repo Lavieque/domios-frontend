@@ -1438,6 +1438,11 @@ a.meal-title:hover {
 
 /* ---------- Sugestões (oportunidades) ---------- */
 
+.opportunity-headline {
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+}
+
 .opportunity-list {
   list-style: none;
   margin: 0;

@@ -77,3 +77,14 @@ export interface OpportunityListDto {
   heldBackCount: number;
   failedSignals: string[];
 }
+
+/** Síntese de `GET .../opportunities/summary`: conta tudo o que está aberto, mostrado ou não. */
+export interface OpportunitySummaryDto {
+  generatedAt: string;
+  openCount: number;
+  heldBackCount: number;
+  totalExpectedBenefit: number;
+  /** Texto pronto ("3 ações podem poupar cerca de 18 €"); `null` sem nada aberto. */
+  headline: string | null;
+  failedSignals: string[];
+}

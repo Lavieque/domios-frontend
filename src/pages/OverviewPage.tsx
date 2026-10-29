@@ -7,6 +7,7 @@ import { listPlannedMeals, mealTypeLabels, PlannedMealStatus, type PlannedMealDt
 import { measurementUnitLabels, type PromotionDto } from "../api/types";
 import { PromotionLabel } from "../components/PromotionLabel";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { OpportunitiesPanel } from "../opportunities/OpportunitiesPanel";
 import { useProducts } from "../pantry/useProducts";
 import { addDays, daysBetween, longDate, shortDate, today, weekdayTitle } from "../plan/dates";
 import { useOpenLists } from "../shopping/useOpenLists";
@@ -112,6 +113,8 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <>
+      <OpportunitiesPanel householdId={householdId} />
+
       <section className="panel">
         <div className="section-head">
           <h2>Próximos dias</h2>

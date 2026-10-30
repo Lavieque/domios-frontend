@@ -5,7 +5,6 @@ import { CategoryScope, measurementUnitLabels, ProductStatus, type CategoryDto, 
 import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
 import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { AisleSign } from "../components/AisleSign";
-import { GroceryOnlyToggle } from "../components/GroceryOnlyToggle";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
@@ -20,6 +19,8 @@ const SCOPE_GROUPS: { scope: CategoryScope; label: string }[] = [
   { scope: CategoryScope.NonGrocery, label: "Acessórios e outros" },
   { scope: CategoryScope.Unclassified, label: "Por classificar" },
 ];
+/** Categorias à vista por grupo antes de "Mais N". */
+const GROUP_PREVIEW = 8;
 
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -104,6 +105,17 @@ export function ProductsPage() {
     });
   }
 
+  // "Mais N" por grupo: só as primeiras categorias à vista, o resto a pedido.
+  const [expandedGroups, setExpandedGroups] = useState<Set<CategoryScope>>(() => new Set());
+  function toggleExpanded(scope: CategoryScope) {
+    setExpandedGroups((expanded) => {
+      const next = new Set(expanded);
+      if (next.has(scope)) next.delete(scope);
+      else next.add(scope);
+      return next;
+    });
+  }
+
   useEffect(() => {
     setLoading(true);
     searchProducts(search, page, PAGE_SIZE, categoryId ?? undefined, groceryOnly)
@@ -114,52 +126,56 @@ export function ProductsPage() {
       .finally(() => setLoading(false));
   }, [search, page, categoryId, groceryOnly]);
 
+  const selectedCategory = categoryId ? categoriesById.get(categoryId) : undefined;
+  // Primeira carga sem nada para mostrar; depois a grelha anterior fica à
+  // vista, esbatida, em vez de desaparecer e saltar a cada filtro.
+  const firstLoad = loading && products.length === 0;
+
   return (
     <div className="page">
       <h1>Produtos</h1>
       <p className="page-sub">Preços observados nas lojas, com o veredicto do histórico de cada oferta.</p>
 
-      <div className="toolbar">
-        <SearchField
-          label="Pesquisar produtos"
-          placeholder="Pesquisar por nome ou marca…"
-          value={search}
-          onChange={(value) => applyFilters({ search: value, page: 1 })}
-        />
-        <button
-          type="button"
-          className="chip chip-more filters-toggle"
-          aria-expanded={showFilters}
-          aria-controls="product-filters"
-          onClick={() => setShowFilters((open) => !open)}
-        >
-          {activeFilterCount > 0 ? `Filtros · ${activeFilterCount}` : "Filtros"}
-        </button>
-      </div>
-
       <div className="catalog-layout">
+        <div className="toolbar catalog-toolbar">
+          <SearchField
+            label="Pesquisar produtos"
+            placeholder="Pesquisar por nome ou marca…"
+            value={search}
+            onChange={(value) => applyFilters({ search: value, page: 1 })}
+          />
+          <button
+            type="button"
+            className="chip chip-more filters-toggle"
+            aria-expanded={showFilters}
+            aria-controls="product-filters"
+            onClick={() => setShowFilters((open) => !open)}
+          >
+            {activeFilterCount > 0 ? `Filtros · ${activeFilterCount}` : "Filtros"}
+          </button>
+        </div>
+
         <aside
           className={`filter-sidebar${showFilters ? " is-open" : ""}`}
           id="product-filters"
           aria-label="Filtros"
         >
-          <div className="filter-sidebar-head">
-            <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
-            {activeFilterCount > 0 && (
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => applyFilters({ categoryId: null, groceryOnly: true, page: 1 })}
-              >
-                Limpar
-              </button>
-            )}
-          </div>
+          <label className="filter-check">
+            <input
+              type="checkbox"
+              checked={groceryOnly}
+              onChange={(e) => applyFilters({ groceryOnly: e.target.checked, page: 1 })}
+            />
+            <span>
+              Só supermercado
+              <span className="filter-check-hint">Esconde brinquedos, decoração e afins</span>
+            </span>
+          </label>
 
           {groups.length > 0 && (
             <button
               type="button"
-              className="filter-option"
+              className="filter-option filter-option-all"
               aria-pressed={categoryId === null}
               onClick={() => applyFilters({ categoryId: null, page: 1 })}
             >
@@ -170,6 +186,12 @@ export function ProductsPage() {
           {groups.map((group) => {
             const open = openGroups.has(group.scope);
             const listId = `filter-group-${group.scope}`;
+            const expanded = expandedGroups.has(group.scope);
+            // A escolhida fica sempre à vista, mesmo para lá do corte.
+            const shown = expanded
+              ? group.categories
+              : group.categories.filter((category, index) => index < GROUP_PREVIEW || category.categoryId === categoryId);
+            const rest = group.categories.length - shown.length;
             return (
               <section key={group.scope} className="filter-group">
                 <button
@@ -183,35 +205,73 @@ export function ProductsPage() {
                   <span className="filter-group-count">{group.categories.length}</span>
                 </button>
                 {open && (
-                  <ul className="filter-group-list" id={listId}>
-                    {group.categories.map((category) => (
-                      <li key={category.categoryId}>
-                        <button
-                          type="button"
-                          className={`filter-option ${aisleClass(aisleOf(category.name))}`}
-                          aria-pressed={categoryId === category.categoryId}
-                          onClick={() => applyFilters({ categoryId: category.categoryId, page: 1 })}
-                        >
-                          <span className="aisle-dot" aria-hidden="true" />
-                          {category.name}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="filter-group-body" id={listId}>
+                    <ul className="filter-group-list">
+                      {shown.map((category) => (
+                        <li key={category.categoryId}>
+                          <button
+                            type="button"
+                            className={`filter-option ${aisleClass(aisleOf(category.name))}`}
+                            aria-pressed={categoryId === category.categoryId}
+                            onClick={() => {
+                              applyFilters({ categoryId: category.categoryId, page: 1 });
+                              setShowFilters(false);
+                            }}
+                          >
+                            <span className="aisle-dot" aria-hidden="true" />
+                            {category.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                    {group.categories.length > GROUP_PREVIEW && (expanded || rest > 0) && (
+                      <button type="button" className="link-button filter-more" onClick={() => toggleExpanded(group.scope)}>
+                        {expanded ? "Mostrar menos" : `Mais ${rest}`}
+                      </button>
+                    )}
+                  </div>
                 )}
               </section>
             );
           })}
         </aside>
 
-        <div className="catalog-results">
-          <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} resultados`}</p>
+        <div className="catalog-results" aria-busy={loading}>
+          <div className="results-head">
+            <p className="results-count">
+              {firstLoad ? "A procurar…" : `${count.format(total)} ${total === 1 ? "produto" : "produtos"}`}
+            </p>
+            {selectedCategory && (
+              <button
+                type="button"
+                className={`active-filter ${aisleClass(aisleOf(selectedCategory.name))}`}
+                aria-label={`Tirar filtro ${selectedCategory.name}`}
+                onClick={() => applyFilters({ categoryId: null, page: 1 })}
+              >
+                <span className="aisle-dot" aria-hidden="true" />
+                {selectedCategory.name}
+                <span className="active-filter-x" aria-hidden="true" />
+              </button>
+            )}
+            {!groceryOnly && <span className="pill pill-muted">Inclui fora do supermercado</span>}
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                className="link-button results-clear"
+                onClick={() => applyFilters({ categoryId: null, groceryOnly: true, page: 1 })}
+              >
+                Limpar filtros
+              </button>
+            )}
+          </div>
 
           {!loading && products.length === 0 ? (
-            <p className="empty-state">Sem resultados para esta pesquisa.</p>
+            <p className="empty-state">
+              {search || categoryId ? "Sem produtos para estes filtros." : "Sem produtos no catálogo."}
+            </p>
           ) : (
-            !loading && (
-              <div className="label-grid">
+            products.length > 0 && (
+              <div className={`label-grid${loading ? " is-loading" : ""}`}>
                 {products.map((product, index) => (
                   <ProductLabel
                     key={product.productId}

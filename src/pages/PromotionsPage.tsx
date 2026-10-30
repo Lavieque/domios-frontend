@@ -40,6 +40,11 @@ export function PromotionsPage() {
   const [offers, setOffers] = useState<CurrentPromotionDto[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  // Fechados por omissão: os quatro filtros juntos ocupavam meio ecrã no
+  // telemóvel. As cadeias ficam sempre à vista.
+  const [showFilters, setShowFilters] = useState(false);
+  const activeFilterCount =
+    (categoryId ? 1 : 0) + (requiresCard !== undefined ? 1 : 0) + (minDiscount !== undefined ? 1 : 0) + (groceryOnly ? 0 : 1);
 
   function applyFilters(next: {
     chainId?: string | null;
@@ -104,60 +109,83 @@ export function PromotionsPage() {
       <h1>Promoções ativas</h1>
       <p className="page-sub">Produtos em promoção na última leitura de cada loja, dos últimos 3 dias.</p>
 
-      <div className="toolbar">
-        <select
-          className="category-select"
-          aria-label="Categoria"
-          value={categoryId ?? ""}
-          onChange={(e) => applyFilters({ categoryId: e.target.value || null, page: 1 })}
+      <div className="chip-row">
+        <button
+          type="button"
+          className="chip chip-more"
+          aria-expanded={showFilters}
+          aria-controls="promotion-filters"
+          onClick={() => setShowFilters((open) => !open)}
         >
-          <option value="">Todas as categorias</option>
-          {topLevelCategories.map((category) => (
-            <option key={category.categoryId} value={category.categoryId}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        <select
-          className="category-select"
-          aria-label="Cartão"
-          value={requiresCard === undefined ? "" : requiresCard ? "1" : "0"}
-          onChange={(e) => applyFilters({ requiresCard: parseCard(e.target.value) ?? null, page: 1 })}
-        >
-          <option value="">Com e sem cartão</option>
-          <option value="1">Só com cartão</option>
-          <option value="0">Só sem cartão</option>
-        </select>
-        <select
-          className="category-select"
-          aria-label="Desconto mínimo"
-          value={minDiscount ?? ""}
-          onChange={(e) => applyFilters({ minDiscount: parseMinDiscount(e.target.value) ?? null, page: 1 })}
-        >
-          <option value="">Qualquer desconto</option>
-          {MIN_DISCOUNTS.map((value) => (
-            <option key={value} value={value}>
-              {value}% ou mais
-            </option>
-          ))}
-        </select>
-        <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
-        {openChains.length > MAX_CHAIN_CHIPS && (
+          {activeFilterCount > 0 ? `Filtros · ${activeFilterCount}` : "Filtros"}
+        </button>
+        {activeFilterCount > 0 && (
+          <button
+            type="button"
+            className="chip"
+            onClick={() => applyFilters({ categoryId: null, requiresCard: null, minDiscount: null, groceryOnly: true, page: 1 })}
+          >
+            Limpar
+          </button>
+        )}
+      </div>
+
+      {showFilters && (
+        <div className="toolbar" id="promotion-filters">
           <select
             className="category-select"
-            aria-label="Cadeia"
-            value={chainId ?? ""}
-            onChange={(e) => applyFilters({ chainId: e.target.value || null, page: 1 })}
+            aria-label="Categoria"
+            value={categoryId ?? ""}
+            onChange={(e) => applyFilters({ categoryId: e.target.value || null, page: 1 })}
           >
-            <option value="">Todas as cadeias</option>
-            {openChains.map((chain) => (
-              <option key={chain.chainId} value={chain.chainId}>
-                {chain.name}
+            <option value="">Todas as categorias</option>
+            {topLevelCategories.map((category) => (
+              <option key={category.categoryId} value={category.categoryId}>
+                {category.name}
               </option>
             ))}
           </select>
-        )}
-      </div>
+          <select
+            className="category-select"
+            aria-label="Cartão"
+            value={requiresCard === undefined ? "" : requiresCard ? "1" : "0"}
+            onChange={(e) => applyFilters({ requiresCard: parseCard(e.target.value) ?? null, page: 1 })}
+          >
+            <option value="">Com e sem cartão</option>
+            <option value="1">Só com cartão</option>
+            <option value="0">Só sem cartão</option>
+          </select>
+          <select
+            className="category-select"
+            aria-label="Desconto mínimo"
+            value={minDiscount ?? ""}
+            onChange={(e) => applyFilters({ minDiscount: parseMinDiscount(e.target.value) ?? null, page: 1 })}
+          >
+            <option value="">Qualquer desconto</option>
+            {MIN_DISCOUNTS.map((value) => (
+              <option key={value} value={value}>
+                {value}% ou mais
+              </option>
+            ))}
+          </select>
+          <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
+          {openChains.length > MAX_CHAIN_CHIPS && (
+            <select
+              className="category-select"
+              aria-label="Cadeia"
+              value={chainId ?? ""}
+              onChange={(e) => applyFilters({ chainId: e.target.value || null, page: 1 })}
+            >
+              <option value="">Todas as cadeias</option>
+              {openChains.map((chain) => (
+                <option key={chain.chainId} value={chain.chainId}>
+                  {chain.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
 
       {openChains.length > 1 && openChains.length <= MAX_CHAIN_CHIPS && (
         <div className="chip-row" role="group" aria-label="Cadeia">

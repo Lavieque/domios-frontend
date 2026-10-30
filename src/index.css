@@ -3580,23 +3580,24 @@ a.meal-title:hover {
   background: var(--danger-soft);
 }
 
-/* Telemóvel: um cartão por linha, campo do corredor à esquerda. */
+/* Telemóvel: dois cartões por linha, a foto por cima e o texto por baixo, como nas receitas. */
 @media (max-width: 480px) {
   .label-grid:has(.product-card) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.6rem;
   }
 
-  .product-card {
-    display: grid;
-    grid-template-columns: 6rem minmax(0, 1fr);
-    grid-template-rows: 1fr auto;
+  .product-card .product-photo {
+    aspect-ratio: 5 / 4;
   }
 
-  .product-card .product-photo {
-    grid-row: 1 / span 2;
-    aspect-ratio: auto;
-    height: 100%;
+  .product-card .product-photo.is-empty {
+    aspect-ratio: 4 / 3;
+  }
+
+  .product-card .product-photo img {
+    width: 82%;
+    height: 82%;
   }
 
   .product-card .product-photo-tag {
@@ -3604,11 +3605,31 @@ a.meal-title:hover {
   }
 
   .product-card .label-body {
-    padding: 0.75rem 0.9rem 0.6rem;
+    padding: 0.6rem 0.7rem 0.65rem;
+  }
+
+  .product-card .label-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    font-size: 14px;
+  }
+
+  .product-card .label-meta,
+  .product-card .label-unit,
+  .product-card .label-card {
+    font-size: 12.5px;
+    overflow-wrap: anywhere;
+  }
+
+  .product-card .label-price {
+    font-size: 26px;
   }
 
   .product-card .verdict {
-    grid-column: 2;
-    padding: 0.45rem 0.9rem;
+    padding: 0.4rem 0.7rem;
+    font-size: 12px;
   }
 }

@@ -668,6 +668,8 @@ input::placeholder {
 
 select,
 .category-select {
+  max-width: 100%;
+  text-overflow: ellipsis;
   appearance: none;
   padding-right: 2.1rem;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%235b6e71' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -1979,7 +1981,7 @@ a.meal-title:hover {
 
 .today-list li {
   display: grid;
-  grid-template-columns: 10rem 1fr;
+  grid-template-columns: 10rem minmax(0, 1fr);
   gap: 0.75rem;
   padding: 0.6rem 0;
   border-bottom: 1px solid var(--line);
@@ -2035,7 +2037,7 @@ a.meal-title:hover {
 
 @media (max-width: 900px) {
   .overview-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -2319,7 +2321,7 @@ a.meal-title:hover {
 @media (max-width: 860px) {
   .recipe-hero.has-photo,
   .recipe-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .recipe-ingredients {
@@ -3194,7 +3196,7 @@ a.meal-title:hover {
   }
 
   .member-form {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -3365,7 +3367,7 @@ a.meal-title:hover {
 
 @media (max-width: 760px) {
   .article-hero {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .article-photo {

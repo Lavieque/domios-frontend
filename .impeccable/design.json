@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-26T20:15:29.053Z",
+  "generatedAt": "2026-10-30T11:47:56.399Z",
   "title": "Design System: DomiOS",
   "extensions": {
     "colorMeta": {
@@ -159,14 +159,14 @@
         "displayName": "Price Red",
         "canonical": "#b91c1c",
         "tonalRamp": [
-          "oklch(15% 0.150 27.5)",
-          "oklch(26% 0.150 27.5)",
-          "oklch(37% 0.150 27.5)",
-          "oklch(48% 0.150 27.5)",
-          "oklch(59% 0.150 27.5)",
-          "oklch(70% 0.150 27.5)",
-          "oklch(82% 0.150 27.5)",
-          "oklch(95% 0.150 27.5)"
+          "oklch(15% 0.190 27.5)",
+          "oklch(26% 0.190 27.5)",
+          "oklch(37% 0.190 27.5)",
+          "oklch(48% 0.190 27.5)",
+          "oklch(59% 0.190 27.5)",
+          "oklch(70% 0.190 27.5)",
+          "oklch(82% 0.190 27.5)",
+          "oklch(95% 0.190 27.5)"
         ]
       },
       "danger-soft": {
@@ -174,14 +174,194 @@
         "displayName": "Price Red Tint",
         "canonical": "rgba(185, 28, 28, 0.1)",
         "tonalRamp": [
-          "oklch(15% 0.150 27.5)",
-          "oklch(26% 0.150 27.5)",
-          "oklch(37% 0.150 27.5)",
-          "oklch(48% 0.150 27.5)",
-          "oklch(59% 0.150 27.5)",
-          "oklch(70% 0.150 27.5)",
-          "oklch(82% 0.150 27.5)",
-          "oklch(95% 0.150 27.5)"
+          "oklch(15% 0.190 27.5)",
+          "oklch(26% 0.190 27.5)",
+          "oklch(37% 0.190 27.5)",
+          "oklch(48% 0.190 27.5)",
+          "oklch(59% 0.190 27.5)",
+          "oklch(70% 0.190 27.5)",
+          "oklch(82% 0.190 27.5)",
+          "oklch(95% 0.190 27.5)"
+        ]
+      },
+      "aisle-fresh": {
+        "role": "tertiary",
+        "displayName": "Fresh Red",
+        "canonical": "#c2412d",
+        "tonalRamp": [
+          "oklch(15% 0.168 31.5)",
+          "oklch(26% 0.168 31.5)",
+          "oklch(37% 0.168 31.5)",
+          "oklch(48% 0.168 31.5)",
+          "oklch(59% 0.168 31.5)",
+          "oklch(70% 0.168 31.5)",
+          "oklch(82% 0.168 31.5)",
+          "oklch(95% 0.168 31.5)"
+        ]
+      },
+      "aisle-fresh-soft": {
+        "role": "tertiary",
+        "displayName": "Fresh Red Tint",
+        "canonical": "#f6e4e0",
+        "tonalRamp": [
+          "oklch(15% 0.021 32.5)",
+          "oklch(26% 0.021 32.5)",
+          "oklch(37% 0.021 32.5)",
+          "oklch(48% 0.021 32.5)",
+          "oklch(59% 0.021 32.5)",
+          "oklch(70% 0.021 32.5)",
+          "oklch(82% 0.021 32.5)",
+          "oklch(95% 0.021 32.5)"
+        ]
+      },
+      "aisle-fish": {
+        "role": "tertiary",
+        "displayName": "Fish Blue",
+        "canonical": "#2f5f9e",
+        "tonalRamp": [
+          "oklch(15% 0.114 256.1)",
+          "oklch(26% 0.114 256.1)",
+          "oklch(37% 0.114 256.1)",
+          "oklch(48% 0.114 256.1)",
+          "oklch(59% 0.114 256.1)",
+          "oklch(70% 0.114 256.1)",
+          "oklch(82% 0.114 256.1)",
+          "oklch(95% 0.114 256.1)"
+        ]
+      },
+      "aisle-fish-soft": {
+        "role": "tertiary",
+        "displayName": "Fish Blue Tint",
+        "canonical": "#e2eaf4",
+        "tonalRamp": [
+          "oklch(15% 0.016 253.9)",
+          "oklch(26% 0.016 253.9)",
+          "oklch(37% 0.016 253.9)",
+          "oklch(48% 0.016 253.9)",
+          "oklch(59% 0.016 253.9)",
+          "oklch(70% 0.016 253.9)",
+          "oklch(82% 0.016 253.9)",
+          "oklch(95% 0.016 253.9)"
+        ]
+      },
+      "aisle-pantry": {
+        "role": "tertiary",
+        "displayName": "Pantry Olive",
+        "canonical": "#5f7a24",
+        "tonalRamp": [
+          "oklch(15% 0.116 125.2)",
+          "oklch(26% 0.116 125.2)",
+          "oklch(37% 0.116 125.2)",
+          "oklch(48% 0.116 125.2)",
+          "oklch(59% 0.116 125.2)",
+          "oklch(70% 0.116 125.2)",
+          "oklch(82% 0.116 125.2)",
+          "oklch(95% 0.116 125.2)"
+        ]
+      },
+      "aisle-pantry-soft": {
+        "role": "tertiary",
+        "displayName": "Pantry Olive Tint",
+        "canonical": "#ebf0dc",
+        "tonalRamp": [
+          "oklch(15% 0.027 118.3)",
+          "oklch(26% 0.027 118.3)",
+          "oklch(37% 0.027 118.3)",
+          "oklch(48% 0.027 118.3)",
+          "oklch(59% 0.027 118.3)",
+          "oklch(70% 0.027 118.3)",
+          "oklch(82% 0.027 118.3)",
+          "oklch(95% 0.027 118.3)"
+        ]
+      },
+      "aisle-bakery": {
+        "role": "tertiary",
+        "displayName": "Bakery Ochre",
+        "canonical": "#9a6f0a",
+        "tonalRamp": [
+          "oklch(15% 0.115 80.9)",
+          "oklch(26% 0.115 80.9)",
+          "oklch(37% 0.115 80.9)",
+          "oklch(48% 0.115 80.9)",
+          "oklch(59% 0.115 80.9)",
+          "oklch(70% 0.115 80.9)",
+          "oklch(82% 0.115 80.9)",
+          "oklch(95% 0.115 80.9)"
+        ]
+      },
+      "aisle-bakery-soft": {
+        "role": "tertiary",
+        "displayName": "Bakery Ochre Tint",
+        "canonical": "#f7eed6",
+        "tonalRamp": [
+          "oklch(15% 0.033 89.8)",
+          "oklch(26% 0.033 89.8)",
+          "oklch(37% 0.033 89.8)",
+          "oklch(48% 0.033 89.8)",
+          "oklch(59% 0.033 89.8)",
+          "oklch(70% 0.033 89.8)",
+          "oklch(82% 0.033 89.8)",
+          "oklch(95% 0.033 89.8)"
+        ]
+      },
+      "aisle-dairy": {
+        "role": "tertiary",
+        "displayName": "Dairy Sky",
+        "canonical": "#2f7fa8",
+        "tonalRamp": [
+          "oklch(15% 0.099 234.9)",
+          "oklch(26% 0.099 234.9)",
+          "oklch(37% 0.099 234.9)",
+          "oklch(48% 0.099 234.9)",
+          "oklch(59% 0.099 234.9)",
+          "oklch(70% 0.099 234.9)",
+          "oklch(82% 0.099 234.9)",
+          "oklch(95% 0.099 234.9)"
+        ]
+      },
+      "aisle-dairy-soft": {
+        "role": "tertiary",
+        "displayName": "Dairy Sky Tint",
+        "canonical": "#dff0f6",
+        "tonalRamp": [
+          "oklch(15% 0.020 220.9)",
+          "oklch(26% 0.020 220.9)",
+          "oklch(37% 0.020 220.9)",
+          "oklch(48% 0.020 220.9)",
+          "oklch(59% 0.020 220.9)",
+          "oklch(70% 0.020 220.9)",
+          "oklch(82% 0.020 220.9)",
+          "oklch(95% 0.020 220.9)"
+        ]
+      },
+      "aisle-home": {
+        "role": "tertiary",
+        "displayName": "Home Plum",
+        "canonical": "#7d4f8f",
+        "tonalRamp": [
+          "oklch(15% 0.111 316.0)",
+          "oklch(26% 0.111 316.0)",
+          "oklch(37% 0.111 316.0)",
+          "oklch(48% 0.111 316.0)",
+          "oklch(59% 0.111 316.0)",
+          "oklch(70% 0.111 316.0)",
+          "oklch(82% 0.111 316.0)",
+          "oklch(95% 0.111 316.0)"
+        ]
+      },
+      "aisle-home-soft": {
+        "role": "tertiary",
+        "displayName": "Home Plum Tint",
+        "canonical": "#efe5f2",
+        "tonalRamp": [
+          "oklch(15% 0.020 318.4)",
+          "oklch(26% 0.020 318.4)",
+          "oklch(37% 0.020 318.4)",
+          "oklch(48% 0.020 318.4)",
+          "oklch(59% 0.020 318.4)",
+          "oklch(70% 0.020 318.4)",
+          "oklch(82% 0.020 318.4)",
+          "oklch(95% 0.020 318.4)"
         ]
       },
       "bg-dark": {
@@ -339,14 +519,14 @@
         "displayName": "Price Red (dark)",
         "canonical": "#f87171",
         "tonalRamp": [
-          "oklch(15% 0.150 22.2)",
-          "oklch(26% 0.150 22.2)",
-          "oklch(37% 0.150 22.2)",
-          "oklch(48% 0.150 22.2)",
-          "oklch(59% 0.150 22.2)",
-          "oklch(70% 0.150 22.2)",
-          "oklch(82% 0.150 22.2)",
-          "oklch(95% 0.150 22.2)"
+          "oklch(15% 0.166 22.2)",
+          "oklch(26% 0.166 22.2)",
+          "oklch(37% 0.166 22.2)",
+          "oklch(48% 0.166 22.2)",
+          "oklch(59% 0.166 22.2)",
+          "oklch(70% 0.166 22.2)",
+          "oklch(82% 0.166 22.2)",
+          "oklch(95% 0.166 22.2)"
         ]
       },
       "danger-soft-dark": {
@@ -354,33 +534,217 @@
         "displayName": "Price Red Tint (dark)",
         "canonical": "rgba(248, 113, 113, 0.14)",
         "tonalRamp": [
-          "oklch(15% 0.150 22.2)",
-          "oklch(26% 0.150 22.2)",
-          "oklch(37% 0.150 22.2)",
-          "oklch(48% 0.150 22.2)",
-          "oklch(59% 0.150 22.2)",
-          "oklch(70% 0.150 22.2)",
-          "oklch(82% 0.150 22.2)",
-          "oklch(95% 0.150 22.2)"
+          "oklch(15% 0.166 22.2)",
+          "oklch(26% 0.166 22.2)",
+          "oklch(37% 0.166 22.2)",
+          "oklch(48% 0.166 22.2)",
+          "oklch(59% 0.166 22.2)",
+          "oklch(70% 0.166 22.2)",
+          "oklch(82% 0.166 22.2)",
+          "oklch(95% 0.166 22.2)"
+        ]
+      },
+      "aisle-fresh-dark": {
+        "role": "tertiary",
+        "displayName": "Fresh Red (dark)",
+        "canonical": "#f09a86",
+        "tonalRamp": [
+          "oklch(15% 0.108 33.8)",
+          "oklch(26% 0.108 33.8)",
+          "oklch(37% 0.108 33.8)",
+          "oklch(48% 0.108 33.8)",
+          "oklch(59% 0.108 33.8)",
+          "oklch(70% 0.108 33.8)",
+          "oklch(82% 0.108 33.8)",
+          "oklch(95% 0.108 33.8)"
+        ]
+      },
+      "aisle-fresh-soft-dark": {
+        "role": "tertiary",
+        "displayName": "Fresh Red Tint (dark)",
+        "canonical": "rgba(240, 154, 134, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.108 33.8)",
+          "oklch(26% 0.108 33.8)",
+          "oklch(37% 0.108 33.8)",
+          "oklch(48% 0.108 33.8)",
+          "oklch(59% 0.108 33.8)",
+          "oklch(70% 0.108 33.8)",
+          "oklch(82% 0.108 33.8)",
+          "oklch(95% 0.108 33.8)"
+        ]
+      },
+      "aisle-fish-dark": {
+        "role": "tertiary",
+        "displayName": "Fish Blue (dark)",
+        "canonical": "#8fb4e6",
+        "tonalRamp": [
+          "oklch(15% 0.083 256.1)",
+          "oklch(26% 0.083 256.1)",
+          "oklch(37% 0.083 256.1)",
+          "oklch(48% 0.083 256.1)",
+          "oklch(59% 0.083 256.1)",
+          "oklch(70% 0.083 256.1)",
+          "oklch(82% 0.083 256.1)",
+          "oklch(95% 0.083 256.1)"
+        ]
+      },
+      "aisle-fish-soft-dark": {
+        "role": "tertiary",
+        "displayName": "Fish Blue Tint (dark)",
+        "canonical": "rgba(143, 180, 230, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.083 256.1)",
+          "oklch(26% 0.083 256.1)",
+          "oklch(37% 0.083 256.1)",
+          "oklch(48% 0.083 256.1)",
+          "oklch(59% 0.083 256.1)",
+          "oklch(70% 0.083 256.1)",
+          "oklch(82% 0.083 256.1)",
+          "oklch(95% 0.083 256.1)"
+        ]
+      },
+      "aisle-pantry-dark": {
+        "role": "tertiary",
+        "displayName": "Pantry Olive (dark)",
+        "canonical": "#b5cf72",
+        "tonalRamp": [
+          "oklch(15% 0.123 122.0)",
+          "oklch(26% 0.123 122.0)",
+          "oklch(37% 0.123 122.0)",
+          "oklch(48% 0.123 122.0)",
+          "oklch(59% 0.123 122.0)",
+          "oklch(70% 0.123 122.0)",
+          "oklch(82% 0.123 122.0)",
+          "oklch(95% 0.123 122.0)"
+        ]
+      },
+      "aisle-pantry-soft-dark": {
+        "role": "tertiary",
+        "displayName": "Pantry Olive Tint (dark)",
+        "canonical": "rgba(181, 207, 114, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.123 122.0)",
+          "oklch(26% 0.123 122.0)",
+          "oklch(37% 0.123 122.0)",
+          "oklch(48% 0.123 122.0)",
+          "oklch(59% 0.123 122.0)",
+          "oklch(70% 0.123 122.0)",
+          "oklch(82% 0.123 122.0)",
+          "oklch(95% 0.123 122.0)"
+        ]
+      },
+      "aisle-bakery-dark": {
+        "role": "tertiary",
+        "displayName": "Bakery Ochre (dark)",
+        "canonical": "#e8c25c",
+        "tonalRamp": [
+          "oklch(15% 0.128 88.9)",
+          "oklch(26% 0.128 88.9)",
+          "oklch(37% 0.128 88.9)",
+          "oklch(48% 0.128 88.9)",
+          "oklch(59% 0.128 88.9)",
+          "oklch(70% 0.128 88.9)",
+          "oklch(82% 0.128 88.9)",
+          "oklch(95% 0.128 88.9)"
+        ]
+      },
+      "aisle-bakery-soft-dark": {
+        "role": "tertiary",
+        "displayName": "Bakery Ochre Tint (dark)",
+        "canonical": "rgba(232, 194, 92, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.128 88.9)",
+          "oklch(26% 0.128 88.9)",
+          "oklch(37% 0.128 88.9)",
+          "oklch(48% 0.128 88.9)",
+          "oklch(59% 0.128 88.9)",
+          "oklch(70% 0.128 88.9)",
+          "oklch(82% 0.128 88.9)",
+          "oklch(95% 0.128 88.9)"
+        ]
+      },
+      "aisle-dairy-dark": {
+        "role": "tertiary",
+        "displayName": "Dairy Sky (dark)",
+        "canonical": "#86c8e6",
+        "tonalRamp": [
+          "oklch(15% 0.079 228.3)",
+          "oklch(26% 0.079 228.3)",
+          "oklch(37% 0.079 228.3)",
+          "oklch(48% 0.079 228.3)",
+          "oklch(59% 0.079 228.3)",
+          "oklch(70% 0.079 228.3)",
+          "oklch(82% 0.079 228.3)",
+          "oklch(95% 0.079 228.3)"
+        ]
+      },
+      "aisle-dairy-soft-dark": {
+        "role": "tertiary",
+        "displayName": "Dairy Sky Tint (dark)",
+        "canonical": "rgba(134, 200, 230, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.079 228.3)",
+          "oklch(26% 0.079 228.3)",
+          "oklch(37% 0.079 228.3)",
+          "oklch(48% 0.079 228.3)",
+          "oklch(59% 0.079 228.3)",
+          "oklch(70% 0.079 228.3)",
+          "oklch(82% 0.079 228.3)",
+          "oklch(95% 0.079 228.3)"
+        ]
+      },
+      "aisle-home-dark": {
+        "role": "tertiary",
+        "displayName": "Home Plum (dark)",
+        "canonical": "#c9a2d8",
+        "tonalRamp": [
+          "oklch(15% 0.087 316.5)",
+          "oklch(26% 0.087 316.5)",
+          "oklch(37% 0.087 316.5)",
+          "oklch(48% 0.087 316.5)",
+          "oklch(59% 0.087 316.5)",
+          "oklch(70% 0.087 316.5)",
+          "oklch(82% 0.087 316.5)",
+          "oklch(95% 0.087 316.5)"
+        ]
+      },
+      "aisle-home-soft-dark": {
+        "role": "tertiary",
+        "displayName": "Home Plum Tint (dark)",
+        "canonical": "rgba(201, 162, 216, 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.087 316.5)",
+          "oklch(26% 0.087 316.5)",
+          "oklch(37% 0.087 316.5)",
+          "oklch(48% 0.087 316.5)",
+          "oklch(59% 0.087 316.5)",
+          "oklch(70% 0.087 316.5)",
+          "oklch(82% 0.087 316.5)",
+          "oklch(95% 0.087 316.5)"
         ]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Display",
-        "purpose": "Page titles only."
+      "price-hero": {
+        "displayName": "Price Hero",
+        "purpose": "The article price; euro sign at 0.4em."
       },
       "price": {
         "displayName": "Price",
-        "purpose": "The shelf-label price; 34px in the store grid, 32px under 720px."
+        "purpose": "Card prices; 32px under 720px, 30px in the store comparison grid."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Section heads."
+        "purpose": "Section heads, 2.5rem above."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Label names, row titles, buttons."
+        "purpose": "Card names, row titles, buttons, h3."
       },
       "body": {
         "displayName": "Body",
@@ -388,59 +752,73 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Verdict bands, pills, meta lines, table headers. Sentence case, no tracking."
+        "purpose": "Verdicts, pills, tags, meta, table headers (12.5-14px)."
       }
     },
     "shadows": [
       {
         "name": "float",
         "value": "0 1px 2px rgba(22, 36, 31, 0.06), 0 8px 24px -12px rgba(22, 36, 31, 0.18)",
-        "purpose": "Floating product search results only. Dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px -12px rgba(0, 0, 0, 0.55)."
+        "purpose": "Product search results floating over the add-to-pantry form. Dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px -12px rgba(0, 0, 0, 0.55)."
+      },
+      {
+        "name": "best-edge",
+        "value": "inset 0 0 0 1px var(--accent)",
+        "purpose": "With a teal border, the 2px edge on the best option and today's day card. Not elevation."
+      },
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 3px var(--accent-soft)",
+        "purpose": "Input focus, with a teal border."
       }
     ],
     "motion": [
       {
         "name": "ease-out",
         "value": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Page, label and band entrances; label hover lift."
+        "purpose": "Default easing for entrances and lifts."
       },
       {
         "name": "page-in",
-        "value": "0.4s; opacity 0 and translateY(6px) to rest",
-        "purpose": "Each page on mount."
+        "value": "0.4s ease-out; opacity 0, translateY(6px)",
+        "purpose": "Page entrance."
       },
       {
         "name": "label-in",
-        "value": "0.45s; opacity 0 and translateY(8px) to rest; delay index x 30ms, index capped at 12",
-        "purpose": "Shelf labels settle in, staggered."
+        "value": "0.45s ease-out; translateY(8px); 30ms stagger capped at 12",
+        "purpose": "Cards rising into a grid."
       },
       {
-        "name": "band-in",
-        "value": "0.5s; clip-path inset(0 100% 0 0) to inset(0); delay index x 30ms + 120ms",
-        "purpose": "Verdict bands fill left to right."
+        "name": "bar-in",
+        "value": "0.7s ease-out; scaleX(0) from left; 70ms stagger + 150ms",
+        "purpose": "Store bars growing once, in price order."
+      },
+      {
+        "name": "drawer-in",
+        "value": "0.28s ease-out; translateX(100%)",
+        "purpose": "Menu drawer from the right."
       },
       {
         "name": "state",
         "value": "0.15s ease",
-        "purpose": "Colour and border transitions on controls; press translateY(1px) at 0.1s."
-      },
-      {
-        "name": "reduced-motion",
-        "value": "0.001ms",
-        "purpose": "All animation and transition durations under prefers-reduced-motion."
+        "purpose": "Colour, border and background changes on controls."
       }
     ],
     "breakpoints": [
       {
         "name": "phone",
-        "value": "720px"
+        "value": "480px"
       },
       {
-        "name": "product-hero",
+        "name": "sm",
         "value": "640px"
       },
       {
-        "name": "recipe-detail",
+        "name": "md",
+        "value": "720px"
+      },
+      {
+        "name": "article",
         "value": "760px"
       },
       {
@@ -448,7 +826,7 @@
         "value": "900px"
       },
       {
-        "name": "nav-wrap",
+        "name": "nav",
         "value": "1100px"
       }
     ]
@@ -458,135 +836,157 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one main action on a view: teal, turning navy on hover.",
+      "description": "The main action on a surface; teal, turns navy on hover.",
       "html": "<button class=\"ds-btn-primary\">Adicionar à despensa</button>",
-      "css": ".ds-btn-primary{display:inline-flex;align-items:center;min-height:42px;padding:.5rem 1.05rem;border:1px solid var(--accent);border-radius:3px;background:var(--accent);color:var(--surface);font:700 15px/1.2 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,transform .1s ease}.ds-btn-primary:hover{background:var(--accent-2);border-color:var(--accent-2)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}@media (prefers-color-scheme:dark){.ds-btn-primary{color:var(--bg)}}"
+      "css": ".ds-btn-primary { font-family: var(--font); display: inline-flex; align-items: center; min-height: 44px; padding: 0.5rem 1.15rem; border: 1px solid var(--accent); border-radius: 10px; background: var(--accent); color: var(--surface); font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease; } .ds-btn-primary:hover { background: var(--accent-2); border-color: var(--accent-2); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Alternative actions: white with a hairline, ink border on hover.",
+      "description": "Neutral action beside a primary.",
       "html": "<button class=\"ds-btn-secondary\">Cancelar lista</button>",
-      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;min-height:42px;padding:.5rem 1.05rem;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink);font:700 15px/1.2 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;cursor:pointer;transition:border-color .15s ease,transform .1s ease}.ds-btn-secondary:hover{border-color:var(--ink)}.ds-btn-secondary:active{transform:translateY(1px)}.ds-btn-secondary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+      "css": ".ds-btn-secondary { font-family: var(--font); display: inline-flex; align-items: center; min-height: 44px; padding: 0.5rem 1.15rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 600; cursor: pointer; transition: border-color 0.15s ease, transform 0.1s ease; } .ds-btn-secondary:hover { border-color: var(--ink); } .ds-btn-secondary:active { transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
     },
     {
-      "name": "Search Field",
+      "name": "Row Actions",
+      "kind": "button",
+      "refersTo": "row-action",
+      "description": "Calm pill verbs on a list row, with the destructive pill set apart and red only on hover.",
+      "html": "<div class=\"ds-row-actions\"><button class=\"ds-row-action\">Abrir</button><button class=\"ds-row-action\" aria-expanded=\"true\">Usar</button><button class=\"ds-btn-danger\">Deitar fora</button></div>",
+      "css": ".ds-row-actions { display: flex; align-items: center; gap: 0.4rem; } .ds-row-action, .ds-btn-danger { font-family: var(--font); display: inline-flex; align-items: center; min-height: 36px; padding: 0.3rem 0.85rem; border-radius: 999px; font-size: 14px; font-weight: 550; cursor: pointer; transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; } .ds-row-action { border: 1px solid transparent; background: var(--surface-2); color: var(--ink); } .ds-row-action:hover { border-color: color-mix(in srgb, var(--ink) 25%, transparent); } .ds-row-action[aria-expanded=\"true\"] { background: var(--accent-soft); color: var(--accent); } .ds-btn-danger { margin-left: 0.6rem; padding: 0.3rem 0.8rem; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); } .ds-btn-danger:hover { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); background: var(--danger-soft); } .ds-row-action:focus-visible, .ds-btn-danger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Icon Danger",
+      "kind": "button",
+      "refersTo": "icon-danger",
+      "description": "Round bin button removing a shopping-list item.",
+      "html": "<button class=\"ds-icon-danger\" aria-label=\"Remover\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 7h14M10 7V5h4v2M7 7l1 12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ".ds-icon-danger { display: inline-grid; place-items: center; width: 40px; height: 40px; border: 1px solid transparent; border-radius: 50%; background: transparent; color: var(--ink-dim); cursor: pointer; transition: color 0.15s ease, background-color 0.15s ease; } .ds-icon-danger svg { width: 20px; height: 20px; } .ds-icon-danger:hover { color: var(--danger); background: var(--danger-soft); } .ds-icon-danger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Input",
       "kind": "input",
       "refersTo": "input",
-      "description": "Search with a drawn magnifier; teal border and soft ring on focus.",
-      "html": "<div class=\"ds-search\"><svg viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8.5\" cy=\"8.5\" r=\"5.75\" stroke=\"currentColor\" stroke-width=\"1.6\"/><path d=\"m13 13 4.5 4.5\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg><input type=\"search\" placeholder=\"Procurar produtos\" aria-label=\"Procurar\"></div>",
-      "css": ".ds-search{position:relative;max-width:30rem}.ds-search svg{position:absolute;left:.8rem;top:50%;width:17px;height:17px;transform:translateY(-50%);color:var(--ink-dim);pointer-events:none}.ds-search input{display:block;width:100%;min-height:42px;padding:.5rem .8rem .5rem 2.4rem;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink);font:450 15px/1.5 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;transition:border-color .15s ease,box-shadow .15s ease}.ds-search input::placeholder{color:var(--ink-dim)}.ds-search input:hover{border-color:color-mix(in srgb,var(--ink) 30%,transparent)}.ds-search input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}"
+      "description": "42px field with a drawn magnifier; teal border and tint ring on focus.",
+      "html": "<div class=\"ds-search\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"6.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"/><path d=\"m16 16 4 4\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"/></svg><input type=\"search\" placeholder=\"Procurar produtos\"></div>",
+      "css": ".ds-search { position: relative; max-width: 30rem; } .ds-search svg { position: absolute; left: 0.8rem; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); color: var(--ink-dim); pointer-events: none; } .ds-search input { font-family: var(--font); display: block; width: 100%; min-height: 42px; padding: 0.5rem 0.8rem 0.5rem 2.4rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font-size: 15px; transition: border-color 0.15s ease, box-shadow 0.15s ease; } .ds-search input::placeholder { color: var(--ink-dim); } .ds-search input:hover { border-color: color-mix(in srgb, var(--ink) 30%, transparent); } .ds-search input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }"
     },
     {
-      "name": "Top Navigation",
-      "kind": "nav",
-      "refersTo": "top-bar",
-      "description": "62px bar with a 6px navy top rail that scrolls away with the page: wordmark, two nav groups split by a hairline, navy active underline. Under 1100px a Menu button opens the groups in a side drawer from the right, over a dimmed page.",
-      "html": "<nav class=\"ds-nav\"><span class=\"ds-wordmark\">Domi<em>OS</em></span><div class=\"ds-nav-group\"><a href=\"#\" class=\"active\">Hoje</a><a href=\"#\">Plano</a><a href=\"#\">Despensa</a><a href=\"#\">Listas</a></div><div class=\"ds-nav-group\"><a href=\"#\">Produtos</a><a href=\"#\">Promoções</a><a href=\"#\">Receitas</a></div></nav>",
-      "css": ".ds-nav{display:flex;align-items:stretch;gap:1.75rem;height:60px;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--line);font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif}.ds-wordmark{align-self:center;font-weight:800;font-size:21px;letter-spacing:-.03em;color:var(--ink)}.ds-wordmark em{font-style:normal;color:var(--accent-2)}.ds-nav-group{display:flex;gap:1.1rem}.ds-nav-group+.ds-nav-group{padding-left:1.75rem;border-left:1px solid var(--line);margin:14px 0}.ds-nav-group+.ds-nav-group a{margin:-14px 0}.ds-nav a{display:flex;align-items:center;color:var(--ink-dim);text-decoration:none;font-size:14.5px;font-weight:600;border-top:3px solid transparent;border-bottom:3px solid transparent;transition:color .15s ease,border-color .15s ease}.ds-nav a:hover{color:var(--ink)}.ds-nav a.active{color:var(--accent-2);border-bottom-color:var(--accent-2)}.ds-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
-    },
-    {
-      "name": "Filter Chip",
+      "name": "Aisle Chips",
       "kind": "chip",
       "refersTo": "chip",
-      "description": "Filter toggles; pressed state fills navy.",
-      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\">Peixe</button><button class=\"ds-chip\" aria-pressed=\"false\">Carne</button><button class=\"ds-chip\" aria-pressed=\"false\">Vegetariano</button></div>",
-      "css": ".ds-chips{display:flex;gap:.4rem}.ds-chip{min-height:34px;padding:.3rem .8rem;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink);font:600 14px/1.2 \"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,color .15s ease}.ds-chip:hover{border-color:var(--ink)}.ds-chip[aria-pressed=\"true\"]{background:var(--accent-2);border-color:var(--accent-2);color:var(--surface)}.ds-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+      "description": "Pill filter chips, each led by its aisle dot; pressed fills navy.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"false\">Todas</button><button class=\"ds-chip\" aria-pressed=\"true\" style=\"--aisle: var(--aisle-fresh)\"><span class=\"ds-dot\"></span>Frescos</button><button class=\"ds-chip\" aria-pressed=\"false\" style=\"--aisle: var(--aisle-dairy)\"><span class=\"ds-dot\"></span>Laticínios e Ovos</button><button class=\"ds-chip\" aria-pressed=\"false\" style=\"--aisle: var(--aisle-pantry)\"><span class=\"ds-dot\"></span>Mercearia</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; } .ds-chip { font-family: var(--font); display: inline-flex; align-items: center; gap: 0.5rem; min-height: 36px; padding: 0.3rem 0.95rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 550; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; } .ds-chip:hover { border-color: var(--ink); } .ds-chip[aria-pressed=\"true\"] { background: var(--accent-2); border-color: var(--accent-2); color: var(--surface); } .ds-chip[aria-pressed=\"true\"] .ds-dot { box-shadow: 0 0 0 2px var(--surface); } .ds-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--aisle, var(--ink-dim)); flex: none; }"
     },
     {
-      "name": "Shelf Label",
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "top-bar",
+      "description": "64px top bar, hairline bottom, 2px navy underline on the active link.",
+      "html": "<header class=\"ds-nav\"><span class=\"ds-wordmark\">Domi<em>OS</em></span><nav><a href=\"#\">Hoje</a><a href=\"#\">Despensa</a><a href=\"#\" class=\"active\">Produtos</a><a href=\"#\">Receitas</a></nav></header>",
+      "css": ".ds-nav { font-family: var(--font); display: flex; align-items: center; gap: 2rem; height: 64px; padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--line); } .ds-wordmark { font-weight: 800; font-size: 21px; letter-spacing: -0.03em; color: var(--ink); } .ds-wordmark em { font-style: normal; color: var(--accent-2); } .ds-nav nav { display: flex; align-self: stretch; gap: 1.1rem; } .ds-nav a { display: flex; align-items: center; color: var(--ink-dim); text-decoration: none; font-size: 14.5px; font-weight: 500; box-shadow: inset 0 -2px 0 transparent; transition: color 0.15s ease, box-shadow 0.15s ease; } .ds-nav a:hover { color: var(--ink); } .ds-nav a.active { color: var(--ink); font-weight: 650; box-shadow: inset 0 -2px 0 var(--accent-2); } .ds-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Product Card",
       "kind": "card",
       "refersTo": "shelf-label",
-      "description": "The signature container for anything with a price: navy rail, big price, verdict band.",
-      "html": "<a href=\"#\" class=\"ds-label\"><div class=\"ds-label-body\"><div class=\"ds-label-name\">Arroz Agulha 1 kg</div><div class=\"ds-label-meta\">Sem marca</div><div class=\"ds-label-price\">1,19<small>€</small></div><div class=\"ds-label-unit\"><strong>1,19 €/kg</strong> no Lidl</div><div class=\"ds-label-card\">1,09 € com cartão</div></div><div class=\"ds-verdict\">Preço habitual</div></a>",
-      "css": ".ds-label{display:flex;flex-direction:column;width:15.5rem;background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--accent-2);border-radius:3px;color:inherit;text-decoration:none;overflow:hidden;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;font-variant-numeric:lining-nums proportional-nums;transition:border-color .15s ease,transform .15s cubic-bezier(.16,1,.3,1)}.ds-label:hover{border-color:color-mix(in srgb,var(--ink) 35%,transparent);border-top-color:var(--accent-2);transform:translateY(-2px)}.ds-label:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.ds-label-body{display:flex;flex-direction:column;gap:.2rem;padding:.85rem 1rem .9rem}.ds-label-name{font-weight:700;font-size:15.5px;line-height:1.3;color:var(--ink)}.ds-label-meta,.ds-label-unit{font-size:13.5px;color:var(--ink-dim)}.ds-label-unit strong{color:var(--ink);font-weight:650}.ds-label-price{display:flex;align-items:baseline;gap:.25rem;padding-top:.6rem;font-weight:800;font-size:40px;line-height:1;letter-spacing:-.035em;color:var(--ink)}.ds-label-price small{font-size:.45em;font-weight:700;letter-spacing:0}.ds-label-card{font-size:13.5px;font-weight:700;color:var(--accent)}.ds-verdict{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;font-size:13px;font-weight:700;line-height:1.3;color:var(--ink);background:var(--accent-2-soft)}.ds-verdict::before{content:\"\";width:8px;height:8px;flex:none;background:var(--accent-2)}"
+      "description": "Aisle-tinted photo field with pictogram fallback, name, 800 price, verdict foot row with a round dot.",
+      "html": "<a href=\"#\" class=\"ds-card\" style=\"--aisle: var(--aisle-pantry); --aisle-soft: var(--aisle-pantry-soft)\"><div class=\"ds-photo\"><span class=\"ds-photo-tag\"><span class=\"ds-dot\"></span>Mercearia</span><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M8 3h8M9 3v3.5c-2 1-3 2.6-3 4.5v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8c0-1.9-1-3.5-3-4.5V3M6 13h12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div class=\"ds-body\"><span class=\"ds-name\">Azeite Virgem Extra Clássico</span><span class=\"ds-meta\">Gallo · 750 ml</span><span class=\"ds-price\"><span class=\"ds-from\">desde</span>6,49<small>€</small></span><span class=\"ds-meta\">8,65 €/L</span></div><div class=\"ds-verdict ds-v1\">Mínimo dos últimos 90 dias</div></a>",
+      "css": ".ds-card { font-family: var(--font); display: flex; flex-direction: column; width: 16rem; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--ink); text-decoration: none; overflow: hidden; transition: border-color 0.15s ease, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); } .ds-card:hover { border-color: color-mix(in srgb, var(--ink) 30%, transparent); transform: translateY(-2px); } .ds-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-photo { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 7; background: var(--aisle-soft, var(--surface-2)); } .ds-photo svg { width: 3rem; color: var(--aisle); } .ds-photo-tag { position: absolute; left: 0.7rem; top: 0.7rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0.6rem 0.2rem 0.5rem; border-radius: 999px; background: var(--surface); font-size: 12.5px; font-weight: 600; } .ds-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--aisle, var(--ink-dim)); flex: none; } .ds-body { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.85rem 1.1rem 1rem; } .ds-name { font-weight: 600; font-size: 15.5px; line-height: 1.3; } .ds-meta { font-size: 13.5px; color: var(--ink-dim); } .ds-price { display: flex; align-items: baseline; gap: 0.25rem; padding-top: 0.5rem; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.035em; font-variant-numeric: lining-nums proportional-nums; } .ds-price small { font-size: 0.45em; font-weight: 700; letter-spacing: 0; } .ds-from { font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ink-dim); margin-right: 0.15rem; } .ds-verdict { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1.1rem; font-size: 13px; font-weight: 600; line-height: 1.3; border-top: 1px solid var(--line); background: var(--surface-2); color: var(--ink); } .ds-verdict::before { content: \"\"; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-dim); flex: none; } .ds-v1 { background: var(--accent-soft); color: var(--accent); } .ds-v1::before { background: var(--accent); }"
     },
     {
-      "name": "Verdict Bands",
-      "kind": "custom",
-      "refersTo": "verdict-historic-low",
-      "description": "PriceLabel 0-4 plus none and urgent tones, each with an 8px square marker; fills left to right.",
-      "html": "<div class=\"ds-bands\"><div class=\"ds-band ds-band-1\">Mínimo dos últimos 90 dias</div><div class=\"ds-band ds-band-2\">Abaixo da média</div><div class=\"ds-band ds-band-3\">Preço habitual</div><div class=\"ds-band ds-band-4\">Acima da média</div><div class=\"ds-band ds-band-0\">Histórico insuficiente</div><div class=\"ds-band ds-band-urgent\">Termina amanhã</div></div>",
-      "css": ".ds-bands{display:flex;flex-direction:column;gap:6px;width:16rem;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif}.ds-band{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;font-size:13px;font-weight:700;line-height:1.3;color:var(--ink);background:var(--surface-2);animation:ds-band-in .5s cubic-bezier(.16,1,.3,1) both}.ds-band::before{content:\"\";width:8px;height:8px;flex:none;background:var(--ink-dim)}.ds-band-1{background:var(--accent);color:var(--surface)}.ds-band-1::before{background:var(--surface)}.ds-band-2{background:var(--accent-soft)}.ds-band-2::before{background:var(--accent)}.ds-band-3{background:var(--accent-2-soft)}.ds-band-3::before{background:var(--accent-2)}.ds-band-4,.ds-band-urgent{background:var(--danger-soft)}.ds-band-4::before,.ds-band-urgent::before{background:var(--danger)}.ds-band-0{color:var(--ink-dim)}@keyframes ds-band-in{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}@media (prefers-color-scheme:dark){.ds-band-1{background:var(--accent-soft);color:var(--ink)}.ds-band-1::before{background:var(--accent)}}@media (prefers-reduced-motion:reduce){.ds-band{animation-duration:.001ms}}"
-    },
-    {
-      "name": "Pills",
+      "name": "Verdict Pills",
       "kind": "chip",
-      "refersTo": "pill-good",
-      "description": "Small 2px tags; on the shopping list the good pill names the cheapest store and its price.",
-      "html": "<div class=\"ds-pills\"><span class=\"ds-pill ds-pill-good\">Lidl · 1,19 €</span><span class=\"ds-pill ds-pill-navy\">Em 2 dias</span><span class=\"ds-pill ds-pill-danger\">Expira hoje</span><span class=\"ds-pill ds-pill-muted\">Peixe</span></div>",
-      "css": ".ds-pills{display:flex;gap:.4rem;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif}.ds-pill{display:inline-flex;align-items:center;border-radius:2px;padding:.12rem .45rem;font-size:12.5px;font-weight:650;line-height:1.4;white-space:nowrap;font-variant-numeric:lining-nums proportional-nums}.ds-pill-good{background:var(--accent-soft);color:var(--accent)}.ds-pill-navy{background:var(--accent-2-soft);color:var(--accent-2)}.ds-pill-danger{background:var(--danger-soft);color:var(--danger)}.ds-pill-muted{background:var(--surface-2);color:var(--ink-dim)}"
+      "refersTo": "verdict-pill",
+      "description": "The Api PriceLabel as a loose pill led by a round dot.",
+      "html": "<div class=\"ds-verdicts\"><span class=\"ds-vp ds-vp1\">Mais barato</span><span class=\"ds-vp ds-vp2\">Abaixo da média</span><span class=\"ds-vp ds-vp3\">Preço habitual</span><span class=\"ds-vp ds-vp4\">Acima da média</span><span class=\"ds-vp ds-vp0\">Sem histórico de preços</span></div>",
+      "css": ".ds-verdicts { display: flex; flex-wrap: wrap; gap: 0.5rem; } .ds-vp { font-family: var(--font); display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 14px; font-weight: 600; line-height: 1.3; background: var(--surface-2); color: var(--ink); } .ds-vp::before { content: \"\"; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-dim); flex: none; } .ds-vp1 { background: var(--accent-soft); color: var(--accent); } .ds-vp1::before, .ds-vp2::before { background: var(--accent); } .ds-vp2 { background: var(--accent-soft); } .ds-vp3 { background: var(--accent-2-soft); } .ds-vp3::before { background: var(--accent-2); } .ds-vp4 { background: var(--danger-soft); } .ds-vp4::before { background: var(--danger); } .ds-vp0 { color: var(--ink-dim); }"
     },
     {
-      "name": "Table",
+      "name": "Onde comprar",
       "kind": "custom",
-      "refersTo": "panel",
-      "description": "Hairline rows, 2px ink header rule, numbers right-aligned in proportional figures.",
-      "html": "<div class=\"ds-table-wrap\"><table class=\"ds-table\"><thead><tr><th>Item</th><th>Precisas</th><th class=\"num\">Preço</th></tr></thead><tbody><tr><td>Arroz Agulha</td><td>1 kg</td><td class=\"num\">1,19 €</td></tr><tr><td>Leite meio-gordo</td><td>6 l</td><td class=\"num\">5,34 €</td></tr></tbody></table></div>",
-      "css": ".ds-table-wrap{border:1px solid var(--line);border-radius:4px;background:var(--surface);overflow-x:auto}.ds-table{width:100%;border-collapse:collapse;font-family:\"Schibsted Grotesk Variable\",\"Segoe UI\",Arial,sans-serif;font-variant-numeric:lining-nums proportional-nums}.ds-table th,.ds-table td{text-align:left;font-size:14.5px;padding:.65rem .9rem;border-bottom:1px solid var(--line);color:var(--ink)}.ds-table th{color:var(--ink-dim);font-weight:700;font-size:12.5px;border-bottom:2px solid var(--ink)}.ds-table .num{text-align:right}.ds-table tbody tr:last-child td{border-bottom:none}.ds-table tbody tr:hover td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}"
+      "refersTo": "store-row",
+      "description": "One row per store, bar scaled to price, cheapest in teal; bars grow once on load.",
+      "html": "<ul class=\"ds-stores\"><li class=\"ds-store is-best\" style=\"--i:0\"><span class=\"ds-sname\"><strong>Continente</strong><span>Continente Colombo · 8,65 €/L</span></span><span class=\"ds-bar\"><span style=\"width:87%\"></span></span><span class=\"ds-sprice\">6,49 €<small>5,99 € com cartão</small></span><span class=\"ds-vp ds-vp1\">Mais barato</span></li><li class=\"ds-store\" style=\"--i:1\"><span class=\"ds-sname\"><strong>Pingo Doce</strong><span>Pingo Doce Benfica · 9,32 €/L</span></span><span class=\"ds-bar\"><span style=\"width:93%\"></span></span><span class=\"ds-sprice\">6,99 €</span><span class=\"ds-vp ds-vp3\">Preço habitual</span></li><li class=\"ds-store\" style=\"--i:2\"><span class=\"ds-sname\"><strong>Lidl</strong><span>Lidl Telheiras · 9,99 €/L</span></span><span class=\"ds-bar\"><span style=\"width:100%\"></span></span><span class=\"ds-sprice\">7,49 €</span><span class=\"ds-vp ds-vp4\">Acima da média</span></li></ul>",
+      "css": ".ds-stores { font-family: var(--font); list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); } .ds-store { display: grid; grid-template-columns: minmax(9rem, 13rem) minmax(4rem, 1fr) auto auto; align-items: center; gap: 0.5rem 1.25rem; padding: 0.9rem 1.1rem; cursor: pointer; } .ds-store + .ds-store { border-top: 1px solid var(--line); } .ds-store:hover { background: color-mix(in srgb, var(--surface-2) 40%, transparent); } .ds-sname { display: flex; flex-direction: column; min-width: 0; } .ds-sname strong { font-weight: 600; } .ds-sname span { font-size: 13px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-bar { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; } .ds-bar span { display: block; height: 100%; border-radius: inherit; background: color-mix(in srgb, var(--ink-dim) 45%, transparent); transform-origin: left; animation: ds-bar-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 150ms); } .ds-store.is-best .ds-bar span { background: var(--accent); } @keyframes ds-bar-in { from { transform: scaleX(0); } to { transform: none; } } .ds-sprice { font-weight: 700; font-size: 19px; letter-spacing: -0.01em; text-align: right; white-space: nowrap; font-variant-numeric: lining-nums proportional-nums; } .ds-sprice small { display: block; font-size: 12.5px; font-weight: 500; letter-spacing: 0; color: var(--accent); } .ds-vp { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; } .ds-vp::before { content: \"\"; width: 8px; height: 8px; border-radius: 50%; flex: none; } .ds-vp1 { background: var(--accent-soft); color: var(--accent); } .ds-vp1::before { background: var(--accent); } .ds-vp3 { background: var(--accent-2-soft); } .ds-vp3::before { background: var(--accent-2); } .ds-vp4 { background: var(--danger-soft); } .ds-vp4::before { background: var(--danger); }"
     }
   ],
   "narrative": {
-    "northStar": "The Shelf Label",
-    "overview": "Every price, item and offer in DomiOS is drawn as a supermarket shelf label: a white card with a 6px navy rail across the top, the product name in bold, the price as the headline in heavy figures with a small euro sign, the unit price and store under it, and a full-width verdict band at the foot saying what the Api learned from 90 days of history. The rest of the app (panels, tables, row lists, forms) is the plain shelving the labels hang on: flat surfaces, 1px hairlines, almost-square corners.\n\nThis is an Operate tool, dense but legible. Planning happens at a desk and the shopping list is used one-handed in the aisle, so type is large for the price and calm everywhere else, and controls are at least 42px tall (list checkboxes 22px with a 32px hit row). The palette is a fixed brand commitment (see PRODUCT.md): teal and navy on cool paper in light mode, the same roles on deep green in dark mode. Redesigns change layout, type and components, never these values.\n\nThe world rejects the soft-card dashboard: no stat tiles, no pastel status pills as the main voice, no eyebrows above headings, no serif and no monospace costume.",
+    "northStar": "The Aisle Sign",
+    "overview": "DomiOS borrows the supermarket's own wayfinding: every product carries the colour of its aisle, and that colour is how you find things in the catalog, the pantry and the shopping list. Six muted aisle hues sit on top of the fixed base palette (cool paper, white surface, teal for \"good now\", navy for structure) and appear only where a category appears: the chip dot, the tinted photo field with its pictogram, the dot on a pantry row, the dot beside a shopping-list group.\n\nThis is an Operate tool for a household that plans at a desk and shops one-handed on a phone. Body text is quiet (400), headings are calm (600), and only prices go heavy (800). Surfaces are white on cool paper with 1px hairlines and soft corners (8, 12, 16px; pills for chips, verdicts and row actions). Status speaks through round dots and tinted pills, never rails or bold bands.",
     "keyCharacteristics": [
-      "Price is the headline: 800-weight figures at 40px (32px on phone), lining and proportional.",
-      "A 6px navy rail tops every label and day card; teal replaces it only for the best option.",
-      "Verdict bands close each label, filling left to right on load.",
-      "Flat surfaces, 1px hairlines, corners of 2-4px.",
-      "One family, Schibsted Grotesk, at 450 body to 800 display."
+      "Aisle hue as wayfinding: one hue per top category, from chip dot to photo field to list group.",
+      "Price is the only heavy type: 800 at 34px on cards, up to 68px on the article.",
+      "Verdicts are tinted foot rows or pills led by an 8px round dot.",
+      "Soft corners (8 / 12 / 16px), pill controls, 1px hairlines, no rails.",
+      "Flat at rest; one floating dropdown carries the only shadow."
     ],
     "rules": [
       {
         "name": "The Fixed Palette Rule",
-        "body": "The colour tokens in `:root` and the dark block are the user's brand commitment. Do not add, tune or replace them; express new states with the existing tokens and their tints.",
+        "body": "Base tokens are the user's brand commitment and stay byte-identical. The six aisle pairs (approved 2026-10-30) are the only additions; express new states with existing tokens and tints.",
+        "section": "colors"
+      },
+      {
+        "name": "The Wayfinding Rule",
+        "body": "An aisle hue appears only where a category appears: chip dot, photo field, pictogram, pantry row dot, list group dot. Never on buttons, prices, verdicts or text.",
         "section": "colors"
       },
       {
         "name": "The Good Now Rule",
-        "body": "Teal means \"this is the good choice right now\": historic low, cheapest store, today, the primary action. Structure and neutral emphasis use navy or ink.",
+        "body": "Teal means \"the good choice right now\": historic low, cheapest store, today, the primary action. Structure uses navy or ink.",
         "section": "colors"
       },
       {
+        "name": "The Price Weight Rule",
+        "body": "800 belongs to prices and the wordmark. Titles and headings stop at 600.",
+        "section": "typography"
+      },
+      {
         "name": "The Proportional Figures Rule",
-        "body": "Figures are lining and proportional everywhere (`font-variant-numeric: lining-nums proportional-nums`), including tables, dates and timestamps. Schibsted Grotesk's tabular comma takes a full figure cell and splits \"1,19\" into \"1 , 19\". Tables align numeric columns right instead of relying on tabular figures.",
+        "body": "Figures are `lining-nums proportional-nums` everywhere, tables and dates included; Schibsted's tabular comma splits \"1,19\". Numeric columns align right.",
         "section": "typography"
       },
       {
         "name": "The No Eyebrow Rule",
-        "body": "Headings stand alone. No small uppercase kicker or tracked label above a title.",
+        "body": "Headings stand alone; no small uppercase kicker above a title.",
         "section": "typography"
       },
       {
-        "name": "The Aisle Rule",
-        "body": "The shopping list must fit the first phone screen: the store comparison is compact, per-store breakdowns are closed by default, unpriced items sit behind a single disclosure, and every item row shows a \"Chain · €\" pill for its cheapest store, so no breakdown needs opening to shop.",
+        "name": "The In-Aisle Rule",
+        "body": "The shopping list fits a phone: items grouped by aisle, store breakdowns closed, unpriced items behind one disclosure, and each row shows a \"Chain · €\" good pill for its cheapest store.",
         "section": "layout"
       },
       {
         "name": "The Flat Shelf Rule",
-        "body": "Surfaces are flat at rest and on hover. Shadow is reserved for something that genuinely floats over other content.",
+        "body": "Surfaces are flat at rest and on hover; shadow is only for something that floats over other content.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do make the price the largest thing on any label (800, 40px; 32px on phone) with the currency at 0.45em.",
-      "Do end every offer that has a `priceInsight` with a verdict band, and every label with the 6px rail.",
-      "Do use `lining-nums proportional-nums` for every figure, tables and dates included, and right-align numeric table columns.",
-      "Do keep teal for \"good now\" (historic low, cheapest store, today, primary action) and navy for structure.",
-      "Do keep controls at least 42px tall and shopping list rows at least 56px.",
-      "Do keep the shopping list's store breakdowns closed by default and unpriced items behind a disclosure.",
-      "Do draw icons as inline SVG or CSS shapes (magnifier, select chevron, band marker, disclosure chevron)."
+      "Do make the price the heaviest thing on any card or article (800; 34px card, up to 68px article) with the euro sign at 0.4-0.45em.",
+      "Do carry the aisle hue wherever a category appears: chip dot, photo field, pictogram, pantry row dot, list group dot.",
+      "Do fall back to Dim Ink / Shelf Grey when a category matches no aisle.",
+      "Do lead every verdict with an 8px round dot, as a foot row on cards and a pill elsewhere.",
+      "Do keep teal for \"good now\" and navy for structure.",
+      "Do keep destructive controls neutral at rest and red only on hover.",
+      "Do use `lining-nums proportional-nums` for every figure and right-align numeric columns.",
+      "Do keep controls at least 36px (primary buttons 44px, inputs 42px) and shopping-list rows at least 56px.",
+      "Do draw icons as inline SVG or CSS shapes."
     ],
     "donts": [
-      "Don't change, add to or tune the colour tokens.",
-      "Don't use tabular figures; the tabular comma splits \"1,19\".",
+      "Don't change or tune the base colour tokens, or add hues beyond the six aisle pairs.",
+      "Don't use aisle hues on buttons, prices, verdicts or text.",
+      "Don't use 800 weight for headings or titles.",
+      "Don't bring back top rails, square markers or solid verdict bands.",
       "Don't put eyebrows or kickers above headings.",
-      "Don't use a coloured border-left as an accent; the only side border is the neutral hairline between nav groups.",
+      "Don't use a coloured border-left as an accent.",
       "Don't use emoji or text glyphs as icons, or gradient text.",
-      "Don't add shadows to labels, panels or cards, or round corners past 4px.",
-      "Don't add a second typeface, a serif or a monospace costume.",
-      "Don't build stat tiles or soft dashboard cards; numbers live on shelf labels or in a plain catalog line."
+      "Don't add shadows to cards, panels or rows.",
+      "Don't use tabular figures.",
+      "Don't add a second typeface."
     ]
   }
 }

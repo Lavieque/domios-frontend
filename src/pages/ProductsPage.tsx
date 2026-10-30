@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
 import { CategoryScope, measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
+import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
 import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
+import { AisleSign } from "../components/AisleSign";
 import { GroceryOnlyToggle } from "../components/GroceryOnlyToggle";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
@@ -59,6 +61,7 @@ export function ProductsPage() {
         .sort((a, b) => a.name.localeCompare(b.name, "pt")),
     [categories, groceryOnly],
   );
+  const categoriesById = useMemo(() => new Map(categories.map((category) => [category.categoryId, category])), [categories]);
 
   useEffect(() => {
     setLoading(true);
@@ -82,21 +85,33 @@ export function ProductsPage() {
           value={search}
           onChange={(value) => applyFilters({ search: value, page: 1 })}
         />
-        <select
-          className="category-select"
-          aria-label="Categoria"
-          value={categoryId ?? ""}
-          onChange={(e) => applyFilters({ categoryId: e.target.value || null, page: 1 })}
-        >
-          <option value="">Todas as categorias</option>
-          {topLevelCategories.map((category) => (
-            <option key={category.categoryId} value={category.categoryId}>
-              {category.name}
-            </option>
-          ))}
-        </select>
         <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
       </div>
+
+      {topLevelCategories.length > 0 && (
+        <div className="chip-row aisle-row" role="group" aria-label="Categoria">
+          <button
+            type="button"
+            className="chip"
+            aria-pressed={categoryId === null}
+            onClick={() => applyFilters({ categoryId: null, page: 1 })}
+          >
+            Todas
+          </button>
+          {topLevelCategories.map((category) => (
+            <button
+              key={category.categoryId}
+              type="button"
+              className={`chip ${aisleClass(aisleOf(category.name))}`}
+              aria-pressed={categoryId === category.categoryId}
+              onClick={() => applyFilters({ categoryId: category.categoryId, page: 1 })}
+            >
+              <span className="aisle-dot" aria-hidden="true" />
+              {category.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} resultados`}</p>
 
@@ -106,7 +121,12 @@ export function ProductsPage() {
         !loading && (
           <div className="label-grid">
             {products.map((product, index) => (
-              <ProductLabel key={product.productId} product={product} index={index} />
+              <ProductLabel
+                key={product.productId}
+                product={product}
+                index={index}
+                top={topCategory(product.category, categoriesById)}
+              />
             ))}
           </div>
         )
@@ -118,8 +138,10 @@ export function ProductsPage() {
 }
 
 /** O produto com a oferta mais barata que a Api conhece (GET /products não traz preços). */
-function ProductLabel({ product, index }: { product: ProductDto; index: number }) {
+function ProductLabel({ product, index, top }: { product: ProductDto; index: number; top: CategoryDto | null }) {
   const offers = useOffers(product.productId);
+  const aisleName = (top ?? product.category).name;
+  const aisle = aisleOf(aisleName);
   const priced = offers ? sortOffers(offers).filter(isOnSale) : [];
   const cheapest = priced[0];
   const unit = cheapest ? unitPriceLabel(cheapest) : null;
@@ -131,15 +153,28 @@ function ProductLabel({ product, index }: { product: ProductDto; index: number }
   else band = <VerdictBand tone="none">Sem preço observado</VerdictBand>;
 
   return (
-    <ShelfLabel to={`/produtos/${product.productId}`} index={index} band={band}>
-      <div className="label-head">
-        <div>
-          <div className="label-name">{product.name}</div>
-          <div className="label-meta">
-            {product.brand ?? "Sem marca"} · {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
-          </div>
+    <ShelfLabel
+      to={`/produtos/${product.productId}`}
+      index={index}
+      band={band}
+      className={`product-card ${aisleClass(aisle)}`}
+      media={
+        <div className={`product-photo${product.imageUrl ? "" : " is-empty"}`}>
+          <span className="product-photo-tag">
+            <span className="aisle-dot" aria-hidden="true" />
+            {aisleName}
+          </span>
+          {product.imageUrl ? (
+            <img src={product.imageUrl} alt="" loading="lazy" />
+          ) : (
+            <AisleSign aisle={aisle} />
+          )}
         </div>
-        {product.imageUrl && <img className="label-thumb" src={product.imageUrl} alt="" loading="lazy" />}
+      }
+    >
+      <div className="label-name">{product.name}</div>
+      <div className="label-meta">
+        {product.brand ?? "Sem marca"} · {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
       </div>
       {(offers === undefined || cheapest) && (
         <LabelPrice amount={offers === undefined ? undefined : cheapest?.latestPrice?.price.amount} from={priced.length > 1} />

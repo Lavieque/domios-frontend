@@ -35,7 +35,7 @@ The catalog is real: prices are observed per store and chain, and the Api judges
 ## Brand Commitments
 
 - Name and wordmark: "DomiOS" with "OS" in the second accent; the two-roof brand mark (teal + navy polylines).
-- The colour palette is fixed by the user: the tokens in `src/index.css` (`--bg`, `--surface`, `--surface-2`, `--ink`, `--ink-dim`, `--line`, `--accent` teal, `--accent-soft`, `--accent-2` navy, `--accent-2-soft`, `--danger`, `--danger-soft`, light and dark sets) must not change. Redesigns change layout, type, components and presentation only.
+- The colour palette is fixed by the user: the tokens in `src/index.css` (`--bg`, `--surface`, `--surface-2`, `--ink`, `--ink-dim`, `--line`, `--accent` teal, `--accent-soft`, `--accent-2` navy, `--accent-2-soft`, `--danger`, `--danger-soft`, light and dark sets) must not change. Redesigns change layout, type, components and presentation only. On top of these base tokens, six aisle hues (`--aisle-*`, light and dark) mark a product's top category; the user approved them on 2026-10-30 and they appear only where a category appears.
 
 ## Evidence on Hand
 

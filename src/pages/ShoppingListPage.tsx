@@ -21,11 +21,12 @@ import {
 } from "../api/shopping";
 import { MeasurementUnit, measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
+import { aisleClass, aisleOf } from "../catalog/aisles";
 import { useCategories } from "../catalog/useCategories";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
-import { groupByTopCategory, type ItemGroup } from "../shopping/groups";
+import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/groups";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
 const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -274,8 +275,9 @@ function PendingItems({
   return (
     <>
       {groups.map((group) => (
-        <section key={group.name} className="item-group">
+        <section key={group.name} className={`item-group ${aisleClass(group.name === OTHERS_GROUP ? null : aisleOf(group.name))}`}>
           <h3>
+            <span className="aisle-dot" aria-hidden="true" />
             {group.name} <span className="muted">({group.items.length})</span>
           </h3>
           <ItemList items={group.items} {...rest} />
@@ -315,8 +317,10 @@ function ItemList({
             </span>
           )}
           {open && (
-            <button type="button" className="link-button" onClick={() => onDelete(item)}>
-              Remover
+            <button type="button" className="icon-danger" aria-label={`Remover ${item.label}`} title="Remover" onClick={() => onDelete(item)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 7h14M10 7V5h4v2M7 7l1 12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
           )}
         </li>

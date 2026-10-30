@@ -11,20 +11,20 @@ Whole DomiOS web app (shell plus every route in `src/App.tsx`). Mode: Operate. H
 
 ## Task and content
 
-Read real prices and their history verdict, find products, plan the week, use the pantry in FIFO order, run shopping lists in the aisle and pick the cheapest store. Surface Api fields the old frontend ignored: unit price, card price, price insight (90-day label, Omnibus check, promotion frequency), promotion discount percent, recipe dish type and main protein (filters and labels), recipe source link, substitute product. Colours are pinned: tokens in `src/index.css` stay byte-identical.
+Read real prices and their 90-day verdict, find products, plan the week, use the pantry in FIFO order, run shopping lists in the aisle and pick the cheapest store. The article detail is a first-class screen: photo, price, verdict, history range, where to buy. Base colour tokens in `src/index.css` stay byte-identical (user, 2026-10-30); category hues are added on top.
 
 ## Direction contract
 
-THESIS: Every price, item and offer is a supermarket shelf label: the number is the headline, €/kg sits under it, and a verdict band says what the Api learned from 90 days. Refuses the soft-card dashboard with stat tiles and pastel pills.
+THESIS: The supermarket's own wayfinding: every product carries the colour of its aisle, and that colour is how you find things in the catalog, the pantry and the shopping list. Refuses the grid of identical railed labels and the bold-everything density.
 
-OWN-WORLD: Fixed palette (bg #f0f3f5, surface, navy #1e3a5c as the label rail and shell, teal #2a6a78 only for "good now": historic low, cheapest store, today, primary action). Schibsted Grotesk throughout, heavy 800 lining figures for prices (proportional everywhere, including tables and dates, because the face's tabular comma takes a full cell and splits "1,19" into "1 , 19"; tables align numbers right instead), 500 body. Square corners (2–4px), 1px hairlines, a 6px navy top rail on labels, full-width verdict bands at the label foot. No serif, no mono costume, no eyebrows.
+OWN-WORLD: Base palette unchanged (cool paper, white surface, teal "good now", navy structure). Six muted aisle hues (fresh red, fish blue, pantry olive, bakery yellow, dairy sky, home plum) used only where a category appears: chip dot, photo field, group marker. Schibsted Grotesk at 400 body, 600 titles, 800 only for prices. Soft corners (10px cards, 16px photo fields, pill chips and verdicts), hairlines, no rails, no shadows at rest.
 
-STORY: The household sees what a thing costs and whether that is good, then acts: add to pantry, to list, to plan.
+STORY: The household sees what a thing is, what it costs, whether that is good and where it is cheapest, then adds it to the pantry; lists are filled from the list page, the plan and recipes.
 
-FIRST VIEWPORT: Compact light top bar (wordmark, grouped nav, household switch, account); page title with a one-line count; search and filter row; grid of shelf labels (name, brand, big price, unit price and store, card price, verdict band). On phone: nav collapses to a scrolling tab strip, labels stack two-up for products and full width for lists.
+FIRST VIEWPORT: Article detail: crumb, then two columns: a 16px-rounded photo field tinted in the aisle hue, and the name, brand and pack, a 64px price, the verdict pill, unit and card price, the 90-day range and the actions. Below, "Onde comprar": one row per store with a bar scaled to price, cheapest in teal. Catalog: aisle chips with colour dots over a grid of photo cards.
 
-FORM: Shelf price label, IMPECCABLE’S PICK (my rank 1 of 7); seed: efece9fa54a8c918
+FORM: Cores por categoria (user-steered free-palette round, then base palette restored by the user), IMPECCABLE'S PICK of that round; seed:6d3837fa1aa324e6
 
-SIGNATURE: The verdict band. Every offer with `priceInsight` ends in a band (Mínimo de 90 dias in teal, Abaixo da média, Habitual, Acima da média in danger tint, Histórico insuficiente muted); promotions add the Omnibus real discount line. Motion: labels settle in with a short staggered rise once per page load, bands fill left to right.
+SIGNATURE: Aisle colour as wayfinding: one hue per top category, from the chip to the photo field to the shopping-list group. Motion: store bars grow left to right once on load, ordered by price.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

@@ -69,16 +69,15 @@ export function ProductsPage() {
   // corredores ocupavam meio ecrã no telemóvel. A pesquisa fica à vista.
   const [showFilters, setShowFilters] = useState(false);
   const activeFilterCount = (categoryId ? 1 : 0) + (groceryOnly ? 0 : 1);
-  const [showAllAisles, setShowAllAisles] = useState(false);
-  const canCollapse = topLevelCategories.length > VISIBLE_AISLES;
-  // A categoria escolhida fica sempre à vista, mesmo que esteja para lá do corte.
-  const visibleCategories =
-    showAllAisles || !canCollapse
-      ? topLevelCategories
-      : topLevelCategories.filter(
-          (category, index) => index < VISIBLE_AISLES || category.categoryId === categoryId,
-        );
-  const hiddenAisleCount = topLevelCategories.length - visibleCategories.length;
+  // A categoria escolhida fica sempre à vista, mesmo que esteja para lá do
+  // corte. As restantes vão para uma lista: abrir todas em chips enchia a
+  // página inteira (centenas de categorias de topo entre cadeias).
+  const visibleCategories = topLevelCategories.filter(
+    (category, index) => index < VISIBLE_AISLES || category.categoryId === categoryId,
+  );
+  const hiddenCategories = topLevelCategories.filter(
+    (category, index) => index >= VISIBLE_AISLES && category.categoryId !== categoryId,
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -150,15 +149,20 @@ export function ProductsPage() {
               {category.name}
             </button>
           ))}
-          {canCollapse && (
-            <button
-              type="button"
-              className="chip chip-more"
-              aria-expanded={showAllAisles}
-              onClick={() => setShowAllAisles((open) => !open)}
+          {hiddenCategories.length > 0 && (
+            <select
+              className="category-select"
+              aria-label="Mais categorias"
+              value=""
+              onChange={(e) => e.target.value && applyFilters({ categoryId: e.target.value, page: 1 })}
             >
-              {showAllAisles ? "Menos" : `Mais ${hiddenAisleCount}`}
-            </button>
+              <option value="">Mais {hiddenCategories.length}…</option>
+              {hiddenCategories.map((category) => (
+                <option key={category.categoryId} value={category.categoryId}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           )}
         </div>
       )}

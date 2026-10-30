@@ -1,67 +1,67 @@
 <!doctype html>
-<html lang="pt"><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<html lang="pt-PT"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f0f3f5;--surface:#fafbfc;--s2:#e3e9eb;--ink:#16241f;--dim:#5b6e71;--line:rgba(22,36,31,.14);--a:#2a6a78;--as:#dde8ea;--b:#1e3a5c;--bs:#dfe6ec;--d:#b91c1c}
+:root{--bg:#f0f3f5;--surface:#fafbfc;--s2:#e3e9eb;--ink:#16241f;--dim:#5b6e71;--line:rgba(22,36,31,.14);--teal:#2a6a78;--tealS:#dde8ea;--navy:#1e3a5c;--navyS:#dfe6ec;--red:#b91c1c;--redS:rgba(185,28,28,.1)}
 *{box-sizing:border-box;margin:0}
-body{width:1440px;height:900px;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.45 "Schibsted Grotesk",sans-serif;display:grid;grid-template-columns:232px 1fr}
-.rail{background:var(--b);color:#e7eeec;padding:24px 0;position:relative}
-.rail::after{content:"";position:absolute;top:0;right:0;width:10px;height:100%;background:radial-gradient(circle at 0 0,transparent 4px,var(--a) 4px 5px,transparent 5px) 0 0/10px 10px}
-.brand{font-weight:800;font-size:22px;padding:0 24px 28px}.brand em{font-style:normal;color:#8fc3c9}
-.rail a{display:flex;justify-content:space-between;padding:9px 24px;color:#c6d3dc;text-decoration:none;font-weight:500}
-.rail a.on{background:rgba(255,255,255,.08);color:#fff;box-shadow:inset 3px 0 0 #8fc3c9}
-.rail small{color:#8aa0b4;font-size:12px;font-variant-numeric:tabular-nums}
-.grp{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8aa0b4;padding:18px 24px 6px}
-main{padding:28px 40px;overflow:hidden}
-.top{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}
-.kick{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--a);font-weight:700}
-h1{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
-.house{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:4px;font-weight:500}
-.panel{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--b);background:var(--b);gap:1px;margin-bottom:22px}
-.tile{background:var(--surface);aspect-ratio:1/1;position:relative;padding:12px;display:flex;flex-direction:column;justify-content:space-between}
-.tile .q{position:absolute;width:46%;height:46%;border:2px solid var(--b)}
-.tile .q1{top:0;left:0;border-radius:0 0 100% 0;border-width:0 2px 2px 0}
-.tile .q2{top:0;right:0;border-radius:0 0 0 100%;border-width:0 0 2px 2px}
-.tile .q3{bottom:0;left:0;border-radius:0 100% 0 0;border-width:2px 2px 0 0}
-.tile .q4{bottom:0;right:0;border-radius:100% 0 0 0;border-width:2px 0 0 2px}
-.tile .f{background:var(--bs)}
-.tile.today{outline:3px solid var(--a);outline-offset:-3px}.tile.today .f{background:var(--as);border-color:var(--a)}
-.day{position:relative;z-index:1;font-weight:800;font-size:28px;line-height:1}.day small{display:block;font-size:12px;font-weight:500;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
-.meals{position:relative;z-index:1;font-size:12.5px;background:var(--surface);padding:4px 6px;border-radius:3px}
-.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:22px}
-.mod{background:var(--surface);border:1px solid var(--line)}
-.mod h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
-.row{display:grid;grid-template-columns:1fr 110px 90px;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);align-items:center}
-.n{font-variant-numeric:tabular-nums;text-align:right}
-.big{font-size:22px;font-weight:800}
-.pill{font-size:12px;font-weight:700;padding:2px 8px;border-radius:2px;background:var(--bs);color:var(--b);justify-self:start}
-.pill.r{background:rgba(185,28,28,.1);color:var(--d)}.pill.t{background:var(--as);color:var(--a)}
+body{width:1440px;height:900px;overflow:hidden;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Schibsted Grotesk",sans-serif}
+header{height:64px;display:flex;align-items:center;gap:40px;padding:0 48px;background:var(--surface);border-bottom:1px solid var(--line)}
+.wm{font:800 21px/1 "Schibsted Grotesk";letter-spacing:-.02em}.wm b{color:var(--navy)}
+nav{display:flex;gap:26px;font-weight:500;color:var(--dim)}nav .on{color:var(--ink);font-weight:600;position:relative}nav .on:after{content:"";position:absolute;left:0;right:0;bottom:-22px;height:2px;background:var(--navy)}
+.acct{margin-left:auto;display:flex;gap:20px;color:var(--dim)}
+main{padding:36px 48px;display:grid;grid-template-columns:1.45fr 1fr;gap:28px}
+h1{grid-column:1/-1;font:700 34px/1.1 "Schibsted Grotesk";letter-spacing:-.02em}
+.sub{grid-column:1/-1;color:var(--dim);margin-top:-20px}
+.menu{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:22px 26px}
+.menu h2{font:700 19px/1.2 "Schibsted Grotesk";display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:3px double var(--line);margin-bottom:6px}
+.menu h2 a{font:500 14px "Schibsted Grotesk";color:var(--teal)}
+.tint{background:var(--navyS);border-color:transparent}
+.tint2{background:var(--tealS);border-color:transparent}
+.day{display:grid;grid-template-columns:110px 1fr;padding:12px 0;border-bottom:1px solid var(--line)}
+.day:last-child{border:0}
+.day .d{font-weight:600}.day .d small{display:block;color:var(--dim);font-weight:400;font-size:13px}
+.dish{display:flex;align-items:baseline;gap:8px;padding:2px 0}
+.dish span:first-child{white-space:nowrap}
+.lead{flex:1;border-bottom:2px dotted rgba(22,36,31,.28);transform:translateY(-4px)}
+.dish .m{color:var(--dim);font-size:13.5px;white-space:nowrap}
+.today .d{color:var(--teal)}
+.row{display:flex;align-items:baseline;gap:8px;padding:9px 0}
+.row .n{font-weight:500;white-space:nowrap}
+.row .v{font-weight:600;white-space:nowrap}
+.urg{width:8px;height:8px;border-radius:50%;flex:none;transform:translateY(-1px)}
+.u3{background:var(--red)}.u2{background:var(--navy)}.u1{background:rgba(22,36,31,.25)}
+.price{font:800 22px/1 "Schibsted Grotesk";letter-spacing:-.02em}
+.tag{font-size:12.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--redS);color:var(--red)}
+.col{display:flex;flex-direction:column;gap:22px}
 </style></head><body>
-<nav class="rail"><div class="brand">Domi<em>OS</em></div>
-<div class="grp">Casa</div>
-<a class="on" href="#">Visão geral</a><a href="#">Plano <small>14</small></a><a href="#">Despensa <small>37</small></a><a href="#">Listas <small>2</small></a>
-<div class="grp">Catálogo</div>
-<a href="#">Produtos</a><a href="#">Promoções <small>412</small></a><a href="#">Receitas</a><a href="#">Ementas</a>
-<div class="grp">Conta</div><a href="#">Casa Lavieque</a><a href="#">Conta</a></nav>
+<header><div class="wm">Domi<b>OS</b></div>
+<nav><span class="on">Hoje</span><span>Plano</span><span>Despensa</span><span>Listas</span><span style="color:var(--line)">|</span><span>Produtos</span><span>Promoções</span><span>Receitas</span><span>Ementas</span></nav>
+<div class="acct"><span>Casa de teste</span><span>Conta</span></div></header>
 <main>
-<div class="top"><div><h1>Faltam 7 refeições por planear</h1></div><div class="house">Casa Lavieque ▾</div></div>
-<div class="panel">
-<div class="tile today"><span class="q q1 f"></span><span class="q q2 f"></span><span class="q q3 f"></span><span class="q q4"></span><div class="day"><small>Seg</small>26</div><div class="meals">Jantar: Bacalhau à Brás</div></div>
-<div class="tile"><span class="q q1 f"></span><span class="q q2 f"></span><span class="q q3"></span><span class="q q4"></span><div class="day"><small>Ter</small>27</div><div class="meals">Almoço: Sopa de legumes</div></div>
-<div class="tile"><span class="q q1 f"></span><span class="q q2"></span><span class="q q3 f"></span><span class="q q4"></span><div class="day"><small>Qua</small>28</div><div class="meals">2 refeições</div></div>
-<div class="tile"><span class="q q1"></span><span class="q q2 f"></span><span class="q q3 f"></span><span class="q q4"></span><div class="day"><small>Qui</small>29</div><div class="meals">2 refeições</div></div>
-<div class="tile"><span class="q q1"></span><span class="q q2"></span><span class="q q3"></span><span class="q q4"></span><div class="day"><small>Sex</small>30</div><div class="meals">Por planear</div></div>
-<div class="tile"><span class="q q1 f"></span><span class="q q2 f"></span><span class="q q3"></span><span class="q q4"></span><div class="day"><small>Sáb</small>31</div><div class="meals">2 refeições</div></div>
-<div class="tile"><span class="q q1"></span><span class="q q2"></span><span class="q q3"></span><span class="q q4"></span><div class="day"><small>Dom</small>1</div><div class="meals">Por planear</div></div>
+<h1>Sexta-feira, 30 de outubro</h1>
+<p class="sub">6122 produtos · 235 promoções ativas · 2248 receitas</p>
+<section class="menu">
+<h2>Ementa da semana <a>Abrir plano</a></h2>
+<div class="day today"><div class="d">Hoje<small>sex 30</small></div><div><div class="dish"><span>Bacalhau com Natas</span><i class="lead"></i><span class="m">Jantar · 2 pessoas</span></div></div></div>
+<div class="day"><div class="d">Sábado<small>sáb 31</small></div><div><div class="dish"><span>Arroz de Pato</span><i class="lead"></i><span class="m">Almoço · 4 pessoas</span></div><div class="dish"><span>Sopa de Legumes</span><i class="lead"></i><span class="m">Jantar · 2 pessoas</span></div></div></div>
+<div class="day"><div class="d">Domingo<small>dom 1</small></div><div><div class="dish"><span>Frango Assado com Batatas</span><i class="lead"></i><span class="m">Almoço · 4 pessoas</span></div></div></div>
+<div class="day"><div class="d">Segunda<small>seg 2</small></div><div><div class="dish"><span>Caldo Verde</span><i class="lead"></i><span class="m">Jantar · 2 pessoas</span></div></div></div>
+<div class="day"><div class="d">Terça<small>ter 3</small></div><div><div class="dish" style="color:var(--dim)"><span>Nada planeado</span><i class="lead"></i><span class="m" style="color:var(--teal)">Escolher receita</span></div></div></div>
+</section>
+<div class="col">
+<section class="menu tint">
+<h2>Usar primeiro <a>Despensa</a></h2>
+<div class="row"><i class="urg u3"></i><span class="n">Arroz Agulha 1 kg</span><i class="lead"></i><span class="v" style="color:var(--red)">expira hoje</span></div>
+<div class="row"><i class="urg u2"></i><span class="n">Iogurte Natural x4</span><i class="lead"></i><span class="v">em 2 dias</span></div>
+<div class="row"><i class="urg u1"></i><span class="n">Fiambre da Perna</span><i class="lead"></i><span class="v">até 4/11</span></div>
+<div class="row"><i class="urg u1"></i><span class="n">Queijo Flamengo Fatiado</span><i class="lead"></i><span class="v">até 15/11</span></div>
+</section>
+<section class="menu tint2">
+<h2>A terminar <a>Promoções</a></h2>
+<div class="row"><span class="n">Azeite Virgem Extra 75 cl</span><i class="lead"></i><span class="price">−30%</span></div>
+<div class="row" style="padding-top:0;color:var(--dim);font-size:13.5px">Continente · com cartão <span class="tag" style="margin-left:auto">termina hoje</span></div>
+<div class="row"><span class="n">Leite Meio-Gordo 1 L</span><i class="lead"></i><span class="price">−10%</span></div>
+<div class="row" style="padding-top:0;color:var(--dim);font-size:13.5px">Pingo Doce · 18/10 – 31/10</div>
+</section>
 </div>
-<div class="cols">
-<section class="mod"><h2>Usar primeiro <span>Despensa · FIFO</span></h2>
-<div class="row"><b>Iogurte natural Mimosa 4×125 g</b><span class="pill r">expira hoje</span><span class="n">2 un</span></div>
-<div class="row"><b>Natas para culinária 200 ml</b><span class="pill">aberto</span><span class="n">120 ml</span></div>
-<div class="row"><b>Fiambre da perna fatiado</b><span class="pill">até 29 out</span><span class="n">150 g</span></div>
-<div class="row"><b>Cogumelos laminados</b><span class="pill">até 30 out</span><span class="n">250 g</span></div></section>
-<section class="mod"><h2>Lista da semana <span>18 itens</span></h2>
-<div class="row"><b>Mais barato no Continente</b><span class="pill t">mais barato</span><span class="n big">42,18 €</span></div>
-<div class="row"><b>Pingo Doce</b><span></span><span class="n big">44,90 €</span></div>
-<div class="row"><b>Lidl</b><span class="pill">12 de 18</span><span class="n big">31,07 €</span></div></section>
-</div></main></body></html>
+</main></body></html>

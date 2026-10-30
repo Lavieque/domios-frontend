@@ -1,0 +1,47 @@
+{
+  "title": "Paleta livre: três caminhos",
+  "question": "Cada esboço mostra o detalhe de um artigo. Escolhe um caminho ou pede outra mão.",
+  "followup": true,
+  "options": [
+    {
+      "id": "cat-colors",
+      "kind": "grounded",
+      "label": "Cores por categoria",
+      "kicker": "RECOMENDADO",
+      "lineage": "as cores das secções de um supermercado e das embalagens",
+      "thesis": "Branco limpo; cada categoria tem a sua cor e é ela que orienta listas, catálogo e detalhe.",
+      "palette": ["#ffffff", "#14181b", "#5a7a1e", "#2b5d9e", "#d9442b", "#f2c230"],
+      "materials": ["fotografia de produto", "cor de secção", "cantos suaves"],
+      "viewport": "Detalhe: foto grande no campo da cor da categoria, preço de 72px, veredicto, régua dos 90 dias e lojas como barras ordenadas.",
+      "risk": "Muitas cores: só funciona se cada uma aparecer só onde a categoria aparece.",
+      "html": ".impeccable/mocks/decision/cat-colors.html"
+    },
+    {
+      "id": "azulejo",
+      "kind": "grounded",
+      "label": "Azulejo",
+      "lineage": "azulejo de padrão azul e branco",
+      "thesis": "Azul-cobalto sobre branco vidrado; verde e tomate só para estados.",
+      "palette": ["#ffffff", "#eef3fb", "#1c4aa0", "#0e2a63", "#2f7d4f", "#d24a2c"],
+      "materials": ["vidrado", "faixa de padrão", "moldura cobalto"],
+      "viewport": "Detalhe: foto e ficha à esquerda; à direita um cartão cobalto com preço, veredicto, lojas e ações.",
+      "risk": "Pode ficar frio e monocromático numa app de comida.",
+      "html": ".impeccable/mocks/decision/azulejo.html"
+    },
+    {
+      "id": "mercado",
+      "kind": "grounded",
+      "label": "Mercado fresco",
+      "lineage": "banca de frutaria e mercado municipal",
+      "thesis": "Verde-folha como cor da casa, tomate para promoções, limão para destaques.",
+      "palette": ["#ffffff", "#1f5a3a", "#e8f1ea", "#c2402a", "#f4cf3a", "#14201a"],
+      "materials": ["campo verde-menta", "botões redondos", "barra lateral"],
+      "viewport": "Detalhe: bloco menta com foto, preço com preço anterior riscado e desconto real Omnibus; lojas e histórico lado a lado.",
+      "risk": "Familiar: perto do que muitos supermercados já usam.",
+      "html": ".impeccable/mocks/decision/mercado.html"
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code", "toggle": false },
+  "steer": true
+}

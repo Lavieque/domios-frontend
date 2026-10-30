@@ -65,6 +65,10 @@ export function ProductsPage() {
   );
   const categoriesById = useMemo(() => new Map(categories.map((category) => [category.categoryId, category])), [categories]);
 
+  // Fechados por omissão, como em Promoções: "Só supermercado" e os
+  // corredores ocupavam meio ecrã no telemóvel. A pesquisa fica à vista.
+  const [showFilters, setShowFilters] = useState(false);
+  const activeFilterCount = (categoryId ? 1 : 0) + (groceryOnly ? 0 : 1);
   const [showAllAisles, setShowAllAisles] = useState(false);
   const canCollapse = topLevelCategories.length > VISIBLE_AISLES;
   // A categoria escolhida fica sempre à vista, mesmo que esteja para lá do corte.
@@ -98,10 +102,33 @@ export function ProductsPage() {
           value={search}
           onChange={(value) => applyFilters({ search: value, page: 1 })}
         />
-        <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
+        <button
+          type="button"
+          className="chip chip-more"
+          aria-expanded={showFilters}
+          aria-controls="product-filters"
+          onClick={() => setShowFilters((open) => !open)}
+        >
+          {activeFilterCount > 0 ? `Filtros · ${activeFilterCount}` : "Filtros"}
+        </button>
+        {activeFilterCount > 0 && (
+          <button
+            type="button"
+            className="chip"
+            onClick={() => applyFilters({ categoryId: null, groceryOnly: true, page: 1 })}
+          >
+            Limpar
+          </button>
+        )}
       </div>
 
-      {topLevelCategories.length > 0 && (
+      {showFilters && (
+        <div className="chip-row" id="product-filters">
+          <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
+        </div>
+      )}
+
+      {showFilters && topLevelCategories.length > 0 && (
         <div className="chip-row aisle-row" role="group" aria-label="Categoria">
           <button
             type="button"

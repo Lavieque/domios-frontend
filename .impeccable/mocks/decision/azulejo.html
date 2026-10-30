@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-PT"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--glaze:#eef3fb;--cob:#1c4aa0;--deep:#0e2a63;--ink:#101a2e;--dim:#56617a;--line:#d9e2f1;--folha:#2f7d4f;--folhaS:#e4f2ea;--tom:#d24a2c}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Schibsted Grotesk",sans-serif}
+header{height:68px;display:flex;align-items:center;gap:36px;padding:0 48px;background:var(--deep);color:#c8d5ef}
+.wm{font:800 22px/1 "Schibsted Grotesk";color:#fff}.wm b{color:#8fb0ea}
+nav{display:flex;gap:24px;font-weight:500}nav .on{color:#fff;font-weight:700}
+.tiles{height:14px;background:
+radial-gradient(circle at 50% 50%,var(--cob) 3px,transparent 4px) 0 0/14px 14px,
+linear-gradient(45deg,transparent 45%,var(--glaze) 46% 54%,transparent 55%) 0 0/14px 14px,var(--bg);border-bottom:1px solid var(--line)}
+main{padding:30px 48px;display:grid;grid-template-columns:1fr 420px;gap:40px}
+.crumb{color:var(--dim);font-size:14px}
+h1{font:800 42px/1.05 "Schibsted Grotesk";letter-spacing:-.025em;color:var(--deep);margin:6px 0}
+.brand{color:var(--dim);font-size:16px;margin-bottom:22px}
+.photo{height:300px;border-radius:6px;background:var(--glaze);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.bottle{width:90px;height:240px;border-radius:26px 26px 10px 10px;background:var(--cob);opacity:.85}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);margin-top:20px;border-top:2px solid var(--cob)}
+.f{padding:12px 0}.f span{display:block;color:var(--dim);font-size:13px}.f b{font-weight:700}
+.card{border:2px solid var(--cob);border-radius:6px;overflow:hidden}
+.card .top{background:var(--cob);color:#fff;padding:22px 24px}
+.price{font:800 64px/.95 "Schibsted Grotesk";letter-spacing:-.04em}.price small{font-size:.4em}
+.top .u{opacity:.85;margin-top:6px}
+.v{background:var(--folhaS);color:var(--folha);font-weight:700;padding:10px 24px;display:flex;gap:8px;align-items:center}.v i{width:8px;height:8px;background:var(--folha)}
+.rows{padding:8px 24px 18px}
+.r{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.r:last-child{border:0}
+.r b{font-weight:700}.r.best b{color:var(--folha)}
+.btns{display:flex;gap:10px;padding:0 24px 24px}
+.btn{flex:1;height:46px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.p{background:var(--deep);color:#fff}.s{border:1.5px solid var(--cob);color:var(--cob)}
+.range{margin:26px 0 6px;height:6px;background:var(--glaze);position:relative}.range b{position:absolute;left:0;width:100%;height:100%;background:linear-gradient(90deg,var(--folha),var(--cob))}
+.range i{position:absolute;left:8%;top:-7px;width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--deep)}
+.leg{display:flex;justify-content:space-between;color:var(--dim);font-size:13px}
+h2{font:700 20px "Schibsted Grotesk";color:var(--deep);margin-top:26px}
+</style></head><body>
+<header><div class="wm">Domi<b>OS</b></div><nav><span>Hoje</span><span>Plano</span><span>Despensa</span><span>Listas</span><span class="on">Produtos</span><span>Promoções</span><span>Receitas</span></nav></header>
+<div class="tiles"></div>
+<main>
+<div>
+<div class="crumb">Mercearia › Azeites e óleos</div>
+<h1>Azeite Virgem Extra Clássico</h1><div class="brand">Gallo · 75 cl</div>
+<div class="photo"><div class="bottle"></div></div>
+<div class="facts"><div class="f"><span>Marca</span><b>Gallo</b></div><div class="f"><span>Embalagem</span><b>75 cl</b></div><div class="f"><span>Categoria</span><b>Azeites</b></div><div class="f"><span>EAN</span><b>5601…</b></div></div>
+<h2>Histórico de 90 dias</h2>
+<div class="range"><b></b><i></i></div><div class="leg"><span>mín 6,49 €</span><span>média 7,35 €</span><span>máx 8,19 €</span></div>
+</div>
+<aside class="card">
+<div class="top"><div class="price">6,49<small> €</small></div><div class="u">8,65 €/L · Continente · cartão 5,99 €</div></div>
+<div class="v"><i></i>Mínimo dos últimos 90 dias</div>
+<div class="rows">
+<div class="r best"><span>Continente</span><b>6,49 €</b></div>
+<div class="r"><span>Pingo Doce</span><b>6,99 €</b></div>
+<div class="r"><span>Auchan</span><b>7,49 €</b></div>
+</div>
+<div class="btns"><span class="btn p">Pôr na lista</span><span class="btn s">Despensa</span></div>
+</aside>
+</main></body></html>

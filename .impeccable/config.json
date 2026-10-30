@@ -12,6 +12,33 @@
         "rule": "design-system-color",
         "value": "rgb(0 0 0 / 0.42)",
         "createdAt": "2026-10-27T12:01:08.851Z"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/cat-colors.html"
+        ],
+        "createdAt": "2026-10-30T11:18:32.626Z",
+        "reason": "decision-round sketch, not shipped; uses Schibsted via Google Fonts as sketch rules require"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/azulejo.html"
+        ],
+        "createdAt": "2026-10-30T11:18:32.946Z",
+        "reason": "decision-round sketch, not shipped; uses Schibsted via Google Fonts as sketch rules require"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/mercado.html"
+        ],
+        "createdAt": "2026-10-30T11:18:33.325Z",
+        "reason": "decision-round sketch, not shipped; uses Schibsted via Google Fonts as sketch rules require"
       }
     ]
   }

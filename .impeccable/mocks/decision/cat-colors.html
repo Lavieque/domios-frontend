@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-PT"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--soft:#f4f5f6;--ink:#14181b;--dim:#5d666d;--line:#e3e6e9;--azeite:#5a7a1e;--azeiteS:#eef3e2;--sardinha:#2b5d9e;--tomate:#d9442b;--limao:#f2c230;--ceu:#6aa9d8;--good:#1f7a4d;--goodS:#e3f3ea}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Schibsted Grotesk",sans-serif}
+header{height:64px;display:flex;align-items:center;gap:36px;padding:0 48px;border-bottom:1px solid var(--line)}
+.wm{font:800 21px/1 "Schibsted Grotesk"}.wm b{color:#1e3a5c}
+nav{display:flex;gap:24px;color:var(--dim);font-weight:500}nav .on{color:var(--ink);font-weight:700}
+.cats{display:flex;gap:6px;padding:12px 48px;border-bottom:1px solid var(--line)}
+.cat{padding:6px 14px;border-radius:999px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;background:var(--soft)}
+.cat i{width:10px;height:10px;border-radius:50%}
+.cat.on{background:var(--azeite);color:#fff}
+.hero{display:grid;grid-template-columns:460px 1fr;gap:48px;padding:28px 48px 0}
+.photo{height:420px;border-radius:20px;background:var(--azeiteS);display:flex;align-items:center;justify-content:center;position:relative}
+.bottle{width:110px;height:300px;border-radius:30px 30px 14px 14px;background:linear-gradient(#7d9a35,#3f5714);box-shadow:0 20px 40px -18px rgba(30,40,10,.5)}
+.photo .badge{position:absolute;left:18px;top:18px;background:#fff;color:var(--azeite);font-weight:700;font-size:13px;padding:5px 12px;border-radius:999px}
+.crumb{color:var(--dim);font-size:14px}
+h1{font:700 40px/1.08 "Schibsted Grotesk";letter-spacing:-.025em;margin:6px 0 4px}
+.brand{color:var(--dim);font-size:16px}
+.priceRow{display:flex;align-items:flex-end;gap:22px;margin:26px 0 8px}
+.price{font:800 72px/.9 "Schibsted Grotesk";letter-spacing:-.04em}.price small{font-size:.4em}
+.verdict{display:inline-flex;align-items:center;gap:8px;background:var(--goodS);color:var(--good);font-weight:700;padding:8px 14px;border-radius:999px}
+.verdict i{width:8px;height:8px;border-radius:50%;background:var(--good)}
+.unit{color:var(--dim)}.unit b{color:var(--ink)}
+.range{margin:22px 0 6px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--good),var(--limao),var(--tomate));position:relative;max-width:520px}
+.range i{position:absolute;left:8%;top:-6px;width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--ink)}
+.leg{display:flex;justify-content:space-between;max-width:520px;color:var(--dim);font-size:13px}
+.acts{display:flex;gap:10px;margin-top:26px}
+.btn{height:48px;padding:0 22px;border-radius:12px;display:flex;align-items:center;font-weight:700}
+.p{background:var(--ink);color:#fff}.s{background:var(--soft)}
+.stores{padding:30px 48px}
+.stores h2{font:700 22px "Schibsted Grotesk";margin-bottom:12px}
+.st{display:grid;grid-template-columns:180px 1fr 120px 150px;align-items:center;gap:18px;padding:10px 0;border-bottom:1px solid var(--line)}
+.bar{height:12px;border-radius:6px;background:var(--soft);overflow:hidden}.bar b{display:block;height:100%;background:#c9cfd4;border-radius:6px}
+.st.best .bar b{background:var(--good)}.st.best .n{font-weight:700}
+.pp{font:700 20px "Schibsted Grotesk";text-align:right}
+.tag{font-size:13px;color:var(--dim)}.best .tag{color:var(--good);font-weight:700}
+</style></head><body>
+<header><div class="wm">Domi<b>OS</b></div><nav><span>Hoje</span><span>Plano</span><span>Despensa</span><span>Listas</span><span class="on">Produtos</span><span>Promoções</span><span>Receitas</span></nav></header>
+<div class="cats"><span class="cat"><i style="background:var(--tomate)"></i>Frescos</span><span class="cat"><i style="background:var(--sardinha)"></i>Peixaria</span><span class="cat on"><i style="background:#fff"></i>Mercearia</span><span class="cat"><i style="background:var(--limao)"></i>Padaria</span><span class="cat"><i style="background:var(--ceu)"></i>Laticínios</span><span class="cat"><i style="background:#8a5a9e"></i>Limpeza</span></div>
+<section class="hero">
+<div class="photo"><span class="badge">Mercearia · Azeites</span><div class="bottle"></div></div>
+<div>
+<div class="crumb">Mercearia › Azeites e óleos</div>
+<h1>Azeite Virgem Extra Clássico</h1>
+<div class="brand">Gallo · 75 cl</div>
+<div class="priceRow"><div class="price">6,49<small> €</small></div><div><span class="verdict"><i></i>Mínimo dos últimos 90 dias</span><div class="unit" style="margin-top:8px"><b>8,65 €/L</b> · Continente · com cartão 5,99 €</div></div></div>
+<div class="range"><i></i></div>
+<div class="leg"><span>mín 6,49 €</span><span>média 7,35 €</span><span>máx 8,19 €</span></div>
+<div class="acts"><span class="btn p">Pôr na lista</span><span class="btn s">Pôr na despensa</span><span class="btn s">Planear receita</span></div>
+</div></section>
+<section class="stores"><h2>Onde comprar</h2>
+<div class="st best"><span class="n">Continente</span><div class="bar"><b style="width:79%"></b></div><span class="pp">6,49 €</span><span class="tag">Mais barato</span></div>
+<div class="st"><span class="n">Pingo Doce</span><div class="bar"><b style="width:86%"></b></div><span class="pp">6,99 €</span><span class="tag">Habitual</span></div>
+<div class="st"><span class="n">Auchan</span><div class="bar"><b style="width:92%"></b></div><span class="pp">7,49 €</span><span class="tag">Habitual</span></div>
+</section></body></html>

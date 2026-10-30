@@ -86,8 +86,18 @@ export function searchCurrentPromotions(
   pageSize = 20,
   categoryId?: string,
   groceryOnly = false,
+  requiresCard?: boolean,
+  minDiscountPercent?: number,
 ): Promise<PagedResult<CurrentPromotionDto>> {
-  return get<PagedResult<CurrentPromotionDto>>("/promotions/current", { chainId, categoryId, groceryOnly, page, pageSize });
+  return get<PagedResult<CurrentPromotionDto>>("/promotions/current", {
+    chainId,
+    categoryId,
+    groceryOnly,
+    requiresCard,
+    minDiscountPercent,
+    page,
+    pageSize,
+  });
 }
 
 /** Todas as cadeias, incluindo as fechadas. */

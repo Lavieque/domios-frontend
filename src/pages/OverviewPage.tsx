@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { searchActivePromotions, searchProducts, searchRecipes } from "../api/client";
+import { searchActivePromotions, searchCurrentPromotions, searchProducts, searchRecipes } from "../api/client";
 import type { CallerHouseholdDto } from "../api/households";
 import { listPantryItems, type PantryItemDto } from "../api/pantry";
 import { listPlannedMeals, mealTypeLabels, PlannedMealStatus, type PlannedMealDto } from "../api/planning";
-import { measurementUnitLabels, type PromotionDto } from "../api/types";
-import { PromotionLabel } from "../components/PromotionLabel";
+import { measurementUnitLabels, type CurrentPromotionDto } from "../api/types";
+import { PromotionOfferLabel } from "../components/PromotionOfferLabel";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { OpportunitiesPanel } from "../opportunities/OpportunitiesPanel";
 import { useProducts } from "../pantry/useProducts";
@@ -19,17 +19,14 @@ export function OverviewPage() {
   const [productsTotal, setProductsTotal] = useState<number | null>(null);
   const [promotionsTotal, setPromotionsTotal] = useState<number | null>(null);
   const [recipesTotal, setRecipesTotal] = useState<number | null>(null);
-  const [soonPromotions, setSoonPromotions] = useState<PromotionDto[] | null>(null);
+  const [soonPromotions, setSoonPromotions] = useState<CurrentPromotionDto[] | null>(null);
 
   useEffect(() => {
     searchProducts("", 1, 1).then((result) => setProductsTotal(result.total));
     searchRecipes("", 1, 1).then((result) => setRecipesTotal(result.total));
-    searchActivePromotions(1, 100).then((result) => {
-      setPromotionsTotal(result.total);
-      setSoonPromotions(
-        [...result.items].sort((a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime()).slice(0, 4),
-      );
-    });
+    searchActivePromotions(1, 1).then((result) => setPromotionsTotal(result.total));
+    // A Api já devolve primeiro as que acabam mais cedo.
+    searchCurrentPromotions(undefined, 1, 4, undefined, true).then((result) => setSoonPromotions(result.items));
   }, []);
 
   const day = today();
@@ -79,8 +76,8 @@ export function OverviewPage() {
           )}
           {soonPromotions !== null && soonPromotions.length > 0 && (
             <div className="label-grid">
-              {soonPromotions.map((promo, index) => (
-                <PromotionLabel key={promo.promotionId} promotion={promo} index={index} />
+              {soonPromotions.map((offer, index) => (
+                <PromotionOfferLabel key={offer.storeOfferId} offer={offer} index={index} />
               ))}
             </div>
           )}

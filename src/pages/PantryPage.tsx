@@ -80,7 +80,9 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     let cancelled = false;
     setLoading(true);
     listPantryItems(householdId, {
-      sort: view === "fifo" ? "fifo" : undefined,
+      // O que há e os estados com stock: a validade mais curta primeiro.
+      // Consumidos e descartados ficam pela data de compra.
+      sort: view === PantryState.Consumed || view === PantryState.Discarded ? undefined : "expiry",
       state: view === "fifo" ? undefined : view,
       location: locationFilter,
       page,

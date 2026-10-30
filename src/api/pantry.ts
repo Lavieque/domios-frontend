@@ -96,8 +96,12 @@ export interface PantryItemDto {
 }
 
 export interface ListPantryOptions {
-  /** fifo = só o que conta como stock (inclui expirados): abertos primeiro, depois validade. */
-  sort?: "fifo" | "purchasedAt";
+  /**
+   * fifo e expiry = só o que conta como stock (inclui expirados). fifo: abertos
+   * primeiro, depois validade (a ordem de consumo). expiry: só a validade, a
+   * mais curta primeiro.
+   */
+  sort?: "fifo" | "expiry" | "purchasedAt";
   state?: PantryState;
   location?: PantryLocation;
   expiringBefore?: IsoDate;

@@ -103,7 +103,7 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
     listPlannedMeals(householdId, day, addDays(day, 6))
       .then((result) => !cancelled && setMeals(result.filter((m) => m.status !== PlannedMealStatus.Skipped)))
       .catch(() => !cancelled && setMeals([]));
-    listPantryItems(householdId, { sort: "fifo", pageSize: 6 })
+    listPantryItems(householdId, { sort: "expiry", pageSize: 6 })
       .then((result) => !cancelled && setPantry(result.items))
       .catch(() => !cancelled && setPantry([]));
     return () => {

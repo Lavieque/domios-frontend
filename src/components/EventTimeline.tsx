@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEvents } from "../api/client";
 import type { DomainEventLogEntryDto } from "../api/types";
-import { eventLabel } from "../history/events";
+import { eventDetail, eventLabel } from "../history/events";
 
 interface EventTimelineProps {
   aggregateType: string;
@@ -26,17 +26,15 @@ export function EventTimeline({ aggregateType, aggregateId }: EventTimelineProps
 
   return (
     <ul className="event-timeline">
-      {events.map((event) => (
-        <li key={event.eventId}>
-          <details>
-            <summary>
-              <strong>{eventLabel(event.eventType)}</strong>
-              <span className="muted">{new Date(event.occurredOn).toLocaleString("pt-PT", { dateStyle: "medium", timeStyle: "short" })}</span>
-            </summary>
-            <pre>{JSON.stringify(JSON.parse(event.payload), null, 2)}</pre>
-          </details>
-        </li>
-      ))}
+      {events.map((event) => {
+        const detail = eventDetail(event.payload);
+        return (
+          <li key={event.eventId}>
+            <strong>{detail ? `${eventLabel(event.eventType)}: ${detail}` : eventLabel(event.eventType)}</strong>
+            <span className="muted">{new Date(event.occurredOn).toLocaleString("pt-PT", { dateStyle: "medium", timeStyle: "short" })}</span>
+          </li>
+        );
+      })}
     </ul>
   );
 }

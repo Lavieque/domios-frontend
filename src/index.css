@@ -1772,54 +1772,18 @@ a.meal-title:hover {
 
 .event-timeline li {
   border-bottom: 1px solid var(--line);
+  /* Proporcional: a vírgula tabular da Schibsted ocupa uma célula inteira ("2026 , 16:31"). */
+  font-variant-numeric: lining-nums proportional-nums;
+  font-size: 14px;
+  padding: 0.7rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
 }
 
 .event-timeline li:last-child {
   border-bottom: none;
-}
-
-.event-timeline summary {
-  /* Proporcional: a vírgula tabular da Schibsted ocupa uma célula inteira ("2026 , 16:31"). */
-  font-variant-numeric: lining-nums proportional-nums;
-  cursor: pointer;
-  font-size: 14px;
-  list-style: none;
-  padding: 0.7rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.event-timeline summary:hover {
-  background: color-mix(in srgb, var(--surface-2) 55%, transparent);
-}
-
-.event-timeline summary::-webkit-details-marker {
-  display: none;
-}
-
-.event-timeline summary::before {
-  content: "";
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border-right: 1.5px solid var(--ink-dim);
-  border-bottom: 1.5px solid var(--ink-dim);
-  transform: rotate(-45deg);
-  transition: transform 0.18s ease;
-}
-
-.event-timeline details[open] summary::before {
-  transform: rotate(45deg);
-}
-
-.event-timeline pre {
-  background: var(--surface-2);
-  padding: 0.75rem 0.9rem;
-  border-radius: var(--radius-sm);
-  overflow-x: auto;
-  font-size: 12.5px;
-  margin: 0 1rem 0.85rem;
 }
 
 /* ---------- Receitas ---------- */

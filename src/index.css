@@ -1795,6 +1795,20 @@ a.meal-title:hover {
 }
 
 .recipe-card .label-body {
+/* Foto de receita: fotografia de comida, preenche o campo (ao contrário da embalagem). */
+.recipe-photo {
+  aspect-ratio: 16 / 10;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.recipe-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
   gap: 0.5rem;
 }
 
@@ -2107,6 +2121,27 @@ a.meal-title:hover {
 }
 
 /* Grupos por categoria de topo nos itens por comprar. */
+/* Com imagem da receita: miniatura à esquerda, texto em coluna ao lado. */
+.day-meals li.has-thumb {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  column-gap: 0.7rem;
+  align-items: start;
+}
+
+.day-meals li.has-thumb > :not(.meal-thumb) {
+  grid-column: 2;
+}
+
+.meal-thumb {
+  grid-row: 1 / span 3;
+  width: 3rem;
+  height: 3rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
 .item-group + .item-group {
   margin-top: 1.5rem;
 }

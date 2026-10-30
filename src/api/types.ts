@@ -444,6 +444,7 @@ export interface RecipeSummaryDto {
   dishType: DishType | null;
   mainProtein: MainProtein | null;
   classificationSource: ClassificationSource | null;
+  imageUrl: string | null;
 }
 
 export interface RecipeDto {

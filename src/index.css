@@ -892,6 +892,142 @@ select,
   color: var(--ink);
 }
 
+/* ---------- Catálogo: filtros à esquerda, grelha à direita ---------- */
+
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.filter-sidebar {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 0.25rem;
+}
+
+.filters-toggle {
+  display: none;
+}
+
+.filter-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.filter-group {
+  border-top: 1px solid var(--line);
+}
+
+.filter-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.25rem;
+  border: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Chevron desenhado, como em .chip-more: roda ao abrir. */
+.filter-group-head::after {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--ink-dim);
+  border-bottom: 1.5px solid var(--ink-dim);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.18s ease;
+}
+
+.filter-group-head[aria-expanded="true"]::after {
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+
+.filter-group-count {
+  margin-left: auto;
+  color: var(--ink-dim);
+  font-weight: 500;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.filter-group-list {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 34px;
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.filter-option:hover {
+  background: var(--surface-2);
+}
+
+.filter-option[aria-pressed="true"] {
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+  font-weight: 650;
+}
+
+.filter-sidebar > .filter-option {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 899px) {
+  .catalog-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .filters-toggle {
+    display: inline-flex;
+  }
+
+  .filter-sidebar {
+    display: none;
+    position: static;
+    max-height: none;
+    margin-bottom: 1.25rem;
+  }
+
+  .filter-sidebar.is-open {
+    display: block;
+  }
+}
+
 .results-count {
   color: var(--ink-dim);
   font-size: 14px;

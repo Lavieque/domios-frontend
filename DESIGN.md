@@ -401,6 +401,12 @@ An 8px pill track graded from teal through navy tint to red tint, a 2px dim tick
 ### Aisle Dot
 10px round dot in `--aisle`. Leads aisle chips, the photo tag, pantry rows (own grid column) and shopping-list group headings.
 
+### Settings List (Casa, Conta)
+Casa and Conta are left-aligned in a 54rem column. Facts and account actions sit in one 12px bordered list of rows (min 60px, padding 0.8rem 1.1rem, hairline dividers): a 10rem 600 label, then the value with a pill or a dim hint, and the action pushed right (a 14px 650 teal link, a secondary button, or a danger button for "Sair em todos"). Under 640px the label takes its own line. The household switcher is a chip row (pressed chip = current household).
+
+### Member Row
+One bordered list of members, the caller first, then by role and name. Each row is a 44px round initials avatar (Shelf Grey; navy tint for "tu"), name 600, a meta line (role pill: navy for Administrador, muted otherwise; age; an 8px dot, filled teal "Com conta" or hollow dim "Sem conta") and restriction tags (hairline pills). Actions on the right: "Editar" and "Ligar conta" as row actions, "Remover" / "Sair da casa" as a danger button. Editing, linking and removing open inline under the name on a faint Shelf Grey tint; removal asks once more with a 44px danger-outlined confirm. "Acrescentar membro" adds a two-column form as the list's last row (one column under 640px).
+
 ### Disclosures
 Store breakdowns and event history are `<details>` in hairline containers; 600 summaries with Shelf Grey hover and open state; drawn CSS chevrons rotate on open.
 

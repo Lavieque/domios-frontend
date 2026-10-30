@@ -62,7 +62,8 @@ export function MealPlanTemplateDetailPage() {
               {entries.length === 0 && <p className="muted day-empty">Sem refeições.</p>}
               <ul className="day-meals">
                 {entries.map((entry) => (
-                  <li key={entry.mealPlanTemplateEntryId}>
+                  <li key={entry.mealPlanTemplateEntryId} className={entry.recipeImageUrl ? "has-thumb" : undefined}>
+                    {entry.recipeImageUrl && <img className="meal-thumb" src={entry.recipeImageUrl} alt="" loading="lazy" />}
                     <span className="meal-type">{mealTypeLabels[entry.mealType]}</span>
                     <Link to={`/receitas/${entry.recipeId}`} className="meal-title">
                       {entry.recipeTitle}

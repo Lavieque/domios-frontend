@@ -29,6 +29,7 @@ export interface MealPlanTemplateEntryDto {
   servings: number;
   notes: string | null;
   sortOrder: number;
+  recipeImageUrl: string | null;
 }
 
 export interface MealPlanTemplateDto extends Omit<MealPlanTemplateSummaryDto, "entryCount"> {

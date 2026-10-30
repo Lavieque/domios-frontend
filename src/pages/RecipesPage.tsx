@@ -110,7 +110,19 @@ export function RecipesPage() {
         !loading && (
           <div className="recipe-grid">
             {recipes.map((recipe, index) => (
-              <ShelfLabel key={recipe.recipeId} to={`/receitas/${recipe.recipeId}`} index={index} className="recipe-card">
+              <ShelfLabel
+                key={recipe.recipeId}
+                to={`/receitas/${recipe.recipeId}`}
+                index={index}
+                className="recipe-card"
+                media={
+                  recipe.imageUrl ? (
+                    <div className="recipe-photo">
+                      <img src={recipe.imageUrl} alt="" loading="lazy" />
+                    </div>
+                  ) : undefined
+                }
+              >
                 <div className="recipe-card-title">{recipe.title}</div>
                 <div className="label-meta">
                   {[

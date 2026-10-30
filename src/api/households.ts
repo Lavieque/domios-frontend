@@ -82,3 +82,54 @@ export function getHouseholdTimeline(
 export function createHousehold(request: CreateHouseholdRequest): Promise<HouseholdDto> {
   return authedRequest<HouseholdDto>("/households", { method: "POST", body: request });
 }
+
+export interface UpdateHouseholdRequest {
+  name?: string;
+  timeZone?: string;
+  currency?: string;
+  locale?: string;
+}
+
+export interface AddMemberRequest {
+  name: string;
+  role: MemberRole;
+  dateOfBirth: string | null;
+  dietaryRestrictions: string[];
+}
+
+/** `role` só o Admin pode mandar (403 `forbidden-household-role`); nome e restrições, qualquer membro. */
+export interface UpdateMemberRequest {
+  name?: string;
+  role?: MemberRole;
+  dietaryRestrictions?: string[];
+}
+
+/** Só Admin. Devolve a casa atualizada. */
+export function updateHousehold(householdId: string, request: UpdateHouseholdRequest): Promise<HouseholdDto> {
+  return authedRequest<HouseholdDto>(`/households/${householdId}`, { method: "PATCH", body: request });
+}
+
+/** Só Admin. Devolve a casa com o membro novo. */
+export function addMember(householdId: string, request: AddMemberRequest): Promise<HouseholdDto> {
+  return authedRequest<HouseholdDto>(`/households/${householdId}/members`, { method: "POST", body: request });
+}
+
+export function updateMember(householdId: string, memberId: string, request: UpdateMemberRequest): Promise<HouseholdDto> {
+  return authedRequest<HouseholdDto>(`/households/${householdId}/members/${memberId}`, {
+    method: "PATCH",
+    body: request,
+  });
+}
+
+/** Admin remove qualquer membro; os outros só a si próprios (sair da casa). O último Admin não sai. */
+export function removeMember(householdId: string, memberId: string): Promise<void> {
+  return authedRequest<void>(`/households/${householdId}/members/${memberId}`, { method: "DELETE" });
+}
+
+/** Só Admin: liga o membro à conta com este email; dá-lhe acesso total à casa. */
+export function linkMemberToUser(householdId: string, memberId: string, email: string): Promise<void> {
+  return authedRequest<void>(`/households/${householdId}/members/${memberId}/link-user`, {
+    method: "POST",
+    body: { email },
+  });
+}

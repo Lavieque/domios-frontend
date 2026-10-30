@@ -10,6 +10,8 @@ interface HouseholdsState {
   households: CallerHouseholdDto[];
   current: CallerHouseholdDto | null;
   select: (householdId: string) => void;
+  /** Volta a pedir a lista, ex. depois de sair de uma casa. */
+  reload: () => void;
 }
 
 /** As casas do utilizador (`GET /households`) e a casa escolhida neste browser. */
@@ -19,6 +21,7 @@ export function useHouseholds(): HouseholdsState {
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     if (!userId) return;
@@ -40,7 +43,9 @@ export function useHouseholds(): HouseholdsState {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, version]);
+
+  const reload = useCallback(() => setVersion((v) => v + 1), []);
 
   const select = useCallback(
     (householdId: string) => {
@@ -57,5 +62,6 @@ export function useHouseholds(): HouseholdsState {
     households,
     current: households.find((h) => h.householdId === currentId) ?? null,
     select,
+    reload,
   };
 }

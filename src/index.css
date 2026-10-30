@@ -2568,6 +2568,340 @@ a.meal-title:hover {
   }
 }
 
+/* ---------- Casa e conta: definições e membros ---------- */
+
+.settings-page {
+  max-width: 54rem;
+}
+
+.settings-page > h2 {
+  margin-top: 2.5rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 1rem;
+}
+
+.title-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin: 0 0 1rem;
+}
+
+.title-form .form-field {
+  flex: 1 1 18rem;
+  max-width: 26rem;
+}
+
+.title-form .form-error {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.household-switch {
+  margin: -0.5rem 0 0.5rem;
+}
+
+/* Uma lista de linhas: rótulo à esquerda, valor e ação à direita. */
+.settings-list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.settings-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  min-height: 60px;
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row > dt {
+  flex: 0 0 10rem;
+  font-weight: 600;
+}
+
+.settings-row > dd {
+  flex: 1 1 16rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.settings-value {
+  overflow-wrap: anywhere;
+}
+
+.settings-row-title {
+  flex: 1 1 14rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.6rem;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.settings-row-title small {
+  flex-basis: 100%;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.settings-row-end {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  font-size: 14.5px;
+}
+
+/* Link de ação ao fundo da linha, alinhado à direita. */
+.settings-action {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.settings-note {
+  margin: -0.5rem 0 0;
+  font-size: 14px;
+}
+
+.member-list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.member-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+  transition: background-color 0.15s ease;
+}
+
+.member-row:last-child {
+  border-bottom: none;
+}
+
+.member-row:not(.is-open):not(.member-row-form):hover {
+  background: color-mix(in srgb, var(--surface-2) 40%, transparent);
+}
+
+.member-row.is-open {
+  background: color-mix(in srgb, var(--surface-2) 30%, transparent);
+}
+
+.member-avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.member-avatar.is-me {
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+}
+
+.member-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.member-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.member-name .muted {
+  font-weight: 400;
+}
+
+.member-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.8rem;
+  font-size: 14px;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.member-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.member-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-dim);
+}
+
+.member-dot.is-linked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.member-restrictions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.member-restriction {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Separa o que apaga do que edita. */
+.member-actions .button-danger {
+  margin-left: 0.6rem;
+}
+
+.member-panel,
+.member-error {
+  grid-column: 2 / -1;
+}
+
+.member-error {
+  margin: 0;
+}
+
+.member-confirm p {
+  max-width: 60ch;
+  margin: 0 0 0.75rem;
+  font-size: 14.5px;
+}
+
+.button-danger.is-confirm {
+  min-height: 44px;
+  padding: 0.5rem 1.15rem;
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+  border-radius: 10px;
+  color: var(--danger);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.member-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem 1rem;
+  padding-top: 0.25rem;
+}
+
+.member-form h3 {
+  margin: 0;
+}
+
+.member-form p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.member-form-wide {
+  grid-column: 1 / -1;
+}
+
+.member-form .form-field select,
+.member-form .form-field input {
+  width: 100%;
+}
+
+.member-row-form {
+  display: block;
+  padding: 1.1rem 1.1rem 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .settings-row > dt {
+    flex-basis: 100%;
+  }
+
+  .settings-row-end {
+    margin-left: 0;
+  }
+
+  .member-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .member-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .member-actions {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+
+  .member-panel,
+  .member-error {
+    grid-column: 1 / -1;
+  }
+
+  .member-form {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Cartão de produto (catálogo) ---------- */
 
 .product-card .label-body {

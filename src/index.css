@@ -868,6 +868,30 @@ select,
   }
 }
 
+/* "Mais N": abre o resto dos corredores; chevron desenhado roda ao abrir. */
+.chip-more {
+  color: var(--ink-dim);
+  background: transparent;
+}
+
+.chip-more::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.18s ease;
+}
+
+.chip-more[aria-expanded="true"]::after {
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+
+.chip-more:hover {
+  color: var(--ink);
+}
+
 .results-count {
   color: var(--ink-dim);
   font-size: 14px;

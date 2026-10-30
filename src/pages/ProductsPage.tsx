@@ -12,6 +12,8 @@ import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
 
 const count = new Intl.NumberFormat("pt-PT");
 const PAGE_SIZE = 20;
+/** Corredores à vista antes de "Mais": o resto da fila ocupava meio ecrã. */
+const VISIBLE_AISLES = 8;
 
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -63,6 +65,17 @@ export function ProductsPage() {
   );
   const categoriesById = useMemo(() => new Map(categories.map((category) => [category.categoryId, category])), [categories]);
 
+  const [showAllAisles, setShowAllAisles] = useState(false);
+  const canCollapse = topLevelCategories.length > VISIBLE_AISLES;
+  // A categoria escolhida fica sempre à vista, mesmo que esteja para lá do corte.
+  const visibleCategories =
+    showAllAisles || !canCollapse
+      ? topLevelCategories
+      : topLevelCategories.filter(
+          (category, index) => index < VISIBLE_AISLES || category.categoryId === categoryId,
+        );
+  const hiddenAisleCount = topLevelCategories.length - visibleCategories.length;
+
   useEffect(() => {
     setLoading(true);
     searchProducts(search, page, PAGE_SIZE, categoryId ?? undefined, groceryOnly)
@@ -98,7 +111,7 @@ export function ProductsPage() {
           >
             Todas
           </button>
-          {topLevelCategories.map((category) => (
+          {visibleCategories.map((category) => (
             <button
               key={category.categoryId}
               type="button"
@@ -110,6 +123,16 @@ export function ProductsPage() {
               {category.name}
             </button>
           ))}
+          {canCollapse && (
+            <button
+              type="button"
+              className="chip chip-more"
+              aria-expanded={showAllAisles}
+              onClick={() => setShowAllAisles((open) => !open)}
+            >
+              {showAllAisles ? "Menos" : `Mais ${hiddenAisleCount}`}
+            </button>
+          )}
         </div>
       )}
 

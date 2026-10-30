@@ -22,6 +22,7 @@ export function ShelfLabel({
   className = "",
   children,
   band,
+  media,
 }: {
   to?: string;
   index?: number;
@@ -29,11 +30,14 @@ export function ShelfLabel({
   className?: string;
   children: ReactNode;
   band?: ReactNode;
+  /** Por cima do corpo: o campo da foto no cartão de produto. */
+  media?: ReactNode;
 }) {
   const style = { "--i": Math.min(index, 12) } as CSSProperties;
   const classes = `shelf-label${best ? " is-best" : ""}${className ? ` ${className}` : ""}`;
   const content = (
     <>
+      {media}
       <div className="label-body">{children}</div>
       {band}
     </>
@@ -63,15 +67,28 @@ export function LabelPrice({ amount, from = false }: { amount: number | null | u
 }
 
 /** A faixa do veredicto, com o rótulo da Api (PriceLabel) ou um texto livre. */
-export function VerdictBand({ insight, children, tone }: { insight?: PriceInsightDto | null; children?: ReactNode; tone?: string }) {
+export function VerdictBand({
+  insight,
+  children,
+  tone,
+  pill = false,
+}: {
+  insight?: PriceInsightDto | null;
+  children?: ReactNode;
+  tone?: string;
+  /** Solto, fora do cartão: pastilha em vez de faixa. */
+  pill?: boolean;
+}) {
+  const Tag = pill ? "span" : "div";
+  const shape = pill ? " verdict-pill" : "";
   if (children !== undefined) {
-    return <div className={`verdict verdict-${tone ?? "none"}`}>{children}</div>;
+    return <Tag className={`verdict verdict-${tone ?? "none"}${shape}`}>{children}</Tag>;
   }
-  if (!insight) return <div className="verdict verdict-none">Sem histórico de preços</div>;
+  if (!insight) return <Tag className={`verdict verdict-none${shape}`}>Sem histórico de preços</Tag>;
   const days = insight.windowDays;
   const text =
     insight.label === PriceLabel.HistoricLow ? `Mínimo dos últimos ${days} dias` : priceLabelLabels[insight.label];
-  return <div className={`verdict verdict-${insight.label}`}>{text}</div>;
+  return <Tag className={`verdict verdict-${insight.label}${shape}`}>{text}</Tag>;
 }
 
 /** Régua mínimo–máximo do período, com a média e o preço atual. */

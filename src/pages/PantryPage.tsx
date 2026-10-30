@@ -16,7 +16,9 @@ import {
   type PantryItemDto,
   type PantryLocation,
 } from "../api/pantry";
-import { measurementUnitLabels } from "../api/types";
+import { measurementUnitLabels, type ProductDto } from "../api/types";
+import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
+import { useCategories } from "../catalog/useCategories";
 import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
@@ -72,6 +74,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   const products = useProducts(items.map((item) => item.productId));
+  const categories = useCategories();
 
   useEffect(() => {
     let cancelled = false;
@@ -172,7 +175,8 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
               <PantryRow
                 key={item.pantryItemId}
                 item={item}
-                productName={products.get(item.productId)?.name}
+                product={products.get(item.productId)}
+                aisle={aisleFor(products.get(item.productId), categories)}
                 onAct={act}
                 householdId={householdId}
               />
@@ -186,14 +190,21 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   );
 }
 
+function aisleFor(product: ProductDto | undefined, categories: ReturnType<typeof useCategories>): string {
+  if (!product) return aisleClass(null);
+  return aisleClass(aisleOf((topCategory(product.category, categories) ?? product.category).name));
+}
+
 function PantryRow({
   item,
-  productName,
+  product,
+  aisle,
   householdId,
   onAct,
 }: {
   item: PantryItemDto;
-  productName: string | undefined;
+  product: ProductDto | undefined;
+  aisle: string;
   householdId: string;
   onAct: (action: () => Promise<unknown>) => void;
 }) {
@@ -212,10 +223,11 @@ function PantryRow({
   }
 
   return (
-    <li className="pantry-row">
+    <li className={`pantry-row ${aisle}`}>
+      <span className="aisle-dot" title={product?.category.name} aria-hidden="true" />
       <div className="pantry-main">
         <Link to={`/produtos/${item.productId}`} className="meal-title">
-          {productName ?? "…"}
+          {product?.name ?? "…"}
         </Link>
         <span className="meal-meta muted">
           {quantityFormat.format(item.quantity.amount)} {unit} · {pantryStateLabels[item.state]}
@@ -238,14 +250,24 @@ function PantryRow({
             ))}
           </select>
           {item.state === PantryState.Sealed && (
-            <button type="button" className="link-button" onClick={() => onAct(() => openPantryItem(householdId, item.pantryItemId))}>
+            <button type="button" className="row-action" onClick={() => onAct(() => openPantryItem(householdId, item.pantryItemId))}>
               Abrir
             </button>
           )}
-          <button type="button" className="link-button" onClick={() => setMode(mode === "consume" ? null : "consume")}>
+          <button
+            type="button"
+            className="row-action"
+            aria-expanded={mode === "consume"}
+            onClick={() => setMode(mode === "consume" ? null : "consume")}
+          >
             Usar
           </button>
-          <button type="button" className="link-button" onClick={() => setMode(mode === "discard" ? null : "discard")}>
+          <button
+            type="button"
+            className="button-danger"
+            aria-expanded={mode === "discard"}
+            onClick={() => setMode(mode === "discard" ? null : "discard")}
+          >
             Deitar fora
           </button>
         </div>

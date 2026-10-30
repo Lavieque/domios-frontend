@@ -12,8 +12,14 @@ import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
 
 const count = new Intl.NumberFormat("pt-PT");
 const PAGE_SIZE = 20;
-/** Corredores à vista antes de "Mais": o resto da fila ocupava meio ecrã. */
-const VISIBLE_AISLES = 8;
+
+/** Grupos da barra de filtros, pela ordem em que aparecem. */
+const SCOPE_GROUPS: { scope: CategoryScope; label: string }[] = [
+  { scope: CategoryScope.Food, label: "Alimentação" },
+  { scope: CategoryScope.Household, label: "Casa e higiene" },
+  { scope: CategoryScope.NonGrocery, label: "Acessórios e outros" },
+  { scope: CategoryScope.Unclassified, label: "Por classificar" },
+];
 
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,19 +71,38 @@ export function ProductsPage() {
   );
   const categoriesById = useMemo(() => new Map(categories.map((category) => [category.categoryId, category])), [categories]);
 
-  // Fechados por omissão, como em Promoções: "Só supermercado" e os
-  // corredores ocupavam meio ecrã no telemóvel. A pesquisa fica à vista.
+  // No telemóvel a barra lateral fecha-se atrás de "Filtros", como em
+  // Promoções; no ecrã largo fica sempre à vista, à esquerda da grelha.
   const [showFilters, setShowFilters] = useState(false);
   const activeFilterCount = (categoryId ? 1 : 0) + (groceryOnly ? 0 : 1);
-  // A categoria escolhida fica sempre à vista, mesmo que esteja para lá do
-  // corte. As restantes vão para uma lista: abrir todas em chips enchia a
-  // página inteira (centenas de categorias de topo entre cadeias).
-  const visibleCategories = topLevelCategories.filter(
-    (category, index) => index < VISIBLE_AISLES || category.categoryId === categoryId,
+
+  // Centenas de categorias de topo entre cadeias: agrupadas pelo âmbito que a
+  // Api lhes dá, cada grupo dobrável, em vez de uma fila de chips sem fim.
+  const groups = useMemo(
+    () =>
+      SCOPE_GROUPS.map((group) => ({
+        ...group,
+        categories: topLevelCategories.filter((category) => category.scope === group.scope),
+      })).filter((group) => group.categories.length > 0),
+    [topLevelCategories],
   );
-  const hiddenCategories = topLevelCategories.filter(
-    (category, index) => index >= VISIBLE_AISLES && category.categoryId !== categoryId,
-  );
+  const selectedScope = categoryId ? categoriesById.get(categoryId)?.scope : undefined;
+  // Só Alimentação aberta à partida; o grupo da categoria escolhida abre-se
+  // sozinho para ela nunca ficar escondida.
+  const [openGroups, setOpenGroups] = useState<Set<CategoryScope>>(() => new Set([CategoryScope.Food]));
+  useEffect(() => {
+    if (selectedScope === undefined) return;
+    setOpenGroups((open) => (open.has(selectedScope) ? open : new Set(open).add(selectedScope)));
+  }, [selectedScope]);
+
+  function toggleGroup(scope: CategoryScope) {
+    setOpenGroups((open) => {
+      const next = new Set(open);
+      if (next.has(scope)) next.delete(scope);
+      else next.add(scope);
+      return next;
+    });
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -103,90 +128,105 @@ export function ProductsPage() {
         />
         <button
           type="button"
-          className="chip chip-more"
+          className="chip chip-more filters-toggle"
           aria-expanded={showFilters}
           aria-controls="product-filters"
           onClick={() => setShowFilters((open) => !open)}
         >
           {activeFilterCount > 0 ? `Filtros · ${activeFilterCount}` : "Filtros"}
         </button>
-        {activeFilterCount > 0 && (
-          <button
-            type="button"
-            className="chip"
-            onClick={() => applyFilters({ categoryId: null, groceryOnly: true, page: 1 })}
-          >
-            Limpar
-          </button>
-        )}
       </div>
 
-      {showFilters && (
-        <div className="chip-row" id="product-filters">
-          <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
-        </div>
-      )}
-
-      {showFilters && topLevelCategories.length > 0 && (
-        <div className="chip-row aisle-row" role="group" aria-label="Categoria">
-          <button
-            type="button"
-            className="chip"
-            aria-pressed={categoryId === null}
-            onClick={() => applyFilters({ categoryId: null, page: 1 })}
-          >
-            Todas
-          </button>
-          {visibleCategories.map((category) => (
-            <button
-              key={category.categoryId}
-              type="button"
-              className={`chip ${aisleClass(aisleOf(category.name))}`}
-              aria-pressed={categoryId === category.categoryId}
-              onClick={() => applyFilters({ categoryId: category.categoryId, page: 1 })}
-            >
-              <span className="aisle-dot" aria-hidden="true" />
-              {category.name}
-            </button>
-          ))}
-          {hiddenCategories.length > 0 && (
-            <select
-              className="category-select"
-              aria-label="Mais categorias"
-              value=""
-              onChange={(e) => e.target.value && applyFilters({ categoryId: e.target.value, page: 1 })}
-            >
-              <option value="">Mais {hiddenCategories.length}…</option>
-              {hiddenCategories.map((category) => (
-                <option key={category.categoryId} value={category.categoryId}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      )}
-
-      <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} resultados`}</p>
-
-      {!loading && products.length === 0 ? (
-        <p className="empty-state">Sem resultados para esta pesquisa.</p>
-      ) : (
-        !loading && (
-          <div className="label-grid">
-            {products.map((product, index) => (
-              <ProductLabel
-                key={product.productId}
-                product={product}
-                index={index}
-                top={topCategory(product.category, categoriesById)}
-              />
-            ))}
+      <div className="catalog-layout">
+        <aside
+          className={`filter-sidebar${showFilters ? " is-open" : ""}`}
+          id="product-filters"
+          aria-label="Filtros"
+        >
+          <div className="filter-sidebar-head">
+            <GroceryOnlyToggle value={groceryOnly} onChange={(value) => applyFilters({ groceryOnly: value, page: 1 })} />
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => applyFilters({ categoryId: null, groceryOnly: true, page: 1 })}
+              >
+                Limpar
+              </button>
+            )}
           </div>
-        )
-      )}
 
-      <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+          {groups.length > 0 && (
+            <button
+              type="button"
+              className="filter-option"
+              aria-pressed={categoryId === null}
+              onClick={() => applyFilters({ categoryId: null, page: 1 })}
+            >
+              Todas as categorias
+            </button>
+          )}
+
+          {groups.map((group) => {
+            const open = openGroups.has(group.scope);
+            const listId = `filter-group-${group.scope}`;
+            return (
+              <section key={group.scope} className="filter-group">
+                <button
+                  type="button"
+                  className="filter-group-head"
+                  aria-expanded={open}
+                  aria-controls={listId}
+                  onClick={() => toggleGroup(group.scope)}
+                >
+                  <span>{group.label}</span>
+                  <span className="filter-group-count">{group.categories.length}</span>
+                </button>
+                {open && (
+                  <ul className="filter-group-list" id={listId}>
+                    {group.categories.map((category) => (
+                      <li key={category.categoryId}>
+                        <button
+                          type="button"
+                          className={`filter-option ${aisleClass(aisleOf(category.name))}`}
+                          aria-pressed={categoryId === category.categoryId}
+                          onClick={() => applyFilters({ categoryId: category.categoryId, page: 1 })}
+                        >
+                          <span className="aisle-dot" aria-hidden="true" />
+                          {category.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            );
+          })}
+        </aside>
+
+        <div className="catalog-results">
+          <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} resultados`}</p>
+
+          {!loading && products.length === 0 ? (
+            <p className="empty-state">Sem resultados para esta pesquisa.</p>
+          ) : (
+            !loading && (
+              <div className="label-grid">
+                {products.map((product, index) => (
+                  <ProductLabel
+                    key={product.productId}
+                    product={product}
+                    index={index}
+                    top={topCategory(product.category, categoriesById)}
+                  />
+                ))}
+              </div>
+            )
+          )}
+
+          <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+        </div>
+      </div>
     </div>
   );
 }

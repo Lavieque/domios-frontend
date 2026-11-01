@@ -4,7 +4,7 @@
 
 import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
-import type { QuantityDto } from "./pantry";
+import type { PantryLocation, QuantityDto } from "./pantry";
 import type { MeasurementUnit, PagedResult } from "./types";
 
 export const ShoppingListStatus = {
@@ -43,6 +43,8 @@ export interface ShoppingListItemDto {
   quantity: QuantityDto;
   isPurchased: boolean;
   purchasedAt: string | null;
+  /** Quando foi para a despensa; null se ainda não foi. */
+  storedInPantryAt: string | null;
 }
 
 export interface ShoppingListDto {
@@ -131,6 +133,28 @@ export function reopenShoppingList(householdId: string, listId: string): Promise
   return authedRequest<void>(`${listPath(householdId, listId)}/reopen`, { method: "POST" });
 }
 
+// --- Comprado → despensa ---
+
+export interface StoreInPantryResultDto {
+  shoppingList: ShoppingListDto;
+  storedCount: number;
+  /** Itens escritos à mão, sem produto nem ingrediente: não têm onde entrar na despensa. */
+  skipped: { shoppingListItemId: string; label: string }[];
+}
+
+/** Sem `itemIds`, passa para a despensa tudo o que está comprado e ainda lá não entrou. */
+export function storeShoppingListInPantry(
+  householdId: string,
+  listId: string,
+  location: PantryLocation,
+  itemIds?: string[],
+): Promise<StoreInPantryResultDto> {
+  return authedRequest<StoreInPantryResultDto>(`${listPath(householdId, listId)}/store-in-pantry`, {
+    method: "POST",
+    body: { itemIds: itemIds ?? null, location, overrides: null },
+  });
+}
+
 // --- Lista do plano (Fase 6, secção 2) ---
 
 export interface PlanShoppingListResultDto {
@@ -138,6 +162,8 @@ export interface PlanShoppingListResultDto {
   plannedMealCount: number;
   addedItemCount: number;
   skippedPlannedMealIds: string[];
+  /** Linhas que o plano pede e que a lista já cobria: não se acrescentou nada por elas. */
+  coveredByListCount: number;
 }
 
 export function addPlanToShoppingList(

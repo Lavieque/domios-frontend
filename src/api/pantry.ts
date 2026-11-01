@@ -118,6 +118,16 @@ export interface AddPantryItemRequest {
   purchasedPrice: MoneyDto | null;
 }
 
+/** Um item do pedido em lote: um produto ou, sem produto, um ingrediente (entra pelo produto genérico dele). */
+export interface AddPantryItemsBatchItem {
+  productId: string | null;
+  ingredientId: string | null;
+  quantity: QuantityDto;
+  location: PantryLocation;
+  expiresAt: IsoDate | null;
+  purchasedPrice: MoneyDto | null;
+}
+
 const base = (householdId: string) => `/households/${householdId}/pantry-items`;
 
 export function listPantryItems(householdId: string, options: ListPantryOptions = {}): Promise<PagedResult<PantryItemDto>> {
@@ -135,6 +145,11 @@ export function listPantryItems(householdId: string, options: ListPantryOptions 
 
 export function addPantryItem(householdId: string, request: AddPantryItemRequest): Promise<PantryItemDto> {
   return authedRequest<PantryItemDto>(base(householdId), { method: "POST", body: request });
+}
+
+/** Todos ou nenhum. */
+export function addPantryItemsBatch(householdId: string, items: AddPantryItemsBatchItem[]): Promise<PantryItemDto[]> {
+  return authedRequest<PantryItemDto[]>(`${base(householdId)}/batch`, { method: "POST", body: { items } });
 }
 
 export function openPantryItem(householdId: string, pantryItemId: string): Promise<void> {

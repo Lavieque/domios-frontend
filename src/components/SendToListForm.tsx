@@ -5,13 +5,20 @@ import { describeError } from "../auth/errors";
 import { useOpenLists } from "../shopping/useOpenLists";
 import { ListPicker, NEW_LIST } from "./ListPicker";
 
+interface SendResult {
+  list: ShoppingListDto;
+  added: number;
+  /** Linhas que a lista já tinha a cobrir (só o plano o sabe dizer). */
+  covered?: number;
+}
+
 interface Props {
   householdId: string;
   /** Nome da lista se for preciso criar uma. */
   newListName: string;
   submitLabel: string;
   /** Acrescenta à lista e diz quantos itens entraram. */
-  send: (listId: string) => Promise<{ list: ShoppingListDto; added: number }>;
+  send: (listId: string) => Promise<SendResult>;
   children?: ReactNode;
 }
 
@@ -19,7 +26,7 @@ interface Props {
 export function SendToListForm({ householdId, newListName, submitLabel, send, children }: Props) {
   const { lists, reload } = useOpenLists(householdId);
   const [chosen, setChosen] = useState<string | null>(null);
-  const [result, setResult] = useState<{ list: ShoppingListDto; added: number } | null>(null);
+  const [result, setResult] = useState<SendResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -53,7 +60,9 @@ export function SendToListForm({ householdId, newListName, submitLabel, send, ch
       {result && (
         <p className="notice inline-notice">
           {result.added === 0
-            ? `Nada a acrescentar a ${result.list.name}.`
+            ? result.covered
+              ? `${result.list.name} já tem o que isto pede.`
+              : `Nada a acrescentar a ${result.list.name}.`
             : `${result.added} ${result.added === 1 ? "item acrescentado" : "itens acrescentados"} a ${result.list.name}.`}{" "}
           <Link to={`/listas/${result.list.shoppingListId}`}>Ver a lista</Link>
         </p>

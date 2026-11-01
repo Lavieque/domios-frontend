@@ -12,13 +12,16 @@ import {
   reopenShoppingList,
   setItemPurchased,
   ShoppingListStatus,
+  storeShoppingListInPantry,
   shoppingListStatusLabels,
   UnpricedItemReason,
   type ShoppingListDto,
   type ShoppingListItemDto,
   type StoreComparisonDto,
   type StoreComparisonStoreDto,
+  type StoreInPantryResultDto,
 } from "../api/shopping";
+import { PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
 import { MeasurementUnit, measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
 import { aisleClass, aisleOf } from "../catalog/aisles";
@@ -100,6 +103,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   }
   const pending = list.items.filter((item) => !item.isPurchased);
   const purchased = list.items.filter((item) => item.isPurchased);
+  const notInPantry = purchased.filter((item) => !item.storedInPantryAt);
 
   return (
     <div className="page">
@@ -161,6 +165,17 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
         </>
       )}
 
+      {list.status !== ShoppingListStatus.Cancelled && notInPantry.length > 0 && (
+        <StoreInPantryPanel
+          count={notInPantry.length}
+          onStore={async (location) => {
+            const result = await storeShoppingListInPantry(householdId, listId, location);
+            setVersion((v) => v + 1);
+            return result;
+          }}
+        />
+      )}
+
       <div className="button-row list-status-actions">
         {open ? (
           <>
@@ -179,6 +194,61 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
       </div>
 
     </div>
+  );
+}
+
+/** O que está comprado e ainda fora da despensa: um clique e entra, com o sítio escolhido. */
+function StoreInPantryPanel({ count, onStore }: { count: number; onStore: (location: PantryLocation) => Promise<StoreInPantryResultDto> }) {
+  const [location, setLocation] = useState<PantryLocation>(PantryLocation.Pantry);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<StoreInPantryResultDto | null>(null);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    try {
+      setResult(await onStore(location));
+    } catch (err) {
+      setError(describeError(err));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <section className="panel">
+      <h2>Pôr na despensa</h2>
+      <p className="muted">
+        {count === 1 ? "1 item comprado ainda não está" : `${count} itens comprados ainda não estão`} na despensa. Entram com a quantidade da lista; a
+        validade podes acertar depois, na despensa.
+      </p>
+      <form className="inline-form" onSubmit={handleSubmit}>
+        <select className="category-select" aria-label="Onde ficam" value={location} onChange={(e) => setLocation(Number(e.target.value) as PantryLocation)}>
+          {pantryLocations.map((loc) => (
+            <option key={loc} value={loc}>
+              {pantryLocationLabels[loc]}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className="button-primary" disabled={submitting}>
+          {submitting ? "A guardar…" : "Pôr na despensa"}
+        </button>
+      </form>
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
+      {result && (
+        <p className="notice inline-notice">
+          {result.storedCount === 1 ? "1 item entrou" : `${result.storedCount} itens entraram`} na <Link to="/despensa">despensa</Link>.
+          {result.skipped.length > 0 &&
+            ` Ficaram de fora, por não terem produto nem ingrediente: ${result.skipped.map((s) => s.label).join(", ")}. Acrescenta-os à mão na despensa.`}
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -311,6 +381,7 @@ function ItemList({
           <span className="muted">
             {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]}
           </span>
+          {item.storedInPantryAt && <span className="pill pill-muted">Na despensa</span>}
           {cheapest?.get(item.shoppingListItemId) && (
             <span className="pill pill-good">
               {cheapest.get(item.shoppingListItemId)!.chainName} · {money.format(cheapest.get(item.shoppingListItemId)!.lineTotal)}

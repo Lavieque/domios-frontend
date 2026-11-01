@@ -21,6 +21,7 @@ const item = (id: string, productId: string | null = null): ShoppingListItemDto 
   quantity: { amount: 1, unit: 0 },
   isPurchased: false,
   purchasedAt: null,
+  storedInPantryAt: null,
 });
 
 const iogurtes = category("c-iog", "Iogurtes");

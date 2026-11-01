@@ -3633,3 +3633,59 @@ a.meal-title:hover {
     font-size: 12px;
   }
 }
+
+/* ---------- Despensa: adicionar vários ---------- */
+
+.product-results li.result-group {
+  padding: 0.4rem 0.85rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--accent-soft);
+}
+
+.draft-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.draft-card {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.draft-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.draft-head .link-button {
+  margin-left: auto;
+}
+
+.draft-more > summary,
+.have-it-already > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.draft-more .form-field {
+  margin-top: 0.6rem;
+}
+
+.have-it-already {
+  margin-top: 0.5rem;
+}

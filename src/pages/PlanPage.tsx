@@ -22,6 +22,7 @@ import { measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
 import { addPlanToShoppingList } from "../api/shopping";
 import { AddToPlanForm } from "../components/AddToPlanForm";
+import { PlanToPantryForm } from "../components/PlanToPantryForm";
 import { SendToListForm } from "../components/SendToListForm";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekDays, weekdayName, weekdayTitle } from "../plan/dates";
@@ -211,10 +212,11 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
               submitLabel="Pôr o que falta na lista"
               send={async (listId) => {
                 const result = await addPlanToShoppingList(householdId, listId, monday, sunday);
-                return { list: result.shoppingList, added: result.addedItemCount };
+                return { list: result.shoppingList, added: result.addedItemCount, covered: result.coveredByListCount };
               }}
             />
           )}
+          {missingLines.length > 0 && <PlanToPantryForm householdId={householdId} lines={missingLines} onDone={reload} />}
         </section>
 
         <section className="panel">

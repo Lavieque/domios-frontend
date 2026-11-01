@@ -102,7 +102,7 @@ function OpportunityCard({
             await actOnOpportunity(householdId, opportunity.opportunityId).catch(() => undefined);
             setClosed(true);
             onClosed(true);
-            return { list: result.shoppingList, added: result.addedItemCount };
+            return { list: result.shoppingList, added: result.addedItemCount, covered: result.coveredByListCount };
           }}
         />
       )}

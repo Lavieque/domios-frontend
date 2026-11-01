@@ -7,6 +7,7 @@ import {
   type DishType,
   type DomainEventLogEntryDto,
   type MainProtein,
+  type MeasurementUnit,
   type PagedResult,
   type ProductDto,
   type ProductStoreOfferDto,
@@ -29,6 +30,19 @@ export function searchProducts(
   groceryOnly = false,
 ): Promise<PagedResult<ProductDto>> {
   return get<PagedResult<ProductDto>>("/products", { search, categoryId, groceryOnly, page, pageSize });
+}
+
+export interface IngredientDto {
+  ingredientId: string;
+  name: string;
+  defaultUnit: MeasurementUnit;
+  displayName: string | null;
+  canonicalIngredientId: string | null;
+}
+
+/** Só os canónicos: as variantes ("Cebola roxa") contam como o canónico na despensa. */
+export function searchIngredients(search: string, pageSize = 8): Promise<PagedResult<IngredientDto>> {
+  return get<PagedResult<IngredientDto>>("/ingredients", { search, canonical: true, pageSize });
 }
 
 export function getCategories(hasProducts?: boolean): Promise<CategoryDto[]> {

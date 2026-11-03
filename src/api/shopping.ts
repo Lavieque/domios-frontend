@@ -133,6 +133,22 @@ export function reopenShoppingList(householdId: string, listId: string): Promise
   return authedRequest<void>(`${listPath(householdId, listId)}/reopen`, { method: "POST" });
 }
 
+// --- Embalagens ---
+
+/** O que uma linha dá em embalagens inteiras: 50 ml de azeite são 1 × 1 L. */
+export interface ShoppingItemPackagingDto {
+  shoppingListItemId: string;
+  productId: string;
+  productName: string;
+  packageQuantity: number;
+  packageUnit: MeasurementUnit;
+  packageCount: number;
+}
+
+export function getShoppingListPackaging(householdId: string, listId: string): Promise<{ items: ShoppingItemPackagingDto[] }> {
+  return authedRequest<{ items: ShoppingItemPackagingDto[] }>(`${listPath(householdId, listId)}/packaging`);
+}
+
 // --- Comprado → despensa ---
 
 export interface StoreInPantryResultDto {

@@ -110,7 +110,7 @@ spacing:
   panel-pad: "1.35rem 1.5rem 1.5rem"
   section: "2.5rem"
   page-x: "clamp(16px, 3vw, 40px)"
-  page-max: "1320px"
+  page-max: "1760px"
 components:
   button-primary:
     backgroundColor: "{colors.accent}"
@@ -324,9 +324,11 @@ The full hue marks dots and pictograms; the `-soft` tint fills photo fields. Dar
 
 ## Layout
 
-One centered column, max 1320px, padding clamp(16px, 3vw, 40px), 2.25rem top and 5rem bottom. Pages open with title, a dim `page-sub` line (1.75rem below), a search/filter row (gap 0.6rem), then content; sections sit 2.5rem apart with headline left and a link or count right, baseline-aligned.
+One column, max 1760px (aligned with the full-width top bar), padding clamp(16px, 3vw, 40px), 2.25rem top and 5rem bottom. Pages open with title, a dim `page-sub` line (1.75rem below), a search/filter row (gap 0.6rem), then content; sections sit 2.5rem apart with headline left and a link or count right, baseline-aligned.
 
 Product cards fill auto-fill grids at minmax(15.5rem, 1fr), gap 1rem (10.5rem, gap 0.65rem under 720px). Under 480px each product card becomes a horizontal row: a 6rem photo field on the left, body and verdict on the right. The aisle chip row scrolls sideways below 900px and wraps above.
+
+The plan week shows all seven days in one row from 1500px. Adding to the pantry is two columns from 1100px: search, results, location chips and hint in a sticky left column (20-26rem), the "Por guardar" rows and the save bar on the right. Promotion cards reuse the product card: the photo field (neutral, offers carry no category) with the discount as a navy-tint tag.
 
 The article is two columns (0.85fr photo / 1.15fr info, gap clamp(1.5rem, 4vw, 3.25rem)), stacking under 760px. Lists (pantry, shopping list, store rows) are one bordered container of rows with hairline dividers. Pantry rows are a 10px dot column + name + expiry + actions grid; actions wrap under the name below 1100px and everything stacks under 720px. The shopping list groups unpurchased items by top category, each group headed by an aisle dot, name and count.
 

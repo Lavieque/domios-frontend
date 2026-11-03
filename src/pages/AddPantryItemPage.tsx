@@ -186,66 +186,61 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
       <h1>Adicionar à despensa</h1>
       <p className="page-sub">{household.name}</p>
 
-      <div className="add-search">
-        <div className="search-wrap">
-          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" strokeWidth="1.6" />
-            <path d="m13 13 4.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-          <input
-            type="search"
-            aria-label="Produto ou ingrediente"
-            placeholder="Leite, cebola, arroz…"
-            autoFocus
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Escape" && setSearch("")}
-          />
-        </div>
-        {searching && !hasResults && <p className="add-search-empty muted">Nada encontrado para “{search.trim()}”.</p>}
-        {hasResults && (
-          <ul className="product-results">
-            {ingredients.length > 0 && <li className="result-group">Ingredientes sem marca</li>}
-            {ingredients.map((ingredient) => (
-              <li key={ingredient.ingredientId}>
-                <button type="button" onClick={() => add(fromIngredient(ingredient, location))}>
-                  <span className="aisle-dot" aria-hidden="true" />
-                  <span className="result-text">
-                    <strong>{ingredient.displayName ?? ingredient.name}</strong>
-                    <span className="muted">Basta o nome, sem marca</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-            {products.length > 0 && <li className="result-group">Produtos do catálogo</li>}
-            {products.map((product) => (
-              <li key={product.productId} className={aisleFor(product.category, categories)}>
-                <button type="button" onClick={() => add(fromProduct(product, location))}>
-                  <span className="aisle-dot" title={product.category.name} aria-hidden="true" />
-                  <span className="result-text">
-                    <strong>{product.name}</strong>
-                    <span className="muted">
-                      {product.brand ? `${product.brand} · ` : ""}
-                      {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
-                    </span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <div className="add-layout">
+        <section className="add-picker" aria-label="Procurar">
+          <div className="add-search">
+            <div className="search-wrap">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" strokeWidth="1.6" />
+                <path d="m13 13 4.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <input
+                type="search"
+                aria-label="Produto ou ingrediente"
+                placeholder="Leite, cebola, arroz…"
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Escape" && setSearch("")}
+              />
+            </div>
+            {searching && !hasResults && <p className="add-search-empty muted">Nada encontrado para “{search.trim()}”.</p>}
+            {hasResults && (
+              <ul className="product-results">
+                {ingredients.length > 0 && <li className="result-group">Ingredientes sem marca</li>}
+                {ingredients.map((ingredient) => (
+                  <li key={ingredient.ingredientId}>
+                    <button type="button" onClick={() => add(fromIngredient(ingredient, location))}>
+                      <span className="aisle-dot" aria-hidden="true" />
+                      <span className="result-text">
+                        <strong>{ingredient.displayName ?? ingredient.name}</strong>
+                        <span className="muted">Basta o nome, sem marca</span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+                {products.length > 0 && <li className="result-group">Produtos do catálogo</li>}
+                {products.map((product) => (
+                  <li key={product.productId} className={aisleFor(product.category, categories)}>
+                    <button type="button" onClick={() => add(fromProduct(product, location))}>
+                      <span className="aisle-dot" title={product.category.name} aria-hidden="true" />
+                      <span className="result-text">
+                        <strong>{product.name}</strong>
+                        <span className="muted">
+                          {product.brand ? `${product.brand} · ` : ""}
+                          {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
-      {drafts.length === 0 ? (
-        <p className="empty-state">
-          Pesquisa e escolhe o que trouxeste. Para “2 cebolas” serve o ingrediente; para uma marca em concreto, o produto. Junta vários e
-          guarda tudo de uma vez.
-        </p>
-      ) : (
-        <form onSubmit={handleSubmit}>
           <div className="add-where">
             <span className="add-where-label" id="add-where-label">
-              Guardar tudo em
+              Guardar em
             </span>
             <div className="chip-row" role="group" aria-labelledby="add-where-label">
               {pantryLocations.map((loc) => (
@@ -255,32 +250,46 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
               ))}
             </div>
           </div>
+          <p className="add-hint muted">
+            Para “2 cebolas” serve o ingrediente; para uma marca em concreto, o produto. Junta vários e guarda tudo de uma vez.
+          </p>
+        </section>
 
-          <ul className="draft-list">
-            {drafts.map((draft) => (
-              <DraftRow
-                key={draft.key}
-                draft={draft}
-                aisle={aisleFor(draft.category, categories)}
-                onChange={(patch) => update(draft.key, patch)}
-                onRemove={() => setDrafts((current) => current.filter((d) => d.key !== draft.key))}
-              />
-            ))}
-          </ul>
+        <section className="add-basket" aria-labelledby="add-basket-title">
+          <h2 id="add-basket-title">
+            Por guardar {drafts.length > 0 && <span className="muted">{drafts.length}</span>}
+          </h2>
+          {drafts.length === 0 ? (
+            <p className="empty-state">Ainda nada. Pesquisa e escolhe o que trouxeste das compras.</p>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <ul className="draft-list">
+                {drafts.map((draft) => (
+                  <DraftRow
+                    key={draft.key}
+                    draft={draft}
+                    aisle={aisleFor(draft.category, categories)}
+                    onChange={(patch) => update(draft.key, patch)}
+                    onRemove={() => setDrafts((current) => current.filter((d) => d.key !== draft.key))}
+                  />
+                ))}
+              </ul>
 
-          {error && (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+              <div className="add-submit">
+                <span className="muted">{drafts.length === 1 ? "1 item por guardar" : `${drafts.length} itens por guardar`}</span>
+                <button type="submit" className="button-primary" disabled={submitting}>
+                  {submitting ? "A guardar…" : drafts.length === 1 ? "Guardar na despensa" : `Guardar ${drafts.length} itens`}
+                </button>
+              </div>
+            </form>
           )}
-          <div className="add-submit">
-            <span className="muted">{drafts.length === 1 ? "1 item por guardar" : `${drafts.length} itens por guardar`}</span>
-            <button type="submit" className="button-primary" disabled={submitting}>
-              {submitting ? "A guardar…" : drafts.length === 1 ? "Guardar na despensa" : `Guardar ${drafts.length} itens`}
-            </button>
-          </div>
-        </form>
-      )}
+        </section>
+      </div>
     </div>
   );
 }

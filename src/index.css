@@ -370,7 +370,7 @@ td.num,
 }
 
 .app-main {
-  max-width: 1320px;
+  max-width: 1760px;
   margin: 0 auto;
   padding: 2.25rem clamp(16px, 3vw, 40px) 5rem;
 }
@@ -2362,6 +2362,14 @@ a.meal-title:hover {
   margin-bottom: 1.75rem;
 }
 
+/* Ecrã largo: a semana inteira numa fila, sem o domingo sozinho por baixo. */
+@media (min-width: 1500px) {
+  .week-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
 .day-card {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -2493,6 +2501,28 @@ a.meal-title:hover {
 
 .apply-form .category-select {
   width: 100%;
+}
+
+/* Ecrã largo: os três campos e o botão numa só fila, em vez de uma coluna estreita num painel largo. */
+@media (min-width: 900px) {
+  .auth-form.apply-form {
+    display: grid;
+    grid-template-columns: minmax(13rem, 17rem) 9rem minmax(15rem, 21rem) auto;
+    align-items: start;
+    gap: 1rem 1.25rem;
+    max-width: none;
+    margin-bottom: 0;
+  }
+
+  .auth-form.apply-form .button-primary {
+    justify-self: start;
+    width: auto;
+    margin-top: 1.55rem;
+  }
+
+  .apply-form .form-error {
+    grid-column: 1 / -1;
+  }
 }
 
 .template-card-description {
@@ -2835,7 +2865,7 @@ a.meal-title:hover {
 }
 
 .app-notice {
-  max-width: 1320px;
+  max-width: 1760px;
   margin: 1rem auto 0;
   padding: 0 clamp(16px, 3vw, 40px);
 }
@@ -3308,6 +3338,13 @@ a.meal-title:hover {
 }
 
 
+/* Promoção: o desconto na etiqueta da foto, a navy das promoções. */
+.promotion-tag {
+  padding-left: 0.6rem;
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+}
+
 .article-photo .product-photo-tag {
   left: 1rem;
   top: 1rem;
@@ -3681,11 +3718,52 @@ a.meal-title:hover {
 
 /* ---------- Despensa: adicionar vários ---------- */
 
-.add-pantry-page {
-  max-width: 60rem;
+/* Procurar à esquerda, o que vai ser guardado à direita; empilha abaixo de 1100px. */
+.add-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem 2.5rem;
+  align-items: start;
 }
 
-/* A pesquisa manda: os resultados flutuam por cima do que já está escolhido. */
+.add-basket > h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.85rem;
+}
+
+.add-basket > h2 .muted {
+  font-weight: 500;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.add-hint {
+  max-width: 44ch;
+  margin: 0.25rem 0 0;
+  font-size: 14px;
+}
+
+@media (min-width: 1100px) {
+  .add-layout {
+    grid-template-columns: minmax(20rem, 26rem) minmax(0, 1fr);
+  }
+
+  .add-picker {
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  /* Com espaço, os resultados ficam na coluna em vez de flutuar. */
+  .add-layout .add-search .product-results {
+    position: static;
+    margin-top: 0.5rem;
+    max-height: min(32rem, 60vh);
+    box-shadow: none;
+  }
+}
+
+/* A pesquisa manda: em coluna única os resultados flutuam por cima do que já está escolhido. */
 .add-search {
   position: relative;
   max-width: 36rem;

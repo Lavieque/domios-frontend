@@ -28,7 +28,6 @@ import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { AisleSign } from "../components/AisleSign";
 import { SearchField } from "../components/SearchField";
-import { matchesSearch } from "../pantry/search";
 import { useProducts } from "../pantry/useProducts";
 import { daysBetween, longDate, shortDate, today } from "../plan/dates";
 
@@ -64,6 +63,12 @@ function ExpiryLabel({ expiresAt }: { expiresAt: string | null }) {
   return <span>Até {shortDate(expiresAt)}</span>;
 }
 
+function withoutPage(params: URLSearchParams): URLSearchParams {
+  const next = new URLSearchParams(params);
+  next.delete("page");
+  return next;
+}
+
 function Pantry({ household }: { household: CallerHouseholdDto }) {
   const householdId = household.householdId;
   const location = useLocation();
@@ -80,11 +85,23 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
-  // Só no cliente: o nome vive no módulo Products, o item da despensa só traz o
-  // productId. Filtra a página carregada (50 itens).
+  // A pesquisa vai à Api (o nome vive em Products): procura em todos os itens, não só nos da página.
+  // O pedido só sai quando se pára de escrever.
   const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
   const products = useProducts(items.map((item) => item.productId));
   const categories = useCategories();
+
+  useEffect(() => {
+    const next = search.trim();
+    if (next === query) return;
+    const timer = setTimeout(() => {
+      setQuery(next);
+      // Os resultados são outros: voltar à primeira página.
+      if (page > 1) setSearchParams(withoutPage(searchParams), { replace: true });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, query, page, searchParams, setSearchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,6 +112,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
       sort: view === PantryState.Consumed || view === PantryState.Discarded ? undefined : "expiry",
       state: view === "fifo" ? undefined : view,
       location: locationFilter,
+      search: query === "" ? undefined : query,
       page,
       pageSize: PAGE_SIZE,
     })
@@ -109,7 +127,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     return () => {
       cancelled = true;
     };
-  }, [householdId, view, locationFilter, page, version]);
+  }, [householdId, view, locationFilter, query, page, version]);
 
   function setFilter(next: { view?: View; location?: PantryLocation | null; page?: number }) {
     const params = new URLSearchParams();
@@ -121,13 +139,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     setSearchParams(params, { replace: true });
   }
 
-  const searching = search.trim() !== "";
-  const visible = searching
-    ? items.filter((item) => {
-        const product = products.get(item.productId);
-        return product ? matchesSearch(product.name, search) : false;
-      })
-    : items;
+  const searching = query !== "";
 
   async function act(action: () => Promise<unknown>) {
     setError(null);
@@ -184,22 +196,22 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
       )}
       {loading && <p className="muted loading">A carregar…</p>}
 
-      {!loading && items.length === 0 ? (
+      {!loading && items.length === 0 && searching ? (
         <p className="empty-state">
-          {view === "fifo" ? "A despensa está vazia." : "Nada neste estado."}{" "}
-          {view === "fifo" && <Link to="/despensa/adicionar">Adicionar o primeiro produto</Link>}
-        </p>
-      ) : !loading && searching && visible.length === 0 ? (
-        <p className="empty-state">
-          Nenhum artigo corresponde a “{search.trim()}”.{" "}
+          Nenhum artigo corresponde a “{query}”.{" "}
           <button type="button" className="link-button" onClick={() => setSearch("")}>
             Limpar pesquisa
           </button>
         </p>
+      ) : !loading && items.length === 0 ? (
+        <p className="empty-state">
+          {view === "fifo" ? "A despensa está vazia." : "Nada neste estado."}{" "}
+          {view === "fifo" && <Link to="/despensa/adicionar">Adicionar o primeiro produto</Link>}
+        </p>
       ) : (
         !loading && (
           <ul className="pantry-list">
-            {visible.map((item) => (
+            {items.map((item) => (
               <PantryRow
                 key={item.pantryItemId}
                 item={item}

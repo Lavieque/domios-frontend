@@ -114,6 +114,8 @@ export interface ListPantryOptions {
   state?: PantryState;
   location?: PantryLocation;
   expiringBefore?: IsoDate;
+  /** Nome ou marca do artigo, sem acentos nem maiúsculas; procura em todos os itens, não só na página. */
+  search?: string;
   page?: number;
   pageSize?: number;
 }
@@ -146,6 +148,7 @@ export function listPantryItems(householdId: string, options: ListPantryOptions 
       state: options.state === undefined ? undefined : stateNames[options.state],
       location: options.location === undefined ? undefined : locationNames[options.location],
       expiringBefore: options.expiringBefore,
+      search: options.search,
       page: options.page,
       pageSize: options.pageSize,
     },

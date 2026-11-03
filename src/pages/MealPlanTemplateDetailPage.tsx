@@ -13,6 +13,7 @@ import { dishTypeLabels, mainProteinLabels } from "../api/types";
 import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekdayName } from "../plan/dates";
+import { withoutNamePrefix } from "../plan/templates";
 
 export function MealPlanTemplateDetailPage() {
   const { id } = useParams();
@@ -39,11 +40,13 @@ export function MealPlanTemplateDetailPage() {
 
   return (
     <div className="page">
-      <Link to="/ementas" className="back-link">
-        Ementas prontas
-      </Link>
+      <nav className="crumb" aria-label="Caminho">
+        <Link to="/ementas" className="back-link">
+          Ementas prontas
+        </Link>
+      </nav>
       <h1>{template.name}</h1>
-      {template.description && <p className="muted">{template.description}</p>}
+      {template.description && <p className="page-lede">{withoutNamePrefix(template.description, template.name)}</p>}
 
       <section className="panel">
         <h2>Aplicar ao plano</h2>

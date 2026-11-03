@@ -5,6 +5,7 @@ import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { ShelfLabel } from "../components/ShelfLabel";
+import { withoutNamePrefix } from "../plan/templates";
 
 const count = new Intl.NumberFormat("pt-PT");
 
@@ -76,7 +77,7 @@ export function MealPlanTemplatesPage() {
                 <div className="recipe-card-title clamp-3" title={template.name}>
                   {template.name}
                 </div>
-                {template.description && <p className="template-card-description clamp-3">{template.description}</p>}
+                {template.description && <p className="template-card-description clamp-3">{withoutNamePrefix(template.description, template.name)}</p>}
                 <div className="recipe-card-pills">
                   <span className="pill pill-accent2">
                     {template.durationDays} {template.durationDays === 1 ? "dia" : "dias"}

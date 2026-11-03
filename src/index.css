@@ -1755,9 +1755,40 @@ tbody tr:hover td {
 
 .pantry-main {
   display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.pantry-text {
+  display: flex;
   flex-direction: column;
   gap: 0.1rem;
   min-width: 0;
+}
+
+.pantry-thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius-sm);
+  background: var(--aisle-soft, var(--surface-2));
+  overflow: hidden;
+}
+
+.pantry-thumb img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.pantry-thumb .aisle-sign {
+  width: 1.6rem;
+  height: 1.6rem;
+  color: var(--aisle, var(--ink-dim));
 }
 
 .pantry-expiry {

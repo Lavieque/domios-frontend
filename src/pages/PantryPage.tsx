@@ -22,6 +22,9 @@ import { useCategories } from "../catalog/useCategories";
 import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { AisleSign } from "../components/AisleSign";
+import { SearchField } from "../components/SearchField";
+import { matchesSearch } from "../pantry/search";
 import { useProducts } from "../pantry/useProducts";
 import { daysBetween, longDate, shortDate, today } from "../plan/dates";
 
@@ -73,6 +76,9 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
+  // Só no cliente: o nome vive no módulo Products, o item da despensa só traz o
+  // productId. Filtra a página carregada (50 itens).
+  const [search, setSearch] = useState("");
   const products = useProducts(items.map((item) => item.productId));
   const categories = useCategories();
 
@@ -111,6 +117,14 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     setSearchParams(params, { replace: true });
   }
 
+  const searching = search.trim() !== "";
+  const visible = searching
+    ? items.filter((item) => {
+        const product = products.get(item.productId);
+        return product ? matchesSearch(product.name, search) : false;
+      })
+    : items;
+
   async function act(action: () => Promise<unknown>) {
     setError(null);
     try {
@@ -128,6 +142,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
       {notice && <p className="notice">{notice}</p>}
 
       <div className="filter-row">
+        <SearchField value={search} label="Pesquisar na despensa" placeholder="Pesquisar artigo…" onChange={setSearch} />
         <select
           className="category-select"
           aria-label="Ver"
@@ -170,10 +185,17 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
           {view === "fifo" ? "A despensa está vazia." : "Nada neste estado."}{" "}
           {view === "fifo" && <Link to="/despensa/adicionar">Adicionar o primeiro produto</Link>}
         </p>
+      ) : !loading && searching && visible.length === 0 ? (
+        <p className="empty-state">
+          Nenhum artigo corresponde a “{search.trim()}”.{" "}
+          <button type="button" className="link-button" onClick={() => setSearch("")}>
+            Limpar pesquisa
+          </button>
+        </p>
       ) : (
         !loading && (
           <ul className="pantry-list">
-            {items.map((item) => (
+            {visible.map((item) => (
               <PantryRow
                 key={item.pantryItemId}
                 item={item}
@@ -228,13 +250,18 @@ function PantryRow({
     <li className={`pantry-row ${aisle}`}>
       <span className="aisle-dot" title={product?.category.name} aria-hidden="true" />
       <div className="pantry-main">
-        <Link to={`/produtos/${item.productId}`} className="meal-title">
-          {product?.name ?? "…"}
-        </Link>
-        <span className="meal-meta muted">
-          {quantityFormat.format(item.quantity.amount)} {unit} · {pantryStateLabels[item.state]}
-          {!live && ` · ${pantryLocationLabels[item.location]}`}
-        </span>
+        <div className={`pantry-thumb${product?.imageUrl ? "" : " is-empty"}`}>
+          {product?.imageUrl ? <img src={product.imageUrl} alt="" loading="lazy" /> : <AisleSign aisle={null} />}
+        </div>
+        <div className="pantry-text">
+          <Link to={`/produtos/${item.productId}`} className="meal-title">
+            {product?.name ?? "…"}
+          </Link>
+          <span className="meal-meta muted">
+            {quantityFormat.format(item.quantity.amount)} {unit} · {pantryStateLabels[item.state]}
+            {!live && ` · ${pantryLocationLabels[item.location]}`}
+          </span>
+        </div>
       </div>
       <div className="pantry-expiry">{live && <ExpiryLabel expiresAt={item.expiresAt} />}</div>
       {live && (

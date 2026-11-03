@@ -3,8 +3,10 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getProduct, searchIngredients, searchProducts, type IngredientDto } from "../api/client";
 import type { CallerHouseholdDto } from "../api/households";
 import { addPantryItemsBatch, PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
-import { MeasurementUnit, measurementUnitLabels, type ProductDto } from "../api/types";
+import { MeasurementUnit, measurementUnitLabels, type CategoryDto, type ProductDto } from "../api/types";
 import { describeError } from "../auth/errors";
+import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
+import { useCategories } from "../catalog/useCategories";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { isIsoDate } from "../plan/dates";
 
@@ -22,6 +24,8 @@ interface Draft {
   location: PantryLocation;
   expiresAt: string;
   price: string;
+  /** Categoria do produto, para a cor do corredor; os ingredientes não têm. */
+  category: CategoryDto | null;
 }
 
 let nextKey = 1;
@@ -39,6 +43,7 @@ function fromProduct(product: ProductDto, location: PantryLocation): Draft {
     location,
     expiresAt: "",
     price: "",
+    category: product.category,
   };
 }
 
@@ -54,7 +59,13 @@ function fromIngredient(ingredient: IngredientDto, location: PantryLocation): Dr
     location,
     expiresAt: "",
     price: "",
+    category: null,
   };
+}
+
+function aisleFor(category: CategoryDto | null, categories: Map<string, CategoryDto> | null): string {
+  if (!category) return aisleClass(null);
+  return aisleClass(aisleOf((topCategory(category, categories) ?? category).name));
 }
 
 export function AddPantryItemPage() {
@@ -73,6 +84,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
   const [location, setLocation] = useState<PantryLocation>(PantryLocation.Pantry);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const categories = useCategories();
 
   useEffect(() => {
     if (productIdParam) {
@@ -162,46 +174,60 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
   }
 
   const searching = search.trim().length >= 2;
+  const hasResults = products.length > 0 || ingredients.length > 0;
 
   return (
-    <div className="page auth-page">
-      <Link to="/despensa" className="back-link">
-        Despensa
-      </Link>
+    <div className="page add-pantry-page">
+      <nav className="crumb" aria-label="Caminho">
+        <Link to="/despensa" className="back-link">
+          Despensa
+        </Link>
+      </nav>
       <h1>Adicionar à despensa</h1>
-      <p className="page-sub">
-        {household.name} · acrescenta quantos quiseres e guarda tudo de uma vez
-      </p>
+      <p className="page-sub">{household.name}</p>
 
-      <div className="form-field">
-        <span>Produto ou ingrediente</span>
-        <input
-          type="search"
-          className="product-search"
-          placeholder="Pesquisar: leite, cebola, arroz…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {searching && products.length === 0 && ingredients.length === 0 && <p className="muted">Nada encontrado para “{search.trim()}”.</p>}
-        {(products.length > 0 || ingredients.length > 0) && (
+      <div className="add-search">
+        <div className="search-wrap">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" strokeWidth="1.6" />
+            <path d="m13 13 4.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+          <input
+            type="search"
+            aria-label="Produto ou ingrediente"
+            placeholder="Leite, cebola, arroz…"
+            autoFocus
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Escape" && setSearch("")}
+          />
+        </div>
+        {searching && !hasResults && <p className="add-search-empty muted">Nada encontrado para “{search.trim()}”.</p>}
+        {hasResults && (
           <ul className="product-results">
-            {ingredients.length > 0 && <li className="result-group muted">Sem marca (basta o nome)</li>}
+            {ingredients.length > 0 && <li className="result-group">Ingredientes sem marca</li>}
             {ingredients.map((ingredient) => (
               <li key={ingredient.ingredientId}>
                 <button type="button" onClick={() => add(fromIngredient(ingredient, location))}>
-                  <strong>{ingredient.displayName ?? ingredient.name}</strong>
-                  <span className="muted">ingrediente, sem marca</span>
+                  <span className="aisle-dot" aria-hidden="true" />
+                  <span className="result-text">
+                    <strong>{ingredient.displayName ?? ingredient.name}</strong>
+                    <span className="muted">Basta o nome, sem marca</span>
+                  </span>
                 </button>
               </li>
             ))}
-            {products.length > 0 && <li className="result-group muted">Produtos do catálogo</li>}
+            {products.length > 0 && <li className="result-group">Produtos do catálogo</li>}
             {products.map((product) => (
-              <li key={product.productId}>
+              <li key={product.productId} className={aisleFor(product.category, categories)}>
                 <button type="button" onClick={() => add(fromProduct(product, location))}>
-                  <strong>{product.name}</strong>
-                  <span className="muted">
-                    {product.brand ? `${product.brand} · ` : ""}
-                    {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
+                  <span className="aisle-dot" title={product.category.name} aria-hidden="true" />
+                  <span className="result-text">
+                    <strong>{product.name}</strong>
+                    <span className="muted">
+                      {product.brand ? `${product.brand} · ` : ""}
+                      {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
+                    </span>
                   </span>
                 </button>
               </li>
@@ -212,91 +238,33 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
 
       {drafts.length === 0 ? (
         <p className="empty-state">
-          Pesquisa acima e escolhe. Para “2 cebolas” escolhe o ingrediente; para uma marca em concreto, o produto. Podes juntar vários antes de guardar.
+          Pesquisa e escolhe o que trouxeste. Para “2 cebolas” serve o ingrediente; para uma marca em concreto, o produto. Junta vários e
+          guarda tudo de uma vez.
         </p>
       ) : (
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <label className="form-field">
-            <span>Onde ficam (para todos)</span>
-            <select className="category-select" value={location} onChange={(e) => applyLocationToAll(Number(e.target.value) as PantryLocation)}>
+        <form onSubmit={handleSubmit}>
+          <div className="add-where">
+            <span className="add-where-label" id="add-where-label">
+              Guardar tudo em
+            </span>
+            <div className="chip-row" role="group" aria-labelledby="add-where-label">
               {pantryLocations.map((loc) => (
-                <option key={loc} value={loc}>
+                <button key={loc} type="button" className="chip" aria-pressed={location === loc} onClick={() => applyLocationToAll(loc)}>
                   {pantryLocationLabels[loc]}
-                </option>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+          </div>
 
           <ul className="draft-list">
             {drafts.map((draft) => (
-              <li key={draft.key} className="draft-card">
-                <div className="draft-head">
-                  <strong>{draft.name}</strong> <span className="muted">{draft.detail}</span>
-                  <button
-                    type="button"
-                    className="link-button"
-                    onClick={() => setDrafts((current) => current.filter((d) => d.key !== draft.key))}
-                  >
-                    Tirar
-                  </button>
-                </div>
-                <div className="form-row">
-                  <label className="form-field">
-                    <span>Quantidade</span>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      required
-                      value={draft.amount}
-                      onChange={(e) => update(draft.key, { amount: e.target.value })}
-                    />
-                  </label>
-                  <label className="form-field">
-                    <span>Unidade</span>
-                    <select
-                      className="category-select"
-                      value={draft.unit}
-                      onChange={(e) => update(draft.key, { unit: Number(e.target.value) as MeasurementUnit })}
-                    >
-                      {units.map((u) => (
-                        <option key={u} value={u}>
-                          {measurementUnitLabels[u]}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-                <details className="draft-more">
-                  <summary>Onde, validade e preço</summary>
-                  <label className="form-field">
-                    <span>Onde fica</span>
-                    <select
-                      className="category-select"
-                      value={draft.location}
-                      onChange={(e) => update(draft.key, { location: Number(e.target.value) as PantryLocation })}
-                    >
-                      {pantryLocations.map((loc) => (
-                        <option key={loc} value={loc}>
-                          {pantryLocationLabels[loc]}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="form-field">
-                    <span>Validade (opcional)</span>
-                    <input type="date" value={draft.expiresAt} onChange={(e) => update(draft.key, { expiresAt: e.target.value })} />
-                  </label>
-                  <label className="form-field">
-                    <span>Preço pago em € (opcional)</span>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={draft.price}
-                      onChange={(e) => update(draft.key, { price: e.target.value })}
-                    />
-                  </label>
-                </details>
-              </li>
+              <DraftRow
+                key={draft.key}
+                draft={draft}
+                aisle={aisleFor(draft.category, categories)}
+                onChange={(patch) => update(draft.key, patch)}
+                onRemove={() => setDrafts((current) => current.filter((d) => d.key !== draft.key))}
+              />
             ))}
           </ul>
 
@@ -305,11 +273,95 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
               {error}
             </p>
           )}
-          <button type="submit" className="button-primary" disabled={submitting}>
-            {submitting ? "A adicionar…" : drafts.length === 1 ? "Adicionar" : `Adicionar ${drafts.length} itens`}
-          </button>
+          <div className="add-submit">
+            <span className="muted">{drafts.length === 1 ? "1 item por guardar" : `${drafts.length} itens por guardar`}</span>
+            <button type="submit" className="button-primary" disabled={submitting}>
+              {submitting ? "A guardar…" : drafts.length === 1 ? "Guardar na despensa" : `Guardar ${drafts.length} itens`}
+            </button>
+          </div>
         </form>
       )}
     </div>
+  );
+}
+
+function DraftRow({
+  draft,
+  aisle,
+  onChange,
+  onRemove,
+}: {
+  draft: Draft;
+  aisle: string;
+  onChange: (patch: Partial<Draft>) => void;
+  onRemove: () => void;
+}) {
+  // Validade e preço são opcionais: ficam fechados até serem precisos.
+  const [more, setMore] = useState(false);
+
+  return (
+    <li className={`draft-row ${aisle}`}>
+      <span className="aisle-dot" title={draft.category?.name} aria-hidden="true" />
+      <div className="pantry-main">
+        <span className="meal-title">{draft.name}</span>
+        <span className="meal-meta muted">{draft.detail}</span>
+      </div>
+      <div className="draft-controls">
+        <span className="qty-field">
+          <input
+            type="text"
+            inputMode="decimal"
+            required
+            aria-label={`Quantidade de ${draft.name}`}
+            value={draft.amount}
+            onChange={(e) => onChange({ amount: e.target.value })}
+          />
+          <select
+            className="category-select"
+            aria-label="Unidade"
+            value={draft.unit}
+            onChange={(e) => onChange({ unit: Number(e.target.value) as MeasurementUnit })}
+          >
+            {units.map((u) => (
+              <option key={u} value={u}>
+                {measurementUnitLabels[u]}
+              </option>
+            ))}
+          </select>
+        </span>
+        <select
+          className="category-select"
+          aria-label={`Onde fica ${draft.name}`}
+          value={draft.location}
+          onChange={(e) => onChange({ location: Number(e.target.value) as PantryLocation })}
+        >
+          {pantryLocations.map((loc) => (
+            <option key={loc} value={loc}>
+              {pantryLocationLabels[loc]}
+            </option>
+          ))}
+        </select>
+        <button type="button" className="row-action" aria-expanded={more} onClick={() => setMore(!more)}>
+          Validade e preço
+        </button>
+      </div>
+      <button type="button" className="icon-danger" aria-label={`Tirar ${draft.name}`} title="Tirar" onClick={onRemove}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 7l10 10M17 7 7 17" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      </button>
+      {more && (
+        <div className="draft-more">
+          <label className="form-field">
+            <span>Validade</span>
+            <input type="date" value={draft.expiresAt} onChange={(e) => onChange({ expiresAt: e.target.value })} />
+          </label>
+          <label className="form-field">
+            <span>Preço pago (€)</span>
+            <input type="text" inputMode="decimal" placeholder="Opcional" value={draft.price} onChange={(e) => onChange({ price: e.target.value })} />
+          </label>
+        </div>
+      )}
+    </li>
   );
 }

@@ -38,14 +38,19 @@ export function CreateHouseholdPage() {
   }
 
   return (
-    <div className="page auth-page">
+    <div className="page settings-page">
+      <nav className="crumb" aria-label="Caminho">
+        <Link to="/casa" className="back-link">
+          Casa
+        </Link>
+      </nav>
       <h1>Criar casa</h1>
-      <p className="muted">
+      <p className="page-lede">
         A casa junta a despensa, as listas de compras e o plano de refeições. Ficas como administrador e podes
         acrescentar o resto da família depois.
       </p>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form create-household-form" onSubmit={handleSubmit}>
         <label className="form-field">
           <span>Nome da casa</span>
           <input type="text" required maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
@@ -70,10 +75,6 @@ export function CreateHouseholdPage() {
           {submitting ? "A criar…" : "Criar casa"}
         </button>
       </form>
-
-      <p className="form-links">
-        <Link to="/casa">Voltar</Link>
-      </p>
     </div>
   );
 }

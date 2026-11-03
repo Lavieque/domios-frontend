@@ -218,7 +218,7 @@ function StoreInPantryPanel({ count, onStore }: { count: number; onStore: (locat
   }
 
   return (
-    <section className="panel">
+    <section className="panel store-in-pantry">
       <h2>Pôr na despensa</h2>
       <p className="muted">
         {count === 1 ? "1 item comprado ainda não está" : `${count} itens comprados ainda não estão`} na despensa. Entram com a quantidade da lista; a

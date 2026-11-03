@@ -61,29 +61,26 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
       <h1>Listas de compras</h1>
       <p className="page-sub">{household.name}</p>
 
-      <form className="inline-form new-list-form" onSubmit={handleCreate}>
-        <input type="text" aria-label="Nome da lista" placeholder="Nome (opcional)" maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
-        <button type="submit" className="button-primary" disabled={creating}>
-          {creating ? "A criar…" : "Nova lista"}
-        </button>
-      </form>
-
-      <div className="filter-row">
-        <select
-          className="category-select"
-          aria-label="Estado"
-          value={status}
-          onChange={(e) => {
-            const next = Number(e.target.value) as ShoppingListStatus;
-            setSearchParams(next === ShoppingListStatus.Open ? {} : { estado: String(next) }, { replace: true });
-          }}
-        >
+      <div className="lists-toolbar">
+        <div className="chip-row" role="group" aria-label="Estado">
           {statuses.map((s) => (
-            <option key={s} value={s}>
+            <button
+              key={s}
+              type="button"
+              className="chip"
+              aria-pressed={status === s}
+              onClick={() => setSearchParams(s === ShoppingListStatus.Open ? {} : { estado: String(s) }, { replace: true })}
+            >
               {s === ShoppingListStatus.Open ? "Abertas" : s === ShoppingListStatus.Completed ? "Concluídas" : "Canceladas"}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
+        <form className="inline-form new-list-form" onSubmit={handleCreate}>
+          <input type="text" aria-label="Nome da lista" placeholder="Nome da nova lista (opcional)" maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
+          <button type="submit" className="button-primary" disabled={creating}>
+            {creating ? "A criar…" : "Nova lista"}
+          </button>
+        </form>
       </div>
 
       {error && (

@@ -38,26 +38,30 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
 
   return (
     <div className="page">
-      <p className="muted">
-        <Link to="/casa">{name}</Link>
-      </p>
+      <nav className="crumb" aria-label="Caminho">
+        <Link to="/casa" className="back-link">
+          {name}
+        </Link>
+      </nav>
       <h1>Histórico</h1>
+      <p className="page-sub">O que mudou na casa, do mais recente para o mais antigo.</p>
 
-      <select
-        className="category-select"
-        aria-label="Área do histórico"
-        value={area}
-        onChange={(e) => {
-          setArea(e.target.value);
-          setPage(1);
-        }}
-      >
+      <div className="chip-row aisle-row" role="group" aria-label="Área do histórico">
         {timelineAreas.map((option) => (
-          <option key={option.label} value={option.label}>
+          <button
+            key={option.label}
+            type="button"
+            className="chip"
+            aria-pressed={area === option.label}
+            onClick={() => {
+              setArea(option.label);
+              setPage(1);
+            }}
+          >
             {option.label}
-          </option>
+          </button>
         ))}
-      </select>
+      </div>
 
       {error && (
         <p className="form-error" role="alert">

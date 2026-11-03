@@ -7,6 +7,7 @@ import {
   completeShoppingList,
   deleteShoppingListItem,
   getShoppingList,
+  getShoppingListPackaging,
   getStoreComparison,
   renameShoppingList,
   reopenShoppingList,
@@ -16,6 +17,7 @@ import {
   shoppingListStatusLabels,
   UnpricedItemReason,
   type ShoppingListDto,
+  type ShoppingItemPackagingDto,
   type ShoppingListItemDto,
   type StoreComparisonDto,
   type StoreComparisonStoreDto,
@@ -48,6 +50,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [version, setVersion] = useState(0);
   const [comparison, setComparison] = useState<StoreComparisonDto | null>(null);
   const [comparing, setComparing] = useState(false);
+  const [packaging, setPackaging] = useState<Map<string, ShoppingItemPackagingDto>>(new Map());
   const products = useProducts(list?.items.flatMap((item) => (item.productId && !item.isPurchased ? [item.productId] : [])) ?? []);
   const categories = useCategories();
 
@@ -56,6 +59,17 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     getShoppingList(householdId, listId)
       .then((result) => !cancelled && setList(result))
       .catch((err: unknown) => !cancelled && setError(describeError(err, { "not-found": "Esta lista não existe nesta casa." })));
+    return () => {
+      cancelled = true;
+    };
+  }, [householdId, listId, version]);
+
+  // As embalagens são um extra: se falharem, a lista mostra-se na mesma.
+  useEffect(() => {
+    let cancelled = false;
+    getShoppingListPackaging(householdId, listId)
+      .then((result) => !cancelled && setPackaging(new Map(result.items.map((p) => [p.shoppingListItemId, p]))))
+      .catch(() => !cancelled && setPackaging(new Map()));
     return () => {
       cancelled = true;
     };
@@ -152,6 +166,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
               groups={categories && (products.size > 0 || !pending.some((item) => item.productId)) ? groupByTopCategory(pending, products, categories) : null}
               open={open}
               cheapest={cheapestByItem}
+              packaging={packaging}
               onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
               onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
             />
@@ -159,7 +174,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
           {purchased.length > 0 && (
             <>
               <h2>Comprados ({purchased.length})</h2>
-              <ItemList items={purchased} open={open} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
+              <ItemList items={purchased} open={open} packaging={packaging} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
             </>
           )}
         </>
@@ -338,6 +353,7 @@ function PendingItems({
   groups: ItemGroup[] | null;
   open: boolean;
   cheapest: Map<string, { chainName: string; lineTotal: number }>;
+  packaging: Map<string, ShoppingItemPackagingDto>;
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
 }) {
@@ -361,12 +377,14 @@ function ItemList({
   items,
   open,
   cheapest,
+  packaging,
   onToggle,
   onDelete,
 }: {
   items: ShoppingListItemDto[];
   open: boolean;
   cheapest?: Map<string, { chainName: string; lineTotal: number }>;
+  packaging?: Map<string, ShoppingItemPackagingDto>;
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
 }) {
@@ -381,6 +399,12 @@ function ItemList({
           <span className="muted">
             {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]}
           </span>
+          {packaging?.get(item.shoppingListItemId) && (
+            <span className="pill pill-accent2" title={packaging.get(item.shoppingListItemId)!.productName}>
+              comprar {packaging.get(item.shoppingListItemId)!.packageCount} ×{" "}
+              {formatQuantity(packaging.get(item.shoppingListItemId)!.packageQuantity, packaging.get(item.shoppingListItemId)!.packageUnit)}
+            </span>
+          )}
           {item.storedInPantryAt && <span className="pill pill-muted">Na despensa</span>}
           {cheapest?.get(item.shoppingListItemId) && (
             <span className="pill pill-good">

@@ -13,13 +13,17 @@ import {
   pantryLocations,
   PantryState,
   pantryStateLabels,
+  scanPantryItem,
   type PantryItemDto,
   type PantryLocation,
 } from "../api/pantry";
+import { lookupBarcode, type BarcodeLookupResult } from "../api/barcodes";
+import { ApiError } from "../api/http";
 import { measurementUnitLabels, type ProductDto } from "../api/types";
 import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
 import { useCategories } from "../catalog/useCategories";
 import { describeError } from "../auth/errors";
+import { BarcodeScanner } from "../components/BarcodeScanner";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { AisleSign } from "../components/AisleSign";
@@ -232,11 +236,50 @@ function PantryRow({
   householdId: string;
   onAct: (action: () => Promise<unknown>) => void;
 }) {
-  const [mode, setMode] = useState<"consume" | "discard" | null>(null);
+  const [mode, setMode] = useState<"consume" | "discard" | "scan" | null>(null);
+  const [scan, setScan] = useState<{ barcode: string; result: BarcodeLookupResult | null } | "searching" | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState<DiscardReason>(DiscardReason.Expired);
   const unit = measurementUnitLabels[item.quantity.unit];
   const live = isLive(item);
+  // O que a casa leu na embalagem que comprou ganha ao produto da cadeia.
+  const thumb = item.scanned?.imageUrl ?? product?.imageUrl;
+  const title = item.scanned?.name ?? product?.name ?? "…";
+
+  async function onScanned(barcode: string) {
+    setScan("searching");
+    setScanError(null);
+    try {
+      setScan({ barcode, result: await lookupBarcode(barcode) });
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        setScan({ barcode, result: null });
+      } else {
+        setScan(null);
+        setScanError(describeError(err));
+      }
+    }
+  }
+
+  function saveScan(scanned: { barcode: string; result: BarcodeLookupResult | null }) {
+    const { result } = scanned;
+    onAct(() =>
+      scanPantryItem(householdId, item.pantryItemId, {
+        barcode: result?.barcode ?? scanned.barcode,
+        name: result?.name ?? null,
+        brand: result?.brand ?? null,
+        imageUrl: result?.imageUrl ?? null,
+      }),
+    );
+    closeScan();
+  }
+
+  function closeScan() {
+    setMode(null);
+    setScan(null);
+    setScanError(null);
+  }
 
   function consumePart() {
     const value = Number(amount.replace(",", "."));
@@ -250,13 +293,14 @@ function PantryRow({
     <li className={`pantry-row ${aisle}`}>
       <span className="aisle-dot" title={product?.category.name} aria-hidden="true" />
       <div className="pantry-main">
-        <div className={`pantry-thumb${product?.imageUrl ? "" : " is-empty"}`}>
-          {product?.imageUrl ? <img src={product.imageUrl} alt="" loading="lazy" /> : <AisleSign aisle={null} />}
+        <div className={`pantry-thumb${thumb ? "" : " is-empty"}`}>
+          {thumb ? <img src={thumb} alt="" loading="lazy" /> : <AisleSign aisle={null} />}
         </div>
         <div className="pantry-text">
           <Link to={`/produtos/${item.productId}`} className="meal-title">
-            {product?.name ?? "…"}
+            {title}
           </Link>
+          {item.scanned?.brand && <span className="meal-meta muted">{item.scanned.brand}</span>}
           <span className="meal-meta muted">
             {quantityFormat.format(item.quantity.amount)} {unit} · {pantryStateLabels[item.state]}
             {!live && ` · ${pantryLocationLabels[item.location]}`}
@@ -293,6 +337,14 @@ function PantryRow({
           </button>
           <button
             type="button"
+            className="row-action"
+            aria-expanded={mode === "scan"}
+            onClick={() => (mode === "scan" ? closeScan() : setMode("scan"))}
+          >
+            {item.scanned ? "Voltar a ler" : "Ler código"}
+          </button>
+          <button
+            type="button"
             className="button-danger"
             aria-expanded={mode === "discard"}
             onClick={() => setMode(mode === "discard" ? null : "discard")}
@@ -325,6 +377,39 @@ function PantryRow({
           >
             Usar tudo
           </button>
+        </div>
+      )}
+
+      {mode === "scan" && (
+        <div className="pantry-inline pantry-scan">
+          {scanError && (
+            <p className="form-error" role="alert">
+              {scanError}
+            </p>
+          )}
+          {scan === null && <BarcodeScanner onScan={onScanned} />}
+          {scan === "searching" && <p className="muted loading">A procurar…</p>}
+          {scan !== null && scan !== "searching" && (
+            <div className="scan-result">
+              {scan.result ? (
+                <>
+                  {scan.result.imageUrl && <img src={scan.result.imageUrl} alt="" className="scan-image" />}
+                  <div className="pantry-text">
+                    <strong>{scan.result.name}</strong>
+                    {scan.result.brand && <span className="muted">{scan.result.brand}</span>}
+                  </div>
+                </>
+              ) : (
+                <p className="muted">Não conheço o código {scan.barcode}. Guardo só o código?</p>
+              )}
+              <button type="button" className="button-primary" onClick={() => saveScan(scan)}>
+                Guardar
+              </button>
+              <button type="button" className="button-secondary" onClick={() => setScan(null)}>
+                Ler outro
+              </button>
+            </div>
+          )}
         </div>
       )}
 

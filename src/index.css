@@ -1820,6 +1820,42 @@ tbody tr:hover td {
   width: 9rem;
 }
 
+.pantry-scan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.barcode-scanner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 24rem;
+}
+
+.barcode-video {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.scan-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+}
+
+.scan-image {
+  width: 3.25rem;
+  height: 3.25rem;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
 @media (max-width: 1100px) {
   .pantry-row {
     grid-template-columns: 10px minmax(0, 1fr) auto;

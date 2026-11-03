@@ -93,6 +93,15 @@ export interface PantryItemDto {
   purchasedPrice: MoneyDto | null;
   batch: string | null;
   confidence: number;
+  /** O que a casa leu na embalagem que comprou; independente do produto de qualquer cadeia. */
+  scanned: ScannedProductDto | null;
+}
+
+export interface ScannedProductDto {
+  barcode: string | null;
+  name: string | null;
+  brand: string | null;
+  imageUrl: string | null;
 }
 
 export interface ListPantryOptions {
@@ -172,5 +181,18 @@ export function movePantryItem(householdId: string, pantryItemId: string, locati
   return authedRequest<PantryItemDto>(`${base(householdId)}/${pantryItemId}`, {
     method: "PATCH",
     body: { location, quantity: null },
+  });
+}
+
+/** Guarda (ou, com campos vazios, apaga) a embalagem lida. A validade só muda se vier uma. */
+export function scanPantryItem(
+  householdId: string,
+  pantryItemId: string,
+  scanned: ScannedProductDto,
+  expiresAt?: IsoDate,
+): Promise<PantryItemDto> {
+  return authedRequest<PantryItemDto>(`${base(householdId)}/${pantryItemId}`, {
+    method: "PATCH",
+    body: { location: null, quantity: null, scanned, expiresAt: expiresAt ?? null },
   });
 }

@@ -11,6 +11,7 @@ import {
   getStoreComparison,
   renameShoppingList,
   reopenShoppingList,
+  reorderShoppingListItems,
   setItemPurchased,
   ShoppingListStatus,
   storeShoppingListInPantry,
@@ -32,6 +33,7 @@ import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
 import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/groups";
+import { moveItem, withPendingOrder } from "../shopping/order";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
 const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -51,6 +53,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [comparison, setComparison] = useState<StoreComparisonDto | null>(null);
   const [comparing, setComparing] = useState(false);
   const [packaging, setPackaging] = useState<Map<string, ShoppingItemPackagingDto>>(new Map());
+  // Modo "Ordenar": ids dos itens por comprar pela ordem que se está a montar; null fora do modo.
+  const [draftOrder, setDraftOrder] = useState<string[] | null>(null);
   const products = useProducts(list?.items.flatMap((item) => (item.productId && !item.isPurchased ? [item.productId] : [])) ?? []);
   const categories = useCategories();
 
@@ -157,9 +161,27 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
         </p>
       ) : (
         <>
-          <h2>Por comprar ({pending.length})</h2>
+          <div className="section-head pending-head">
+            <h2>Por comprar ({pending.length})</h2>
+            {open && pending.length > 1 && !draftOrder && (
+              <button type="button" className="link-button" onClick={() => setDraftOrder(pending.map((item) => item.shoppingListItemId))}>
+                Ordenar
+              </button>
+            )}
+          </div>
           {pending.length === 0 ? (
             <p className="muted">Tudo comprado.</p>
+          ) : draftOrder ? (
+            <OrderItems
+              items={draftOrder.flatMap((itemId) => pending.filter((item) => item.shoppingListItemId === itemId))}
+              onMove={(index, delta) => setDraftOrder(moveItem(draftOrder, index, delta))}
+              onDone={() => {
+                const order = withPendingOrder(list.items, draftOrder);
+                setDraftOrder(null);
+                void act(() => reorderShoppingListItems(householdId, listId, order));
+              }}
+              onCancel={() => setDraftOrder(null)}
+            />
           ) : (
             <PendingItems
               items={pending}
@@ -340,6 +362,54 @@ function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: M
         Acrescentar
       </button>
     </form>
+  );
+}
+
+/** Modo "Ordenar": a lista sem grupos, pela ordem guardada, com setas; grava ao sair. */
+function OrderItems({
+  items,
+  onMove,
+  onDone,
+  onCancel,
+}: {
+  items: ShoppingListItemDto[];
+  onMove: (index: number, delta: -1 | 1) => void;
+  onDone: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <>
+      <p className="muted">Põe os itens pela ordem em que os vais buscar. Fora deste modo a lista volta a aparecer por corredor.</p>
+      <ol className="pantry-list order-list">
+        {items.map((item, index) => (
+          <li key={item.shoppingListItemId} className="list-row">
+            <span className="meal-title">{item.label}</span>
+            <span className="order-buttons">
+              <button type="button" className="icon-button" aria-label={`Subir ${item.label}`} disabled={index === 0} onClick={() => onMove(index, -1)}>
+                ↑
+              </button>
+              <button
+                type="button"
+                className="icon-button"
+                aria-label={`Descer ${item.label}`}
+                disabled={index === items.length - 1}
+                onClick={() => onMove(index, 1)}
+              >
+                ↓
+              </button>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <div className="button-row">
+        <button type="button" className="button-primary" onClick={onDone}>
+          Guardar ordem
+        </button>
+        <button type="button" className="button-secondary" onClick={onCancel}>
+          Cancelar
+        </button>
+      </div>
+    </>
   );
 }
 

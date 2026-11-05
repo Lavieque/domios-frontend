@@ -129,6 +129,11 @@ export function cancelShoppingList(householdId: string, listId: string): Promise
   return authedRequest<void>(`${listPath(householdId, listId)}/cancel`, { method: "POST" });
 }
 
+/** Ordem à mão: todos os itens da lista, pela ordem nova. */
+export function reorderShoppingListItems(householdId: string, listId: string, itemIds: string[]): Promise<void> {
+  return authedRequest<void>(`${listPath(householdId, listId)}/items/order`, { method: "PUT", body: { itemIds } });
+}
+
 export function reopenShoppingList(householdId: string, listId: string): Promise<void> {
   return authedRequest<void>(`${listPath(householdId, listId)}/reopen`, { method: "POST" });
 }

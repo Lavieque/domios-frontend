@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-30T11:47:56.399Z",
+  "generatedAt": "2026-11-06T14:36:34.176Z",
   "title": "Design System: DomiOS",
   "extensions": {
     "colorMeta": {
@@ -753,6 +753,14 @@
       "label": {
         "displayName": "Label",
         "purpose": "Verdicts, pills, tags, meta, table headers (12.5-14px)."
+      },
+      "price-label": {
+        "displayName": "Price label (site)",
+        "purpose": "The demo shelf label's price; 800, clamp(52px, 7vw, 72px). The only 800 on the site besides the wordmark."
+      },
+      "verdict-site": {
+        "displayName": "Verdict (site)",
+        "purpose": "Verdict foot of the demo label; 600 at 14px."
       }
     },
     "shadows": [
@@ -802,6 +810,21 @@
         "name": "state",
         "value": "0.15s ease",
         "purpose": "Colour, border and background changes on controls."
+      },
+      {
+        "name": "site-in",
+        "value": "translateY(8px) to none, 0.5s ease-out; demo label delayed 90ms",
+        "purpose": "The site's one authored entrance: hero copy, demo label and page heads."
+      },
+      {
+        "name": "admin-in",
+        "value": "translateY(6px) to none, 0.4s ease-out",
+        "purpose": "Admin page content and login fade up."
+      },
+      {
+        "name": "range-marker",
+        "value": "left 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The demo range marker slides when the verdict chip changes."
       }
     ],
     "breakpoints": [
@@ -828,6 +851,26 @@
       {
         "name": "nav",
         "value": "1100px"
+      },
+      {
+        "name": "site-split",
+        "value": "880px"
+      },
+      {
+        "name": "site-stack",
+        "value": "820px"
+      },
+      {
+        "name": "site-header-wrap",
+        "value": "700px"
+      },
+      {
+        "name": "admin-header-wrap",
+        "value": "720px"
+      },
+      {
+        "name": "admin-rows-stack",
+        "value": "900px"
       }
     ]
   },
@@ -911,17 +954,67 @@
       "description": "One row per store, bar scaled to price, cheapest in teal; bars grow once on load.",
       "html": "<ul class=\"ds-stores\"><li class=\"ds-store is-best\" style=\"--i:0\"><span class=\"ds-sname\"><strong>Continente</strong><span>Continente Colombo · 8,65 €/L</span></span><span class=\"ds-bar\"><span style=\"width:87%\"></span></span><span class=\"ds-sprice\">6,49 €<small>5,99 € com cartão</small></span><span class=\"ds-vp ds-vp1\">Mais barato</span></li><li class=\"ds-store\" style=\"--i:1\"><span class=\"ds-sname\"><strong>Pingo Doce</strong><span>Pingo Doce Benfica · 9,32 €/L</span></span><span class=\"ds-bar\"><span style=\"width:93%\"></span></span><span class=\"ds-sprice\">6,99 €</span><span class=\"ds-vp ds-vp3\">Preço habitual</span></li><li class=\"ds-store\" style=\"--i:2\"><span class=\"ds-sname\"><strong>Lidl</strong><span>Lidl Telheiras · 9,99 €/L</span></span><span class=\"ds-bar\"><span style=\"width:100%\"></span></span><span class=\"ds-sprice\">7,49 €</span><span class=\"ds-vp ds-vp4\">Acima da média</span></li></ul>",
       "css": ".ds-stores { font-family: var(--font); list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); } .ds-store { display: grid; grid-template-columns: minmax(9rem, 13rem) minmax(4rem, 1fr) auto auto; align-items: center; gap: 0.5rem 1.25rem; padding: 0.9rem 1.1rem; cursor: pointer; } .ds-store + .ds-store { border-top: 1px solid var(--line); } .ds-store:hover { background: color-mix(in srgb, var(--surface-2) 40%, transparent); } .ds-sname { display: flex; flex-direction: column; min-width: 0; } .ds-sname strong { font-weight: 600; } .ds-sname span { font-size: 13px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-bar { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; } .ds-bar span { display: block; height: 100%; border-radius: inherit; background: color-mix(in srgb, var(--ink-dim) 45%, transparent); transform-origin: left; animation: ds-bar-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 150ms); } .ds-store.is-best .ds-bar span { background: var(--accent); } @keyframes ds-bar-in { from { transform: scaleX(0); } to { transform: none; } } .ds-sprice { font-weight: 700; font-size: 19px; letter-spacing: -0.01em; text-align: right; white-space: nowrap; font-variant-numeric: lining-nums proportional-nums; } .ds-sprice small { display: block; font-size: 12.5px; font-weight: 500; letter-spacing: 0; color: var(--accent); } .ds-vp { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; } .ds-vp::before { content: \"\"; width: 8px; height: 8px; border-radius: 50%; flex: none; } .ds-vp1 { background: var(--accent-soft); color: var(--accent); } .ds-vp1::before { background: var(--accent); } .ds-vp3 { background: var(--accent-2-soft); } .ds-vp3::before { background: var(--accent-2); } .ds-vp4 { background: var(--danger-soft); } .ds-vp4::before { background: var(--danger); }"
+    },
+    {
+      "name": "Shelf-label Demonstrator",
+      "kind": "card",
+      "refersTo": "demo-label",
+      "description": "Site signature: a label that judges its own price; verdict foot changes with the chip.",
+      "html": "<article class=\"ds-demo\"><div class=\"ds-demo-body\"><span class=\"ds-demo-tag\">Exemplo</span><h2 class=\"ds-demo-name\">Leite meio-gordo 1 L</h2><p class=\"ds-demo-unit\">1 litro</p><div class=\"ds-demo-price\">0,79<small>€</small></div></div><div class=\"ds-demo-verdict\"><span class=\"ds-demo-dot\"></span>Mínimo dos últimos 90 dias</div></article>",
+      "css": ".ds-demo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; max-width: 30rem; font-family: var(--font); color: var(--ink); } .ds-demo-body { padding: 1.35rem 1.5rem 1.4rem; } .ds-demo-tag { display: inline-flex; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--surface-2); font-size: 12.5px; font-weight: 600; } .ds-demo-name { margin: 0.85rem 0 0; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; } .ds-demo-unit { margin: 0.15rem 0 0; color: var(--ink-dim); font-size: 14px; } .ds-demo-price { display: flex; align-items: baseline; gap: 0.25rem; padding-top: 1.1rem; font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: lining-nums proportional-nums; } .ds-demo-price small { font-size: 0.4em; font-weight: 700; letter-spacing: 0; } .ds-demo-verdict { display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.5rem; border-top: 1px solid var(--line); background: var(--accent-soft); color: var(--accent); font-size: 14px; font-weight: 600; } .ds-demo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }"
+    },
+    {
+      "name": "Verdict Chip Picker",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Site chips that flip the demo label between the four verdicts; pressed fills navy.",
+      "html": "<div class=\"ds-vchips\"><button class=\"ds-vchip\" aria-pressed=\"true\"><span class=\"ds-vdot ds-vdot-1\"></span>Mínimo histórico</button><button class=\"ds-vchip\" aria-pressed=\"false\"><span class=\"ds-vdot ds-vdot-3\"></span>Preço habitual</button><button class=\"ds-vchip\" aria-pressed=\"false\"><span class=\"ds-vdot ds-vdot-4\"></span>Acima da média</button></div>",
+      "css": ".ds-vchips { display: flex; flex-wrap: wrap; gap: 0.4rem; } .ds-vchip { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 36px; padding: 0.3rem 0.95rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: 550 14px var(--font); cursor: pointer; } .ds-vchip:hover { border-color: var(--ink); } .ds-vchip[aria-pressed=\"true\"] { background: var(--accent-2); border-color: var(--accent-2); color: var(--surface); } .ds-vchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-vdot { width: 8px; height: 8px; border-radius: 50%; } .ds-vdot-1 { background: var(--accent); } .ds-vdot-3 { background: var(--accent-2); } .ds-vdot-4 { background: var(--danger); } .ds-vchip[aria-pressed=\"true\"] .ds-vdot { box-shadow: 0 0 0 2px var(--surface); }"
+    },
+    {
+      "name": "Site Row Link List",
+      "kind": "custom",
+      "refersTo": "row-link",
+      "description": "Bordered list of menu rows: name, dim hint, drawn chevron.",
+      "html": "<ul class=\"ds-rowlist\"><li><a class=\"ds-rowlink\" href=\"#\"><span class=\"ds-rowname\">Despensa</span><span class=\"ds-rowhint\">O que tem em casa, por validade</span><svg class=\"ds-chev\" viewBox=\"0 0 20 20\" fill=\"none\"><path d=\"m7.5 4.5 5.5 5.5-5.5 5.5\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></a></li><li><a class=\"ds-rowlink\" href=\"#\"><span class=\"ds-rowname\">Listas</span><span class=\"ds-rowhint\">Compras por corredor</span><svg class=\"ds-chev\" viewBox=\"0 0 20 20\" fill=\"none\"><path d=\"m7.5 4.5 5.5 5.5-5.5 5.5\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></a></li></ul>",
+      "css": ".ds-rowlist { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; font-family: var(--font); } .ds-rowlist li + li { border-top: 1px solid var(--line); } .ds-rowlink { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) 20px; align-items: center; gap: 1rem; min-height: 60px; padding: 0.8rem 1.1rem; color: var(--ink); text-decoration: none; transition: background-color 0.15s ease; } .ds-rowlink:hover { background: color-mix(in srgb, var(--surface-2) 45%, transparent); } .ds-rowlink:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; } .ds-rowname { min-width: 6rem; font-weight: 600; font-size: 16.5px; } .ds-rowhint { color: var(--ink-dim); font-size: 14px; } .ds-chev { width: 20px; height: 20px; color: var(--ink-dim); justify-self: end; }"
+    },
+    {
+      "name": "Admin Row with ConfirmAction",
+      "kind": "custom",
+      "refersTo": "admin-row",
+      "description": "Flat hairline admin row: title and meta, state pill, neutral verbs that arm before they run.",
+      "html": "<ul class=\"ds-rows\"><li class=\"ds-row\"><div><div class=\"ds-row-title\"><strong>Ana Silva</strong><span class=\"ds-muted\">ana@exemplo.pt</span></div><p class=\"ds-row-meta\">Pedido a 6 nov 2026 · PT</p></div><div><span class=\"ds-pill ds-pill-navy\">Pendente</span></div><div class=\"ds-actions\"><button class=\"ds-row-action is-armed\">Aprovar e enviar convite</button><button class=\"ds-link\">Cancelar</button><button class=\"ds-danger\">Rejeitar</button></div></li></ul>",
+      "css": ".ds-rows { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; font-family: var(--font); color: var(--ink); } .ds-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 0.75rem 1.5rem; padding: 0.9rem 1.1rem; } .ds-row-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem 0.75rem; font-size: 15.5px; } .ds-muted { color: var(--ink-dim); } .ds-row-meta { margin: 0.25rem 0 0; color: var(--ink-dim); font-size: 13px; } .ds-pill { display: inline-flex; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 12.5px; font-weight: 600; } .ds-pill-navy { background: var(--accent-2-soft); color: var(--accent-2); } .ds-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; justify-content: flex-end; } .ds-row-action, .ds-danger { display: inline-flex; align-items: center; min-height: 36px; padding: 0.3rem 0.85rem; border-radius: 999px; font: 550 14px var(--font); cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease; } .ds-row-action { border: 1px solid transparent; background: var(--surface-2); color: var(--ink); } .ds-row-action:hover { border-color: color-mix(in srgb, var(--ink) 25%, transparent); } .ds-row-action.is-armed { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); } .ds-danger { border: 1px solid var(--line); background: transparent; color: var(--ink-dim); } .ds-danger:hover { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); background: var(--danger-soft); } .ds-link { border: none; background: none; padding: 0.3rem 0.4rem; color: var(--accent); font: 600 14px var(--font); cursor: pointer; } .ds-row-action:focus-visible, .ds-danger:focus-visible, .ds-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Admin Facts List",
+      "kind": "custom",
+      "refersTo": "fact-row",
+      "description": "Label, value and detail, optional status pill; read-only system state.",
+      "html": "<dl class=\"ds-facts\"><div class=\"ds-fact\"><dt>Base de dados</dt><dd><span class=\"ds-fv\">Ligada</span> · Resposta em 12 ms</dd><dd><span class=\"ds-fpill\">Ligada</span></dd></div><div class=\"ds-fact\"><dt>Email</dt><dd><span class=\"ds-fv\">Logging</span> · Desenvolvimento</dd><dd><span class=\"ds-fpill ds-fpill-muted\">Só log</span></dd></div></dl>",
+      "css": ".ds-facts { margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; font-family: var(--font); color: var(--ink); } .ds-fact { display: grid; grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr) auto; align-items: center; gap: 0.25rem 1.25rem; min-height: 56px; padding: 0.7rem 1.1rem; } .ds-fact + .ds-fact { border-top: 1px solid var(--line); } .ds-fact dt { font-weight: 600; } .ds-fact dd { margin: 0; color: var(--ink-dim); font-size: 14px; font-variant-numeric: lining-nums proportional-nums; } .ds-fv { color: var(--ink); font-weight: 650; font-size: 16px; } .ds-fpill { display: inline-flex; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12.5px; font-weight: 600; } .ds-fpill-muted { background: var(--surface-2); color: var(--ink-dim); }"
+    },
+    {
+      "name": "Admin Edit Panel",
+      "kind": "input",
+      "refersTo": "admin-panel",
+      "description": "Hairline panel holding an auto-fill field grid, primary submit and secondary cancel.",
+      "html": "<div class=\"ds-panel\"><h2 class=\"ds-panel-h\">Editar produto</h2><form class=\"ds-form\"><div class=\"ds-grid\"><label class=\"ds-field\"><span>Nome</span><input type=\"text\" value=\"Leite meio-gordo\"></label><label class=\"ds-field\"><span>Marca</span><input type=\"text\" value=\"Mimosa\"><small>Opcional</small></label></div><div class=\"ds-form-actions\"><button type=\"button\" class=\"ds-btn-p\">Guardar</button><button type=\"button\" class=\"ds-btn-s\">Cancelar</button></div></form></div>",
+      "css": ".ds-panel { padding: 0.25rem 1.25rem 1.25rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-family: var(--font); color: var(--ink); } .ds-panel-h { margin: 1.1rem 0 0.9rem; font-size: 19px; font-weight: 600; letter-spacing: -0.012em; } .ds-form { display: grid; gap: 1rem; } .ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.9rem 1.1rem; } .ds-field { display: flex; flex-direction: column; gap: 0.3rem; font-size: 13.5px; font-weight: 650; } .ds-field small { font-size: 12.5px; font-weight: 400; color: var(--ink-dim); } .ds-field input { width: 100%; min-height: 42px; padding: 0.5rem 0.8rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font: 400 15px var(--font); } .ds-field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); } .ds-form-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; } .ds-btn-p, .ds-btn-s { min-height: 44px; padding: 0.5rem 1.15rem; border-radius: 10px; font: 600 15px var(--font); cursor: pointer; } .ds-btn-p { border: 1px solid var(--accent); background: var(--accent); color: var(--surface); } .ds-btn-p:hover { background: var(--accent-2); border-color: var(--accent-2); } .ds-btn-s { border: 1px solid var(--line); background: var(--surface); color: var(--ink); } .ds-btn-s:hover { border-color: var(--ink); }"
     }
   ],
   "narrative": {
     "northStar": "The Aisle Sign",
-    "overview": "DomiOS borrows the supermarket's own wayfinding: every product carries the colour of its aisle, and that colour is how you find things in the catalog, the pantry and the shopping list. Six muted aisle hues sit on top of the fixed base palette (cool paper, white surface, teal for \"good now\", navy for structure) and appear only where a category appears: the chip dot, the tinted photo field with its pictogram, the dot on a pantry row, the dot beside a shopping-list group.\n\nThis is an Operate tool for a household that plans at a desk and shops one-handed on a phone. Body text is quiet (400), headings are calm (600), and only prices go heavy (800). Surfaces are white on cool paper with 1px hairlines and soft corners (8, 12, 16px; pills for chips, verdicts and row actions). Status speaks through round dots and tinted pills, never rails or bold bands.",
+    "overview": "DomiOS borrows the supermarket's own wayfinding: every product carries the colour of its aisle, and that colour is how you find things in the catalog, the pantry and the shopping list. Six muted aisle hues sit on top of the fixed base palette (cool paper, white surface, teal for \"good now\", navy for structure) and appear only where a category appears: the chip dot, the tinted photo field with its pictogram, the dot on a pantry row, the dot beside a shopping-list group.\n\nThis is an Operate tool for a household that plans at a desk and shops one-handed on a phone. Body text is quiet (400), headings are calm (600), and only prices go heavy (800). Surfaces are white on cool paper with 1px hairlines and soft corners (8, 12, 16px; pills for chips, verdicts and row actions). Status speaks through round dots and tinted pills, never rails or bold bands.\n\nThe same system has two more surfaces, both on the shared tokens and the same family, weights and corners. The public site is a Persuade surface in pt-PT and en: a 72rem column whose home opens on one interactive shelf label that judges its own price, then reads as bordered lists of rows. The admin is an Operate surface for platform staff: flat hairline rows, neutral controls, consequential and destructive actions confirmed in two steps. Neither uses aisle hues; neither casts a shadow.",
     "keyCharacteristics": [
       "Aisle hue as wayfinding: one hue per top category, from chip dot to photo field to list group.",
       "Price is the only heavy type: 800 at 34px on cards, up to 68px on the article.",
       "Verdicts are tinted foot rows or pills led by an 8px round dot.",
       "Soft corners (8 / 12 / 16px), pill controls, 1px hairlines, no rails.",
-      "Flat at rest; one floating dropdown carries the only shadow."
+      "Flat at rest; one floating dropdown in the app carries the only shadow.",
+      "Site: one shelf label at price-hero size with a verdict foot and four verdict chips, labelled as example.",
+      "Admin: hairline rows, state pills on the right, actions that arm before they run."
     ],
     "rules": [
       {
@@ -963,6 +1056,26 @@
         "name": "The Flat Shelf Rule",
         "body": "Surfaces are flat at rest and on hover; shadow is only for something that floats over other content.",
         "section": "elevation"
+      },
+      {
+        "name": "The Shelf Label Rule",
+        "body": "The public site proves the product with one object: a label surface (Label White, 12px, hairline) holding the name, the price at 800 and the 90-day range, closed by a verdict foot. Only the verdict, the price and the range marker change between states; the label itself never gains imagery, shadow or decoration.",
+        "section": "components"
+      },
+      {
+        "name": "The Example Rule",
+        "body": "Every figure on the public site is example data and says so: the label carries a muted \"Exemplo\" pill and a note beneath it. No invented prices, savings or counts appear outside that label.",
+        "section": "components"
+      },
+      {
+        "name": "The Armed Rule",
+        "body": "In the admin a consequential verb asks twice, inline, in place. At rest it is a neutral row action (or a neutral outlined danger button); pressed, it swaps to the armed tint with a longer confirm label plus a \"Cancelar\" link; the second press runs it and a failure shows as red text under the buttons. No modal, no red at rest.",
+        "section": "components"
+      },
+      {
+        "name": "The Flat Row Rule",
+        "body": "Admin records are rows in one hairline-bordered list: title and meta on the left, state pills, then actions on the right, dividers instead of cards. Facts use the same container as a label/value list. Density comes from 0.9rem row padding and 36px controls, never from smaller text.",
+        "section": "layout"
       }
     ],
     "dos": [
@@ -974,7 +1087,11 @@
       "Do keep destructive controls neutral at rest and red only on hover.",
       "Do use `lining-nums proportional-nums` for every figure and right-align numeric columns.",
       "Do keep controls at least 36px (primary buttons 44px, inputs 42px) and shopping-list rows at least 56px.",
-      "Do draw icons as inline SVG or CSS shapes."
+      "Do draw icons as inline SVG or CSS shapes.",
+      "Do keep the site's one 800 figure the demo price (and the wordmark), and label it as example data.",
+      "Do change only verdict, price and range marker when the demo label flips state.",
+      "Do arm consequential admin actions in two inline steps, neutral at rest, and show record state as pills on the right of a hairline row.",
+      "Do ship every site string in both pt-PT and en from the typed dictionaries."
     ],
     "donts": [
       "Don't change or tune the base colour tokens, or add hues beyond the six aisle pairs.",
@@ -986,7 +1103,10 @@
       "Don't use emoji or text glyphs as icons, or gradient text.",
       "Don't add shadows to cards, panels or rows.",
       "Don't use tabular figures.",
-      "Don't add a second typeface."
+      "Don't add a second typeface.",
+      "Don't show unlabeled prices, savings or counts on the public site.",
+      "Don't give admin records their own cards or shadows, or put red on a control at rest.",
+      "Don't open a modal to confirm an admin action; confirm in the row."
     ]
   }
 }

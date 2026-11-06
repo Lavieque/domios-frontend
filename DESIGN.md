@@ -94,6 +94,18 @@ typography:
     fontWeight: 600
     lineHeight: 1.3
     letterSpacing: "normal"
+  price-label:
+    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "clamp(52px, 7vw, 72px)"
+    fontWeight: 800
+    lineHeight: 1
+    letterSpacing: "-0.04em"
+    fontFeature: "lnum, pnum"
+  verdict-site:
+    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "14px"
+    fontWeight: 600
+    lineHeight: 1.3
 rounded:
   sm: "8px"
   button: "10px"
@@ -111,6 +123,10 @@ spacing:
   section: "2.5rem"
   page-x: "clamp(16px, 3vw, 40px)"
   page-max: "1760px"
+  site-x: "clamp(16px, 4vw, 48px)"
+  site-max: "72rem"
+  admin-max: "76rem"
+  demo-pad: "1.35rem 1.5rem 1.4rem"
 components:
   button-primary:
     backgroundColor: "{colors.accent}"
@@ -239,6 +255,98 @@ components:
     textColor: "{colors.ink-dim}"
     height: "64px"
     padding: "0 {spacing.page-x}"
+  site-header:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink-dim}"
+    height: "64px"
+    padding: "0 {spacing.site-x}"
+  button-lg:
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.button}"
+    padding: "0.6rem 1.6rem"
+    height: "52px"
+  demo-label:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    padding: "{spacing.demo-pad}"
+  demo-price:
+    textColor: "{colors.ink}"
+    typography: "{typography.price-label}"
+  demo-verdict:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink}"
+    typography: "{typography.verdict-site}"
+    padding: "0.65rem 1.5rem"
+  demo-verdict-historic-low:
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.accent}"
+  demo-verdict-below-average:
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.ink}"
+  demo-verdict-usual:
+    backgroundColor: "{colors.accent-2-soft}"
+    textColor: "{colors.ink}"
+  demo-verdict-above-average:
+    backgroundColor: "{colors.danger-soft}"
+    textColor: "{colors.ink}"
+  lang-switch-current:
+    backgroundColor: "{colors.accent-2}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
+    height: "28px"
+  row-link:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    padding: "0.8rem 1.1rem"
+    height: "60px"
+  cta-band:
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+  step-number:
+    backgroundColor: "{colors.accent-2-soft}"
+    textColor: "{colors.accent-2}"
+    rounded: "{rounded.round}"
+    size: "32px"
+  admin-header:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink-dim}"
+    height: "64px"
+    padding: "0 {spacing.page-x}"
+  admin-row:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    padding: "{spacing.row-pad}"
+  admin-row-armed:
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.accent}"
+  button-danger-armed:
+    backgroundColor: "{colors.danger-soft}"
+    textColor: "{colors.danger}"
+    rounded: "{rounded.pill}"
+    height: "36px"
+  admin-panel:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.md}"
+    padding: "0.25rem 1.25rem 1.25rem"
+  edit-field-input:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sm}"
+    padding: "0.5rem 0.8rem"
+    height: "42px"
+  fact-row:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink-dim}"
+    padding: "0.7rem 1.1rem"
+    height: "56px"
+  brand-tag:
+    backgroundColor: "{colors.accent-2-soft}"
+    textColor: "{colors.accent-2}"
+    rounded: "{rounded.pill}"
+    padding: "0.1rem 0.55rem"
 ---
 
 # Design System: DomiOS
@@ -251,12 +359,16 @@ DomiOS borrows the supermarket's own wayfinding: every product carries the colou
 
 This is an Operate tool for a household that plans at a desk and shops one-handed on a phone. Body text is quiet (400), headings are calm (600), and only prices go heavy (800). Surfaces are white on cool paper with 1px hairlines and soft corners (8, 12, 16px; pills for chips, verdicts and row actions). Status speaks through round dots and tinted pills, never rails or bold bands.
 
+The same system has two more surfaces, both on the shared tokens (`src/shared/tokens.css`) and the same family, weights and corners. The public site (`site/site.css`) is a Persuade surface in pt-PT and en: a 72rem column whose home opens on one interactive shelf label that judges its own price (the "shelf-label demonstrator"), then reads as bordered lists of rows. The admin (`admin/admin.css`) is an Operate surface for platform staff: flat hairline rows, neutral controls, consequential and destructive actions confirmed in two steps. Neither uses aisle hues; neither casts a shadow.
+
 **Key Characteristics:**
 - Aisle hue as wayfinding: one hue per top category, from chip dot to photo field to list group.
 - Price is the only heavy type: 800 at 34px on cards, up to 68px on the article.
 - Verdicts are tinted foot rows or pills led by an 8px round dot.
 - Soft corners (8 / 12 / 16px), pill controls, 1px hairlines, no rails.
-- Flat at rest; one floating dropdown carries the only shadow.
+- Flat at rest; one floating dropdown in the app carries the only shadow.
+- Site: one shelf label at price-hero size with a verdict foot and four verdict chips, labelled as example.
+- Admin: hairline rows, state pills on the right, actions that arm before they run.
 
 ## Colors
 
@@ -288,7 +400,7 @@ Each top category maps to one aisle by name (`src/catalog/aisles.ts`); the conta
 - **Dairy Sky** (`aisle-dairy`): milk, yoghurt, cheese, eggs, butter.
 - **Home Plum** (`aisle-home`): cleaning, hygiene, baby, pets.
 
-The full hue marks dots and pictograms; the `-soft` tint fills photo fields. Dark mode swaps every base and aisle token for its `-dark` value; aisle tints become 16% alpha.
+The public site and the admin use no aisle hue. The full hue marks dots and pictograms; the `-soft` tint fills photo fields. Dark mode swaps every base and aisle token for its `-dark` value; aisle tints become 16% alpha.
 
 ### Named Rules
 **The Fixed Palette Rule.** Base tokens are the user's brand commitment and stay byte-identical. The six aisle pairs (approved 2026-10-30) are the only additions; express new states with existing tokens and tints.
@@ -314,6 +426,10 @@ The full hue marks dots and pictograms; the `-soft` tint fills photo fields. Dar
 - **Body** (400, 15.5px, 1.55): running text; ledes 62ch, recipe steps 70ch.
 - **Label** (600, 12.5-14px): verdicts (13px foot, 14px pill), pills, tags, meta, table headers.
 - **Store price** (700, 19px, -0.01em): the figure in an "Onde comprar" row, card price beneath at 12.5px teal.
+- **Price label, site** (800, clamp(52px, 7vw, 72px), 1, -0.04em): the demo label's price; euro sign at 0.4em and 700. The only 800 on the site besides the wordmark (21px).
+- **Site headings** (600): h1 clamp(30px, 4.6vw, 52px) at 1.06 and -0.03em; h2 clamp(20px, 2.6vw, 26px) at 1.18; h3 16px. Ledes are dim, clamp(16.5px, 1.6vw, 19px), 58ch. The demo name is 600 at clamp(20px, 2.4vw, 24px).
+- **Verdict, site** (600, 14px, 1.3): the verdict foot of the demo label; chips 14px 550.
+- **Admin headings** (600): h1 clamp(26px, 3.4vw, 34px) at 1.1 and -0.025em with a 15px dim `page-sub`; h2 matches Headline, 2rem above. Row titles 15.5px, notes 14.5px, meta and times 13px dim.
 
 ### Named Rules
 **The Price Weight Rule.** 800 belongs to prices and the wordmark. Titles and headings stop at 600.
@@ -334,12 +450,19 @@ The article is two columns (0.85fr photo / 1.15fr info, gap clamp(1.5rem, 4vw, 3
 
 Under 1100px the top bar keeps the wordmark and a "Menu" button that opens a right-side drawer.
 
+### Public site and admin
+**Site.** One column, max 72rem, padding clamp(16px, 4vw, 48px), 5rem bottom, under a sticky 64px header (wordmark, menu links, language switch, "Pedir acesso"; the links wrap to their own line under 700px). The home hero is two columns (1.05fr copy, 0.95fr demo label capped at 30rem, gap clamp(1.5rem, 5vw, 4.5rem)) and stacks under 880px. Bands follow at clamp(3rem, 7vw, 5.5rem) apart: a three-cell bordered strip (judge list, flow; stacked under 820px), two bordered row lists of menus (stacked under 820px), a guide teaser and the tinted request band. A feature page is text beside a capture (1fr / 1.1fr, stacking under 900px) and drops to a single 46rem column when no capture exists. The guide is a sticky 15rem table of contents beside numbered steps; the request page is form (1.2fr) beside the "what happens next" list (0.8fr). The footer is three columns (1.4fr, 0.6fr, 0.6fr) over a one-line honesty note.
+
+**Admin.** One column, max 76rem, padding 2.25rem clamp(16px, 3vw, 40px) 5rem. The 64px header holds wordmark, an "Admin" tag, a scrolling nav and the account at the right. Pages open with a flex page head (h1, dim sub, actions right), an optional chip row and search, then one `rows` list. A row is a grid of main / state / actions (gap 0.75rem 1.5rem, padding 0.9rem 1.1rem) and stacks under 900px; edit forms are auto-fill grids at 15rem; the facts list is label (8-14rem) / value / badge.
+
 ### Named Rules
+**The Flat Row Rule.** Admin records are rows in one hairline-bordered list: title and meta on the left, state pills, then actions on the right, dividers instead of cards. Facts use the same container as a label/value list. Density comes from 0.9rem row padding and 36px controls, never from smaller text.
+
 **The In-Aisle Rule.** The shopping list fits a phone: items grouped by aisle, store breakdowns closed, unpriced items behind one disclosure, and each row shows a "Chain · €" good pill for its cheapest store.
 
 ## Elevation & Depth
 
-Flat. Cards, panels and rows separate from the page by Cool Paper against Label White and 1px hairlines. The best option and today's day card take a 2px teal edge (1px border plus 1px inset ring), not a shadow. A linked card lifts 2px on hover with a darker hairline.
+Flat. Cards, panels and rows separate from the page by Cool Paper against Label White and 1px hairlines. The best option and today's day card take a 2px teal edge (1px border plus 1px inset ring), not a shadow. A linked card lifts 2px on hover with a darker hairline. The public site and the admin carry no shadow at all, not even the float; their only depth cues are hairlines and tints.
 
 ### Shadow Vocabulary
 - **Float** (`box-shadow: var(--shadow)`): the product search results that float over the add-to-pantry form. Nothing else.
@@ -349,7 +472,7 @@ Flat. Cards, panels and rows separate from the page by Cool Paper against Label 
 
 ## Shapes
 
-Soft corners on a short scale: 8px (`sm`) for inputs, notices, thumbnails, drawer rows, breakdowns; 10px for buttons and pagination; 12px (`md`) for cards, panels, tables, row lists and store rows; 16px (`lg`) for the article photo field. Chips, pills, verdict pills, row actions, danger buttons and store bars are full pills. Dots are round: 8px verdict and drawer markers, 10px aisle dots, the 18px price-range marker, the 40px icon-danger hit area. Every border is a 1px hairline; the active nav underline is a 2px inset navy shadow. The card photo field runs edge to edge, clipped by the card.
+Soft corners on a short scale: 8px (`sm`) for inputs, notices, thumbnails, drawer rows, breakdowns; 10px for buttons and pagination; 12px (`md`) for cards, panels, tables, row lists and store rows; 16px (`lg`) for the article photo field. Chips, pills, verdict pills, row actions, danger buttons and store bars are full pills. Dots are round: 8px verdict and drawer markers, 10px aisle dots, the 18px price-range marker, the 40px icon-danger hit area. Every border is a 1px hairline; the active nav underline is a 2px inset navy shadow. The card photo field runs edge to edge, clipped by the card. On the site the shelf label, row lists, strips and FAQ are 12px with clipped overflow so dividers meet the corner; the request band and capture frames are 16px; the language switch, chips, pills and step numbers are pill or round. In the admin rows, facts, panels and filters use 12px, fields and edit fieldsets 8px.
 
 ## Components
 
@@ -412,8 +535,48 @@ One bordered list of members, the caller first, then by role and name. Each row 
 ### Disclosures
 Store breakdowns and event history are `<details>` in hairline containers; 600 summaries with Shelf Grey hover and open state; drawn CSS chevrons rotate on open.
 
+### Site: Header and Language Switch
+Sticky 64px bar on Label White with a hairline foot: wordmark (800, 21px, "OS" navy) and two-roof mark, menu links 500 at 14.5px dim (hover ink on a Shelf Grey fill, 8px), then at the right the language switch, a dim login link (hidden under 700px) and a 40px primary "Pedir acesso". The switch is a hairline pill holding pt and en links (12.5px 650, 28px); the current one (`aria-current`) fills navy with white text. Both languages ship from typed dictionaries (`site/i18n`); numbers format with `pt-PT` or `en-GB`.
+
+### Site: Shelf-label Demonstrator (signature)
+**The Shelf Label Rule.** The public site proves the product with one object: a label surface (Label White, 12px, hairline) holding the name, the price at 800 and the 90-day range, closed by a verdict foot. Only the verdict, the price and the range marker change between states; the label itself never gains imagery, shadow or decoration.
+- **Label:** Label White, 1px hairline, 12px, clipped; body padding 1.35rem 1.5rem 1.4rem. Top to bottom: a muted "Exemplo" pill, the product name (600), the unit line (14px dim), the price (price label, euro at 0.4em), the price range, then the verdict foot.
+- **Price range:** the app's range (8px track graded teal, navy tint, red tint; 2px dim tick at the average; 18px Label White dot ringed 4px in ink at the current price) with a 12.5px legend of min, average and max. The dot slides (0.45s ease-out) when the verdict changes.
+- **Verdict foot:** full-width row under a hairline, 14px 600, padding 0.65rem 1.5rem, led by an 8px dot, announced politely. Tones match the app's verdict: historic low (teal tint, teal text and dot), below average (teal tint, ink text, teal dot), usual (navy tint, navy dot), above average (red tint, red dot); Shelf Grey with a dim dot by default.
+- **Verdict chips:** four pills under the label (the standard chip: 36px, hairline, 14px 550), each led by an 8px dot in its tone (teal, teal, navy, red); `aria-pressed` fills navy with white text and rings the dot 2px in Label White. They flip the label between the four states; a caption above them and a note below say it is an example.
+**The Example Rule.** Every figure on the public site is example data and says so: the label carries a muted "Exemplo" pill and a note beneath it. No invented prices, savings or counts appear outside that label.
+
+### Site: Row Link List
+Menus are listed as one 12px bordered list of rows per group (min 60px, padding 0.8rem 1.1rem, hairline dividers): a 600 16.5px name, a 14px dim hint, a drawn 20px chevron right. Hover mixes Shelf Grey at 45%; no lift. The group heading is a dim 14px 650 h3.
+
+### Site: Strips, Request Band and Guide
+- **Judge list / Flow:** one bordered 12px strip of three cells (padding 1.35rem 1.5rem 1.4rem, hairline between cells), a 16px 600 h3 and 15px dim text each.
+- **Request band:** 16px corners, `accent-soft` fill with a 35% teal hairline, ink text (dim ink falls under 4.5:1 on the tint), headline left and a primary button right. The guide teaser shares the shape on Label White with a secondary button.
+- **Guide:** table of contents with a 1px left rule and dim links; steps separated by hairlines, each h2 led by a 32px round navy-tint number; step lists use navy markers; a notice is an 8px `accent-soft` block with a teal hairline; the FAQ is a bordered `<details>` list with a drawn chevron that rotates.
+- **Request form:** 34rem column, labels 14px 650, the standard 42px input (8px, hairline, 2px teal outline and 4px `accent-soft` ring on focus), a hidden honeypot field, an error block (`danger-soft`, red 600) and a confirmation panel on Label White.
+- **Capture (`Shot`):** a real app screenshot in a hairline frame with 16px corners and a 13px dim caption; the shopping-list capture is phone-width (19rem). If the file is missing the figure is omitted.
+- **Primary button, large:** 52px, padding 0.6rem 1.6rem, 16.5px, used for "Pedir acesso" in the hero; "Ver como funciona" is a 600 teal text link.
+
+### Admin: Shell, Rows and Facts
+- **Shell:** 64px Label White header with hairline foot; the nav reuses the app's active treatment (ink 650 with a 2px navy inset underline); the "Admin" tag is a navy-tint pill (12.5px 650).
+- **Row:** the flat row of the Flat Row Rule. Title is strong text with a dim email or secondary on the same baseline, an optional 14.5px note (60ch), a 13px dim meta line (figures lining and proportional), state pills right-aligned, actions right-aligned (min 9rem). Audit rows drop to two columns with a nowrap dim time; edit rows are a single column; slim rows (0.6rem) carry recipe steps and lines.
+- **Filter chips and search:** the standard chip row above the list (pressed navy), a 34rem search (input + button) and a bold 14px result count; the pager is two secondary buttons around a dim "Página X de Y".
+- **Facts list:** one 12px bordered list of rows (min 56px, padding 0.7rem 1.1rem) with a 600 label, a dim 14px value line led by a 16px 650 ink figure, and a pill or link pill at the right ("Ligada" good, "Só log" muted, "Ver pedidos" navy). Under 720px the detail drops to its own line.
+- **State line:** loading and empty states are plain dim text; errors are the `danger-soft` block with `role="alert"`.
+
+### Admin: Pills and ConfirmAction
+- **Pills:** the four app pill tones (good teal, navy, muted, danger), 12.5px 600. Status maps are fixed per page: Pendente navy, Aprovado good, Rejeitado muted, "Conta criada" good.
+- **ConfirmAction** (`admin/components.tsx`) has two tones.
+**The Armed Rule.** In the admin a consequential verb asks twice, inline, in place. At rest it is a neutral row action (or a neutral outlined danger button); pressed, it swaps to the armed tint with a longer confirm label plus a "Cancelar" link; the second press runs it and a failure shows as red text under the buttons. No modal, no red at rest.
+- **Neutral tone** (Aprovar, Reenviar convite): row action (Shelf Grey pill, 36px); armed it takes the teal tint, teal text and a 45% teal border.
+- **Danger tone** (Rejeitar, remover): the transparent outlined pill with dim text; hover and armed turn red text, 45% red border and `danger-soft` fill.
+- Disabled controls drop to 45%; under a coarse pointer row actions, danger buttons, chips and link buttons grow to 44px.
+
+### Admin: Edit Form and Panel
+A panel is a 12px hairline container on Label White (padding 0.25rem 1.25rem 1.25rem) holding an edit form: an auto-fill grid (15rem, gap 0.9rem 1.1rem) of fields (13.5px 650 label, 42px input, select or textarea at 8px, optional 12.5px dim hint; `wide` spans the row), a nutrition fieldset (8px hairline, 9.5rem columns), then a primary submit button (reads "A guardar…" while busy) beside a secondary "Cancelar". Focus is the teal border with an `accent-soft` ring; a saved confirmation is a 14px 600 teal line. Search, rename and add-line forms reuse the same inputs and buttons.
+
 ### Motion
-Ease-out `cubic-bezier(0.16, 1, 0.3, 1)`. Pages fade up 6px (0.4s); cards rise 8px (0.45s, 30ms stagger, capped at 12); store bars grow once. All motion collapses under `prefers-reduced-motion`.
+Ease-out `cubic-bezier(0.16, 1, 0.3, 1)`. Pages fade up 6px (0.4s); cards rise 8px (0.45s, 30ms stagger, capped at 12); store bars grow once. All motion collapses under `prefers-reduced-motion`. The site has one authored entrance: hero copy, demo label (90ms later) and page heads rise 8px in 0.5s, plus the range marker slide and smooth anchor scrolling (off under reduced motion). The admin rises its page content 6px in 0.4s.
 
 ## Do's and Don'ts
 
@@ -427,6 +590,10 @@ Ease-out `cubic-bezier(0.16, 1, 0.3, 1)`. Pages fade up 6px (0.4s); cards rise 8
 - **Do** use `lining-nums proportional-nums` for every figure and right-align numeric columns.
 - **Do** keep controls at least 36px (primary buttons 44px, inputs 42px) and shopping-list rows at least 56px.
 - **Do** draw icons as inline SVG or CSS shapes.
+- **Do** keep the site's one 800 figure the demo price (and the wordmark), and label it as example data.
+- **Do** change only verdict, price and range marker when the demo label flips state.
+- **Do** arm consequential admin actions in two inline steps, neutral at rest, and show record state as pills on the right of a hairline row.
+- **Do** ship every site string in both pt-PT and en from the typed dictionaries.
 
 ### Don't:
 - **Don't** change or tune the base colour tokens, or add hues beyond the six aisle pairs.
@@ -439,3 +606,6 @@ Ease-out `cubic-bezier(0.16, 1, 0.3, 1)`. Pages fade up 6px (0.4s); cards rise 8
 - **Don't** add shadows to cards, panels or rows.
 - **Don't** use tabular figures.
 - **Don't** add a second typeface.
+- **Don't** show unlabeled prices, savings or counts on the public site.
+- **Don't** give admin records their own cards or shadows, or put red on a control at rest.
+- **Don't** open a modal to confirm an admin action; confirm in the row.

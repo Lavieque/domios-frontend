@@ -13,7 +13,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 5.5rem;
 }
 
@@ -246,7 +245,7 @@ button {
   padding: 0.15rem 0.6rem;
   border-radius: 999px;
   background: var(--surface-2);
-  color: var(--ink-dim);
+  color: var(--ink);
   font-size: 12.5px;
   font-weight: 600;
 }
@@ -780,11 +779,17 @@ button {
   border-color: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
-.guide-teaser p,
-.cta-band p {
+.guide-teaser p {
   max-width: 56ch;
   margin: 0;
   color: var(--ink-dim);
+}
+
+/* On the tinted band --ink-dim falls under 4.5:1. */
+.cta-band p {
+  max-width: 56ch;
+  margin: 0;
+  color: var(--ink);
 }
 
 /* ---------- Feature page ---------- */
@@ -803,6 +808,39 @@ button {
 @media (max-width: 900px) {
   .feature-layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* No capture shipped yet: do not reserve an empty column. */
+.feature-layout:not(:has(.shot)) {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 46rem;
+}
+
+html:focus-within {
+  scroll-behavior: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (max-width: 700px) {
+  html {
+    scroll-padding-top: 7rem;
+  }
+}
+
+/* Touch targets: 44px where the pointer is a finger. */
+@media (pointer: coarse) {
+  .chip,
+  .text-link,
+  .site-footer a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 }
 
@@ -1069,9 +1107,10 @@ button {
 
 .form-field input:focus,
 .form-field textarea:focus {
-  outline: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 .request-form .button-primary {

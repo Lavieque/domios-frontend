@@ -10,7 +10,7 @@ export function FeaturePage({ featureKey }: { featureKey: FeatureKey }) {
   const p = t.feature;
   return (
     <>
-      <nav className="crumbs" aria-label="breadcrumb">
+      <nav className="crumbs" aria-label={t.nav.breadcrumb}>
         <Link to={to({ kind: "features" })}>{p.back}</Link>
       </nav>
       <header className="page-head">

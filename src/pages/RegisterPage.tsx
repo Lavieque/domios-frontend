@@ -1,16 +1,27 @@
-import { useState, type FormEvent } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useRef, useState, type FormEvent } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, register } from "../api/auth";
 import { ApiError } from "../api/http";
 import { signIn } from "../auth/actions";
 import { describeError } from "../auth/errors";
+import { inviteFromHash } from "../auth/links";
 import { useSession } from "../auth/useSession";
+import { REQUEST_ACCESS_URL } from "../siteUrl";
 
 const WEAK_PASSWORD = `A password tem de ter entre ${PASSWORD_MIN_LENGTH} e ${PASSWORD_MAX_LENGTH} caracteres.`;
+const INVALID_INVITE =
+  "Este convite não é válido: expirou, já foi usado ou é de outro email. Pede acesso de novo ou usa o email para onde o convite foi enviado.";
 
 export function RegisterPage() {
   const session = useSession();
   const navigate = useNavigate();
+  const location = useLocation();
+  // O convite vem no fragmento do link do email. Lembra-se o último visto:
+  // sobrevive a um re-render mesmo que o fragmento desapareça do URL.
+  const inviteRef = useRef<string | null>(null);
+  const hashInvite = inviteFromHash(location.hash);
+  if (hashInvite) inviteRef.current = hashInvite;
+  const invite = inviteRef.current;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +50,7 @@ export function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await register(email.trim(), password);
+      await register(email.trim(), password, invite ?? undefined);
       // O registo não faz login: entra-se a seguir com os mesmos dados.
       await signIn(email, password);
       navigate("/conta", {
@@ -50,15 +61,39 @@ export function RegisterPage() {
       if (err instanceof ApiError && err.type === "duplicate-email") {
         setDuplicateEmail(true);
       } else {
-        setError(describeError(err, { "weak-password": WEAK_PASSWORD }));
+        setError(
+          describeError(err, {
+            "weak-password": WEAK_PASSWORD,
+            "invalid-invite": INVALID_INVITE,
+            "invite-required": INVALID_INVITE,
+          }),
+        );
       }
       setSubmitting(false);
     }
   }
 
+  if (!invite) {
+    return (
+      <div className="page auth-page">
+        <h1>Criar conta</h1>
+        <p>O DomiOS está aberto só a quem tem convite. Pede acesso e, quando for aprovado, recebes um email com o link para criares a conta.</p>
+        <p>
+          <a className="button-primary" href={REQUEST_ACCESS_URL}>
+            Pedir acesso
+          </a>
+        </p>
+        <p className="form-links">
+          Já tens conta? <Link to="/entrar">Entrar</Link>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="page auth-page">
       <h1>Criar conta</h1>
+      <p className="muted">Acesso aprovado. Usa o email para onde enviámos o convite.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label className="form-field">

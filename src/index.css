@@ -1,127 +1,4 @@
-:root {
-  --bg: #f0f3f5;
-  --surface: #fafbfc;
-  --surface-2: #e3e9eb;
-  --ink: #16241f;
-  --ink-dim: #5b6e71;
-  --line: rgba(22, 36, 31, 0.14);
-  --accent: #2a6a78;
-  --accent-soft: #dde8ea;
-  --accent-2: #1e3a5c;
-  --accent-2-soft: #dfe6ec;
-  --danger: #b91c1c;
-  --danger-soft: rgba(185, 28, 28, 0.1);
-  --shadow: 0 1px 2px rgba(22, 36, 31, 0.06), 0 8px 24px -12px rgba(22, 36, 31, 0.18);
-  --shadow-lift: 0 4px 10px rgba(22, 36, 31, 0.08), 0 16px 32px -16px rgba(22, 36, 31, 0.24);
-
-  /* Cores de corredor: só aparecem onde aparece a categoria (ponto, campo da foto, grupo). */
-  --aisle-fresh: #c2412d;
-  --aisle-fresh-soft: #f6e4e0;
-  --aisle-fish: #2f5f9e;
-  --aisle-fish-soft: #e2eaf4;
-  --aisle-pantry: #5f7a24;
-  --aisle-pantry-soft: #ebf0dc;
-  --aisle-bakery: #9a6f0a;
-  --aisle-bakery-soft: #f7eed6;
-  --aisle-dairy: #2f7fa8;
-  --aisle-dairy-soft: #dff0f6;
-  --aisle-home: #7d4f8f;
-  --aisle-home-soft: #efe5f2;
-
-  /* Cantos suaves, filetes finos, sem réguas. */
-  --radius-sm: 8px;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --font: "Schibsted Grotesk Variable", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-
-  font: 15.5px/1.55 var(--font);
-  font-weight: 400;
-  color-scheme: light dark;
-  color: var(--ink);
-  background: var(--bg);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f3f34;
-    --surface: #17453a;
-    --surface-2: #1f4f43;
-    --ink: #e7eeec;
-    --ink-dim: #9fb3b0;
-    --line: rgba(231, 238, 236, 0.16);
-    --accent: #5fa9a0;
-    --accent-soft: rgba(95, 169, 160, 0.16);
-    --accent-2: #6e9bc7;
-    --accent-2-soft: rgba(110, 155, 199, 0.16);
-    --danger: #f87171;
-    --danger-soft: rgba(248, 113, 113, 0.14);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px -12px rgba(0, 0, 0, 0.55);
-    --shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.35), 0 20px 40px -16px rgba(0, 0, 0, 0.6);
-    --aisle-fresh: #f09a86;
-    --aisle-fresh-soft: rgba(240, 154, 134, 0.16);
-    --aisle-fish: #8fb4e6;
-    --aisle-fish-soft: rgba(143, 180, 230, 0.16);
-    --aisle-pantry: #b5cf72;
-    --aisle-pantry-soft: rgba(181, 207, 114, 0.16);
-    --aisle-bakery: #e8c25c;
-    --aisle-bakery-soft: rgba(232, 194, 92, 0.16);
-    --aisle-dairy: #86c8e6;
-    --aisle-dairy-soft: rgba(134, 200, 230, 0.16);
-    --aisle-home: #c9a2d8;
-    --aisle-home-soft: rgba(201, 162, 216, 0.16);
-  }
-}
-
-/* O corredor da categoria: cada classe dá --aisle e --aisle-soft ao que está dentro. */
-.aisle-none {
-  --aisle: var(--ink-dim);
-  --aisle-soft: var(--surface-2);
-}
-.aisle-fresh {
-  --aisle: var(--aisle-fresh);
-  --aisle-soft: var(--aisle-fresh-soft);
-}
-.aisle-fish {
-  --aisle: var(--aisle-fish);
-  --aisle-soft: var(--aisle-fish-soft);
-}
-.aisle-pantry {
-  --aisle: var(--aisle-pantry);
-  --aisle-soft: var(--aisle-pantry-soft);
-}
-.aisle-bakery {
-  --aisle: var(--aisle-bakery);
-  --aisle-soft: var(--aisle-bakery-soft);
-}
-.aisle-dairy {
-  --aisle: var(--aisle-dairy);
-  --aisle-soft: var(--aisle-dairy-soft);
-}
-.aisle-home {
-  --aisle: var(--aisle-home);
-  --aisle-soft: var(--aisle-home-soft);
-}
-
-.aisle-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--aisle, var(--ink-dim));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-  }
-}
+@import "./shared/tokens.css";
 
 /* ---------- Base ---------- */
 
@@ -2900,6 +2777,21 @@ a.meal-title:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1.25rem;
+  font-size: 14px;
+}
+
+.request-access {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.request-access p {
+  margin: 0;
   font-size: 14px;
 }
 

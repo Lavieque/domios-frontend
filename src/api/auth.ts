@@ -20,8 +20,9 @@ export function login(email: string, password: string): Promise<LoginResultDto> 
   return send<LoginResultDto>("/auth/login", { method: "POST", body: { email, password } });
 }
 
-export function register(email: string, password: string): Promise<{ userId: string }> {
-  return send<{ userId: string }>("/auth/register", { method: "POST", body: { email, password } });
+/** `inviteToken` vem do link do email de acesso aprovado; a Api exige-o enquanto o registo for só por convite. */
+export function register(email: string, password: string, inviteToken?: string): Promise<{ userId: string }> {
+  return send<{ userId: string }>("/auth/register", { method: "POST", body: { email, password, inviteToken } });
 }
 
 export function refresh(refreshToken: string): Promise<LoginResultDto> {

@@ -4,6 +4,7 @@ import { signIn } from "../auth/actions";
 import { describeError } from "../auth/errors";
 import { safeNextPath } from "../auth/links";
 import { useSession } from "../auth/useSession";
+import { REQUEST_ACCESS_URL } from "../siteUrl";
 
 export function LoginPage() {
   const session = useSession();
@@ -67,9 +68,14 @@ export function LoginPage() {
 
       <p className="form-links">
         <Link to="/esqueci-password">Esqueci-me da password</Link>
-        <span className="muted">·</span>
-        <Link to="/registar">Criar conta</Link>
       </p>
+
+      <div className="request-access">
+        <p className="muted">Ainda não tens conta?</p>
+        <a className="button-secondary" href={REQUEST_ACCESS_URL}>
+          Pedir acesso
+        </a>
+      </div>
     </div>
   );
 }

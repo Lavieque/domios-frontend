@@ -235,6 +235,8 @@ export interface StoreComparisonItemDto {
   quantityComparable: boolean;
   /** As embalagens saíram do peso por unidade ou da densidade do ingrediente: quantidade aproximada (Api, adenda 2026-11-06). */
   quantityConverted?: boolean;
+  /** O valor que falta para converter, que o utilizador pode escrever (Api, adenda 2026-11-06 (c)). */
+  missingConversion?: MissingConversionDto | null;
   packagePrice: number;
   lineTotal: number;
   cardProductId: string;
@@ -272,6 +274,32 @@ export interface StoreComparisonDto {
     cardSavingVsBestStore: number;
     items: { itemId: string; itemIds: string[]; storeId: string; productId: string; lineTotal: number }[];
   };
+}
+
+export interface MissingConversionDto {
+  /** O canónico, onde o valor fica gravado. */
+  ingredientId: string;
+  field: "UnitWeight" | "Density";
+}
+
+export interface FillIngredientConversionResultDto {
+  ingredientId: string;
+  unitWeightGrams: number | null;
+  densityGramsPerMilliliter: number | null;
+  /** false: alguém já o tinha preenchido; nada mudou. */
+  applied: boolean;
+}
+
+/** Fica no catálogo, para todas as casas, e só quando ainda não havia valor. */
+export function fillIngredientConversion(
+  householdId: string,
+  ingredientId: string,
+  value: { unitWeightGrams: number } | { densityGramsPerMilliliter: number },
+): Promise<FillIngredientConversionResultDto> {
+  return authedRequest<FillIngredientConversionResultDto>(`/households/${householdId}/ingredients/${ingredientId}/conversion`, {
+    method: "PUT",
+    body: value,
+  });
 }
 
 export function getStoreComparison(householdId: string, listId: string): Promise<StoreComparisonDto> {

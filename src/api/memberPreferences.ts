@@ -84,3 +84,26 @@ export function removeAvoidedIngredient(householdId: string, memberId: string, i
     method: "DELETE",
   });
 }
+
+/** Um ingrediente da receita que cai no mesmo grupo de algo que o membro evita. `Conflict`: evita. `Caution`: limita. */
+export interface AvoidedMatchDto {
+  ingredientId: string;
+  name: string;
+  avoidedIngredient: string;
+  severity: AvoidSeverity;
+  result: "Conflict" | "Caution";
+  note: string | null;
+}
+
+/** Só o que o ecrã da receita usa de `GET .../recipes/{id}/restrictions` (adenda 2026-11-06, 5.3). */
+export interface RecipeRestrictionsDto {
+  members: {
+    memberId: string;
+    name: string;
+    avoided: { matches: AvoidedMatchDto[]; optionalMatches: AvoidedMatchDto[] } | null;
+  }[];
+}
+
+export function getRecipeRestrictions(householdId: string, recipeId: string): Promise<RecipeRestrictionsDto> {
+  return authedRequest<RecipeRestrictionsDto>(`/households/${householdId}/recipes/${recipeId}/restrictions`);
+}

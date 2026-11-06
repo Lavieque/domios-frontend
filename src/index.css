@@ -4046,3 +4046,21 @@ a.meal-title:hover {
 .unlinked-warning .button-row {
   margin-top: 0.5rem;
 }
+
+/* Aviso na receita: o que alguém da casa evita. */
+.avoided-notice-list,
+.avoided-notice-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avoided-notice-list > li + li {
+  margin-top: 0.75rem;
+}
+
+.avoided-notice-list ul {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}

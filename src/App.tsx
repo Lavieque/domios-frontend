@@ -25,6 +25,7 @@ import { ShoppingListPage } from "./pages/ShoppingListPage";
 import { ShoppingListsPage } from "./pages/ShoppingListsPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+import { REQUEST_ACCESS_URL } from "./siteUrl";
 
 /** Onde o próprio ecrã já trata do email por confirmar. */
 const PATHS_WITHOUT_VERIFICATION_NOTICE = ["/conta", "/verify-email"];
@@ -71,9 +72,12 @@ function App() {
               </NavLink>
             </>
           ) : (
-            <NavLink to="/entrar" className="nav-account">
-              Entrar
-            </NavLink>
+            <>
+              <a href={REQUEST_ACCESS_URL}>Pedir acesso</a>
+              <NavLink to="/entrar" className="nav-account">
+                Entrar
+              </NavLink>
+            </>
           )}
         </nav>
       </header>

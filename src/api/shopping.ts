@@ -233,6 +233,8 @@ export interface StoreComparisonItemDto {
   packageUnit: MeasurementUnit;
   packageCount: number;
   quantityComparable: boolean;
+  /** As embalagens saíram do peso por unidade ou da densidade do ingrediente: quantidade aproximada (Api, adenda 2026-11-06). */
+  quantityConverted?: boolean;
   packagePrice: number;
   lineTotal: number;
   cardProductId: string;

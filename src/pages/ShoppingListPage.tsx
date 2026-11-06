@@ -780,6 +780,7 @@ function StoreBreakdown({
                   {line.packageCount} × {line.packageQuantity > 0 ? formatQuantity(line.packageQuantity, line.packageUnit) : "embalagem"} a{" "}
                   {money.format(line.packagePrice)}
                   {!line.quantityComparable && " · quantidade não comparável, conta 1 embalagem"}
+                  {line.quantityConverted && " · quantidade aproximada"}
                 </div>
               </td>
               <td className="num">

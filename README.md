@@ -148,7 +148,7 @@ Segundo deploy do mesmo repo, em `domios.pt`: site multi-página em pt-PT e en (
 utilização, pedir acesso). Entrada própria, sem código da app; partilha os tokens (`src/shared/tokens.css`).
 
 - `npm run dev:site` (porta 5174), `npm run build:site` (saída `dist-site`).
-- Vercel: projeto à parte com `vercel.site.json` (build `npm run build:site`, saída `dist-site`).
+- Vercel: projeto à parte, mesmo repo. Build Command `npm run build:site`, Output Directory `dist-site` (definidos no painel; o `vercel.json` da raiz só traz o rewrite SPA e serve os três projetos).
 - Variáveis: `VITE_API_BASE_URL` (o formulário faz `POST /access-requests`) e `VITE_APP_URL` (links "Entrar").
 - Capturas dos menus: `npm run shots` (ver `site/scripts/capture-shots.mjs`) contra uma casa de demonstração.
 
@@ -158,6 +158,6 @@ Terceiro deploy do mesmo repo, em `admin.domios.pt`: pedidos de acesso (aprovar,
 utilizadores (procurar, terminar sessões, desativar, reativar) e auditoria. Entrada própria, sessão própria
 (só entram contas com `isPlatformAdmin`).
 
-- `npm run dev:admin` (porta 5175), `npm run build:admin` (saída `dist-admin`), Vercel com `vercel.admin.json`.
+- `npm run dev:admin` (porta 5175), `npm run build:admin` (saída `dist-admin`), Vercel: projeto à parte, Build Command `npm run build:admin`, Output Directory `dist-admin` (no painel).
 - Um administrador faz-se só por SQL: `UPDATE identity.users SET is_platform_admin = true WHERE email = '...'`.
 - Variável: `VITE_API_BASE_URL`. A Api tem de permitir a origem do admin em `Cors__AllowedOrigins`.

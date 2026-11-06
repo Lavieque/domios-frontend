@@ -684,3 +684,7 @@ h2 {
   align-items: center;
   gap: 0.75rem;
 }
+
+.row-edit {
+  grid-template-columns: minmax(0, 1fr);
+}

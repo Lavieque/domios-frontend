@@ -8,6 +8,7 @@ const FILTERS = [
   { value: "access-request", label: "Pedidos" },
   { value: "user", label: "Utilizadores" },
   { value: "household", label: "Casas" },
+  { value: "catalog", label: "Catálogo" },
 ] as const;
 
 const ACTIONS: Record<string, string> = {
@@ -20,6 +21,7 @@ const ACTIONS: Record<string, string> = {
   "household.rename": "Mudou o nome de uma casa",
   "household.member-role": "Mudou o papel de um membro",
   "household.member-remove": "Removeu um membro de uma casa",
+  "catalog.write": "Alterou o catálogo",
 };
 
 export function AuditPage() {

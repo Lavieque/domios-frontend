@@ -3,6 +3,7 @@ import { Navigate, NavLink, Route, Routes } from "react-router-dom";
 import { ApiError, login, logout } from "./api";
 import { describe, useSession } from "./hooks";
 import { AuditPage } from "./pages/AuditPage";
+import { CatalogPage } from "./pages/CatalogPage";
 import { HouseholdDetailPage } from "./pages/HouseholdDetailPage";
 import { HouseholdsPage } from "./pages/HouseholdsPage";
 import { RequestsPage } from "./pages/RequestsPage";
@@ -36,6 +37,7 @@ export function Admin() {
           <NavLink to="/pedidos">Pedidos</NavLink>
           <NavLink to="/utilizadores">Utilizadores</NavLink>
           <NavLink to="/casas">Casas</NavLink>
+          <NavLink to="/catalogo">Catálogo</NavLink>
           <NavLink to="/sistema">Sistema</NavLink>
           <NavLink to="/auditoria">Auditoria</NavLink>
         </nav>
@@ -56,6 +58,7 @@ export function Admin() {
           <Route path="/utilizadores" element={<UsersPage selfId={session.userId} />} />
           <Route path="/casas" element={<HouseholdsPage />} />
           <Route path="/casas/:id" element={<HouseholdDetailPage />} />
+          <Route path="/catalogo" element={<CatalogPage />} />
           <Route path="/sistema" element={<SystemPage />} />
           <Route path="/auditoria" element={<AuditPage />} />
           <Route path="*" element={<p className="muted">Esta página não existe.</p>} />

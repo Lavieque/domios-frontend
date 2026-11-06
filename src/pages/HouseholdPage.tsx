@@ -13,6 +13,7 @@ import {
   type MemberDto,
 } from "../api/households";
 import { describeError } from "../auth/errors";
+import { AvoidedIngredientsPanel, NutritionGoalsPanel } from "../components/MemberPreferencesPanels";
 import { useHouseholds } from "../household/useHouseholds";
 
 const ROLES = [MemberRole.Admin, MemberRole.Adult, MemberRole.Child, MemberRole.Guest];
@@ -285,7 +286,7 @@ function HouseholdName({ household, onSaved }: { household: HouseholdDto; onSave
   );
 }
 
-type RowMode = "view" | "edit" | "link" | "remove";
+type RowMode = "view" | "edit" | "link" | "remove" | "avoid" | "goals";
 
 interface MemberRowProps {
   householdId: string;
@@ -361,8 +362,14 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
         )}
       </div>
 
-      {mode === "view" && (canEdit || canRemove) && (
+      {mode === "view" && (
         <div className="member-actions">
+          <button type="button" className="row-action" onClick={() => open("avoid")}>
+            Evitar
+          </button>
+          <button type="button" className="row-action" onClick={() => open("goals")}>
+            Objetivos
+          </button>
           {canEdit && (
             <button type="button" className="row-action" onClick={() => open("edit")}>
               Editar
@@ -392,6 +399,14 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
           }}
           onCancel={() => setMode("view")}
         />
+      )}
+
+      {mode === "avoid" && (
+        <AvoidedIngredientsPanel householdId={householdId} member={member} canEdit={canEdit} onClose={() => setMode("view")} />
+      )}
+
+      {mode === "goals" && (
+        <NutritionGoalsPanel householdId={householdId} member={member} canEdit={canEdit} onClose={() => setMode("view")} />
       )}
 
       {mode === "link" && (

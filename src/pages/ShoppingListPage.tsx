@@ -9,6 +9,7 @@ import {
   getShoppingList,
   getShoppingListPackaging,
   getStoreComparison,
+  linkShoppingListItem,
   renameShoppingList,
   reopenShoppingList,
   reorderShoppingListItems,
@@ -34,6 +35,7 @@ import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
 import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/groups";
 import { moveItem, withPendingOrder } from "../shopping/order";
+import { LinkPicker, SuggestionList, useCatalogSuggestions, type CatalogPick } from "../shopping/CatalogSuggestions";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
 const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -52,6 +54,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [version, setVersion] = useState(0);
   const [comparison, setComparison] = useState<StoreComparisonDto | null>(null);
   const [comparing, setComparing] = useState(false);
+  // Aviso antes de comparar: linhas escritas à mão que ainda não estão ligadas a um produto.
+  const [checkingLinks, setCheckingLinks] = useState(false);
   const [packaging, setPackaging] = useState<Map<string, ShoppingItemPackagingDto>>(new Map());
   // Modo "Ordenar": ids dos itens por comprar pela ordem que se está a montar; null fora do modo.
   const [draftOrder, setDraftOrder] = useState<string[] | null>(null);
@@ -90,7 +94,37 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     }
   }
 
+  const unlinked = list?.items.filter((item) => !item.isPurchased && !item.productId && !item.ingredientId) ?? [];
+
+  /** Liga uma linha ao catálogo; se era a última por ligar, compara logo. */
+  async function link(item: ShoppingListItemDto, pick: CatalogPick) {
+    setError(null);
+    try {
+      const updated = await linkShoppingListItem(householdId, listId, item.shoppingListItemId, pick.kind === "product" ? { productId: pick.id } : { ingredientId: pick.id });
+      setList(updated);
+      setComparison(null);
+      setVersion((v) => v + 1);
+      const stillUnlinked = updated.items.some((i) => !i.isPurchased && !i.productId && !i.ingredientId);
+      if (checkingLinks && !stillUnlinked) {
+        setCheckingLinks(false);
+        await compare();
+      }
+    } catch (err) {
+      setError(describeError(err));
+    }
+  }
+
+  /** Com linhas por ligar, avisa primeiro; "Comparar mesmo assim" salta o aviso. */
+  async function startCompare() {
+    if (unlinked.length > 0) {
+      setCheckingLinks(true);
+      return;
+    }
+    await compare();
+  }
+
   async function compare() {
+    setCheckingLinks(false);
     setComparing(true);
     try {
       setComparison(await getStoreComparison(householdId, listId));
@@ -140,15 +174,33 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
         </p>
       )}
 
-      {open && <AddItemForm onAdd={(label, amount, unit) => act(() => addShoppingListItem(householdId, listId, { label, quantity: { amount, unit } }))} />}
+      {open && (
+        <AddItemForm
+          onAdd={(label, amount, unit, pick) =>
+            act(() =>
+              addShoppingListItem(householdId, listId, {
+                label,
+                quantity: { amount, unit },
+                productId: pick?.kind === "product" ? pick.id : null,
+                ingredientId: pick?.kind === "ingredient" ? pick.id : null,
+              }),
+            )
+          }
+        />
+      )}
 
       {pending.length > 0 && (
         <section className="panel comparison-panel">
           <h2>Onde fica mais barato</h2>
+          {checkingLinks && unlinked.length > 0 && (
+            <UnlinkedWarning items={unlinked} onLink={link} onCompareAnyway={compare} onCancel={() => setCheckingLinks(false)} />
+          )}
           {!comparison ? (
-            <button type="button" className="button-secondary" onClick={compare} disabled={comparing}>
-              {comparing ? "A comparar…" : "Comparar lojas"}
-            </button>
+            !checkingLinks && (
+              <button type="button" className="button-secondary" onClick={startCompare} disabled={comparing}>
+                {comparing ? "A comparar…" : "Comparar lojas"}
+              </button>
+            )
           ) : (
             <Comparison comparison={comparison} items={list.items} />
           )}
@@ -191,6 +243,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
               packaging={packaging}
               onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
               onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
+              onLink={link}
             />
           )}
           {purchased.length > 0 && (
@@ -333,23 +386,90 @@ function ListName({ list, onRename }: { list: ShoppingListDto; onRename: (name: 
   );
 }
 
-function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: MeasurementUnit) => void }) {
+/** Linhas por ligar, antes de comparar: cada uma com as sugestões do catálogo; ligar a última compara. */
+function UnlinkedWarning({
+  items,
+  onLink,
+  onCompareAnyway,
+  onCancel,
+}: {
+  items: ShoppingListItemDto[];
+  onLink: (item: ShoppingListItemDto, pick: CatalogPick) => void;
+  onCompareAnyway: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="notice unlinked-warning" role="status">
+      <p>
+        {items.length === 1 ? "1 item não está ligado" : `${items.length} itens não estão ligados`} a um produto do catálogo e por isso não entra
+        {items.length === 1 ? "" : "m"} na comparação. Confirma o que é cada um:
+      </p>
+      <ul className="unlinked-list">
+        {items.map((item) => (
+          <li key={item.shoppingListItemId}>
+            <strong>{item.label}</strong>
+            <LinkPicker label={item.label} onPick={(pick) => onLink(item, pick)} />
+          </li>
+        ))}
+      </ul>
+      <div className="button-row">
+        <button type="button" className="button-secondary" onClick={onCompareAnyway}>
+          Comparar mesmo assim
+        </button>
+        <button type="button" className="link-button" onClick={onCancel}>
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: MeasurementUnit, pick: CatalogPick | null) => void }) {
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState("1");
   const [unit, setUnit] = useState<MeasurementUnit>(MeasurementUnit.Unit);
+  // A escolha feita nas sugestões; escrever outra vez desfaz-a.
+  const [pick, setPick] = useState<CatalogPick | null>(null);
+  const suggestions = useCatalogSuggestions(label, pick === null);
+
+  function handlePick(chosen: CatalogPick) {
+    setPick(chosen);
+    setLabel(chosen.name);
+    if (chosen.kind === "product") setUnit(chosen.product.packageUnit);
+    else setUnit(chosen.ingredient.defaultUnit);
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const value = Number(amount.replace(",", "."));
     if (!label.trim() || !(value > 0)) return;
-    onAdd(label.trim(), value, unit);
+    onAdd(label.trim(), value, unit, pick);
     setLabel("");
     setAmount("1");
+    setPick(null);
   }
 
   return (
     <form className="inline-form add-item-form" onSubmit={handleSubmit}>
-      <input type="text" aria-label="Item" placeholder="Acrescentar item…" required maxLength={200} value={label} onChange={(e) => setLabel(e.target.value)} />
+      <div className="add-item-field">
+        <input
+          type="text"
+          aria-label="Item"
+          placeholder="Acrescentar item…"
+          required
+          maxLength={200}
+          value={label}
+          onChange={(e) => {
+            setLabel(e.target.value);
+            setPick(null);
+          }}
+        />
+        {pick ? (
+          <p className="muted add-item-linked">Ligado a {pick.kind === "product" ? "produto" : "ingrediente"}: {pick.name}</p>
+        ) : (
+          <SuggestionList suggestions={suggestions} onPick={handlePick} />
+        )}
+      </div>
       <input type="text" inputMode="decimal" aria-label="Quantidade" className="amount-input" value={amount} onChange={(e) => setAmount(e.target.value)} />
       <select className="category-select" aria-label="Unidade" value={unit} onChange={(e) => setUnit(Number(e.target.value) as MeasurementUnit)}>
         {units.map((u) => (
@@ -426,6 +546,7 @@ function PendingItems({
   packaging: Map<string, ShoppingItemPackagingDto>;
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
+  onLink: (item: ShoppingListItemDto, pick: CatalogPick) => void;
 }) {
   if (!groups || groups.length < 2) return <ItemList items={items} {...rest} />;
   return (
@@ -450,6 +571,7 @@ function ItemList({
   packaging,
   onToggle,
   onDelete,
+  onLink,
 }: {
   items: ShoppingListItemDto[];
   open: boolean;
@@ -457,7 +579,9 @@ function ItemList({
   packaging?: Map<string, ShoppingItemPackagingDto>;
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
+  onLink?: (item: ShoppingListItemDto, pick: CatalogPick) => void;
 }) {
+  const [linking, setLinking] = useState<string | null>(null);
   return (
     <ul className="pantry-list">
       {items.map((item) => (
@@ -476,6 +600,26 @@ function ItemList({
             </span>
           )}
           {item.storedInPantryAt && <span className="pill pill-muted">Na despensa</span>}
+          {open && onLink && !item.isPurchased && !item.productId && !item.ingredientId && (
+            <button
+              type="button"
+              className="link-button"
+              title="Sem produto ligado: não entra na comparação de lojas"
+              onClick={() => setLinking(linking === item.shoppingListItemId ? null : item.shoppingListItemId)}
+            >
+              Ligar a produto
+            </button>
+          )}
+          {linking === item.shoppingListItemId && onLink && (
+            <LinkPicker
+              label={item.label}
+              onCancel={() => setLinking(null)}
+              onPick={(pick) => {
+                setLinking(null);
+                onLink(item, pick);
+              }}
+            />
+          )}
           {cheapest?.get(item.shoppingListItemId) && (
             <span className="pill pill-good">
               {cheapest.get(item.shoppingListItemId)!.chainName} · {money.format(cheapest.get(item.shoppingListItemId)!.lineTotal)}

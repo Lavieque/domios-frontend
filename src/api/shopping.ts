@@ -97,6 +97,16 @@ export function addShoppingListItem(householdId: string, listId: string, request
   return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/items`, { method: "POST", body: request });
 }
 
+/** Liga uma linha escrita à mão a um produto (marca escolhida) ou a um ingrediente (qualquer marca). */
+export function linkShoppingListItem(
+  householdId: string,
+  listId: string,
+  itemId: string,
+  link: { productId?: string; ingredientId?: string },
+): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/items/${itemId}`, { method: "PATCH", body: link });
+}
+
 /** `onlyMissing`: só o que a despensa não cobre. */
 export function addItemsFromRecipe(
   householdId: string,

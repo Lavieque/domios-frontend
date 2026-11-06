@@ -4078,3 +4078,33 @@ a.meal-title:hover {
 .have-it-already {
   margin-top: 0.5rem;
 }
+
+/* Sugestões do catálogo ao escrever/ligar itens da lista de compras */
+.add-item-field {
+  position: relative;
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.add-item-field input {
+  width: 100%;
+}
+.add-item-linked {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+}
+.suggestion-list {
+  margin-top: 0.25rem;
+}
+.link-picker {
+  flex-basis: 100%;
+}
+.unlinked-list {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.unlinked-warning .button-row {
+  margin-top: 0.5rem;
+}

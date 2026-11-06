@@ -1,10 +1,15 @@
 import { useState, type FormEvent } from "react";
-import { admin, type CatalogProduct, type CatalogPromotion, type CatalogStore } from "../api";
+import { admin, type CatalogCategory, type CatalogProduct, type CatalogPromotion, type CatalogStore } from "../api";
 import { ConfirmAction, PageHead, Pager, State } from "../components";
-import { dateOnly, describe, useLoad } from "../hooks";
+import { dateOnly, useLoad } from "../hooks";
+import { IngredientsSection } from "./IngredientsSection";
+import { ProductForm } from "./ProductForm";
+import { RecipesSection } from "./RecipesSection";
 
 const TABS = [
   { value: "products", label: "Produtos" },
+  { value: "recipes", label: "Receitas" },
+  { value: "ingredients", label: "Ingredientes" },
   { value: "stores", label: "Lojas" },
   { value: "promotions", label: "Promoções" },
 ] as const;
@@ -15,7 +20,7 @@ export function CatalogPage() {
   const [tab, setTab] = useState<Tab>("products");
   return (
     <>
-      <PageHead title="Catálogo" sub="Produtos, lojas e promoções. Cada alteração fica na auditoria; a recolha de preços continua a escrever à parte." />
+      <PageHead title="Catálogo" sub="Produtos, receitas, ingredientes, lojas e promoções. Cada alteração fica na auditoria; a recolha de preços continua a escrever à parte." />
       <div className="chip-row" role="group" aria-label="Secção">
         {TABS.map((t) => (
           <button key={t.value} type="button" className="chip" aria-pressed={tab === t.value} onClick={() => setTab(t.value)}>
@@ -24,6 +29,8 @@ export function CatalogPage() {
         ))}
       </div>
       {tab === "products" && <ProductsSection />}
+      {tab === "recipes" && <RecipesSection />}
+      {tab === "ingredients" && <IngredientsSection />}
       {tab === "stores" && <StoresSection />}
       {tab === "promotions" && <PromotionsSection />}
     </>
@@ -40,7 +47,9 @@ function ProductsSection() {
   const [draft, setDraft] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [creating, setCreating] = useState(false);
   const list = useLoad(() => admin.products(search, page), [search, page]);
+  const categories = useLoad(() => admin.categories(), []);
   const items = list.data?.items ?? [];
 
   function submit(event: FormEvent) {
@@ -51,18 +60,36 @@ function ProductsSection() {
 
   return (
     <>
-      <form className="search" onSubmit={submit} role="search">
-        <input type="search" aria-label="Procurar produtos" placeholder="Procurar por nome ou marca…" value={draft} onChange={(e) => setDraft(e.target.value)} />
-        <button type="submit" className="button-secondary">
-          Procurar
+      <div className="toolbar">
+        <form className="search" onSubmit={submit} role="search">
+          <input type="search" aria-label="Procurar produtos" placeholder="Procurar por nome ou marca…" value={draft} onChange={(e) => setDraft(e.target.value)} />
+          <button type="submit" className="button-secondary">
+            Procurar
+          </button>
+        </form>
+        <button type="button" className="button-primary" onClick={() => setCreating(true)} disabled={creating || !categories.data}>
+          Novo produto
         </button>
-      </form>
+      </div>
+      {creating && categories.data && (
+        <div className="panel">
+          <h2>Novo produto</h2>
+          <ProductForm
+            categories={categories.data}
+            onSaved={() => {
+              setCreating(false);
+              list.reload();
+            }}
+            onCancel={() => setCreating(false)}
+          />
+        </div>
+      )}
       {list.data && <p className="count">{list.data.total} produtos</p>}
       <State loading={list.loading} error={list.error} empty={items.length === 0} emptyText="Sem produtos." />
       {items.length > 0 && (
         <ul className="rows">
           {items.map((p) => (
-            <ProductRow key={p.productId} product={p} onChanged={list.reload} />
+            <ProductRow key={p.productId} product={p} categories={categories.data ?? []} onChanged={list.reload} />
           ))}
         </ul>
       )}
@@ -71,43 +98,22 @@ function ProductsSection() {
   );
 }
 
-function ProductRow({ product: p, onChanged }: { product: CatalogProduct; onChanged: () => void }) {
+function ProductRow({ product: p, categories, onChanged }: { product: CatalogProduct; categories: CatalogCategory[]; onChanged: () => void }) {
   const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(p.name);
-  const [brand, setBrand] = useState(p.brand ?? "");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const status = PRODUCT_STATUS[p.status] ?? { label: String(p.status), pill: "pill-muted" };
-
-  async function save(event: FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await admin.updateProduct(p.productId, { name: name.trim(), brand: brand.trim() });
-      setEditing(false);
-      onChanged();
-    } catch (err) {
-      setError(describe(err));
-    } finally {
-      setBusy(false);
-    }
-  }
 
   if (editing) {
     return (
       <li className="row row-edit">
-        <form className="rename" onSubmit={save}>
-          <input type="text" aria-label="Nome" required maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
-          <input type="text" aria-label="Marca" maxLength={120} placeholder="Marca" value={brand} onChange={(e) => setBrand(e.target.value)} />
-          <button type="submit" className="button-primary" disabled={busy || !name.trim()}>
-            {busy ? "A guardar…" : "Guardar"}
-          </button>
-          <button type="button" className="button-secondary" disabled={busy} onClick={() => setEditing(false)}>
-            Cancelar
-          </button>
-        </form>
-        {error && <p className="form-error" role="alert">{error}</p>}
+        <ProductForm
+          product={p}
+          categories={categories}
+          onSaved={() => {
+            setEditing(false);
+            onChanged();
+          }}
+          onCancel={() => setEditing(false)}
+        />
       </li>
     );
   }

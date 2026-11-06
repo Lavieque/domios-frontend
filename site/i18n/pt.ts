@@ -12,6 +12,8 @@ export const pt: Dict = {
     menuClose: "Fechar",
     language: "Idioma",
     skip: "Saltar para o conteúdo",
+    main: "Principal",
+    breadcrumb: "Caminho",
   },
   verdict: {
     historicLow: "Mínimo dos últimos 90 dias",
@@ -174,7 +176,7 @@ export const pt: Dict = {
       name: "Receitas",
       hint: "Para cozinhar",
       title: "Receitas: para cozinhar",
-      lede: "Milhares de receitas publicadas, ligadas ao que tens em casa.",
+      lede: "Receitas publicadas, ligadas ao que tens em casa.",
       does: [
         { title: "Procurar", text: "Por nome, tipo de prato ou proteína principal." },
         { title: "Ver o que já tens", text: "Cada receita mostra os ingredientes que a despensa cobre e os que faltam." },
@@ -327,7 +329,7 @@ export const pt: Dict = {
     submit: "Pedir acesso",
     sending: "A enviar…",
     successTitle: "Pedido enviado",
-    successText: "Enviámos um email para confirmar que recebemos o pedido: está em avaliação. Se o pedido for aprovado, recebes outro email com o convite para criares a conta.",
+    successText: "Pedido recebido: está em avaliação. Se o email estiver correto, vais receber uma confirmação; se o pedido for aprovado, recebes outro email com o convite para criares a conta.",
     again: "Enviar outro pedido",
     errorInvalid: "Confirma o nome e o email: faltam dados ou o email não é válido.",
     errorTooMany: "Demasiados pedidos a partir desta ligação. Tenta de novo daqui a pouco.",

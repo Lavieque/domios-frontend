@@ -44,6 +44,8 @@ export interface Dict {
     menuClose: string;
     language: string;
     skip: string;
+    main: string;
+    breadcrumb: string;
   };
   verdict: {
     historicLow: string;

@@ -148,7 +148,7 @@ function Header({ pathname }: { pathname: string }) {
     <header className="site-header">
       <div className="site-header-inner">
         <Brand />
-        <nav className="site-nav" aria-label="Principal">
+        <nav className="site-nav" aria-label={t.nav.main}>
           <Link to={to({ kind: "features" })}>{t.nav.features}</Link>
           <Link to={to({ kind: "guide" })}>{t.nav.guide}</Link>
         </nav>

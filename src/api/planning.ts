@@ -98,6 +98,7 @@ export const SuggestionReason = {
   RecentlyCooked: 2,
   AlreadyPlanned: 3,
   RestrictionsUnverifiable: 4,
+  ContainsAvoided: 5,
 } as const;
 export type SuggestionReason = (typeof SuggestionReason)[keyof typeof SuggestionReason];
 
@@ -107,6 +108,7 @@ export const suggestionReasonLabels: Record<SuggestionReason, string> = {
   [SuggestionReason.RecentlyCooked]: "Cozinhada há pouco",
   [SuggestionReason.AlreadyPlanned]: "Já está no plano",
   [SuggestionReason.RestrictionsUnverifiable]: "Restrições por confirmar",
+  [SuggestionReason.ContainsAvoided]: "Leva algo que evitam",
 };
 
 export interface IngredientReferenceDto {
@@ -128,6 +130,8 @@ export interface MealSuggestionDto {
   plannedOn: IsoDate[];
   restrictions: RestrictionResult;
   reasons: SuggestionReason[];
+  /** Os ingredientes obrigatórios que alguém da casa evita ou limita; só com `ContainsAvoided`. */
+  avoided: { avoidedBy: { ingredientId: string; name: string; severity: "Avoid" | "Limit"; memberIds: string[] }[] } | null;
 }
 
 export interface MealSuggestionsDto {

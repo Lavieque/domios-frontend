@@ -293,6 +293,8 @@ code {
   display: flex;
   gap: 0.25rem;
   align-self: stretch;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .admin-nav a {
@@ -527,9 +529,10 @@ input::placeholder {
 }
 
 input:focus {
-  outline: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 .form-error {
@@ -687,4 +690,175 @@ h2 {
 
 .row-edit {
   grid-template-columns: minmax(0, 1fr);
+}
+
+/* ---------- Catalog editing ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.toolbar .search {
+  flex: 1 1 22rem;
+}
+
+.panel {
+  margin-bottom: 1.5rem;
+  padding: 0.25rem 1.25rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.panel h2 {
+  margin-top: 1.1rem;
+}
+
+.edit-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.9rem 1.1rem;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.edit-field small {
+  font-size: 12.5px;
+  font-weight: 400;
+}
+
+.edit-field-wide {
+  grid-column: 1 / -1;
+}
+
+.edit-field input,
+.edit-field select,
+.edit-field textarea,
+.edit-grid select,
+.edit-grid textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.edit-field textarea {
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.edit-field select:focus,
+.edit-field textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.edit-nutrition {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 0;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.edit-nutrition legend {
+  padding: 0 0.4rem;
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.editor {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.editor h2 {
+  margin: 0;
+}
+
+.editor h3 {
+  margin: 1.4rem 0 0;
+  font-size: 16px;
+}
+
+.row-slim {
+  padding-block: 0.6rem;
+}
+
+.steps {
+  counter-reset: none;
+}
+
+.step-text {
+  margin: 0;
+  max-width: 70ch;
+}
+
+.add-line {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  align-items: end;
+  gap: 0.75rem 1rem;
+  padding: 1rem 0 0.25rem;
+}
+
+.add-line .edit-field-wide {
+  grid-column: 1 / -1;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 42px;
+  font-size: 14.5px;
+}
+
+.saved {
+  margin: 0;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Touch targets: 44px where the pointer is a finger. */
+@media (pointer: coarse) {
+  .row-action,
+  .button-danger,
+  .chip,
+  .link-button {
+    min-height: 44px;
+  }
 }

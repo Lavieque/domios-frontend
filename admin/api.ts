@@ -124,14 +124,127 @@ export interface SystemStatus {
   email: { sender: string; configured: boolean; fromAddress: string | null; pending: number };
 }
 
+export interface Nutrition {
+  energyKcal: number;
+  protein: number;
+  carbs: number;
+  sugar: number;
+  fat: number;
+  saturates: number;
+  fiber: number;
+  salt: number;
+}
+
+export interface CatalogCategory {
+  categoryId: string;
+  name: string;
+  parentCategoryId: string | null;
+}
+
 export interface CatalogProduct {
   productId: string;
   name: string;
   brand: string | null;
   category: { categoryId: string; name: string };
   barcode: string | null;
+  packageQuantity: number;
+  /** MeasurementUnit: 0 Unit, 1 Gram, 2 Kilogram, 3 Milliliter, 4 Liter. */
+  packageUnit: number;
+  imageUrl: string | null;
+  allergens: string[];
+  nutritionFacts: Nutrition;
   /** ProductStatus: 0 Active, 1 Discontinued, 2 Seasonal. */
   status: number;
+}
+
+export interface ProductChanges {
+  name?: string;
+  brand?: string;
+  categoryId?: string;
+  imageUrl?: string;
+  allergens?: string[];
+  nutritionFacts?: Nutrition;
+}
+
+export interface NewProduct {
+  name: string;
+  categoryId: string;
+  packageQuantity: number;
+  packageUnit: number;
+  nutritionFacts: Nutrition;
+  brand: string | null;
+  barcode: string | null;
+  imageUrl: string | null;
+  allergens: string[];
+}
+
+export interface CatalogIngredient {
+  ingredientId: string;
+  name: string;
+  /** MeasurementUnit, as for products. */
+  defaultUnit: number;
+  allergens: string[];
+  /** IngredientStatus: 0 Active, 1 Archived. */
+  status: number;
+  canonicalIngredientId: string | null;
+  displayName: string | null;
+}
+
+export interface RecipeSummary {
+  recipeId: string;
+  title: string;
+  /** RecipeDifficulty: 0 Easy, 1 Medium, 2 Hard. */
+  difficulty: number;
+  /** RecipeStatus: 0 Draft, 1 Published, 2 Archived. */
+  status: number;
+  tags: string[];
+  sourceCategory: string | null;
+  imageUrl: string | null;
+}
+
+export interface RecipeIngredient {
+  recipeIngredientId: string;
+  ingredientId: string;
+  ingredientName: string;
+  quantity: { amount: number; unit: number };
+  notes: string | null;
+  isOptional: boolean;
+}
+
+export interface RecipeStep {
+  recipeStepId: string;
+  stepNumber: number;
+  instruction: string;
+  durationMinutes: number | null;
+}
+
+export interface RecipeDetail extends RecipeSummary {
+  description: string | null;
+  servings: number;
+  prepTimeMinutes: number | null;
+  cookTimeMinutes: number | null;
+  ingredients: RecipeIngredient[];
+  steps: RecipeStep[];
+}
+
+export interface RecipeChanges {
+  title?: string;
+  description?: string;
+  servings?: number;
+  difficulty?: number;
+  imageUrl?: string;
+  tags?: string[];
+}
+
+export interface NewRecipe {
+  title: string;
+  servings: number;
+  difficulty: number;
+  description: string | null;
+  prepTimeMinutes: number | null;
+  cookTimeMinutes: number | null;
+  imageUrl: string | null;
+  tags: string[];
 }
 
 export interface CatalogChain {
@@ -321,7 +434,30 @@ export const admin = {
   system: () => authed<SystemStatus>("/admin/system", "GET"),
   products: (search: string, page: number) =>
     authed<Paged<CatalogProduct>>(`/products${qs({ search, page, pageSize: 25, includeDiscontinued: "true" })}`, "GET"),
-  updateProduct: (id: string, body: { name?: string; brand?: string }) => authed<CatalogProduct>(`/products/${id}`, "PATCH", body),
+  updateProduct: (id: string, body: ProductChanges) => authed<CatalogProduct>(`/products/${id}`, "PATCH", body),
+  createProduct: (body: NewProduct) => authed<CatalogProduct>("/products", "POST", body),
+  categories: () => authed<CatalogCategory[]>("/categories", "GET"),
+  ingredients: (search: string, status: string, page: number) =>
+    authed<Paged<CatalogIngredient>>(`/ingredients${qs({ search, status, page, pageSize: 25 })}`, "GET"),
+  createIngredient: (body: { name: string; defaultUnit: number; allergens: string[] }) =>
+    authed<CatalogIngredient>("/ingredients", "POST", body),
+  updateIngredient: (id: string, body: { name?: string; defaultUnit?: number; allergens?: string[] }) =>
+    authed<CatalogIngredient>(`/ingredients/${id}`, "PATCH", body),
+  archiveIngredient: (id: string) => authed<void>(`/ingredients/${id}/archive`, "POST"),
+  recipes: (search: string, status: string, page: number) =>
+    authed<Paged<RecipeSummary>>(`/admin/recipes${qs({ search, status, page, pageSize: 25 })}`, "GET"),
+  recipe: (id: string) => authed<RecipeDetail>(`/recipes/${id}`, "GET"),
+  createRecipe: (body: NewRecipe) => authed<RecipeDetail>("/recipes", "POST", body),
+  updateRecipe: (id: string, body: RecipeChanges) => authed<RecipeDetail>(`/recipes/${id}`, "PATCH", body),
+  publishRecipe: (id: string) => authed<void>(`/recipes/${id}/publish`, "POST"),
+  archiveRecipe: (id: string) => authed<void>(`/recipes/${id}/archive`, "POST"),
+  addRecipeIngredient: (id: string, body: { ingredientId: string; quantity: { amount: number; unit: number }; notes: string | null; isOptional: boolean }) =>
+    authed<RecipeDetail>(`/recipes/${id}/ingredients`, "POST", body),
+  removeRecipeIngredient: (id: string, recipeIngredientId: string) =>
+    authed<void>(`/recipes/${id}/ingredients/${recipeIngredientId}`, "DELETE"),
+  addRecipeStep: (id: string, body: { instruction: string; durationMinutes: number | null }) =>
+    authed<RecipeDetail>(`/recipes/${id}/steps`, "POST", body),
+  removeRecipeStep: (id: string, recipeStepId: string) => authed<void>(`/recipes/${id}/steps/${recipeStepId}`, "DELETE"),
   discontinueProduct: (id: string) => authed<void>(`/products/${id}/discontinue`, "POST"),
   chains: () => authed<CatalogChain[]>("/chains", "GET"),
   setChainOpen: (id: string, open: boolean) => authed<void>(`/chains/${id}/${open ? "reopen" : "close"}`, "POST"),

@@ -26,7 +26,7 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
 - **`/receitas`** — pesquisa, filtros por tipo de prato e proteína
   (`dishType`, `mainProtein`), detalhe com ingredientes, passos e link para a
   receita original (`sourceUrl`).
-- **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta.
+- **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta. O registo só abre com `#convite=...` (link do email de acesso aprovado); sem convite, a página manda para o site (`VITE_SITE_URL`, por omissão https://domios.pt) para pedir acesso.
 - **`/reset-password`**, **`/verify-email`** — destino dos links dos emails
   (caminhos fixados pela Api, token no fragmento `#token=`).
 - **`/plano`** (`?semana=` segunda-feira) — plano da semana da casa atual
@@ -141,3 +141,23 @@ suporte a tema claro/escuro via `prefers-color-scheme`. O sistema visual
 cada etiqueta lê `GET /products/{id}/store-offers` (20 pedidos por página). Sem geração
 automática de cliente Api a partir do OpenAPI — 3 páginas não
 justificam essa máquina.
+
+## Site público (`site/`)
+
+Segundo deploy do mesmo repo, em `domios.pt`: site multi-página em pt-PT e en (menus, guia de
+utilização, pedir acesso). Entrada própria, sem código da app; partilha os tokens (`src/shared/tokens.css`).
+
+- `npm run dev:site` (porta 5174), `npm run build:site` (saída `dist-site`).
+- Vercel: projeto à parte com `vercel.site.json` (build `npm run build:site`, saída `dist-site`).
+- Variáveis: `VITE_API_BASE_URL` (o formulário faz `POST /access-requests`) e `VITE_APP_URL` (links "Entrar").
+- Capturas dos menus: `npm run shots` (ver `site/scripts/capture-shots.mjs`) contra uma casa de demonstração.
+
+## Admin (`admin/`)
+
+Terceiro deploy do mesmo repo, em `admin.domios.pt`: pedidos de acesso (aprovar, rejeitar, reenviar convite),
+utilizadores (procurar, terminar sessões, desativar, reativar) e auditoria. Entrada própria, sessão própria
+(só entram contas com `isPlatformAdmin`).
+
+- `npm run dev:admin` (porta 5175), `npm run build:admin` (saída `dist-admin`), Vercel com `vercel.admin.json`.
+- Um administrador faz-se só por SQL: `UPDATE identity.users SET is_platform_admin = true WHERE email = '...'`.
+- Variável: `VITE_API_BASE_URL`. A Api tem de permitir a origem do admin em `Cors__AllowedOrigins`.

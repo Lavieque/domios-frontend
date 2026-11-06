@@ -5,6 +5,7 @@ import type { PlannedMealDto } from "../api/planning";
 import { addItemsFromRecipe, getShoppingList } from "../api/shopping";
 import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
+import { RecipeAvoidedNotice } from "../components/RecipeAvoidedNotice";
 import { SendToListForm } from "../components/SendToListForm";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { longDate, startOfWeek, today } from "../plan/dates";
@@ -165,6 +166,9 @@ export function RecipeDetailPage() {
           )}
         </div>
       </section>
+
+      {/* Sem casa não há membros: o aviso simplesmente não aparece. */}
+      <RecipeAvoidedNotice recipeId={recipe.recipeId} />
 
       {task !== null && (
         <section id="recipe-task" className="panel recipe-task">

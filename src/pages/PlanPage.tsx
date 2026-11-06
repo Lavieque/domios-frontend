@@ -248,6 +248,12 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                     Falta: {suggestion.missingIngredients.map((i) => i.name).join(", ")}
                   </p>
                 )}
+                {suggestion.avoided && suggestion.avoided.avoidedBy.length > 0 && (
+                  <p className="muted suggestion-missing">
+                    {suggestion.avoided.avoidedBy.some((a) => a.severity === "Avoid") ? "Evitam" : "Limitam"}:{" "}
+                    {suggestion.avoided.avoidedBy.map((a) => a.name).join(", ")}
+                  </p>
+                )}
                 {suggestion.restrictions === RestrictionResult.Unverifiable && (
                   <p className="muted suggestion-missing">
                     Não deu para confirmar as restrições alimentares de todos os membros.

@@ -3195,6 +3195,52 @@ a.meal-title:hover {
   width: 100%;
 }
 
+/* Alimentos a evitar e objetivos de um membro. */
+.preference-panel {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.preference-note {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 14px;
+}
+
+.avoided-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avoided-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.avoided-row:first-child {
+  border-top: 0;
+}
+
+.avoided-name {
+  font-weight: 600;
+}
+
+.avoided-note {
+  flex: 1;
+  min-width: 8rem;
+  font-size: 14px;
+}
+
+.avoided-row .row-action {
+  margin-left: auto;
+}
+
 .member-row-form {
   display: block;
   padding: 1.1rem 1.1rem 1.25rem;

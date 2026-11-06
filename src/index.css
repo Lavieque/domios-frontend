@@ -4047,20 +4047,95 @@ a.meal-title:hover {
   margin-top: 0.5rem;
 }
 
-/* Aviso na receita: o que alguém da casa evita. */
-.avoided-notice-list,
-.avoided-notice-list ul {
+/* Aviso na receita: o que alguém da casa evita. Tinta navy, como os outros avisos;
+   fica a respirar entre a foto e o método, com a largura de leitura da receita. */
+.avoided-notice {
+  --avoided-line: color-mix(in srgb, var(--accent-2) 20%, transparent);
+  max-width: 54rem;
+  margin: 2.25rem 0 2.5rem;
+  padding: 1.1rem 1.35rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 35%, transparent);
+  border-radius: var(--radius);
+  background: var(--accent-2-soft);
+}
+
+.avoided-notice-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--accent-2);
+}
+
+.avoided-notice-head svg {
+  flex: none;
+}
+
+.avoided-notice-head h2 {
+  margin: 0;
+  font-size: 17px;
+  text-wrap: balance;
+}
+
+.avoided-notice-members,
+.avoided-notice-items {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.avoided-notice-list > li + li {
-  margin-top: 0.75rem;
+.avoided-notice-members {
+  margin-top: 0.85rem;
 }
 
-.avoided-notice-list ul {
+.avoided-notice-member {
   display: grid;
-  gap: 0.35rem;
-  margin-top: 0.35rem;
+  grid-template-columns: minmax(7rem, 10rem) minmax(0, 1fr);
+  gap: 0.35rem 1.25rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--avoided-line);
+}
+
+.avoided-notice-who {
+  font-weight: 600;
+}
+
+.avoided-notice-items {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.avoided-notice-items li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+}
+
+/* Mesma largura nas três etiquetas: o nome do alimento começa sempre no mesmo sítio. */
+.avoided-notice-items .pill {
+  min-width: 5.25rem;
+  justify-content: center;
+}
+
+/* Sobre a tinta navy, o cinza das etiquetas some-se: sobe para a cor da superfície. */
+.avoided-notice .pill-muted {
+  background: var(--surface);
+}
+
+.avoided-notice-foot {
+  margin: 0.15rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--avoided-line);
+  font-size: 13.5px;
+}
+
+@media (max-width: 640px) {
+  .avoided-notice {
+    margin: 1.75rem 0 2rem;
+    padding: 1rem 1rem 1.05rem;
+  }
+
+  .avoided-notice-member {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

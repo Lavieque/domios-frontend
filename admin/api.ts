@@ -124,6 +124,45 @@ export interface SystemStatus {
   email: { sender: string; configured: boolean; fromAddress: string | null; pending: number };
 }
 
+export interface CatalogProduct {
+  productId: string;
+  name: string;
+  brand: string | null;
+  category: { categoryId: string; name: string };
+  barcode: string | null;
+  /** ProductStatus: 0 Active, 1 Discontinued, 2 Seasonal. */
+  status: number;
+}
+
+export interface CatalogChain {
+  chainId: string;
+  name: string;
+  /** ChainStatus: 0 Active, 1 Closed. */
+  status: number;
+}
+
+export interface CatalogStore {
+  storeId: string;
+  chainId: string;
+  name: string;
+  address: string;
+  /** StoreStatus: 0 Active, 1 Closed. */
+  status: number;
+}
+
+export interface CatalogPromotion {
+  promotionId: string;
+  /** PromotionType: 0 PercentageOff, 1 FixedAmountOff, 2 BuyXGetY, 3 BundlePrice. */
+  type: number;
+  description: string;
+  startsAt: string;
+  endsAt: string;
+  requiresCard: boolean;
+  /** PromotionStatus: 0 Active, 1 Cancelled. */
+  status: number;
+  discountPercent: number | null;
+}
+
 const KEY = "domios.admin.session";
 const listeners = new Set<() => void>();
 
@@ -280,6 +319,16 @@ export const admin = {
     authed<void>(`/admin/households/${id}/members/${memberId}/role`, "POST", { role }),
   removeMember: (id: string, memberId: string) => authed<void>(`/admin/households/${id}/members/${memberId}`, "DELETE"),
   system: () => authed<SystemStatus>("/admin/system", "GET"),
+  products: (search: string, page: number) =>
+    authed<Paged<CatalogProduct>>(`/products${qs({ search, page, pageSize: 25, includeDiscontinued: "true" })}`, "GET"),
+  updateProduct: (id: string, body: { name?: string; brand?: string }) => authed<CatalogProduct>(`/products/${id}`, "PATCH", body),
+  discontinueProduct: (id: string) => authed<void>(`/products/${id}/discontinue`, "POST"),
+  chains: () => authed<CatalogChain[]>("/chains", "GET"),
+  setChainOpen: (id: string, open: boolean) => authed<void>(`/chains/${id}/${open ? "reopen" : "close"}`, "POST"),
+  stores: (page: number) => authed<Paged<CatalogStore>>(`/stores${qs({ page, pageSize: 25 })}`, "GET"),
+  setStoreOpen: (id: string, open: boolean) => authed<void>(`/stores/${id}/${open ? "reopen" : "close"}`, "POST"),
+  promotions: (status: string, page: number) => authed<Paged<CatalogPromotion>>(`/promotions${qs({ status, page, pageSize: 25 })}`, "GET"),
+  cancelPromotion: (id: string) => authed<void>(`/promotions/${id}/cancel`, "POST"),
   audit: (targetType: string | undefined, page: number) =>
     authed<Paged<AuditEntry>>(`/admin/audit${qs({ targetType, page, pageSize: 25 })}`, "GET"),
 };

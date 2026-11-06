@@ -9,6 +9,7 @@ import {
   getShoppingList,
   getShoppingListPackaging,
   getStoreComparison,
+  fillIngredientConversion,
   linkShoppingListItem,
   renameShoppingList,
   reopenShoppingList,
@@ -23,6 +24,7 @@ import {
   type ShoppingListItemDto,
   type StoreComparisonDto,
   type StoreComparisonStoreDto,
+  type MissingConversionDto,
   type StoreInPantryResultDto,
 } from "../api/shopping";
 import { PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
@@ -202,7 +204,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
               </button>
             )
           ) : (
-            <Comparison comparison={comparison} items={list.items} />
+            <Comparison comparison={comparison} items={list.items} householdId={householdId} onRecompare={compare} />
           )}
         </section>
       )}
@@ -645,7 +647,17 @@ function formatQuantity(amount: number, unit: MeasurementUnit): string {
   return `${quantityFormat.format(amount)} ${measurementUnitLabels[unit]}`;
 }
 
-function Comparison({ comparison, items }: { comparison: StoreComparisonDto; items: ShoppingListItemDto[] }) {
+function Comparison({
+  comparison,
+  items,
+  householdId,
+  onRecompare,
+}: {
+  comparison: StoreComparisonDto;
+  items: ShoppingListItemDto[];
+  householdId: string;
+  onRecompare: () => Promise<void>;
+}) {
   const labelOf = (itemId: string) => items.find((i) => i.shoppingListItemId === itemId)?.label ?? "?";
   const { split } = comparison;
   const best = comparison.stores[0];
@@ -698,7 +710,7 @@ function Comparison({ comparison, items }: { comparison: StoreComparisonDto; ite
       )}
 
       {stores.map((store) => (
-        <StoreBreakdown key={store.storeId} store={store} labelOf={labelOf} />
+        <StoreBreakdown key={store.storeId} store={store} labelOf={labelOf} householdId={householdId} onRecompare={onRecompare} />
       ))}
 
       {split.storeCount > 1 && split.savingVsBestStore > 0 && (
@@ -744,12 +756,85 @@ function Comparison({ comparison, items }: { comparison: StoreComparisonDto; ite
   );
 }
 
+/**
+ * A linha conta 1 embalagem porque falta o peso de uma unidade (ou a densidade). O valor fica no
+ * catálogo, para todas as casas, e só se ninguém o tiver escrito antes (Api, adenda 2026-11-06 (c)).
+ */
+function ConversionAsk({
+  householdId,
+  missing,
+  onSaved,
+}: {
+  householdId: string;
+  missing: MissingConversionDto;
+  onSaved: () => Promise<void>;
+}) {
+  const [grams, setGrams] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const isDensity = missing.field === "Density";
+
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    const value = Number(grams.replace(",", "."));
+    if (!Number.isFinite(value) || value <= 0) {
+      setError("Escreve um número maior que zero.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    try {
+      await fillIngredientConversion(
+        householdId,
+        missing.ingredientId,
+        isDensity ? { densityGramsPerMilliliter: value / 1000 } : { unitWeightGrams: value },
+      );
+      await onSaved();
+    } catch (err) {
+      setError(describeError(err));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form className="conversion-ask" onSubmit={submit}>
+      <label>
+        Conta 1 embalagem. {isDensity ? "1 l" : "1 un"} ≈{" "}
+        <input
+          type="text"
+          inputMode="decimal"
+          size={5}
+          value={grams}
+          onChange={(e) => setGrams(e.target.value)}
+          aria-label={isDensity ? "Gramas num litro" : "Gramas numa unidade"}
+        />{" "}
+        g
+      </label>{" "}
+      <button type="submit" className="link-button" disabled={saving || grams.trim() === ""}>
+        {saving ? "A guardar…" : "Guardar"}
+      </button>
+      <div className="muted">Fica para todas as casas.</div>
+      {error && (
+        <div className="form-error" role="alert">
+          {error}
+        </div>
+      )}
+    </form>
+  );
+}
+
 function StoreBreakdown({
   store,
   labelOf,
+  householdId,
+  onRecompare,
 }: {
   store: StoreComparisonStoreDto;
   labelOf: (itemId: string) => string;
+  householdId: string;
+  onRecompare: () => Promise<void>;
 }) {
   // Fechado por defeito: cada item já diz onde é mais barato, e a lista tem de caber no ecrã do corredor.
   return (
@@ -779,9 +864,12 @@ function StoreBreakdown({
                 <div className="muted">
                   {line.packageCount} × {line.packageQuantity > 0 ? formatQuantity(line.packageQuantity, line.packageUnit) : "embalagem"} a{" "}
                   {money.format(line.packagePrice)}
-                  {!line.quantityComparable && " · quantidade não comparável, conta 1 embalagem"}
+                  {!line.quantityComparable && !line.missingConversion && " · quantidade não comparável, conta 1 embalagem"}
                   {line.quantityConverted && " · quantidade aproximada"}
                 </div>
+                {line.missingConversion && (
+                  <ConversionAsk householdId={householdId} missing={line.missingConversion} onSaved={onRecompare} />
+                )}
               </td>
               <td className="num">
                 {money.format(line.lineTotal)}

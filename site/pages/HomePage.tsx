@@ -25,14 +25,21 @@ export function HomePage() {
         <ShelfDemo />
       </section>
 
-      <section id="como-funciona" className="band" aria-labelledby="judge-title">
-        <h2 id="judge-title">{h.judgeTitle}</h2>
-        <p className="band-intro">{h.judgeIntro}</p>
+      <section id="como-funciona" className="band judge" aria-labelledby="judge-title">
+        <div className="judge-intro">
+          <h2 id="judge-title">{h.judgeTitle}</h2>
+          <p className="band-intro">{h.judgeIntro}</p>
+        </div>
         <ol className="judge-list">
-          {h.judge.map((item) => (
+          {h.judge.map((item, i) => (
             <li key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
+              <span className="judge-n" aria-hidden="true">
+                {i + 1}
+              </span>
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </div>
             </li>
           ))}
         </ol>

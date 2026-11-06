@@ -22,17 +22,20 @@ function FeatureGroup({ title, keys }: { title: string; keys: FeatureKey[] }) {
   return (
     <section className="feature-group">
       <h3>{title}</h3>
-      <ul className="row-list">
+      <ul className="menu-labels">
         {ordered.map((key) => {
           const f = t.features[key];
           return (
             <li key={key}>
-              <Link to={to({ kind: "feature", key })} className="row-link">
-                <span className="row-name">{f.name}</span>
-                <span className="row-hint">{f.hint}</span>
-                <svg className="row-chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                  <path d="m7.5 4.5 5.5 5.5-5.5 5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+              {/* Each menu is a shelf label: the name on the body, one line of fact on the foot. */}
+              <Link to={to({ kind: "feature", key })} className="shelf-label menu-label">
+                <span className="menu-label-name">{f.name}</span>
+                <span className="menu-label-foot">
+                  <span className="menu-label-hint">{f.hint}</span>
+                  <svg className="row-chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="m7.5 4.5 5.5 5.5-5.5 5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
               </Link>
             </li>
           );

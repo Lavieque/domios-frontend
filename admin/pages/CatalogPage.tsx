@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import { admin, type CatalogCategory, type CatalogProduct, type CatalogPromotion, type CatalogStore } from "../api";
 import { ConfirmAction, PageHead, Pager, State } from "../components";
 import { dateOnly, useLoad } from "../hooks";
@@ -17,13 +18,17 @@ const TABS = [
 type Tab = (typeof TABS)[number]["value"];
 
 export function CatalogPage() {
-  const [tab, setTab] = useState<Tab>("products");
+  // The section lives in the address (?secao=receitas), so refresh and back keep it.
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("secao");
+  const tab: Tab = TABS.some((t) => t.value === requested) ? (requested as Tab) : "products";
+  const setTab = (value: Tab) => setParams(value === "products" ? {} : { secao: value }, { replace: true });
   return (
     <>
       <PageHead title="Catálogo" sub="Produtos, receitas, ingredientes, lojas e promoções. Cada alteração fica na auditoria; a recolha de preços continua a escrever à parte." />
-      <div className="chip-row" role="group" aria-label="Secção">
+      <div className="chip-row" role="tablist" aria-label="Secção">
         {TABS.map((t) => (
-          <button key={t.value} type="button" className="chip" aria-pressed={tab === t.value} onClick={() => setTab(t.value)}>
+          <button key={t.value} type="button" role="tab" className="chip" aria-selected={tab === t.value} onClick={() => setTab(t.value)}>
             {t.label}
           </button>
         ))}

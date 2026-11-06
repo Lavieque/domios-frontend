@@ -44,15 +44,17 @@ export function FeaturePage({ featureKey }: { featureKey: FeatureKey }) {
 
       <section className="band" aria-labelledby="next-title">
         <h2 id="next-title">{p.nextTitle}</h2>
-        <ul className="row-list next-list">
+        <ul className="menu-labels next-list">
           {f.next.map((key) => (
             <li key={key}>
-              <Link to={to({ kind: "feature", key })} className="row-link">
-                <span className="row-name">{t.features[key].name}</span>
-                <span className="row-hint">{t.features[key].hint}</span>
-                <svg className="row-chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                  <path d="m7.5 4.5 5.5 5.5-5.5 5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+              <Link to={to({ kind: "feature", key })} className="shelf-label menu-label">
+                <span className="menu-label-name">{t.features[key].name}</span>
+                <span className="menu-label-foot">
+                  <span className="menu-label-hint">{t.features[key].hint}</span>
+                  <svg className="row-chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="m7.5 4.5 5.5 5.5-5.5 5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
               </Link>
             </li>
           ))}

@@ -15,6 +15,7 @@ const groups: { title: string; links: MenuLink[] }[] = [
     links: [
       { to: "/", label: "Hoje", hint: "O dia de hoje", end: true },
       { to: "/plano", label: "Plano", hint: "Refeições da semana" },
+      { to: "/nutricao", label: "Nutrição", hint: "O que se come" },
       { to: "/despensa", label: "Despensa", hint: "O que há em casa" },
       { to: "/listas", label: "Listas", hint: "Compras por fazer" },
     ],

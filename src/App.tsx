@@ -14,6 +14,7 @@ import { MealPlanTemplateDetailPage } from "./pages/MealPlanTemplateDetailPage";
 import { MealPlanTemplatesPage } from "./pages/MealPlanTemplatesPage";
 import { PantryPage } from "./pages/PantryPage";
 import { PlanPage } from "./pages/PlanPage";
+import { NutritionPage } from "./pages/NutritionPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
@@ -101,6 +102,7 @@ function App() {
             <Route path="/ementas" element={<MealPlanTemplatesPage />} />
             <Route path="/ementas/:id" element={<MealPlanTemplateDetailPage />} />
             <Route path="/plano" element={<PlanPage />} />
+            <Route path="/nutricao" element={<NutritionPage />} />
             <Route path="/despensa" element={<PantryPage />} />
             <Route path="/despensa/adicionar" element={<AddPantryItemPage />} />
             <Route path="/listas" element={<ShoppingListsPage />} />

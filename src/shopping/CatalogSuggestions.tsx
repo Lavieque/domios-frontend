@@ -17,12 +17,13 @@ export function searchTerms(label: string): string[] {
   const text = label.trim();
   const words = text.split(/\s+/);
   const singular = words.map((w) => (w.length > 3 ? w.replace(/([^s])s$/i, "$1") : w)).join(" ");
-  return [...new Set([text, singular, words[0]])].filter((t) => t.length >= 2);
+  // Sem fallback para a primeira palavra: "Massa de tomate" → "Massa" sugeria tudo menos o que se queria.
+  return [...new Set([text, singular])].filter((t) => t.length >= 2);
 }
 
 /**
- * Ingredientes e produtos que combinam com o texto. Tenta o texto inteiro, depois o singular, depois a primeira
- * palavra, e fica com a primeira que der alguma coisa.
+ * Ingredientes e produtos que combinam com o texto. Tenta o texto inteiro, depois o singular, e fica com a
+ * primeira que der alguma coisa.
  */
 export function useCatalogSuggestions(text: string, enabled = true): Suggestions {
   const [state, setState] = useState<Suggestions>({ ingredients: [], products: [], loading: false });

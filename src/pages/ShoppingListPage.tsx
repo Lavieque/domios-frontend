@@ -61,7 +61,11 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [packaging, setPackaging] = useState<Map<string, ShoppingItemPackagingDto>>(new Map());
   // Modo "Ordenar": ids dos itens por comprar pela ordem que se está a montar; null fora do modo.
   const [draftOrder, setDraftOrder] = useState<string[] | null>(null);
-  const products = useProducts(list?.items.flatMap((item) => (item.productId && !item.isPurchased ? [item.productId] : [])) ?? []);
+  // Produtos das linhas (agrupar e miniaturas) e os das embalagens a comprar (miniatura das linhas só com ingrediente).
+  const products = useProducts([
+    ...(list?.items.flatMap((item) => (item.productId ? [item.productId] : [])) ?? []),
+    ...[...packaging.values()].map((p) => p.productId),
+  ]);
   const categories = useCategories();
 
   useEffect(() => {
@@ -157,6 +161,13 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   }
   const pending = list.items.filter((item) => !item.isPurchased);
   const purchased = list.items.filter((item) => item.isPurchased);
+  // Miniatura: a do produto da linha; numa linha só com ingrediente, a da embalagem que se vai comprar.
+  const thumbs = new Map<string, string>();
+  for (const item of list.items) {
+    const productId = item.productId ?? packaging.get(item.shoppingListItemId)?.productId;
+    const imageUrl = productId ? products.get(productId)?.imageUrl : null;
+    if (imageUrl) thumbs.set(item.shoppingListItemId, imageUrl);
+  }
   const notInPantry = purchased.filter((item) => !item.storedInPantryAt);
 
   return (
@@ -243,6 +254,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
               open={open}
               cheapest={cheapestByItem}
               packaging={packaging}
+              thumbs={thumbs}
               onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
               onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
               onLink={link}
@@ -251,7 +263,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
           {purchased.length > 0 && (
             <>
               <h2>Comprados ({purchased.length})</h2>
-              <ItemList items={purchased} open={open} packaging={packaging} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
+              <ItemList items={purchased} open={open} packaging={packaging} thumbs={thumbs} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
             </>
           )}
         </>
@@ -546,6 +558,7 @@ function PendingItems({
   open: boolean;
   cheapest: Map<string, { chainName: string; lineTotal: number }>;
   packaging: Map<string, ShoppingItemPackagingDto>;
+  thumbs: Map<string, string>;
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
   onLink: (item: ShoppingListItemDto, pick: CatalogPick) => void;
@@ -571,6 +584,7 @@ function ItemList({
   open,
   cheapest,
   packaging,
+  thumbs,
   onToggle,
   onDelete,
   onLink,
@@ -579,17 +593,35 @@ function ItemList({
   open: boolean;
   cheapest?: Map<string, { chainName: string; lineTotal: number }>;
   packaging?: Map<string, ShoppingItemPackagingDto>;
+  /** Imagem por linha; sem nenhuma nesta lista, não se reserva o espaço. */
+  thumbs?: Map<string, string>;
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
   onLink?: (item: ShoppingListItemDto, pick: CatalogPick) => void;
 }) {
   const [linking, setLinking] = useState<string | null>(null);
+  const withThumbs = thumbs !== undefined && items.some((item) => thumbs.has(item.shoppingListItemId));
   return (
     <ul className="pantry-list">
       {items.map((item) => (
         <li key={item.shoppingListItemId} className={`list-row${item.isPurchased ? " is-purchased" : ""}`}>
           <label className="item-check">
             <input type="checkbox" checked={item.isPurchased} disabled={!open} onChange={() => onToggle(item)} />
+            {withThumbs && (
+              <span className={`list-thumb${thumbs.has(item.shoppingListItemId) ? "" : " is-empty"}`} aria-hidden="true">
+                {thumbs.has(item.shoppingListItemId) && (
+                  <img
+                    src={thumbs.get(item.shoppingListItemId)}
+                    alt=""
+                    loading="lazy"
+                    // Imagem da loja que deixou de existir: fica a caixa vazia, sem o ícone partido.
+                    onError={(e) => {
+                      e.currentTarget.style.visibility = "hidden";
+                    }}
+                  />
+                )}
+              </span>
+            )}
             <span className="meal-title">{item.label}</span>
           </label>
           <span className="muted">

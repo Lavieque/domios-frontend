@@ -5,6 +5,8 @@ import { AppMenu } from "./components/AppMenu";
 import { EmailVerificationNotice } from "./components/EmailVerificationNotice";
 import { AccountPage } from "./pages/AccountPage";
 import { AddPantryItemPage } from "./pages/AddPantryItemPage";
+import { CookPage } from "./pages/CookPage";
+import { CookedRecipesPage } from "./pages/CookedRecipesPage";
 import { CreateHouseholdPage } from "./pages/CreateHouseholdPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { HouseholdHistoryPage } from "./pages/HouseholdHistoryPage";
@@ -105,6 +107,8 @@ function App() {
             <Route path="/nutricao" element={<NutritionPage />} />
             <Route path="/despensa" element={<PantryPage />} />
             <Route path="/despensa/adicionar" element={<AddPantryItemPage />} />
+            <Route path="/cozinhar" element={<CookPage />} />
+            <Route path="/cozinhar/feitas" element={<CookedRecipesPage />} />
             <Route path="/listas" element={<ShoppingListsPage />} />
             <Route path="/listas/:id" element={<ShoppingListPage />} />
             <Route path="/casa" element={<HouseholdPage />} />

@@ -24,6 +24,7 @@ import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
 import { useCategories } from "../catalog/useCategories";
 import { describeError } from "../auth/errors";
 import { BarcodeScanner } from "../components/BarcodeScanner";
+import { CookableTeaser } from "../components/CookableTeaser";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { AisleSign } from "../components/AisleSign";
@@ -156,6 +157,8 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
       <h1>Despensa</h1>
       <p className="page-sub">{household.name}</p>
       {notice && <p className="notice">{notice}</p>}
+
+      <CookableTeaser householdId={household.householdId} version={version} />
 
       <div className="filter-row">
         <SearchField value={search} label="Pesquisar na despensa" placeholder="Pesquisar artigo…" onChange={setSearch} />

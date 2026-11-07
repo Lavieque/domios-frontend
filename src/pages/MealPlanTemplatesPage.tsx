@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { searchMealPlanTemplates, type MealPlanTemplateSummaryDto } from "../api/mealPlanTemplates";
+import { Link, useSearchParams } from "react-router-dom";
+import {
+  listHouseholdMealPlanTemplates,
+  searchMealPlanTemplates,
+  type MealPlanTemplateSummaryDto,
+} from "../api/mealPlanTemplates";
+import { RecipeStatus } from "../api/types";
+import { useHouseholds } from "../household/useHouseholds";
 import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
@@ -44,6 +50,8 @@ export function MealPlanTemplatesPage() {
     <div className="page">
       <h1>Ementas prontas</h1>
       <p className="page-sub">Planos de uma semana, quinzena ou mês para aplicar ao teu plano a partir de um dia.</p>
+
+      <MyTemplates />
 
       <div className="toolbar">
         <SearchField
@@ -99,5 +107,41 @@ export function MealPlanTemplatesPage() {
 
       <Pagination page={page} pageSize={20} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
     </div>
+  );
+}
+
+/** As ementas da casa (as cópias personalizadas incluídas); sem nenhuma, não aparece. */
+function MyTemplates() {
+  const { current } = useHouseholds();
+  const [mine, setMine] = useState<MealPlanTemplateSummaryDto[]>([]);
+
+  useEffect(() => {
+    if (!current) return;
+    let active = true;
+    listHouseholdMealPlanTemplates(current.householdId)
+      .then((result) => active && setMine(result.items.filter((t) => t.status !== RecipeStatus.Archived)))
+      .catch(() => active && setMine([]));
+    return () => {
+      active = false;
+    };
+  }, [current]);
+
+  if (mine.length === 0) return null;
+
+  return (
+    <section className="panel">
+      <h2>As minhas ementas</h2>
+      <ul className="cookable-teaser-list">
+        {mine.map((template) => (
+          <li key={template.mealPlanTemplateId}>
+            <Link to={`/ementas/${template.mealPlanTemplateId}`}>{template.name}</Link>
+            <span className="pill pill-muted">
+              {template.durationDays} {template.durationDays === 1 ? "dia" : "dias"}
+            </span>
+            {template.status === RecipeStatus.Draft && <span className="pill pill-accent2">Editável</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

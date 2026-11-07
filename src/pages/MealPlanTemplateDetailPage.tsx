@@ -1,27 +1,49 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import { ApiError } from "../api/http";
-import { getMealPlanTemplate, type MealPlanTemplateDto } from "../api/mealPlanTemplates";
+import {
+  createHouseholdMealPlanTemplate,
+  getMealPlanTemplate,
+  replaceMealPlanTemplateEntries,
+  toEntryRequest,
+  type MealPlanTemplateDto,
+  type MealPlanTemplateEntryRequest,
+} from "../api/mealPlanTemplates";
 import {
   applyTemplate,
   ConflictPolicy,
   mealTypeLabels,
   type ApplyTemplateResultDto,
 } from "../api/planning";
-import { dishTypeLabels, mainProteinLabels } from "../api/types";
+import { dishTypeLabels, mainProteinLabels, RecipeStatus } from "../api/types";
 import { describeError } from "../auth/errors";
+import { TemplateDayEditor, type DayRow } from "../components/TemplateDayEditor";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { useHouseholds } from "../household/useHouseholds";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekdayName } from "../plan/dates";
 import { withoutNamePrefix } from "../plan/templates";
 
 export function MealPlanTemplateDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  // Receitas que ficaram de fora ao personalizar (vem da navegação da cópia).
+  const skippedOnCopy = (location.state as { skipped?: number } | null)?.skipped ?? 0;
+  const { current } = useHouseholds();
   const [template, setTemplate] = useState<MealPlanTemplateDto | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Dia aberto para editar, o erro dele e se está a guardar.
+  const [editingDay, setEditingDay] = useState<number | null>(null);
+  const [dayError, setDayError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [copying, setCopying] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
+    setTemplate(null);
+    setEditingDay(null);
     getMealPlanTemplate(id)
       .then(setTemplate)
       .catch((err: unknown) => setError(describeError(err)));
@@ -37,6 +59,63 @@ export function MealPlanTemplateDetailPage() {
   if (!template) return <p className="muted loading">A carregar…</p>;
 
   const days = Array.from({ length: template.durationDays }, (_, i) => i + 1);
+  // Só uma ementa da própria casa, ainda em rascunho, muda; as outras copiam-se primeiro.
+  const editable =
+    current !== null && template.ownerHouseholdId === current.householdId && template.status === RecipeStatus.Draft;
+  const loaded = template;
+
+  async function copyToHousehold() {
+    if (!current) return;
+    const usable = loaded.entries.filter((entry) => entry.recipeStatus === RecipeStatus.Published);
+    setCopyError(null);
+    setCopying(true);
+    try {
+      const copy = await createHouseholdMealPlanTemplate(current.householdId, {
+        name: `${loaded.name} (minha)`.slice(0, 120),
+        description: loaded.description,
+        durationDays: loaded.durationDays,
+        servingsBasis: loaded.servingsBasis,
+        tags: loaded.tags,
+        // Uma casa só usa receitas publicadas: as que deixaram de o ser ficam de fora da cópia.
+        entries: usable.map((entry) => toEntryRequest(entry, loaded.servingsBasis)),
+      });
+      const skipped = loaded.entries.length - usable.length;
+      navigate(`/ementas/${copy.mealPlanTemplateId}`, { state: { skipped } });
+    } catch (err) {
+      setCopyError(describeError(err));
+    } finally {
+      setCopying(false);
+    }
+  }
+
+  async function saveDay(dayIndex: number, rows: DayRow[]) {
+    setDayError(null);
+    setSaving(true);
+    const others: MealPlanTemplateEntryRequest[] = loaded.entries
+      .filter((entry) => entry.dayIndex !== dayIndex)
+      .map((entry) => toEntryRequest(entry, loaded.servingsBasis));
+    const day: MealPlanTemplateEntryRequest[] = rows.map((row, index) => ({
+      dayIndex,
+      mealType: row.mealType,
+      recipeId: row.recipeId,
+      servings: row.entry && row.entry.servings !== loaded.servingsBasis ? row.entry.servings : null,
+      notes: row.entry?.notes ?? null,
+      sortOrder: index,
+    }));
+    try {
+      setTemplate(await replaceMealPlanTemplateEntries(loaded.mealPlanTemplateId, [...others, ...day]));
+      setEditingDay(null);
+    } catch (err) {
+      setDayError(
+        describeError(err, {
+          "invalid-argument": "A mesma receita está duas vezes na mesma refeição deste dia.",
+          "forbidden-recipe-scope": "Essa receita não pode entrar nesta ementa.",
+        }),
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="page">
@@ -53,15 +132,74 @@ export function MealPlanTemplateDetailPage() {
         <HouseholdGate>{(household) => <ApplyTemplateForm household={household} template={template} />}</HouseholdGate>
       </section>
 
+      {editable && skippedOnCopy > 0 && (
+        <p className="notice">
+          {skippedOnCopy === 1
+            ? "1 receita da ementa original já não está disponível e ficou de fora da cópia."
+            : `${skippedOnCopy} receitas da ementa original já não estão disponíveis e ficaram de fora da cópia.`}
+        </p>
+      )}
+
+      {current && !editable && (
+        <div className="notice template-copy">
+          <span>
+            {template.ownerHouseholdId === current.householdId
+              ? "Esta ementa já foi publicada e não muda. Faz uma cópia para a editar."
+              : "Queres trocar receitas? Faz uma cópia desta ementa para a tua casa e edita os dias."}
+          </span>
+          <button type="button" className="button-secondary" disabled={copying} onClick={copyToHousehold}>
+            {copying ? "A copiar…" : "Personalizar esta ementa"}
+          </button>
+          {copyError && (
+            <p className="form-error" role="alert">
+              {copyError}
+            </p>
+          )}
+        </div>
+      )}
+
       <h2>
         {template.durationDays} dias · {template.servingsBasis} doses
+        {editable && <span className="muted"> · carrega em “Editar” num dia para trocar receitas</span>}
       </h2>
       <div className="week-grid">
         {days.map((dayIndex) => {
           const entries = template.entries.filter((entry) => entry.dayIndex === dayIndex);
+          if (editingDay === dayIndex) {
+            return (
+              <section key={dayIndex} className="day-card is-editing">
+                <TemplateDayEditor
+                  dayIndex={dayIndex}
+                  entries={entries}
+                  saving={saving}
+                  error={dayError}
+                  onSave={(rows) => saveDay(dayIndex, rows)}
+                  onCancel={() => {
+                    setEditingDay(null);
+                    setDayError(null);
+                  }}
+                />
+              </section>
+            );
+          }
           return (
             <section key={dayIndex} className="day-card">
-              <h3 className="day-title">Dia {dayIndex}</h3>
+              <h3 className="day-title">
+                Dia {dayIndex}
+                {editable && editingDay === null && (
+                  <button
+                    type="button"
+                    className="link-button day-edit"
+                    aria-label={`Editar dia ${dayIndex}`}
+                    onClick={() => {
+                      setDayError(null);
+                      setEditingDay(dayIndex);
+                    }}
+                  >
+                    Editar
+                  </button>
+                )}
+              </h3>
               {entries.length === 0 && <p className="muted day-empty">Sem refeições.</p>}
               <ul className="day-meals">
                 {entries.map((entry) => (

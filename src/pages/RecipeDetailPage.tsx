@@ -6,8 +6,10 @@ import { addItemsFromRecipe, getShoppingList } from "../api/shopping";
 import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
 import { RecipeAvoidedNotice } from "../components/RecipeAvoidedNotice";
+import { SaveRecipeButton } from "../components/SaveRecipeButton";
 import { SendToListForm } from "../components/SendToListForm";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { useHouseholds } from "../household/useHouseholds";
 import { longDate, startOfWeek, today } from "../plan/dates";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
@@ -34,6 +36,7 @@ type Task = "plan" | "list" | null;
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { current } = useHouseholds();
   const [recipe, setRecipe] = useState<RecipeDto | null>(null);
   const [added, setAdded] = useState<PlannedMealDto | null>(null);
   const [onlyMissing, setOnlyMissing] = useState(true);
@@ -155,6 +158,8 @@ export function RecipeDetailPage() {
             >
               Pôr na lista de compras
             </button>
+            {/* Sem casa não há onde guardar: o botão simplesmente não aparece. */}
+            {current && <SaveRecipeButton householdId={current.householdId} recipeId={recipe.recipeId} />}
           </div>
 
           {recipe.sourceUrl && (

@@ -2423,6 +2423,115 @@ a.meal-title:hover {
   padding-top: 0;
 }
 
+.cookable-teaser {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.cookable-teaser h2 {
+  margin: 0;
+}
+
+.cookable-teaser-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cookable-teaser-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.day-card.is-editing {
+  grid-column: 1 / -1;
+}
+
+.day-edit {
+  margin-left: 0.5rem;
+  font-size: 13px;
+}
+
+.day-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.day-editor-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.day-editor-rows li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.day-editor-title {
+  flex: 1 1 12rem;
+}
+
+.day-editor-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.recipe-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.recipe-picker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recipe-picker-option {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.25rem;
+  border: none;
+  border-top: 1px solid var(--line);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recipe-picker-option:hover,
+.recipe-picker-option:focus-visible {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.template-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .suggestion-missing {
   margin: 0;
   font-size: 13.5px;

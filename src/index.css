@@ -2758,6 +2758,28 @@ a.meal-title:hover {
   min-height: 32px;
 }
 
+.list-thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.list-thumb img {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.list-row.is-purchased .list-thumb img {
+  opacity: 0.5;
+}
+
 .item-check input,
 .checkbox-field input {
   width: 22px;

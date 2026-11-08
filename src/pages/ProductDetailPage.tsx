@@ -1,7 +1,9 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../api/client";
+import { addShoppingListItem } from "../api/shopping";
 import {
+  MeasurementUnit,
   measurementUnitLabels,
   ProductStatus,
   StoreOfferAvailability,
@@ -14,7 +16,9 @@ import { useCategories } from "../catalog/useCategories";
 import { AisleSign } from "../components/AisleSign";
 import { EventTimeline } from "../components/EventTimeline";
 import { PromotionBadge } from "../components/PromotionBadge";
+import { SendToListForm } from "../components/SendToListForm";
 import { InsightNotes, LabelPrice, PriceRange, VerdictBand } from "../components/ShelfLabel";
+import { useHouseholds } from "../household/useHouseholds";
 
 const dateFormat = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short" });
 
@@ -24,6 +28,7 @@ export function ProductDetailPage() {
   const [product, setProduct] = useState<ProductDto | null>(null);
   const offers = useOffers(id ?? "");
   const categories = useCategories();
+  const { current } = useHouseholds();
 
   useEffect(() => {
     if (!id) return;
@@ -110,6 +115,21 @@ export function ProductDetailPage() {
               <Link to={`/despensa/adicionar?produto=${product.productId}`} className="button-primary">
                 Adicionar à despensa
               </Link>
+              {current && (
+                <SendToListForm
+                  householdId={current.householdId}
+                  newListName="Compras"
+                  submitLabel="Adicionar à lista"
+                  send={async (listId) => ({
+                    list: await addShoppingListItem(current.householdId, listId, {
+                      label: product.name,
+                      quantity: { amount: 1, unit: MeasurementUnit.Unit },
+                      productId: product.productId,
+                    }),
+                    added: 1,
+                  })}
+                />
+              )}
             </div>
           ) : (
             <p className="notice" style={{ marginTop: "1.5rem" }}>

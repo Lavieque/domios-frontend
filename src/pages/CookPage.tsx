@@ -53,8 +53,8 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
       {!result && !error && <p className="muted loading">A carregar…</p>}
 
       {result && (
-        <div className="plan-panels">
-          <section className="panel">
+        <div className="cook-sections">
+          <section className="cook-section">
             <h2>As tuas receitas</h2>
             {result.saved.length === 0 ? (
               <p className="muted">
@@ -66,7 +66,7 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
             )}
           </section>
 
-          <section className="panel">
+          <section className="cook-section">
             <h2>Também dá para fazer</h2>
             {result.others.length === 0 ? (
               <p className="muted">

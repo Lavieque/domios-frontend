@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
 import { RecipeVerdict, SavedRecipeOrigin, type CookableRecipeDto } from "../api/savedRecipes";
 import { shortDate } from "../plan/dates";
-import { RecipeThumb } from "./RecipeThumb";
+import { RecipePhoto } from "./RecipePhoto";
+import { ShelfLabel } from "./ShelfLabel";
 
 const verdictLabels: Record<RecipeVerdict, string> = {
   [RecipeVerdict.CanCook]: "Tens tudo",
@@ -21,23 +21,24 @@ interface Props {
   onRemove?: (recipeId: string) => void;
 }
 
-/** Receitas com o que a despensa cobre: veredito, o que falta e o que está a expirar. */
+/** Receitas com o que a despensa cobre, em cartões como os de /receitas: veredito, o que falta e o que está a expirar. */
 export function CookableRecipeList({ recipes, onRemove }: Props) {
   return (
-    <ul className="suggestion-list">
-      {recipes.map((recipe) => (
-        <li key={recipe.recipeId} className="recipe-row">
-          <RecipeThumb recipeId={recipe.recipeId} imageUrl={recipe.imageUrl} />
-          <div className="recipe-row-body">
-            <Link to={`/receitas/${recipe.recipeId}`} className="meal-title">
-              {recipe.title}
-            </Link>
+    <div className="recipe-grid">
+      {recipes.map((recipe, index) => (
+        <div key={recipe.recipeId} className="cook-card">
+          <ShelfLabel
+            to={`/receitas/${recipe.recipeId}`}
+            index={index}
+            className="recipe-card"
+            media={<RecipePhoto imageUrl={recipe.imageUrl} />}
+          >
+            <div className="recipe-card-title">{recipe.title}</div>
             <div className="recipe-card-pills">
               <span className={verdictPill[recipe.verdict]}>{verdictLabels[recipe.verdict]}</span>
               <span className="pill pill-muted">
                 {recipe.availableCount}/{recipe.requiredCount} ingredientes
               </span>
-              {recipe.expiringIngredients.length > 0 && <span className="pill pill-warning">Aproveita o que está a expirar</span>}
               {recipe.savedOrigin === SavedRecipeOrigin.ShoppingList && (
                 <span className="pill pill-muted">Compraste para esta</span>
               )}
@@ -46,23 +47,23 @@ export function CookableRecipeList({ recipes, onRemove }: Props) {
               )}
             </div>
             {recipe.missingIngredients.length > 0 && (
-              <p className="muted suggestion-missing">Falta: {recipe.missingIngredients.map((i) => i.name).join(", ")}</p>
+              <p className="muted cook-card-note clamp-3">
+                Falta: {recipe.missingIngredients.map((i) => i.name).join(", ")}
+              </p>
             )}
             {recipe.expiringIngredients.length > 0 && (
-              <p className="muted suggestion-missing">
+              <p className="cook-card-note cook-card-expiring clamp-3">
                 A expirar: {recipe.expiringIngredients.map((i) => `${i.name} (${shortDate(i.expiresAt)})`).join(", ")}
               </p>
             )}
-            {onRemove && recipe.savedOrigin !== null && (
-              <div>
-                <button type="button" className="link-button" onClick={() => onRemove(recipe.recipeId)}>
-                  Remover das guardadas
-                </button>
-              </div>
-            )}
-          </div>
-        </li>
+          </ShelfLabel>
+          {onRemove && recipe.savedOrigin !== null && (
+            <button type="button" className="link-button cook-card-action" onClick={() => onRemove(recipe.recipeId)}>
+              Remover das guardadas
+            </button>
+          )}
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }

@@ -4,7 +4,8 @@ import type { CallerHouseholdDto } from "../api/households";
 import { listCookedRecipes, saveRecipe, type CookedRecipeDto } from "../api/savedRecipes";
 import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
-import { RecipeThumb } from "../components/RecipeThumb";
+import { RecipePhoto } from "../components/RecipePhoto";
+import { ShelfLabel } from "../components/ShelfLabel";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { longDate, type IsoDate } from "../plan/dates";
 
@@ -79,38 +80,32 @@ function Cooked({ household }: { household: CallerHouseholdDto }) {
       )}
 
       {items !== null && items.length > 0 && (
-        <section className="panel">
-          <ul className="suggestion-list">
-            {items.map((item) => (
-              <li key={item.recipeId} className="recipe-row">
-                <RecipeThumb recipeId={item.recipeId} imageUrl={item.imageUrl} linked={item.isReadable} />
-                <div className="recipe-row-body">
-                  {item.isReadable ? (
-                    <Link to={`/receitas/${item.recipeId}`} className="meal-title">
-                      {item.title}
-                    </Link>
-                  ) : (
-                    <span className="meal-title">{item.title}</span>
-                  )}
-                  <div className="recipe-card-pills">
-                    <span className="pill pill-accent2">
-                      {item.timesCooked} {item.timesCooked === 1 ? "vez" : "vezes"}
-                    </span>
-                    <span className="pill pill-muted">Última a {longDate(localDay(item.lastCookedAt))}</span>
-                    {item.isSaved && <span className="pill pill-muted">Guardada</span>}
-                  </div>
-                  {item.isReadable && !item.isSaved && (
-                    <div>
-                      <button type="button" className="link-button" onClick={() => save(item.recipeId)}>
-                        Guardar para fazer outra vez
-                      </button>
-                    </div>
-                  )}
+        <div className="recipe-grid">
+          {items.map((item, index) => (
+            <div key={item.recipeId} className="cook-card">
+              <ShelfLabel
+                to={item.isReadable ? `/receitas/${item.recipeId}` : undefined}
+                index={index}
+                className="recipe-card"
+                media={<RecipePhoto imageUrl={item.imageUrl} />}
+              >
+                <div className="recipe-card-title">{item.title}</div>
+                <div className="recipe-card-pills">
+                  <span className="pill pill-accent2">
+                    {item.timesCooked} {item.timesCooked === 1 ? "vez" : "vezes"}
+                  </span>
+                  <span className="pill pill-muted">Última a {longDate(localDay(item.lastCookedAt))}</span>
+                  {item.isSaved && <span className="pill pill-muted">Guardada</span>}
                 </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+              </ShelfLabel>
+              {item.isReadable && !item.isSaved && (
+                <button type="button" className="link-button cook-card-action" onClick={() => save(item.recipeId)}>
+                  Guardar para fazer outra vez
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       )}
 
       <Pagination

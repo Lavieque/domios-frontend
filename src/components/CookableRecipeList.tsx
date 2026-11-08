@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { RecipeVerdict, SavedRecipeOrigin, type CookableRecipeDto } from "../api/savedRecipes";
 import { shortDate } from "../plan/dates";
+import { RecipeThumb } from "./RecipeThumb";
 
 const verdictLabels: Record<RecipeVerdict, string> = {
   [RecipeVerdict.CanCook]: "Tens tudo",
@@ -25,38 +26,41 @@ export function CookableRecipeList({ recipes, onRemove }: Props) {
   return (
     <ul className="suggestion-list">
       {recipes.map((recipe) => (
-        <li key={recipe.recipeId}>
-          <Link to={`/receitas/${recipe.recipeId}`} className="meal-title">
-            {recipe.title}
-          </Link>
-          <div className="recipe-card-pills">
-            <span className={verdictPill[recipe.verdict]}>{verdictLabels[recipe.verdict]}</span>
-            <span className="pill pill-muted">
-              {recipe.availableCount}/{recipe.requiredCount} ingredientes
-            </span>
-            {recipe.expiringIngredients.length > 0 && <span className="pill pill-warning">Aproveita o que está a expirar</span>}
-            {recipe.savedOrigin === SavedRecipeOrigin.ShoppingList && (
-              <span className="pill pill-muted">Compraste para esta</span>
+        <li key={recipe.recipeId} className="recipe-row">
+          <RecipeThumb recipeId={recipe.recipeId} imageUrl={recipe.imageUrl} />
+          <div className="recipe-row-body">
+            <Link to={`/receitas/${recipe.recipeId}`} className="meal-title">
+              {recipe.title}
+            </Link>
+            <div className="recipe-card-pills">
+              <span className={verdictPill[recipe.verdict]}>{verdictLabels[recipe.verdict]}</span>
+              <span className="pill pill-muted">
+                {recipe.availableCount}/{recipe.requiredCount} ingredientes
+              </span>
+              {recipe.expiringIngredients.length > 0 && <span className="pill pill-warning">Aproveita o que está a expirar</span>}
+              {recipe.savedOrigin === SavedRecipeOrigin.ShoppingList && (
+                <span className="pill pill-muted">Compraste para esta</span>
+              )}
+              {recipe.plannedOn.length > 0 && (
+                <span className="pill pill-muted">No plano: {recipe.plannedOn.map(shortDate).join(", ")}</span>
+              )}
+            </div>
+            {recipe.missingIngredients.length > 0 && (
+              <p className="muted suggestion-missing">Falta: {recipe.missingIngredients.map((i) => i.name).join(", ")}</p>
             )}
-            {recipe.plannedOn.length > 0 && (
-              <span className="pill pill-muted">No plano: {recipe.plannedOn.map(shortDate).join(", ")}</span>
+            {recipe.expiringIngredients.length > 0 && (
+              <p className="muted suggestion-missing">
+                A expirar: {recipe.expiringIngredients.map((i) => `${i.name} (${shortDate(i.expiresAt)})`).join(", ")}
+              </p>
+            )}
+            {onRemove && recipe.savedOrigin !== null && (
+              <div>
+                <button type="button" className="link-button" onClick={() => onRemove(recipe.recipeId)}>
+                  Remover das guardadas
+                </button>
+              </div>
             )}
           </div>
-          {recipe.missingIngredients.length > 0 && (
-            <p className="muted suggestion-missing">Falta: {recipe.missingIngredients.map((i) => i.name).join(", ")}</p>
-          )}
-          {recipe.expiringIngredients.length > 0 && (
-            <p className="muted suggestion-missing">
-              A expirar: {recipe.expiringIngredients.map((i) => `${i.name} (${shortDate(i.expiresAt)})`).join(", ")}
-            </p>
-          )}
-          {onRemove && recipe.savedOrigin !== null && (
-            <div>
-              <button type="button" className="link-button" onClick={() => onRemove(recipe.recipeId)}>
-                Remover das guardadas
-              </button>
-            </div>
-          )}
         </li>
       ))}
     </ul>

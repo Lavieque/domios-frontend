@@ -4,6 +4,7 @@ import type { CallerHouseholdDto } from "../api/households";
 import { listCookedRecipes, saveRecipe, type CookedRecipeDto } from "../api/savedRecipes";
 import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
+import { RecipeThumb } from "../components/RecipeThumb";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { longDate, type IsoDate } from "../plan/dates";
 
@@ -81,28 +82,31 @@ function Cooked({ household }: { household: CallerHouseholdDto }) {
         <section className="panel">
           <ul className="suggestion-list">
             {items.map((item) => (
-              <li key={item.recipeId}>
-                {item.isReadable ? (
-                  <Link to={`/receitas/${item.recipeId}`} className="meal-title">
-                    {item.title}
-                  </Link>
-                ) : (
-                  <span className="meal-title">{item.title}</span>
-                )}
-                <div className="recipe-card-pills">
-                  <span className="pill pill-accent2">
-                    {item.timesCooked} {item.timesCooked === 1 ? "vez" : "vezes"}
-                  </span>
-                  <span className="pill pill-muted">Última a {longDate(localDay(item.lastCookedAt))}</span>
-                  {item.isSaved && <span className="pill pill-muted">Guardada</span>}
-                </div>
-                {item.isReadable && !item.isSaved && (
-                  <div>
-                    <button type="button" className="link-button" onClick={() => save(item.recipeId)}>
-                      Guardar para fazer outra vez
-                    </button>
+              <li key={item.recipeId} className="recipe-row">
+                <RecipeThumb recipeId={item.recipeId} imageUrl={item.imageUrl} linked={item.isReadable} />
+                <div className="recipe-row-body">
+                  {item.isReadable ? (
+                    <Link to={`/receitas/${item.recipeId}`} className="meal-title">
+                      {item.title}
+                    </Link>
+                  ) : (
+                    <span className="meal-title">{item.title}</span>
+                  )}
+                  <div className="recipe-card-pills">
+                    <span className="pill pill-accent2">
+                      {item.timesCooked} {item.timesCooked === 1 ? "vez" : "vezes"}
+                    </span>
+                    <span className="pill pill-muted">Última a {longDate(localDay(item.lastCookedAt))}</span>
+                    {item.isSaved && <span className="pill pill-muted">Guardada</span>}
                   </div>
-                )}
+                  {item.isReadable && !item.isSaved && (
+                    <div>
+                      <button type="button" className="link-button" onClick={() => save(item.recipeId)}>
+                        Guardar para fazer outra vez
+                      </button>
+                    </div>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-PT"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;font-family:Archivo,sans-serif;background:#fff;color:#141414}
+.shell{display:grid;grid-template-columns:232px 1fr;height:900px}
+.rail{background:#f2c230;padding:28px 22px;display:flex;flex-direction:column;gap:6px}
+.brand{font:900 26px/1 Archivo;font-stretch:80%;letter-spacing:-.01em;margin-bottom:28px;display:flex;gap:10px;align-items:center}
+.rail a{display:flex;justify-content:space-between;align-items:center;font:700 17px/1 Archivo;padding:12px 12px;border-radius:6px;color:#141414;text-decoration:none}
+.rail a.on{background:#141414;color:#f2c230}
+.rail a small{font:600 13px Archivo;opacity:.7}
+.rail .sep{height:1px;background:rgba(20,20,20,.25);margin:14px 4px}
+.main{padding:34px 44px;display:grid;grid-template-columns:1fr 360px;gap:36px}
+.sheet{display:grid;grid-template-columns:200px 1fr;border-top:6px solid #141414}
+.day{padding-top:14px}
+.day .dow{font:800 20px Archivo;font-stretch:75%;text-transform:uppercase;letter-spacing:.04em}
+.day .num{font:900 210px/0.82 Archivo;font-stretch:62%;letter-spacing:-.04em;color:#d4261c;margin-top:8px}
+.day .mon{font:800 22px Archivo;font-stretch:75%;text-transform:uppercase}
+.day .saint{font:500 14px/1.4 Archivo;color:#555;margin-top:14px;max-width:170px}
+.meal{padding:18px 0 0 28px;border-left:1px solid #141414}
+.slot{font:800 14px Archivo;text-transform:uppercase;letter-spacing:.08em;color:#d4261c}
+.dish{font:900 56px/0.95 Archivo;font-stretch:72%;letter-spacing:-.02em;margin:8px 0 16px;max-width:620px}
+.photo{height:250px;border-radius:4px;background:linear-gradient(135deg,#8a4a1e,#d98a3a 45%,#f0c46a);margin-bottom:18px}
+.ready{display:flex;gap:14px;align-items:center;font:600 16px Archivo}
+.dot{width:12px;height:12px;border-radius:50%;background:#2f6b3a}
+.btn{font:800 16px Archivo;padding:14px 22px;border-radius:6px;background:#141414;color:#fff;border:0}
+.btn.alt{background:#fff;color:#141414;border:2px solid #141414}
+.actions{display:flex;gap:12px;margin-top:20px}
+.next{display:flex;gap:0;margin-top:26px;border-top:1px solid #141414}
+.next div{flex:1;padding:12px 16px;border-right:1px solid #ddd}
+.next b{font:900 34px Archivo;font-stretch:62%;margin-right:10px}
+.next span{font:700 16px Archivo}
+.next em{display:block;font:500 13px Archivo;font-style:normal;color:#666;margin-top:4px}
+.side h3{font:900 22px Archivo;font-stretch:75%;text-transform:uppercase;letter-spacing:.02em;border-top:6px solid #141414;padding-top:12px;margin-bottom:10px}
+.row{display:grid;grid-template-columns:30px 1fr auto;align-items:center;padding:11px 0;border-bottom:1px solid #e5e5e5;font:600 16px Archivo}
+.ph{border-radius:50%;background:#d4261c;justify-self:center}
+.row small{font:500 13px Archivo;color:#666}
+.list{margin-top:30px}
+.big{font:900 64px/1 Archivo;font-stretch:62%}
+.price{font:800 15px Archivo;background:#f2c230;padding:3px 8px;border-radius:4px}
+</style></head><body>
+<div class="shell">
+<nav class="rail">
+ <div class="brand"><svg width="28" height="28" viewBox="0 0 120 120"><polyline points="30,72 30,46 60,20 90,46 90,72" fill="none" stroke="#141414" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><polyline points="52,88 52,62 82,36 112,62 112,88" fill="none" stroke="#d4261c" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>DomiOS</div>
+ <a class="on" href="#">Hoje</a>
+ <a href="#">Semana <small>Plano</small></a>
+ <a href="#">Despensa <small>3 a acabar</small></a>
+ <a href="#">Compras <small>7 itens</small></a>
+ <div class="sep"></div>
+ <a href="#">Receitas</a>
+ <a href="#">Preços</a>
+ <div class="sep"></div>
+ <a href="#">Casa</a>
+</nav>
+<main class="main">
+ <section>
+  <div class="sheet">
+   <div class="day"><div class="dow">Segunda-feira</div><div class="num">9</div><div class="mon">Novembro</div><div class="saint">Outono · época de castanhas, couve e laranja</div></div>
+   <div class="meal">
+    <div class="slot">Jantar de hoje · 4 pessoas</div>
+    <div class="dish">Arroz de pato com laranja</div>
+    <div class="photo"></div>
+    <div class="ready"><span class="dot"></span>Tens 6 de 8 ingredientes · faltam pato e laranjas</div>
+    <div class="actions"><button class="btn">Cozinhar</button><button class="btn alt">Pôr o que falta na lista</button></div>
+   </div>
+  </div>
+  <div class="next">
+   <div><b>10</b><span>Bacalhau à Brás</span><em>Tens tudo</em></div>
+   <div><b>11</b><span>Sopa de legumes</span><em>Faltam 2</em></div>
+   <div><b>12</b><span>Por planear</span><em>Sugerir com o que há</em></div>
+  </div>
+ </section>
+ <aside class="side">
+  <h3>Usar primeiro</h3>
+  <div class="row"><span class="ph" style="width:18px;height:18px"></span><span>Iogurte natural<br><small>Frigorífico · aberto</small></span><b style="color:#d4261c">hoje</b></div>
+  <div class="row"><span class="ph" style="width:13px;height:13px"></span><span>Couve portuguesa<br><small>Frigorífico</small></span><b>2 dias</b></div>
+  <div class="row"><span class="ph" style="width:8px;height:8px;background:#141414"></span><span>Pão de forma<br><small>Despensa</small></span><b>5 dias</b></div>
+  <div class="list">
+   <h3>Compras da semana</h3>
+   <div class="big">7 <span style="font:700 18px Archivo">por comprar</span></div>
+   <div class="row" style="grid-template-columns:1fr auto"><span>Mais barato no Continente</span><span class="price">32,40 €</span></div>
+   <div class="row" style="grid-template-columns:1fr auto"><span>Azeite a preço mínimo de 90 dias</span><span class="price">6,49 €</span></div>
+  </div>
+ </aside>
+</main>
+</div>
+</body></html>

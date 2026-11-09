@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-PT"><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;font-family:system-ui,Segoe UI,sans-serif;background:#f7f7f5;color:#1a1a1a}
+.shell{display:grid;grid-template-columns:240px 1fr;height:900px}
+nav{background:#fff;border-right:1px solid #e6e6e2;padding:28px 18px}
+nav b{display:block;font:800 22px system-ui;margin-bottom:28px}
+nav a{display:block;padding:11px 12px;border-radius:8px;font:600 15px system-ui;color:#444;text-decoration:none}
+nav a.on{background:#e8f3ec;color:#2e7d4f}
+main{padding:36px 44px}
+h1{font:700 32px system-ui;margin-bottom:6px}
+.sub{color:#666;margin-bottom:26px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:22px}
+.card{background:#fff;border:1px solid #e6e6e2;border-radius:14px;overflow:hidden}
+.ph{height:280px;background:linear-gradient(135deg,#8a4a1e,#e0a04a)}
+.cb{padding:22px}
+.cb h2{font:700 26px system-ui;margin:6px 0 10px}
+.pill{display:inline-block;background:#e8f3ec;color:#2e7d4f;font:600 13px system-ui;padding:4px 10px;border-radius:999px}
+.btn{margin-top:16px;background:#2e7d4f;color:#fff;border:0;padding:12px 20px;border-radius:10px;font:600 15px system-ui}
+.mini{padding:20px}
+.mini h3{font:700 17px system-ui;margin-bottom:12px}
+.mini div{display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid #f0f0ec;font-size:15px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-top:22px}
+.w{background:#fff;border:1px solid #e6e6e2;border-radius:12px;height:130px;overflow:hidden}
+.w i{display:block;height:64px;background:#e9dccb}
+.w p{padding:8px 10px;font:600 13px system-ui}
+</style></head><body>
+<div class="shell">
+<nav><b>DomiOS</b><a class="on" href="#">Início</a><a href="#">Plano de refeições</a><a href="#">Despensa</a><a href="#">Lista de compras</a><a href="#">Receitas</a><a href="#">Preços</a></nav>
+<main>
+ <h1>Boa noite, Virgílio</h1><div class="sub">Segunda-feira, 9 de novembro</div>
+ <div class="grid">
+  <div class="card"><div class="ph"></div><div class="cb"><span class="pill">Jantar de hoje</span><h2>Arroz de pato com laranja</h2><div style="color:#666">45 min · 4 pessoas · faltam 2 ingredientes</div><button class="btn">Ver receita</button></div></div>
+  <div>
+   <div class="card mini"><h3>A expirar</h3><div>Iogurte natural<span>hoje</span></div><div>Couve portuguesa<span>2 dias</span></div><div>Pão de forma<span>5 dias</span></div></div>
+   <div class="card mini" style="margin-top:22px"><h3>Lista de compras</h3><div>7 itens<span>32,40 €</span></div></div>
+  </div>
+ </div>
+ <div class="week"><div class="w"><i></i><p>Seg · Arroz de pato</p></div><div class="w"><i></i><p>Ter · Bacalhau</p></div><div class="w"><i></i><p>Qua · Sopa</p></div><div class="w"><i></i><p>Qui · —</p></div><div class="w"><i></i><p>Sex · Frango</p></div><div class="w"><i></i><p>Sáb · Cozido</p></div><div class="w"><i></i><p>Dom · Restos</p></div></div>
+</main>
+</div>
+</body></html>

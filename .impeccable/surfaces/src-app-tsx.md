@@ -7,24 +7,26 @@ related_targets: ["src/index.css"]
 
 ## Scope
 
-Whole DomiOS web app (shell plus every route in `src/App.tsx`). Mode: Operate. Households planning at a computer and shopping on a phone.
+Whole DomiOS web app (shell plus every route in `src/App.tsx`). Mode: Operate. Redesign started 2026-11-09: household first, warm kitchen tone, palette free. First pass: new world, navigation and Hoje (finish review run 2026-11-09: two rounds, disposition fix with open items listed below). Second pass (2026-11-09): shared legacy components restyled into the world, then Semana, Despensa and Compras (index and list) migrated. Third pass (2026-11-09): Receitas (catalog and recipe page) and Cozinhar (cookable and cooked) migrated to recipe rows and the recipe sheet; finish review run, disposition fix, fixes applied. Fourth pass (2026-11-09): Ementas (index and template page) migrated; finish review run, disposition fix, fixes applied. Still to migrate: Nutrição, Preços/Produtos, Promoções, Casa, Conta, auth pages.
+
+Open from the Hoje finish review: FORM seed reference could not be corroborated on this machine; saint of the day and moon phase not in the day column; the same pantry item can appear in both Usar primeiro and Sugestões.
 
 ## Task and content
 
-Read real prices and their 90-day verdict, find products, plan the week, use the pantry in FIFO order, run shopping lists in the aisle and pick the cheapest store. The article detail is a first-class screen: photo, price, verdict, history range, where to buy. Base colour tokens in `src/index.css` stay byte-identical (user, 2026-10-30); category hues are added on top.
+Hoje answers "what do we eat tonight": the planned meal with its photo and readiness against the pantry, the next days, what to use first, the open list. Price truth (90-day verdict, cheapest store) stays, as a lens inside lists, pantry and the product page, not the centre. Phone use in the aisle is first-class: bottom navigation under 900px, list first.
 
 ## Direction contract
 
-THESIS: The supermarket's own wayfinding: every product carries the colour of its aisle, and that colour is how you find things in the catalog, the pantry and the shopping list. Refuses the grid of identical railed labels and the bold-everything density.
+THESIS: The household lives by days. Each day is a tear-off calendar sheet: a huge day number and what is eaten on it. Refuses the dashboard of equal panels and the price-catalog centre.
 
-OWN-WORLD: Base palette unchanged (cool paper, white surface, teal "good now", navy structure). Six muted aisle hues (fresh red, fish blue, pantry olive, bakery yellow, dairy sky, home plum) used only where a category appears: chip dot, photo field, group marker. Schibsted Grotesk at 400 body, 600 titles, 800 only for prices. Soft corners (10px cards, 16px photo fields, pill chips and verdicts), hairlines, no rails, no shadows at rest.
+OWN-WORLD: Portuguese tear-off calendar and Borda d'Água almanac. Almanac yellow owns the shell (side rail on desktop, bottom bar on phone); white newsprint ground; black ink; calendar red for today, Sundays and what is running out; one green for "tens tudo". Archivo at condensed widths for numerals and dish names, normal width for UI. Thick black rules head sections; no card chrome, no shadows.
 
-STORY: The household sees what a thing is, what it costs, whether that is good and where it is cheapest, then adds it to the pantry; lists are filled from the list page, the plan and recipes.
+STORY: The family member opens the app, sees today's sheet, knows tonight's dish and whether the ingredients are home, then cooks or sends what is missing to the list.
 
-FIRST VIEWPORT: Article detail: crumb, then two columns: a 16px-rounded photo field tinted in the aisle hue, and the name, brand and pack, a 64px price, the verdict pill, unit and card price, the 90-day range and the actions. Below, "Onde comprar": one row per store with a bar scaled to price, cheapest in teal. Catalog: aisle chips with colour dots over a grid of photo cards.
+FIRST VIEWPORT: Rail left (Hoje, Semana, Despensa, Compras; then Receitas, Preços; then Casa). Main: today's sheet, day number ~200px red condensed on the left column with weekday, month and season line; right of a black rule the slot label, dish name ~56px condensed, photo, readiness line, Cozinhar primary and "Pôr o que falta na lista". Below, the next three days as a strip of sheet edges. Right column: Usar primeiro with urgency dots sized by days left, then the open list with count and cheapest store.
 
-FORM: Cores por categoria (user-steered free-palette round, then base palette restored by the user), IMPECCABLE'S PICK of that round; seed:6d3837fa1aa324e6
+FORM: Folha do Dia (calendário de folhas e almanaque), candidate 5 of 7 on the grounded list. Raises: split-flap (days are rows ranked by time; the number column never moves), star atlas (urgency is dot size on a fixed ramp), Metro (the dish name is the interface, no card frame). seed:2bf3a171adf69c21
 
-SIGNATURE: Aisle colour as wayfinding: one hue per top category, from the chip to the photo field to the shopping-list group. Motion: store bars grow left to right once on load, ordered by price.
+SIGNATURE: Today's sheet. Motion: on day change the sheet tears up and the next sheet slides into place, once; reduced motion swaps instantly.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

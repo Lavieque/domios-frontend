@@ -1,0 +1,231 @@
+{
+ "title": "Novo mundo visual do DomiOS: casa primeiro, cozinha calorosa",
+ "question": "A tiragem atribuiu a Folha do Dia (calendário de folhas e almanaque). Paleta agora livre. Fica com ela, escolhe uma alternativa ou tira de novo.",
+ "options": [
+  {
+   "id": "folha-do-dia",
+   "kind": "assigned",
+   "label": "A Folha do Dia",
+   "kicker": "THE ROLL",
+   "lineage": "Calendário de folhas de arrancar e almanaque Borda d'Água",
+   "thesis": "A casa vive por dias: cada dia é uma folha com número grande e o que se come nele; o vermelho marca o que é hoje e o que está a acabar.",
+   "palette": [
+    "#ffffff",
+    "#f2c230",
+    "#141414",
+    "#d4261c",
+    "#2f6b3a"
+   ],
+   "materials": [
+    "papel de jornal branco",
+    "amarelo do almanaque",
+    "numerais pretos e domingos a vermelho"
+   ],
+   "viewport": "Hoje: folha do dia com o número enorme à esquerda e o jantar com foto; amanhã e depois espreitam como folhas por baixo; ao lado, o que usar primeiro e a lista aberta.",
+   "risk": "Se os numerais forem tímidos vira agenda genérica; o amarelo tem de ser casca da app, não enfeite.",
+   "raised": [
+    {
+     "from": "signals-instruments-split-flap-concourse",
+     "raise": "Os dias são linhas vivas ordenadas pelo tempo; a coluna do número nunca se mexe."
+    },
+    {
+     "from": "notation-diagram-systems-star-atlas",
+     "raise": "A urgência da despensa é o tamanho do ponto, numa escala fixa: quanto mais perto do fim, maior a fase."
+    },
+    {
+     "from": "digital-design-canon-metro-typographic-tiles",
+     "raise": "O nome do prato é a interface: grande, sem moldura de cartão à volta."
+    }
+   ],
+   "html": ".impeccable/mocks/decision/folha-do-dia.html"
+  },
+  {
+   "id": "prato-do-dia",
+   "kind": "pick",
+   "label": "Prato do Dia",
+   "kicker": "IMPECCABLE’S PICK",
+   "lineage": "A folha do prato do dia colada na montra da tasca",
+   "thesis": "A casa como tasca da família: hoje há isto, e está tudo na despensa.",
+   "palette": [
+    "#ffffff",
+    "#1f3a93",
+    "#d9472b",
+    "#6b7f2a",
+    "#1a1a1a"
+   ],
+   "materials": [
+    "folha de montra",
+    "esferográfica azul",
+    "fotografia de comida"
+   ],
+   "viewport": "Hoje abre com o prato do dia em grande, foto a toda a largura, 'tens tudo' ou 'faltam 2' e os botões Cozinhar e Pôr na lista; a semana em baixo como ementa da casa.",
+   "risk": "É onde muitas apps de receitas aterram: foto grande e título; arrisca parecer catálogo de receitas.",
+   "html": ".impeccable/mocks/decision/prato-do-dia.html"
+  },
+  {
+   "id": "c-flap",
+   "kind": "challenger",
+   "catalogId": "signals-instruments-split-flap-concourse",
+   "label": "Quadro de partidas",
+   "verdict": "declined",
+   "lineage": "Quadro split-flap de estação",
+   "thesis": "Refeições como partidas, a semana como quadro.",
+   "palette": [
+    "#111111",
+    "#ffffff",
+    "#f2a900"
+   ],
+   "materials": [
+    "palhetas pretas",
+    "letras brancas"
+   ],
+   "viewport": "Quadro de linhas por hora.",
+   "risk": "Frio e de transportes; a família não se reconhece.",
+   "case": "Perde nos dois eixos: ninguém pensa no jantar como partida.",
+   "kept": "Linhas ordenadas pelo tempo com colunas fixas.",
+   "hero": "https://impeccable.style/worlds/cards/signals-instruments-split-flap-concourse-hero.webp"
+  },
+  {
+   "id": "c-metro",
+   "kind": "challenger",
+   "catalogId": "digital-design-canon-metro-typographic-tiles",
+   "label": "Mosaicos Metro",
+   "verdict": "declined",
+   "lineage": "Interface Metro de mosaicos",
+   "thesis": "Cores por corredor como mosaicos vivos.",
+   "palette": [
+    "#000000",
+    "#00aba9",
+    "#ffffff"
+   ],
+   "materials": [
+    "mosaicos planos",
+    "minúsculas gigantes"
+   ],
+   "viewport": "Panorama de mosaicos.",
+   "risk": "Lê-se como um sistema operativo antigo, não como casa.",
+   "case": "Perde nos dois eixos: lê-se como sistema operativo, não como casa.",
+   "kept": "O texto é a interface, sem moldura.",
+   "hero": "https://impeccable.style/worlds/cards/digital-design-canon-metro-typographic-tiles-hero.webp"
+  },
+  {
+   "id": "c-acetato",
+   "kind": "challenger",
+   "catalogId": "rw-manual-acetate-tab-board",
+   "label": "Manual com separadores",
+   "verdict": "declined",
+   "lineage": "Manual de software com separadores de cor",
+   "thesis": "Cada área da casa um separador de cor.",
+   "palette": [
+    "#e8a21b",
+    "#f4f1e8",
+    "#2a6a78"
+   ],
+   "materials": [
+    "acetato",
+    "separadores"
+   ],
+   "viewport": "Manual aberto num separador.",
+   "risk": "Técnico e de escritório.",
+   "case": "Perde nos dois eixos: a cozinha não é um manual.",
+   "kept": "Cada divisão com uma cor de corpo inteiro.",
+   "hero": "https://impeccable.style/worlds/cards/rw-manual-acetate-tab-board-hero.webp"
+  },
+  {
+   "id": "c-saville",
+   "kind": "challenger",
+   "catalogId": "brand-identity-canon-saville-catalog-sleeve",
+   "label": "Catálogo codificado",
+   "verdict": "declined",
+   "lineage": "Capas de catálogo de editora",
+   "thesis": "Tudo é uma entrada numerada.",
+   "palette": [
+    "#111111",
+    "#ffffff"
+   ],
+   "materials": [
+    "preto mate",
+    "código de cores"
+   ],
+   "viewport": "Índice numerado.",
+   "risk": "Hermético; esconde o que importa.",
+   "case": "Perde nos dois eixos: códigos em vez de palavras falham na cozinha.",
+   "kept": "Um índice que é o único mapa.",
+   "hero": "https://impeccable.style/worlds/cards/brand-identity-canon-saville-catalog-sleeve-hero.webp"
+  },
+  {
+   "id": "c-atlas",
+   "kind": "challenger",
+   "catalogId": "notation-diagram-systems-star-atlas",
+   "label": "Atlas celeste",
+   "verdict": "declined",
+   "lineage": "Atlas de estrelas",
+   "thesis": "A despensa como céu de pontos por magnitude.",
+   "palette": [
+    "#0f1e3a",
+    "#f5f5f0",
+    "#d24b2a"
+   ],
+   "materials": [
+    "fundo navy",
+    "pontos por magnitude"
+   ],
+   "viewport": "Carta de pontos.",
+   "risk": "Poético mas lento para decidir o jantar.",
+   "case": "Perde nos dois eixos.",
+   "kept": "Importância pelo diâmetro do ponto numa escala fixa.",
+   "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-star-atlas-hero.webp"
+  },
+  {
+   "id": "c-crouwel",
+   "kind": "challenger",
+   "catalogId": "crouwel-grid-specimen",
+   "label": "Grelha Crouwel",
+   "verdict": "declined",
+   "lineage": "Espécime tipográfico em grelha",
+   "thesis": "A semana construída numa grelha visível.",
+   "palette": [
+    "#ffffff",
+    "#1e3a5c",
+    "#2a6a78"
+   ],
+   "materials": [
+    "grelha de construção",
+    "letras de células"
+   ],
+   "viewport": "Grelha da semana.",
+   "risk": "Frio e de cartaz.",
+   "case": "Perde nos dois eixos.",
+   "kept": "A grelha como estrutura visível.",
+   "hero": "https://impeccable.style/worlds/cards/crouwel-grid-specimen-hero.webp"
+  }
+ ],
+ "reroll": {
+  "registers": [
+   "safer",
+   "bolder"
+  ]
+ },
+ "buildPath": {
+  "value": "code"
+ },
+ "canon": true,
+ "canonCard": {
+  "kind": "canon",
+  "label": "O padrão da categoria",
+  "thesis": "App de planeamento de refeições como as do mercado, bem feita.",
+  "palette": [
+   "#ffffff",
+   "#1a1a1a",
+   "#2e7d4f"
+  ],
+  "materials": [
+   "cartões com foto",
+   "barra de separadores em baixo"
+  ],
+  "viewport": "Saudação, cartão do jantar com foto, carrossel da semana, atalhos.",
+  "risk": "Indistinguível das outras apps de refeições.",
+  "html": ".impeccable/mocks/decision/canon-casa.html"
+ },
+ "steer": true
+}

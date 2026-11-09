@@ -57,9 +57,13 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
   }
 
   return (
-    <div className="page">
-      <h1>Listas de compras</h1>
-      <p className="page-sub">{household.name}</p>
+    <div className="page lists-page">
+      <header className="page-head">
+        <div>
+          <h1>Listas de compras</h1>
+          <p className="page-head-sub">{household.name}</p>
+        </div>
+      </header>
 
       <div className="lists-toolbar">
         <div className="chip-row" role="group" aria-label="Estado">
@@ -96,15 +100,20 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
         !loading && (
           <ul className="pantry-list">
             {lists.map((list) => (
-              <li key={list.shoppingListId} className="list-row">
-                <Link to={`/listas/${list.shoppingListId}`} className="meal-title">
-                  {list.name}
+              <li key={list.shoppingListId} className="lists-row">
+                <Link to={`/listas/${list.shoppingListId}`} className="lists-row-link">
+                  <span className="list-tally-count" aria-hidden="true">
+                    {list.itemCount - list.purchasedItemCount}
+                  </span>
+                  <span className="lists-row-text">
+                    <span className="lists-row-name">{list.name}</span>
+                    <span className="lists-row-meta">
+                      {list.itemCount === 0
+                        ? "Vazia"
+                        : `${list.itemCount - list.purchasedItemCount} por comprar · ${list.purchasedItemCount} de ${list.itemCount} comprados`}
+                    </span>
+                  </span>
                 </Link>
-                <span className="muted">
-                  {list.itemCount === 0
-                    ? "Vazia"
-                    : `${list.purchasedItemCount} de ${list.itemCount} comprados`}
-                </span>
               </li>
             ))}
           </ul>

@@ -39,21 +39,42 @@ export function MealPlanTemplateDetailPage() {
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
+  // O dia cujo editor acabou de fechar: o foco volta ao "Editar" dele.
+  const [closedDay, setClosedDay] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (closedDay === null || editingDay !== null) return;
+    document.querySelector<HTMLElement>(`[data-edit-day="${closedDay}"]`)?.focus();
+    setClosedDay(null);
+  }, [closedDay, editingDay]);
 
   useEffect(() => {
     if (!id) return;
+    let active = true;
     setTemplate(null);
+    setError(null);
     setEditingDay(null);
     getMealPlanTemplate(id)
-      .then(setTemplate)
-      .catch((err: unknown) => setError(describeError(err)));
+      .then((data) => active && setTemplate(data))
+      .catch((err: unknown) => active && setError(describeError(err)));
+    return () => {
+      active = false;
+    };
   }, [id]);
 
   if (error) {
     return (
-      <p className="form-error" role="alert">
-        {error}
-      </p>
+      <div className="page template-page">
+        <header className="page-head">
+          <h1>Ementa</h1>
+        </header>
+        <p className="form-error" role="alert">
+          Não deu para abrir esta ementa. {error}
+        </p>
+        <p className="empty-state">
+          <Link to="/ementas">Voltar às ementas</Link>
+        </p>
+      </div>
     );
   }
   if (!template) return <p className="muted loading">A carregar…</p>;
@@ -105,6 +126,7 @@ export function MealPlanTemplateDetailPage() {
     try {
       setTemplate(await replaceMealPlanTemplateEntries(loaded.mealPlanTemplateId, [...others, ...day]));
       setEditingDay(null);
+      setClosedDay(dayIndex);
     } catch (err) {
       setDayError(
         describeError(err, {
@@ -117,20 +139,29 @@ export function MealPlanTemplateDetailPage() {
     }
   }
 
+  const description = template.description ? withoutNamePrefix(template.description, template.name) : null;
+
   return (
-    <div className="page">
+    <div className="page template-page">
       <nav className="crumb" aria-label="Caminho">
         <Link to="/ementas" className="back-link">
           Ementas prontas
         </Link>
       </nav>
-      <h1>{template.name}</h1>
-      {template.description && <p className="page-lede">{withoutNamePrefix(template.description, template.name)}</p>}
-
-      <section className="panel">
-        <h2>Aplicar ao plano</h2>
-        <HouseholdGate>{(household) => <ApplyTemplateForm household={household} template={template} />}</HouseholdGate>
-      </section>
+      <header className="page-head">
+        <div>
+          <h1>{template.name}</h1>
+          <p className="page-head-sub">
+            {template.durationDays} {template.durationDays === 1 ? "dia" : "dias"} · {template.entries.length}{" "}
+            {template.entries.length === 1 ? "refeição" : "refeições"} · {template.servingsBasis}{" "}
+            {template.servingsBasis === 1 ? "dose" : "doses"} por refeição
+          </p>
+        </div>
+        <a href="#template-apply" className="button-primary button-lg template-jump">
+          Aplicar ao plano
+        </a>
+      </header>
+      {description && <p className="page-lede template-lede">{description}</p>}
 
       {editable && skippedOnCopy > 0 && (
         <p className="notice">
@@ -140,89 +171,126 @@ export function MealPlanTemplateDetailPage() {
         </p>
       )}
 
-      {current && !editable && (
-        <div className="notice template-copy">
-          <span>
-            {template.ownerHouseholdId === current.householdId
-              ? "Esta ementa já foi publicada e não muda. Faz uma cópia para a editar."
-              : "Queres trocar receitas? Faz uma cópia desta ementa para a tua casa e edita os dias."}
-          </span>
-          <button type="button" className="button-secondary" disabled={copying} onClick={copyToHousehold}>
-            {copying ? "A copiar…" : "Personalizar esta ementa"}
-          </button>
-          {copyError && (
-            <p className="form-error" role="alert">
-              {copyError}
-            </p>
-          )}
-        </div>
-      )}
-
-      <h2>
-        {template.durationDays} dias · {template.servingsBasis} doses
-        {editable && <span className="muted"> · carrega em “Editar” num dia para trocar receitas</span>}
-      </h2>
-      <div className="week-grid">
-        {days.map((dayIndex) => {
-          const entries = template.entries.filter((entry) => entry.dayIndex === dayIndex);
-          if (editingDay === dayIndex) {
+      <div className="week-layout template-layout">
+        {/* Os dias da ementa em linhas, como no plano: o número fica sempre na mesma coluna. */}
+        <h2 id="template-days" className="visually-hidden">
+          Dias
+        </h2>
+        <ol className="week-days" aria-labelledby="template-days">
+          {days.map((dayIndex) => {
+            const entries = template.entries.filter((entry) => entry.dayIndex === dayIndex);
+            const isEditing = editingDay === dayIndex;
             return (
-              <section key={dayIndex} className="day-card is-editing">
-                <TemplateDayEditor
-                  dayIndex={dayIndex}
-                  entries={entries}
-                  saving={saving}
-                  error={dayError}
-                  onSave={(rows) => saveDay(dayIndex, rows)}
-                  onCancel={() => {
-                    setEditingDay(null);
-                    setDayError(null);
-                  }}
-                />
-              </section>
-            );
-          }
-          return (
-            <section key={dayIndex} className="day-card">
-              <h3 className="day-title">
-                Dia {dayIndex}
-                {editable && editingDay === null && (
-                  <button
-                    type="button"
-                    className="link-button day-edit"
-                    aria-label={`Editar dia ${dayIndex}`}
-                    onClick={() => {
+              <li key={dayIndex} className={isEditing ? "week-day is-editing" : "week-day"}>
+                <div className="week-day-date">
+                  <span className="week-day-weekday template-day-label">Dia</span>
+                  <span className="week-day-number">{dayIndex}</span>
+                  {editable && !isEditing && (
+                    <button
+                      type="button"
+                      className="link-button template-day-edit"
+                      aria-label={`Editar dia ${dayIndex}`}
+                      data-edit-day={dayIndex}
+                      disabled={editingDay !== null}
+                      onClick={() => {
+                        setDayError(null);
+                        setEditingDay(dayIndex);
+                      }}
+                    >
+                      Editar
+                    </button>
+                  )}
+                </div>
+                {isEditing ? (
+                  <TemplateDayEditor
+                    dayIndex={dayIndex}
+                    entries={entries}
+                    saving={saving}
+                    error={dayError}
+                    onSave={(rows) => saveDay(dayIndex, rows)}
+                    onCancel={() => {
+                      setEditingDay(null);
                       setDayError(null);
-                      setEditingDay(dayIndex);
+                      setClosedDay(dayIndex);
                     }}
-                  >
-                    Editar
-                  </button>
+                  />
+                ) : entries.length === 0 ? (
+                  <p className="week-day-empty">Sem refeições.</p>
+                ) : (
+                  <ul className="week-day-meals">
+                    {entries.map((entry) => (
+                      <li key={entry.mealPlanTemplateEntryId} className="week-meal">
+                        <span className="week-meal-slot">{mealTypeLabels[entry.mealType]}</span>
+                        <span className="week-meal-body">
+                          {entry.recipeStatus === RecipeStatus.Published ? (
+                            <Link to={`/receitas/${entry.recipeId}`} className="week-meal-dish">
+                              {entry.recipeTitle}
+                            </Link>
+                          ) : (
+                            <span className="week-meal-dish is-unavailable">{entry.recipeTitle}</span>
+                          )}
+                          <span className="week-meal-meta">
+                            {[
+                              entry.dishType !== null ? dishTypeLabels[entry.dishType] : null,
+                              entry.mainProtein !== null ? mainProteinLabels[entry.mainProtein] : null,
+                              entry.servings !== template.servingsBasis
+                                ? `${entry.servings} ${entry.servings === 1 ? "dose" : "doses"}`
+                                : null,
+                              entry.recipeStatus !== RecipeStatus.Published ? "Já não está disponível" : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              </h3>
-              {entries.length === 0 && <p className="muted day-empty">Sem refeições.</p>}
-              <ul className="day-meals">
-                {entries.map((entry) => (
-                  <li key={entry.mealPlanTemplateEntryId} className={entry.recipeImageUrl ? "has-thumb" : undefined}>
-                    {entry.recipeImageUrl && <img className="meal-thumb" src={entry.recipeImageUrl} alt="" loading="lazy" />}
-                    <span className="meal-type">{mealTypeLabels[entry.mealType]}</span>
-                    <Link to={`/receitas/${entry.recipeId}`} className="meal-title">
-                      {entry.recipeTitle}
-                    </Link>
-                    <span className="meal-meta muted">
-                      {[
-                        entry.dishType !== null ? dishTypeLabels[entry.dishType] : null,
-                        entry.mainProtein !== null ? mainProteinLabels[entry.mainProtein] : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              </li>
+            );
+          })}
+        </ol>
+
+        <aside className="week-side template-side">
+          <section className="side-block" aria-labelledby="template-apply">
+            <div className="side-head">
+              <h2 id="template-apply">Aplicar ao plano</h2>
+            </div>
+            <HouseholdGate>{(household) => <ApplyTemplateForm household={household} template={template} />}</HouseholdGate>
+          </section>
+
+          {current && !editable && (
+            <section className="side-block" aria-labelledby="template-copy">
+              <div className="side-head">
+                <h2 id="template-copy">Personalizar</h2>
+              </div>
+              <p className="side-empty">
+                {template.ownerHouseholdId === current.householdId
+                  ? "Esta ementa já foi publicada e não muda. Faz uma cópia para a editar."
+                  : "Queres trocar receitas? Faz uma cópia desta ementa para a tua casa e edita os dias."}
+              </p>
+              <button type="button" className="button-secondary" disabled={copying} onClick={copyToHousehold}>
+                {copying ? "A copiar…" : "Fazer uma cópia para editar"}
+              </button>
+              {copyError && (
+                <p className="form-error" role="alert">
+                  {copyError}
+                </p>
+              )}
             </section>
-          );
-        })}
+          )}
+
+          {editable && (
+            <section className="side-block" aria-labelledby="template-edit">
+              <div className="side-head">
+                <h2 id="template-edit">Editar</h2>
+              </div>
+              <p className="side-empty">
+                Esta ementa é da tua casa: carrega em “Editar” num dia para trocar, acrescentar ou tirar receitas.
+              </p>
+            </section>
+          )}
+        </aside>
       </div>
     </div>
   );
@@ -285,12 +353,15 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
         <p className="notice">
           {result.createdCount === 0
             ? "Nada foi acrescentado ao plano."
-            : `${result.createdCount} refeições acrescentadas de ${longDate(result.from)} a ${longDate(result.to)}.`}
-          {result.removedCount > 0 && ` ${result.removedCount} refeições substituídas.`}
+            : `${result.createdCount} ${result.createdCount === 1 ? "refeição acrescentada" : "refeições acrescentadas"} de ${longDate(result.from)} a ${longDate(result.to)}.`}
+          {result.removedCount > 0 &&
+            ` ${result.removedCount} ${result.removedCount === 1 ? "refeição substituída" : "refeições substituídas"}.`}
           {result.skippedMeals.length > 0 &&
             ` ${result.skippedMeals.length} ${result.skippedMeals.length === 1 ? "refeição do plano já estava ocupada e ficou" : "refeições do plano já estavam ocupadas e ficaram"} como estava${result.skippedMeals.length === 1 ? "" : "m"}.`}
           {result.skippedEntries.length > 0 &&
-            ` ${result.skippedEntries.length} receitas da ementa já não estão disponíveis e foram saltadas.`}
+            (result.skippedEntries.length === 1
+              ? " 1 receita da ementa já não está disponível e foi saltada."
+              : ` ${result.skippedEntries.length} receitas da ementa já não estão disponíveis e foram saltadas.`)}
         </p>
         {result.restrictionWarnings.length > 0 && (
           <div className="notice notice-warning">
@@ -356,7 +427,7 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
         </p>
       )}
       <button type="submit" className="button-primary" disabled={submitting}>
-        {submitting ? "A aplicar…" : `Aplicar a ${household.name}`}
+        {submitting ? "A aplicar…" : "Aplicar ao plano"}
       </button>
     </form>
   );

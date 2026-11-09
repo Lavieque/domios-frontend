@@ -38,12 +38,16 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
   }
 
   return (
-    <div className="page">
-      <h1>O que posso cozinhar</h1>
-      <p className="page-sub">Com o que tens na despensa de {household.name}</p>
-      <p>
-        <Link to="/cozinhar/feitas">Ver as receitas que já fizeste</Link>
-      </p>
+    <div className="page cook-page">
+      <header className="page-head">
+        <div>
+          <h1>O que posso cozinhar</h1>
+          <p className="page-head-sub">Com o que tens na despensa de {household.name}</p>
+        </div>
+        <Link to="/cozinhar/feitas" className="button-secondary">
+          Receitas já feitas
+        </Link>
+      </header>
 
       {error && (
         <p className="form-error" role="alert">
@@ -54,7 +58,7 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
 
       {result && (
         <div className="cook-sections">
-          <section className="cook-section">
+          <section className="panel cook-section">
             <h2>As tuas receitas</h2>
             {result.saved.length === 0 ? (
               <p className="muted">
@@ -66,7 +70,7 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
             )}
           </section>
 
-          <section className="cook-section">
+          <section className="panel cook-section">
             <h2>Também dá para fazer</h2>
             {result.others.length === 0 ? (
               <p className="muted">

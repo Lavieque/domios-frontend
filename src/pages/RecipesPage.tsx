@@ -11,7 +11,8 @@ import {
 } from "../api/types";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
-import { ShelfLabel } from "../components/ShelfLabel";
+import { describeError } from "../auth/errors";
+import { RecipeRow } from "../components/RecipeRow";
 
 const count = new Intl.NumberFormat("pt-PT");
 const dishTypes = Object.values(DishType) as DishType[];
@@ -33,6 +34,8 @@ export function RecipesPage() {
   const [recipes, setRecipes] = useState<RecipeSummaryDto[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const filtered = search !== "" || dishType !== undefined || mainProtein !== undefined;
 
   function applyFilters(next: { search?: string; page?: number; dishType?: DishType | null; mainProtein?: MainProtein | null }) {
     const nextSearch = next.search ?? search;
@@ -49,19 +52,41 @@ export function RecipesPage() {
   }
 
   useEffect(() => {
+    let active = true;
     setLoading(true);
+    setError(null);
     searchRecipes(search, page, 20, { dishType, mainProtein })
       .then((result) => {
+        if (!active) return;
         setRecipes(result.items);
         setTotal(result.total);
       })
-      .finally(() => setLoading(false));
+      .catch((err: unknown) => active && setError(describeError(err)))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
   }, [search, page, dishType, mainProtein]);
 
+  // O total só se diz quando a Api o deu; com filtros é o que eles encontram, não o catálogo.
+  const countLine = loading
+    ? "A procurar…"
+    : error
+      ? "Para cozinhar, planear ou pôr na lista"
+      : filtered
+        ? `${count.format(total)} ${total === 1 ? "receita" : "receitas"} com estes filtros`
+        : `${count.format(total)} receitas publicadas, para cozinhar, planear ou pôr na lista`;
+
   return (
-    <div className="page">
-      <h1>Receitas</h1>
-      <p className="page-sub">Receitas publicadas, para cozinhar, planear ou pôr na lista.</p>
+    <div className="page recipes-page">
+      <header className="page-head">
+        <div>
+          <h1>Receitas</h1>
+          <p className="page-head-sub" aria-live="polite">
+            {countLine}
+          </p>
+        </div>
+      </header>
 
       <div className="toolbar">
         <SearchField
@@ -102,52 +127,43 @@ export function RecipesPage() {
         ))}
       </div>
 
-      <p className="results-count">{loading ? "A procurar…" : `${count.format(total)} receitas`}</p>
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
 
-      {!loading && recipes.length === 0 ? (
+      {error ? null : !loading && recipes.length === 0 ? (
         <p className="empty-state">Sem receitas com estes filtros.</p>
       ) : (
         !loading && (
-          <div className="recipe-grid">
-            {recipes.map((recipe, index) => (
-              <ShelfLabel
-                key={recipe.recipeId}
-                to={`/receitas/${recipe.recipeId}`}
-                index={index}
-                className="recipe-card"
-                media={
-                  recipe.imageUrl ? (
-                    <div className="recipe-photo">
-                      <img src={recipe.imageUrl} alt="" loading="lazy" />
-                    </div>
-                  ) : undefined
-                }
-              >
-                <div className="recipe-card-title">{recipe.title}</div>
-                <div className="label-meta">
+          <ul className="recipe-rows">
+            {recipes.map((recipe) => (
+              <RecipeRow key={recipe.recipeId} title={recipe.title} to={`/receitas/${recipe.recipeId}`} imageUrl={recipe.imageUrl}>
+                <span className="recipe-row-meta">
                   {[
                     recipe.dishType !== null ? dishTypeLabels[recipe.dishType] : null,
                     recipe.mainProtein !== null ? mainProteinLabels[recipe.mainProtein] : null,
+                    recipeDifficultyLabels[recipe.difficulty],
                   ]
                     .filter(Boolean)
-                    .join(" · ") || "Receita"}
-                </div>
-                <div className="recipe-card-pills">
-                  <span className="pill pill-accent2">{recipeDifficultyLabels[recipe.difficulty]}</span>
-                  {recipe.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="pill pill-muted">
-                      {tag}
-                    </span>
-                  ))}
-                  {recipe.tags.length > 3 && <span className="muted meal-meta">+{recipe.tags.length - 3}</span>}
-                </div>
-              </ShelfLabel>
+                    .join(" · ")}
+                </span>
+                {recipe.tags.length > 0 && (
+                  <span className="recipe-row-tags">
+                    {recipe.tags.slice(0, 4).join(", ")}
+                    {recipe.tags.length > 4 && ` e mais ${recipe.tags.length - 4}`}
+                  </span>
+                )}
+              </RecipeRow>
             ))}
-          </div>
+          </ul>
         )
       )}
 
-      <Pagination page={page} pageSize={20} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+      {!error && (
+        <Pagination page={page} pageSize={20} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+      )}
     </div>
   );
 }

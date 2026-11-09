@@ -8,6 +8,7 @@ import { AddToPlanForm } from "../components/AddToPlanForm";
 import { RecipeAvoidedNotice } from "../components/RecipeAvoidedNotice";
 import { SaveRecipeButton } from "../components/SaveRecipeButton";
 import { SendToListForm } from "../components/SendToListForm";
+import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useHouseholds } from "../household/useHouseholds";
 import { longDate, startOfWeek, today } from "../plan/dates";
@@ -43,21 +44,46 @@ export function RecipeDetailPage() {
   const [task, setTask] = useState<Task>(null);
   // Riscar ingredientes enquanto se cozinha; não sai deste ecrã.
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
+    let active = true;
     setRecipe(null);
+    setError(null);
     setChecked(new Set());
-    getRecipe(id).then(setRecipe);
+    getRecipe(id)
+      .then((data) => active && setRecipe(data))
+      .catch((err: unknown) => active && setError(describeError(err)));
+    return () => {
+      active = false;
+    };
   }, [id]);
 
   if (!id) return null;
+  if (error)
+    return (
+      <div className="page recipe-page">
+        <p className="form-error" role="alert">
+          Não deu para abrir esta receita. {error}
+        </p>
+        <p className="empty-state">
+          <Link to="/receitas">Voltar às receitas</Link>
+        </p>
+      </div>
+    );
   if (!recipe) return <p className="muted loading">A carregar…</p>;
 
   const ingredients = recipe.ingredients.slice().sort((a, b) => a.sortOrder - b.sortOrder);
   const steps = recipe.steps.slice().sort((a, b) => a.stepNumber - b.stepNumber);
   const times = [recipe.prepTimeMinutes, recipe.cookTimeMinutes].filter((m): m is number => m !== null);
   const totalTime = times.length > 0 ? times.reduce((sum, m) => sum + m, 0) : null;
+  const meta = [
+    recipe.dishType !== null ? dishTypeLabels[recipe.dishType] : null,
+    recipe.mainProtein !== null ? mainProteinLabels[recipe.mainProtein] : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   function toggleTask(next: Exclude<Task, null>) {
     setTask((current) => (current === next ? null : next));
@@ -73,7 +99,7 @@ export function RecipeDetailPage() {
   }
 
   return (
-    <div className="page">
+    <div className="page recipe-page">
       <nav className="crumb" aria-label="Caminho">
         <button type="button" className="back-link" onClick={() => navigate(-1)}>
           Voltar
@@ -88,61 +114,54 @@ export function RecipeDetailPage() {
         )}
       </nav>
 
-      <section className={`recipe-hero${recipe.imageUrl ? " has-photo" : ""}`}>
-        {recipe.imageUrl && (
-          <div className="recipe-hero-photo">
-            <img src={recipe.imageUrl} alt={recipe.title} />
-          </div>
-        )}
-
-        <div className="recipe-hero-info">
-          <h1>{recipe.title}</h1>
-          {recipe.description && <p className="recipe-lede">{recipe.description}</p>}
-
-          <ul className="recipe-facts">
-            {totalTime !== null && (
-              <li>
-                <span>Tempo total</span>
-                <strong>{duration(totalTime)}</strong>
-              </li>
-            )}
-            {recipe.prepTimeMinutes !== null && totalTime !== recipe.prepTimeMinutes && (
-              <li>
-                <span>Preparação</span>
-                <strong>{duration(recipe.prepTimeMinutes)}</strong>
-              </li>
-            )}
-            {recipe.cookTimeMinutes !== null && totalTime !== recipe.cookTimeMinutes && (
-              <li>
-                <span>Cozedura</span>
-                <strong>{duration(recipe.cookTimeMinutes)}</strong>
-              </li>
-            )}
-            <li>
-              <span>Porções</span>
-              <strong>{recipe.servings}</strong>
-            </li>
-            <li>
-              <span>Dificuldade</span>
-              <strong>{recipeDifficultyLabels[recipe.difficulty]}</strong>
-            </li>
-          </ul>
-
-          {(recipe.mainProtein !== null || recipe.tags.length > 0) && (
-            <div className="recipe-tags">
-              {recipe.mainProtein !== null && <span className="pill pill-accent2">{mainProteinLabels[recipe.mainProtein]}</span>}
-              {recipe.tags.map((tag) => (
-                <span key={tag} className="pill pill-muted">
-                  {tag}
-                </span>
-              ))}
+      {/* A receita como uma folha: os números numa coluna fixa, o prato à direita da régua. */}
+      <article className="recipe-sheet" aria-labelledby="recipe-title">
+        <dl className="recipe-facts">
+          {totalTime !== null && (
+            <div>
+              <dt>Tempo</dt>
+              <dd>{duration(totalTime)}</dd>
             </div>
           )}
+          {recipe.prepTimeMinutes !== null && totalTime !== recipe.prepTimeMinutes && (
+            <div>
+              <dt>Preparação</dt>
+              <dd>{duration(recipe.prepTimeMinutes)}</dd>
+            </div>
+          )}
+          {recipe.cookTimeMinutes !== null && totalTime !== recipe.cookTimeMinutes && (
+            <div>
+              <dt>Cozedura</dt>
+              <dd>{duration(recipe.cookTimeMinutes)}</dd>
+            </div>
+          )}
+          <div>
+            <dt>Porções</dt>
+            <dd>{recipe.servings}</dd>
+          </div>
+          <div>
+            <dt>Dificuldade</dt>
+            <dd>{recipeDifficultyLabels[recipe.difficulty]}</dd>
+          </div>
+        </dl>
 
-          <div className="article-actions">
+        <div className="recipe-sheet-body">
+          <h1 id="recipe-title" className="dish-name">
+            {recipe.title}
+          </h1>
+          {meta && <p className="dish-meta">{meta}</p>}
+          {recipe.description && <p className="recipe-lede">{recipe.description}</p>}
+
+          {recipe.imageUrl && (
+            <figure className="dish-photo">
+              <img src={recipe.imageUrl} alt="" />
+            </figure>
+          )}
+
+          <div className="day-actions recipe-actions">
             <button
               type="button"
-              className="button-primary"
+              className="button-primary button-lg"
               aria-expanded={task === "plan"}
               aria-controls="recipe-task"
               onClick={() => toggleTask("plan")}
@@ -151,7 +170,7 @@ export function RecipeDetailPage() {
             </button>
             <button
               type="button"
-              className="button-secondary"
+              className="button-secondary button-lg"
               aria-expanded={task === "list"}
               aria-controls="recipe-task"
               onClick={() => toggleTask("list")}
@@ -162,15 +181,18 @@ export function RecipeDetailPage() {
             {current && <SaveRecipeButton householdId={current.householdId} recipeId={recipe.recipeId} />}
           </div>
 
-          {recipe.sourceUrl && (
+          {(recipe.tags.length > 0 || recipe.sourceUrl) && (
             <p className="recipe-source">
-              <a href={recipe.sourceUrl} target="_blank" rel="noreferrer">
-                Receita original em {sourceHost(recipe.sourceUrl)}
-              </a>
+              {recipe.tags.length > 0 && <span className="recipe-tags">{recipe.tags.join(", ")}</span>}
+              {recipe.sourceUrl && (
+                <a href={recipe.sourceUrl} target="_blank" rel="noreferrer">
+                  Receita original em {sourceHost(recipe.sourceUrl)}
+                </a>
+              )}
             </p>
           )}
         </div>
-      </section>
+      </article>
 
       {/* Sem casa não há membros: o aviso simplesmente não aparece. */}
       <RecipeAvoidedNotice recipeId={recipe.recipeId} />
@@ -239,7 +261,7 @@ export function RecipeDetailPage() {
       )}
 
       <div className="recipe-body">
-        <section className="recipe-ingredients" aria-labelledby="recipe-ingredients-title">
+        <section className="panel recipe-ingredients" aria-labelledby="recipe-ingredients-title">
           <div className="recipe-section-head">
             <h2 id="recipe-ingredients-title">Ingredientes</h2>
             <span className="muted">
@@ -279,7 +301,7 @@ export function RecipeDetailPage() {
           )}
         </section>
 
-        <section className="recipe-method" aria-labelledby="recipe-method-title">
+        <section className="panel recipe-method" aria-labelledby="recipe-method-title">
           <div className="recipe-section-head">
             <h2 id="recipe-method-title">Preparação</h2>
             {steps.length > 0 && <span className="muted">{steps.length === 1 ? "1 passo" : `${steps.length} passos`}</span>}

@@ -34,8 +34,9 @@ The catalog is real: prices are observed per store and chain, and the Api judges
 
 ## Brand Commitments
 
-- Name and wordmark: "DomiOS" with "OS" in the second accent; the two-roof brand mark (teal + navy polylines).
-- The colour palette is fixed by the user: the tokens in `src/index.css` (`--bg`, `--surface`, `--surface-2`, `--ink`, `--ink-dim`, `--line`, `--accent` teal, `--accent-soft`, `--accent-2` navy, `--accent-2-soft`, `--danger`, `--danger-soft`, light and dark sets) must not change. Redesigns change layout, type, components and presentation only. On top of these base tokens, six aisle hues (`--aisle-*`, light and dark) mark a product's top category; the user approved them on 2026-10-30 and they appear only where a category appears.
+- Name and wordmark: "DomiOS"; the two-roof brand mark (two offset roof polylines). Their colours follow the new palette.
+- Name and the two-roof mark stay. Everything else is open: on 2026-11-09 the user started a full redesign ("remodelar tudo") and freed the colour palette, layout, page presentation and components. The 2026-10-30 palette lock and the aisle-hue rule no longer bind.
+- Redesign direction set by the user on 2026-11-09: household first (tonight's meal, the week, shopping), price intelligence as a lens inside lists and pantry rather than the centre; warm kitchen tone.
 
 ## Evidence on Hand
 

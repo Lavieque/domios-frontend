@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-PT"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;font-family:'Bricolage Grotesque',sans-serif;background:#f4f5f2;color:#1a1a1a}
+header{height:68px;display:flex;align-items:center;gap:34px;padding:0 48px;background:#1f3a93;color:#fff}
+header b{font:800 24px 'Bricolage Grotesque'}
+header a{color:#c9d3f2;font:600 16px 'Bricolage Grotesque';text-decoration:none}
+header a.on{color:#fff;border-bottom:3px solid #d9472b;padding-bottom:4px}
+main{padding:36px 48px;display:grid;grid-template-columns:1fr 380px;gap:32px}
+.hero{background:#fff;border-radius:10px;overflow:hidden;display:grid;grid-template-columns:1.1fr 1fr}
+.photo{background:linear-gradient(160deg,#5b3417,#b8692b 50%,#e8b45a)}
+.body{padding:36px}
+.tag{font:700 15px 'Bricolage Grotesque';color:#d9472b}
+h1{font:800 64px/0.98 'Bricolage Grotesque';letter-spacing:-.03em;margin:12px 0 20px;color:#1f3a93}
+.check{list-style:none;margin:18px 0 26px}
+.check li{font:500 18px 'Bricolage Grotesque';padding:7px 0;border-bottom:1px dashed #c8cbd6;display:flex;justify-content:space-between}
+.check li.miss{color:#d9472b;font-weight:700}
+.btns{display:flex;gap:12px}
+.btn{font:700 17px 'Bricolage Grotesque';padding:15px 24px;border-radius:999px;border:0;background:#d9472b;color:#fff}
+.btn.o{background:#fff;color:#1f3a93;border:2px solid #1f3a93}
+aside h2{font:800 22px 'Bricolage Grotesque';color:#1f3a93;margin-bottom:12px}
+.menu{background:#fff;border-radius:10px;padding:20px 22px;margin-bottom:22px}
+.menu div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eceef3;font:600 17px 'Bricolage Grotesque'}
+.menu small{color:#6b7f2a;font-weight:700}
+.week{grid-column:1/-1;display:grid;grid-template-columns:repeat(7,1fr);gap:12px}
+.d{background:#fff;border-radius:10px;padding:14px;height:120px}
+.d b{font:800 13px 'Bricolage Grotesque';color:#d9472b;text-transform:uppercase}
+.d p{font:700 17px/1.2 'Bricolage Grotesque';margin-top:8px}
+</style></head><body>
+<header><b>DomiOS</b><a class="on" href="#">Hoje</a><a href="#">Semana</a><a href="#">Despensa</a><a href="#">Compras</a><a href="#">Receitas</a><a href="#" style="margin-left:auto">Casa</a></header>
+<main>
+ <section class="hero">
+  <div class="photo"></div>
+  <div class="body">
+   <div class="tag">Hoje há · jantar para 4</div>
+   <h1>Arroz de pato com laranja</h1>
+   <ul class="check"><li>Arroz agulha <span>na despensa</span></li><li>Chouriço <span>no frigorífico</span></li><li class="miss">Pato <span>falta</span></li><li class="miss">Laranjas <span>falta</span></li></ul>
+   <div class="btns"><button class="btn">Cozinhar</button><button class="btn o">Pôr na lista</button></div>
+  </div>
+ </section>
+ <aside>
+  <h2>Usar primeiro</h2>
+  <div class="menu"><div>Iogurte natural <small>hoje</small></div><div>Couve portuguesa <small>2 dias</small></div><div>Pão de forma <small>5 dias</small></div></div>
+  <h2>Compras</h2>
+  <div class="menu"><div>7 por comprar <small>Continente 32,40 €</small></div></div>
+ </aside>
+ <section class="week">
+  <div class="d"><b>Seg 9</b><p>Arroz de pato</p></div><div class="d"><b>Ter 10</b><p>Bacalhau à Brás</p></div><div class="d"><b>Qua 11</b><p>Sopa de legumes</p></div><div class="d"><b>Qui 12</b><p>Por planear</p></div><div class="d"><b>Sex 13</b><p>Frango assado</p></div><div class="d"><b>Sáb 14</b><p>Cozido</p></div><div class="d"><b>Dom 15</b><p>Restos</p></div>
+ </section>
+</main>
+</body></html>

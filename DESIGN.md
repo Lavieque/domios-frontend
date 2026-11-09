@@ -1,611 +1,307 @@
 ---
 name: DomiOS
-description: A household operating system for food, where every product carries the colour of its aisle.
+description: A household runs by days. Each day is a tear-off calendar sheet with a big number and what gets eaten.
 colors:
-  bg: "#f0f3f5"
-  surface: "#fafbfc"
-  surface-2: "#e3e9eb"
-  ink: "#16241f"
-  ink-dim: "#5b6e71"
-  line: "rgba(22, 36, 31, 0.14)"
-  accent: "#2a6a78"
-  accent-soft: "#dde8ea"
-  accent-2: "#1e3a5c"
-  accent-2-soft: "#dfe6ec"
-  danger: "#b91c1c"
-  danger-soft: "rgba(185, 28, 28, 0.1)"
-  aisle-fresh: "#c2412d"
-  aisle-fresh-soft: "#f6e4e0"
-  aisle-fish: "#2f5f9e"
-  aisle-fish-soft: "#e2eaf4"
-  aisle-pantry: "#5f7a24"
-  aisle-pantry-soft: "#ebf0dc"
-  aisle-bakery: "#9a6f0a"
-  aisle-bakery-soft: "#f7eed6"
-  aisle-dairy: "#2f7fa8"
-  aisle-dairy-soft: "#dff0f6"
-  aisle-home: "#7d4f8f"
-  aisle-home-soft: "#efe5f2"
-  bg-dark: "#0f3f34"
-  surface-dark: "#17453a"
-  surface-2-dark: "#1f4f43"
-  ink-dark: "#e7eeec"
-  ink-dim-dark: "#9fb3b0"
-  line-dark: "rgba(231, 238, 236, 0.16)"
-  accent-dark: "#5fa9a0"
-  accent-soft-dark: "rgba(95, 169, 160, 0.16)"
-  accent-2-dark: "#6e9bc7"
-  accent-2-soft-dark: "rgba(110, 155, 199, 0.16)"
-  danger-dark: "#f87171"
-  danger-soft-dark: "rgba(248, 113, 113, 0.14)"
-  aisle-fresh-dark: "#f09a86"
-  aisle-fresh-soft-dark: "rgba(240, 154, 134, 0.16)"
-  aisle-fish-dark: "#8fb4e6"
-  aisle-fish-soft-dark: "rgba(143, 180, 230, 0.16)"
-  aisle-pantry-dark: "#b5cf72"
-  aisle-pantry-soft-dark: "rgba(181, 207, 114, 0.16)"
-  aisle-bakery-dark: "#e8c25c"
-  aisle-bakery-soft-dark: "rgba(232, 194, 92, 0.16)"
-  aisle-dairy-dark: "#86c8e6"
-  aisle-dairy-soft-dark: "rgba(134, 200, 230, 0.16)"
-  aisle-home-dark: "#c9a2d8"
-  aisle-home-soft-dark: "rgba(201, 162, 216, 0.16)"
+  paper: "#ffffff"
+  paper-shade: "#f1f1ef"
+  ink: "#141414"
+  ink-dim: "#5a5a57"
+  line: "rgb(20 20 20 / 0.15)"
+  rule: "#141414"
+  calendar-red: "#d4261c"
+  calendar-red-soft: "#fbe6e4"
+  danger: "#c8231a"
+  danger-soft: "rgb(200 35 26 / 0.1)"
+  have-it-green: "#23683a"
+  have-it-green-soft: "#e2efe5"
+  almanac-yellow: "#f2c230"
+  almanac-ink: "#141414"
 typography:
-  price-hero:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "clamp(48px, 6vw, 68px)"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "-0.04em"
-    fontFeature: "lnum, pnum"
-  price:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "34px"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "-0.035em"
-    fontFeature: "lnum, pnum"
   display:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "clamp(28px, 4vw, 38px)"
-    fontWeight: 600
-    lineHeight: 1.08
-    letterSpacing: "-0.025em"
+    fontFamily: "Archivo Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "clamp(120px, 15vw, 208px)"
+    fontWeight: 900
+    lineHeight: 0.8
+    letterSpacing: "-0.035em"
+    fontVariation: "'wdth' 62"
   headline:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "clamp(18px, 2.4vw, 21px)"
-    fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "-0.012em"
+    fontFamily: "Archivo Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "clamp(40px, 5.4vw, 72px)"
+    fontWeight: 900
+    lineHeight: 0.95
+    letterSpacing: "-0.015em"
+    fontVariation: "'wdth' 70"
+  page-title:
+    fontFamily: "Archivo Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "clamp(34px, 4.6vw, 52px)"
+    fontWeight: 900
+    lineHeight: 0.98
+    letterSpacing: "-0.015em"
+    fontVariation: "'wdth' 72"
   title:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "15.5px"
-    fontWeight: 600
-    lineHeight: 1.3
+    fontFamily: "Archivo Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "22px"
+    fontWeight: 850
+    lineHeight: 1.15
+    letterSpacing: "0.01em"
+    fontVariation: "'wdth' 80"
   body:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "15.5px"
+    fontFamily: "Archivo Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.55
-    fontFeature: "lnum, pnum"
   label:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "13px"
-    fontWeight: 600
-    lineHeight: 1.3
-    letterSpacing: "normal"
-  price-label:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "clamp(52px, 7vw, 72px)"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "-0.04em"
-    fontFeature: "lnum, pnum"
-  verdict-site:
-    fontFamily: "Schibsted Grotesk Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "14px"
-    fontWeight: 600
-    lineHeight: 1.3
+    fontFamily: "Archivo Variable, Segoe UI, Helvetica Neue, Arial, sans-serif"
+    fontSize: "17px"
+    fontWeight: 850
+    lineHeight: 1.2
+    letterSpacing: "0.04em"
+    fontVariation: "'wdth' 75"
 rounded:
-  sm: "8px"
-  button: "10px"
-  md: "12px"
-  lg: "16px"
-  pill: "999px"
-  round: "50%"
+  tag: "3px"
+  photo: "4px"
+  sm: "6px"
+  md: "8px"
+  lg: "10px"
+  sheet: "14px"
 spacing:
-  gap-sm: "0.6rem"
-  gap: "1rem"
-  label-pad: "1rem 1.1rem 1rem"
-  verdict-pad: "0.55rem 1.1rem"
-  row-pad: "0.9rem 1.1rem"
-  panel-pad: "1.35rem 1.5rem 1.5rem"
-  section: "2.5rem"
-  page-x: "clamp(16px, 3vw, 40px)"
-  page-max: "1760px"
-  site-x: "clamp(16px, 4vw, 48px)"
-  site-max: "72rem"
-  admin-max: "76rem"
-  demo-pad: "1.35rem 1.5rem 1.4rem"
+  gutter: "clamp(16px, 3.2vw, 48px)"
+  column-gap: "clamp(1.75rem, 3vw, 3rem)"
+  block-gap: "2.25rem"
+  row: "0.5rem"
 components:
   button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.surface}"
-    typography: "{typography.title}"
-    rounded: "{rounded.button}"
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.paper}"
+    rounded: "{rounded.lg}"
     padding: "0.5rem 1.15rem"
     height: "44px"
   button-primary-hover:
-    backgroundColor: "{colors.accent-2}"
-    textColor: "{colors.surface}"
+    backgroundColor: "{colors.calendar-red}"
+    textColor: "{colors.paper}"
+  button-primary-lg:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.paper}"
+    rounded: "{rounded.lg}"
+    padding: "0.6rem 1.4rem"
+    height: "52px"
   button-secondary:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.button}"
+    rounded: "{rounded.lg}"
     padding: "0.5rem 1.15rem"
     height: "44px"
-  button-danger:
-    textColor: "{colors.ink-dim}"
-    rounded: "{rounded.pill}"
-    padding: "0.3rem 0.8rem"
-    height: "36px"
-  button-danger-hover:
-    backgroundColor: "{colors.danger-soft}"
-    textColor: "{colors.danger}"
-  icon-danger:
-    textColor: "{colors.ink-dim}"
-    rounded: "{rounded.round}"
-    size: "40px"
-  icon-danger-hover:
-    backgroundColor: "{colors.danger-soft}"
-    textColor: "{colors.danger}"
-  row-action:
-    backgroundColor: "{colors.surface-2}"
+  link-button:
     textColor: "{colors.ink}"
-    rounded: "{rounded.pill}"
-    padding: "0.3rem 0.85rem"
-    height: "36px"
-  row-action-expanded:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
-  input:
-    backgroundColor: "{colors.surface}"
+    padding: "0.25rem 0"
+  button-secondary-lg:
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.sm}"
-    padding: "0.5rem 0.8rem"
-    height: "42px"
-  chip:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.pill}"
-    padding: "0.3rem 0.95rem"
-    height: "36px"
-  chip-pressed:
-    backgroundColor: "{colors.accent-2}"
-    textColor: "{colors.surface}"
-  aisle-dot:
-    rounded: "{rounded.round}"
-    size: "10px"
-  shelf-label:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.label-pad}"
-  photo-field:
     rounded: "{rounded.lg}"
-  verdict-foot:
-    backgroundColor: "{colors.surface-2}"
-    textColor: "{colors.ink}"
-    typography: "{typography.label}"
-    padding: "{spacing.verdict-pad}"
-  verdict-pill:
-    rounded: "{rounded.pill}"
-    padding: "0.4rem 0.85rem"
-  verdict-historic-low:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
-  verdict-below-average:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.ink}"
-  verdict-usual:
-    backgroundColor: "{colors.accent-2-soft}"
-    textColor: "{colors.ink}"
-  verdict-above-average:
-    backgroundColor: "{colors.danger-soft}"
-    textColor: "{colors.ink}"
-  verdict-none:
-    backgroundColor: "{colors.surface-2}"
-    textColor: "{colors.ink-dim}"
-  pill-good:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
-    rounded: "{rounded.pill}"
-    padding: "0.15rem 0.6rem"
-  pill-navy:
-    backgroundColor: "{colors.accent-2-soft}"
-    textColor: "{colors.accent-2}"
-    rounded: "{rounded.pill}"
-    padding: "0.15rem 0.6rem"
-  pill-muted:
-    backgroundColor: "{colors.surface-2}"
-    textColor: "{colors.ink-dim}"
-    rounded: "{rounded.pill}"
-    padding: "0.15rem 0.6rem"
-  pill-danger:
-    backgroundColor: "{colors.danger-soft}"
-    textColor: "{colors.danger}"
-    rounded: "{rounded.pill}"
-    padding: "0.15rem 0.6rem"
-  panel:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.panel-pad}"
-  store-row:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.row-pad}"
-  store-bar:
-    backgroundColor: "{colors.surface-2}"
-    rounded: "{rounded.pill}"
-    height: "10px"
-  store-bar-best:
-    backgroundColor: "{colors.accent}"
-  top-bar:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink-dim}"
-    height: "64px"
-    padding: "0 {spacing.page-x}"
-  site-header:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink-dim}"
-    height: "64px"
-    padding: "0 {spacing.site-x}"
-  button-lg:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.surface}"
-    rounded: "{rounded.button}"
-    padding: "0.6rem 1.6rem"
+    padding: "0.6rem 1.4rem"
     height: "52px"
-  demo-label:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.demo-pad}"
-  demo-price:
-    textColor: "{colors.ink}"
-    typography: "{typography.price-label}"
-  demo-verdict:
-    backgroundColor: "{colors.surface-2}"
-    textColor: "{colors.ink}"
-    typography: "{typography.verdict-site}"
-    padding: "0.65rem 1.5rem"
-  demo-verdict-historic-low:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
-  demo-verdict-below-average:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.ink}"
-  demo-verdict-usual:
-    backgroundColor: "{colors.accent-2-soft}"
-    textColor: "{colors.ink}"
-  demo-verdict-above-average:
-    backgroundColor: "{colors.danger-soft}"
-    textColor: "{colors.ink}"
-  lang-switch-current:
-    backgroundColor: "{colors.accent-2}"
-    textColor: "{colors.surface}"
-    rounded: "{rounded.pill}"
-    height: "28px"
-  row-link:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    padding: "0.8rem 1.1rem"
-    height: "60px"
-  cta-band:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-  step-number:
-    backgroundColor: "{colors.accent-2-soft}"
-    textColor: "{colors.accent-2}"
-    rounded: "{rounded.round}"
-    size: "32px"
-  admin-header:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink-dim}"
-    height: "64px"
-    padding: "0 {spacing.page-x}"
-  admin-row:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    padding: "{spacing.row-pad}"
-  admin-row-armed:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
-  button-danger-armed:
-    backgroundColor: "{colors.danger-soft}"
-    textColor: "{colors.danger}"
-    rounded: "{rounded.pill}"
-    height: "36px"
-  admin-panel:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.md}"
-    padding: "0.25rem 1.25rem 1.25rem"
-  edit-field-input:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
+  rail:
+    backgroundColor: "{colors.almanac-yellow}"
+    textColor: "{colors.almanac-ink}"
+    width: "15.5rem"
+    padding: "1.5rem 1rem 1.25rem"
+  rail-link:
+    backgroundColor: "{colors.almanac-yellow}"
+    textColor: "{colors.almanac-ink}"
     rounded: "{rounded.sm}"
-    padding: "0.5rem 0.8rem"
+    padding: "0.6rem 0.7rem"
     height: "42px"
-  fact-row:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink-dim}"
-    padding: "0.7rem 1.1rem"
-    height: "56px"
-  brand-tag:
-    backgroundColor: "{colors.accent-2-soft}"
-    textColor: "{colors.accent-2}"
-    rounded: "{rounded.pill}"
-    padding: "0.1rem 0.55rem"
+  rail-link-active:
+    backgroundColor: "{colors.almanac-ink}"
+    textColor: "{colors.almanac-yellow}"
+    rounded: "{rounded.sm}"
+  tab:
+    backgroundColor: "{colors.almanac-yellow}"
+    textColor: "{colors.almanac-ink}"
+    rounded: "{rounded.md}"
+    height: "54px"
+  tab-active:
+    backgroundColor: "{colors.almanac-ink}"
+    textColor: "{colors.almanac-yellow}"
+    rounded: "{rounded.md}"
+  more-sheet:
+    backgroundColor: "{colors.almanac-yellow}"
+    textColor: "{colors.almanac-ink}"
+    rounded: "{rounded.sheet}"
+    padding: "0.75rem 1rem 1.25rem"
+  price-tag:
+    backgroundColor: "{colors.almanac-yellow}"
+    textColor: "{colors.almanac-ink}"
+    rounded: "{rounded.tag}"
+    padding: "0.05rem 0.4rem"
 ---
 
 # Design System: DomiOS
 
 ## Overview
 
-**Creative North Star: "The Aisle Sign"**
+**Creative North Star: "A Folha do Dia"**
 
-DomiOS borrows the supermarket's own wayfinding: every product carries the colour of its aisle, and that colour is how you find things in the catalog, the pantry and the shopping list. Six muted aisle hues sit on top of the fixed base palette (cool paper, white surface, teal for "good now", navy for structure) and appear only where a category appears: the chip dot, the tinted photo field with its pictogram, the dot on a pantry row, the dot beside a shopping-list group.
+DomiOS is printed like a Portuguese tear-off wall calendar crossed with the Borda d'Água almanac. White newsprint ground, black ink, almanac yellow framing the app, calendar red for the day itself. A household lives by days, so the app is built around the day as a sheet: a huge condensed red number in a fixed column, a thick black rule across the top, and what gets eaten that day set large and unframed beside it. Below today's sheet you can see the edges of the next ones.
 
-This is an Operate tool for a household that plans at a desk and shops one-handed on a phone. Body text is quiet (400), headings are calm (600), and only prices go heavy (800). Surfaces are white on cool paper with 1px hairlines and soft corners (8, 12, 16px; pills for chips, verdicts and row actions). Status speaks through round dots and tinted pills, never rails or bold bands.
+It is dense the way a printed almanac is dense: hierarchy comes from type width and weight and from black rules, never from boxes. There are no card frames, no panel shadows and no dashboard of equal tiles. Sections start under a 6px black rule and their rows are split by hairlines. Colour has a job or it isn't there: red means today, Sunday or "running out", the single green means "tens tudo", and yellow means the shell.
 
-The same system has two more surfaces, both on the shared tokens (`src/shared/tokens.css`) and the same family, weights and corners. The public site (`site/site.css`) is a Persuade surface in pt-PT and en: a 72rem column whose home opens on one interactive shelf label that judges its own price (the "shelf-label demonstrator"), then reads as bordered lists of rows. The admin (`admin/admin.css`) is an Operate surface for platform staff: flat hairline rows, neutral controls, consequential and destructive actions confirmed in two steps. Neither uses aisle hues; neither casts a shadow.
+**Scope of this world (honest state, 2026-11-09, fourth pass).** The first pass rebuilt the world tokens, the app shell (desktop rail, phone tab bar, "Mais" sheet, guest header) and the Hoje page. The second pass rebuilt the other three everyday destinations, Semana, Despensa and Compras (the list and the lists index), and restyled the shared components every route uses: panels lost their frames and gained the 6px rule, pills and tags went to 3px, tables and the pantry list are headed by a 2px rule, notices became a paper-shade wash, and the page fade-in is gone. The third pass rebuilt Receitas (catalog and recipe page) and Cozinhar (what can be cooked, and recipes already cooked): recipe cards became recipe rows and the recipe page became a recipe sheet. A fourth pass rebuilt Ementas (the template index and a template's page) on the same rows and on Semana's day rows. Nutrição, Preços/Produtos, Promoções, Casa, Conta and the auth pages have only been touched by the shared restyle. Their own layouts (cards, verdict chips, shelf labels, aisle hues from `src/shared/tokens.css`) are **legacy, pending migration**, not examples of this world. The store comparison in Compras still uses the legacy shelf labels and verdict bands, and the shopping list's item-group headings still carry aisle-hue dots. The public site (`site/`) and the admin (`admin/`) still use the old shared tokens and Schibsted Grotesk and are not in this world yet.
 
 **Key Characteristics:**
-- Aisle hue as wayfinding: one hue per top category, from chip dot to photo field to list group.
-- Price is the only heavy type: 800 at 34px on cards, up to 68px on the article.
-- Verdicts are tinted foot rows or pills led by an 8px round dot.
-- Soft corners (8 / 12 / 16px), pill controls, 1px hairlines, no rails.
-- Flat at rest; one floating dropdown in the app carries the only shadow.
-- Site: one shelf label at price-hero size with a verdict foot and four verdict chips, labelled as example.
-- Admin: hairline rows, state pills on the right, actions that arm before they run.
+- Today's sheet is the signature: a red condensed day number in a fixed left column, a 6px black rule on top, and the dish name as the interface.
+- Archivo Variable runs on its width axis: condensed and heavy for numerals, dish names and headings, normal width for UI text.
+- Thick black rules head sections. Hairlines separate rows. No card chrome, no shadows.
+- Urgency is shown by dot diameter on a fixed four-step scale, not by more colours.
+- Almanac yellow owns the frame (rail, tab bar, Mais sheet) and the price tag. Content sits on white paper.
+- One motion moment: the previous day's sheet tears upward once when the day changes.
 
 ## Colors
 
-Low-chroma paper and ink with two working accents, plus six aisle hues reserved for categories.
+Newsprint white and black ink, with three calendar colours that each have exactly one job.
 
 ### Primary
-- **Shelf Teal** (`accent`): "good now". Historic-low and below-average verdicts, the cheapest store's bar and its "Mais barato" pill, the best-option and today edge, primary button, links, focus ring, checkbox fill, caret, card price. Tint (`accent-soft`) backs good verdicts, good pills, notices and the expanded row action.
+- **Calendar Red** (`calendar-red`): today's day number, Sunday numbers in the next-days strip and in Semana (where today's number and its "· hoje" mark are red too), the "Falta N" readiness line, the readiness dot when something is missing, the "faltam …" quantities in Semana's "O que falta", and the two highest urgency dots with their "when" text in Usar primeiro and Despensa. It is also the hover fill of the primary button. In dark mode it lifts to `#ff6a5c`.
+- **Calendar Red Soft** (`calendar-red-soft`): a tint for today-related washes. The migrated danger pill and warning notice currently borrow it as their ground. Use it sparingly.
 
 ### Secondary
-- **Label Navy** (`accent-2`): structure. Active nav underline, pressed chip, drawer current page, "OS" in the wordmark, recipe step numbers, selection, primary button hover. Tint (`accent-2-soft`) backs the usual-price verdict, promotion badges and warning pills.
+- **Almanac Yellow** (`almanac-yellow`) with **Almanac Ink** (`almanac-ink`): the shell. This covers the desktop rail, the phone tab bar, the "Mais" bottom sheet, the guest header, text selection and the price tag. Active navigation inverts it to ink ground with yellow text. Yellow stays yellow in dark mode because the frame doesn't change.
 
 ### Tertiary
-- **Price Red** (`danger`): above-average verdict dot, urgent promotions, form errors, destructive hover. Always as tint (`danger-soft`) with red or ink text; never a solid fill.
+- **Tens-Tudo Green** (`have-it-green`): the one green, and it only means "you have everything". Use it for the ready readiness dot and its text, "Tens tudo" in the next-days strip and in Semana's "O que falta", the ready suggestion meta, the cookable-picks meta and the day note. It also carries the caret colour. Link buttons are no longer green. In dark mode it is `#7cc78e`.
 
 ### Neutral
-- **Cool Paper** (`bg`): the page.
-- **Label White** (`surface`): cards, panels, rows, inputs, top bar.
-- **Shelf Grey** (`surface-2`): neutral verdicts, store-bar track, muted pills, row actions, row hover (mixed 40-55%), the neutral photo field.
-- **Ink** (`ink`): text, hover border on secondary controls, the price-range current marker ring.
-- **Dim Ink** (`ink-dim`): secondary text, meta, inactive nav, non-best store bars (45% mix), the neutral aisle.
-- **Hairline** (`line`): every border and divider.
+- **Paper** (`paper`): page and surface ground. The app has no off-white surface layer.
+- **Paper Shade** (`paper-shade`): photo and thumbnail placeholders, the hover wash on next-day cells and table rows, and the ground of notices.
+- **Ink** (`ink`): text, the primary button, the 2px secondary-button border, underlined link buttons, checkboxes, the focus ring, and the active state inverted on yellow.
+- **Ink Dim** (`ink-dim`): secondary lines such as the season, meta, empty sheets and the smallest urgency dot.
+- **Rule** (`rule`): the 6px section heads, the 2px tops of the next-days strip, tables and the pantry list, and the 1px divider between the day column and the dish body.
+- **Line** (`line`): hairlines between rows and cells.
+- **Danger** (`danger`, `danger-soft`): destructive actions and errors only. It is never used for urgency, which belongs to calendar red.
 
-### Aisle Hues
-Each top category maps to one aisle by name (`src/catalog/aisles.ts`); the container class sets `--aisle` and `--aisle-soft` for everything inside. Unmatched categories fall back to Dim Ink / Shelf Grey so a colour never points at the wrong aisle.
-- **Fresh Red** (`aisle-fresh`): fruit, vegetables, butcher, charcuterie.
-- **Fish Blue** (`aisle-fish`): fish, seafood, cod.
-- **Pantry Olive** (`aisle-pantry`): grocery, oils, rice, pasta, tins, drinks, coffee.
-- **Bakery Ochre** (`aisle-bakery`): bread, pastry, cereals, biscuits, sweets.
-- **Dairy Sky** (`aisle-dairy`): milk, yoghurt, cheese, eggs, butter.
-- **Home Plum** (`aisle-home`): cleaning, hygiene, baby, pets.
-
-The public site and the admin use no aisle hue. The full hue marks dots and pictograms; the `-soft` tint fills photo fields. Dark mode swaps every base and aisle token for its `-dark` value; aisle tints become 16% alpha.
+The dark set inverts paper and ink (`#141414` ground, `#1b1b1a` / `#252523` surfaces, `#f2f1ed` ink and rule, `#a8a7a2` dim ink) and lifts red and green. The yellow shell is unchanged.
 
 ### Named Rules
-**The Fixed Palette Rule.** Base tokens are the user's brand commitment and stay byte-identical. The six aisle pairs (approved 2026-10-30) are the only additions; express new states with existing tokens and tints.
+**The Calendar Red Rule.** Red marks today, Sundays and what is running out. Use it for nothing else, and never as decoration or section colour.
 
-**The Wayfinding Rule.** An aisle hue appears only where a category appears: chip dot, photo field, pictogram, pantry row dot, list group dot. Never on buttons, prices, verdicts or text.
+**The One Green Rule.** There is exactly one green and it means "tens tudo". Prices, savings and "cheapest store" are not green. They go on the yellow price tag, including the cheapest price on each shopping-list line.
 
-**The Good Now Rule.** Teal means "the good choice right now": historic low, cheapest store, today, the primary action. Structure uses navy or ink.
+**The Yellow Frame Rule.** Almanac yellow belongs to the shell and the price tag. Don't use it as a content background or a status colour.
 
 ## Typography
 
-**Display Font:** Schibsted Grotesk Variable (with Segoe UI, Helvetica Neue, Arial)
-**Body Font:** Schibsted Grotesk Variable
-**Label/Mono Font:** none; one family, from `@fontsource-variable/schibsted-grotesk`.
+**Display Font:** Archivo Variable with the width axis (`@fontsource-variable/archivo/wdth.css`), falling back to Segoe UI, Helvetica Neue, Arial.
+**Body Font:** the same Archivo Variable at normal width.
 
-**Character:** A sturdy grotesk kept calm at 400-600 so the 800 price figures carry the page.
+**Character:** a single grotesque family that behaves like almanac typesetting. Squeezed to 62–80% width at 850–900 weight it gives you the numbers and headings. At 100% width it reads quietly as UI. Width does the work a second typeface would otherwise do.
 
 ### Hierarchy
-- **Price hero** (800, clamp(48px, 6vw, 68px), 1, -0.04em): the article price; euro sign at 0.4em.
-- **Price** (800, 34px, 1, -0.035em): card prices; 32px under 720px, 30px in the store comparison grid. Euro sign 0.45em at 700; "desde" 13px 600 dim.
-- **Display** (600, clamp(28px, 4vw, 38px), 1.08, -0.025em): page titles, balanced wrap.
-- **Headline** (600, clamp(18px, 2.4vw, 21px), 1.2, -0.012em): section heads, 2.5rem above.
-- **Title** (600, 15.5px, 1.3): card names, row titles, buttons (15px), h3 (16px). Recipe card titles 650 at 17px.
-- **Body** (400, 15.5px, 1.55): running text; ledes 62ch, recipe steps 70ch.
-- **Label** (600, 12.5-14px): verdicts (13px foot, 14px pill), pills, tags, meta, table headers.
-- **Store price** (700, 19px, -0.01em): the figure in an "Onde comprar" row, card price beneath at 12.5px teal.
-- **Price label, site** (800, clamp(52px, 7vw, 72px), 1, -0.04em): the demo label's price; euro sign at 0.4em and 700. The only 800 on the site besides the wordmark (21px).
-- **Site headings** (600): h1 clamp(30px, 4.6vw, 52px) at 1.06 and -0.03em; h2 clamp(20px, 2.6vw, 26px) at 1.18; h3 16px. Ledes are dim, clamp(16.5px, 1.6vw, 19px), 58ch. The demo name is 600 at clamp(20px, 2.4vw, 24px).
-- **Verdict, site** (600, 14px, 1.3): the verdict foot of the demo label; chips 14px 550.
-- **Admin headings** (600): h1 clamp(26px, 3.4vw, 34px) at 1.1 and -0.025em with a 15px dim `page-sub`; h2 matches Headline, 2rem above. Row titles 15.5px, notes 14.5px, meta and times 13px dim.
+- **Display** (900, 62% width, clamp(120px, 15vw, 208px), line-height 0.8): today's day number only. On phones it lies down to 104px beside the weekday and month. The same 62% condensed numeral style appears smaller elsewhere: the remaining count at the head of a shopping list (clamp(72px, 9vw, 112px), ink), Semana's day numbers (56px, 44px on phones), the list tally and lists-index counts (48px) and the next-days numbers (44px).
+- **Headline** (900, 70% width, clamp(40px, 5.4vw, 72px), line-height 0.95, max 18ch): the dish name, which is the interface. It has no frame, and its link underlines at 3px on hover.
+- **Dish in a row** (900, 72% width, 22px rising to 28px with the viewport, line-height 1.05–1.1): the dish name in a Semana meal row and the list name in the lists index. Suggestions in a side block use the same style smaller (20px, 75% width).
+- **Page title** (900, 72% width, clamp(34px, 4.6vw, 52px), line-height 0.98): `h1` on other pages.
+- **Title** (850, 80% width, 22px, uppercase in side blocks): section heads under the black rule, such as Usar primeiro and Compras.
+- **Body** (400, 16px, line-height 1.55): running text. Readiness and lede lines are 17px, with ledes capped at 52–60ch.
+- **Label** (850, 75% width, uppercase, 0.04em): the weekday and month in the day column. The weekday never wraps and scales clamp(14px, 1.4vw, 17px); the month follows at clamp(14px, 1.4vw, 20px) so it is never larger than the weekday. On phones they are 17px and 20px. Inline slot labels before a dish name ("ALMOÇO"), Semana weekdays, item-group heads and table heads share one small label style: 13px, 800 weight, uppercase, 0.06em, ink-dim.
+
+Numerals use `lining-nums proportional-nums`. Large condensed headings (`h1`, the dish name on today's sheet, cookable picks, list names) open their word spacing to 0.08em, because at that size and 62–75% width the spaces otherwise close up. Dishes set in rows (Semana, suggestions) keep normal spacing so they fit their column.
 
 ### Named Rules
-**The Price Weight Rule.** 800 belongs to prices and the wordmark. Titles and headings stop at 600.
+**The Width Axis Rule.** Hierarchy comes from width and weight on one family. Numerals and dish names are condensed (62–72%). Navigation and body copy stay at normal width, apart from the main rail destinations at 88%.
 
-**The Proportional Figures Rule.** Figures are `lining-nums proportional-nums` everywhere, tables and dates included; Schibsted's tabular comma splits "1,19". Numeric columns align right.
-
-**The No Eyebrow Rule.** Headings stand alone; no small uppercase kicker above a title.
+**The No Kicker Rule.** Don't put an eyebrow or kicker above a heading. Labels sit inline, like the meal slot before the dish, or beside the content, like the weekday in the day column.
 
 ## Layout
 
-One column, max 1760px (aligned with the full-width top bar), padding clamp(16px, 3vw, 40px), 2.25rem top and 5rem bottom. Pages open with title, a dim `page-sub` line (1.75rem below), a search/filter row (gap 0.6rem), then content; sections sit 2.5rem apart with headline left and a link or count right, baseline-aligned.
+On desktop the shell is a two-column grid: a 15.5rem sticky yellow rail on the left and the page on the right (max 1500px, side gutter clamp(16px, 3.2vw, 48px)). Below 900px the rail disappears and a fixed five-slot yellow tab bar sits at the bottom (Hoje, Semana, Despensa, Compras, Mais), with a small brand line on top of the page and bottom padding that clears the bar and the safe area.
 
-Product cards fill auto-fill grids at minmax(15.5rem, 1fr), gap 1rem (10.5rem, gap 0.65rem under 720px). Under 480px each product card becomes a horizontal row: a 6rem photo field on the left, body and verdict on the right. The aisle chip row scrolls sideways below 900px and wraps above.
+Hoje is a two-column grid: the main sheet, then a 17–22rem side column, separated by a clamp(1.75rem, 3vw, 3rem) gap. Below 1100px the side column moves underneath as two columns. Below 640px it becomes a single column. Today's sheet has a fixed day column (clamp(9rem, 15vw, 13rem)) and the dish body to its right of a 1px black divider. The number column never moves. Under 640px it rotates into a row: the number on the left, with weekday, month and season stacked beside it.
 
-The plan week shows all seven days in one row from 1500px. Adding to the pantry is two columns from 1100px: search, results, location chips and hint in a sticky left column (20-26rem), the "Por guardar" rows and the save bar on the right. Promotion cards reuse the product card: the photo field (neutral, offers carry no category) with the discount as a navy-tint tag.
+The next-days strip is three equal cells. When the main column is narrower than 680px, a container query turns it into rows that keep a fixed number column. Side blocks stack with a 2.25rem gap, and their rows are at least 56–64px tall.
 
-The article is two columns (0.85fr photo / 1.15fr info, gap clamp(1.5rem, 4vw, 3.25rem)), stacking under 760px. Lists (pantry, shopping list, store rows) are one bordered container of rows with hairline dividers. Pantry rows are a 10px dot column + name + expiry + actions grid; actions wrap under the name below 1100px and everything stacks under 720px. The shopping list groups unpurchased items by top category, each group headed by an aisle dot, name and count.
+The desktop rail's yellow runs the full height of the page, painted by a gradient on the shell grid (yellow for the first 15.5rem, paper after), so long pages never show white under the rail.
 
-Under 1100px the top bar keeps the wordmark and a "Menu" button that opens a right-side drawer.
+Pages other than Hoje open with a page head: the title and a dim sub-line on the left, the page's primary action on the right; under 720px the action wraps below and goes full width. Semana's head puts the week stepper (2px ink-bordered buttons) and the 80%-width date range on the right instead.
 
-### Public site and admin
-**Site.** One column, max 72rem, padding clamp(16px, 4vw, 48px), 5rem bottom, under a sticky 64px header (wordmark, menu links, language switch, "Pedir acesso"; the links wrap to their own line under 700px). The home hero is two columns (1.05fr copy, 0.95fr demo label capped at 30rem, gap clamp(1.5rem, 5vw, 4.5rem)) and stacks under 880px. Bands follow at clamp(3rem, 7vw, 5.5rem) apart: a three-cell bordered strip (judge list, flow; stacked under 820px), two bordered row lists of menus (stacked under 820px), a guide teaser and the tinted request band. A feature page is text beside a capture (1fr / 1.1fr, stacking under 900px) and drops to a single 46rem column when no capture exists. The guide is a sticky 15rem table of contents beside numbered steps; the request page is form (1.2fr) beside the "what happens next" list (0.8fr). The footer is three columns (1.4fr, 0.6fr, 0.6fr) over a one-line honesty note.
+Semana and Compras share Hoje's two-column grammar: a main column and a minmax(17rem, 24rem) side column with the same gap, stacking below 1100px. Semana lists the seven days as rows, each with a fixed number column (clamp(5.5rem, 9vw, 7.5rem), 4.25rem on phones) and the meals to its right as slot label, dish and actions; past days dim their number and dishes. Its side column holds "O que falta" and suggestions. Compras puts the list first in the main column and the store comparison in a sticky side column, which drops under the list below 1100px. At 640px and under, a list row keeps the checkbox and name on the first line and drops the link action and price under the name. Despensa rows lead with the urgency dot in a fixed 22px slot, then name, expiry and row actions, collapsing to dot plus stacked text under 720px.
 
-**Admin.** One column, max 76rem, padding 2.25rem clamp(16px, 3vw, 40px) 5rem. The 64px header holds wordmark, an "Admin" tag, a scrolling nav and the account at the right. Pages open with a flex page head (h1, dim sub, actions right), an optional chip row and search, then one `rows` list. A row is a grid of main / state / actions (gap 0.75rem 1.5rem, padding 0.9rem 1.1rem) and stacks under 900px; edit forms are auto-fill grids at 15rem; the facts list is label (8-14rem) / value / badge.
-
-### Named Rules
-**The Flat Row Rule.** Admin records are rows in one hairline-bordered list: title and meta on the left, state pills, then actions on the right, dividers instead of cards. Facts use the same container as a label/value list. Density comes from 0.9rem row padding and 36px controls, never from smaller text.
-
-**The In-Aisle Rule.** The shopping list fits a phone: items grouped by aisle, store breakdowns closed, unpriced items behind one disclosure, and each row shows a "Chain · €" good pill for its cheapest store.
+**The Fixed Column Rule.** Days are rows ordered by time. A day's number always sits in its own column at a fixed width, like a split-flap board.
 
 ## Elevation & Depth
 
-Flat. Cards, panels and rows separate from the page by Cool Paper against Label White and 1px hairlines. The best option and today's day card take a 2px teal edge (1px border plus 1px inset ring), not a shadow. A linked card lifts 2px on hover with a darker hairline. The public site and the admin carry no shadow at all, not even the float; their only depth cues are hairlines and tints.
+The world is flat. Depth comes from rules and stacking, not shadows. A section is headed by a 6px black rule; tables and the pantry list are headed by a 2px rule. The next-days strip sits under a 2px rule with two thin 1px rules above it at 55% opacity, which read as the edges of the sheets underneath today's. The only overlay is the "Mais" sheet, set over a 45% black backdrop. The one tonal surface is the notice, a paper-shade wash with no border.
 
-### Shadow Vocabulary
-- **Float** (`box-shadow: var(--shadow)`): the product search results that float over the add-to-pantry form. Nothing else.
+The `--shadow` token still exists in the stylesheet for legacy components. No surface in this world uses it.
 
-### Named Rules
-**The Flat Shelf Rule.** Surfaces are flat at rest and on hover; shadow is only for something that floats over other content.
+**The Sheet Edge Rule.** To show that something is stacked or comes next, draw sheet edges (thin parallel rules). Don't use drop shadows.
 
 ## Shapes
 
-Soft corners on a short scale: 8px (`sm`) for inputs, notices, thumbnails, drawer rows, breakdowns; 10px for buttons and pagination; 12px (`md`) for cards, panels, tables, row lists and store rows; 16px (`lg`) for the article photo field. Chips, pills, verdict pills, row actions, danger buttons and store bars are full pills. Dots are round: 8px verdict and drawer markers, 10px aisle dots, the 18px price-range marker, the 40px icon-danger hit area. Every border is a 1px hairline; the active nav underline is a 2px inset navy shadow. The card photo field runs edge to edge, clipped by the card. On the site the shelf label, row lists, strips and FAQ are 12px with clipped overflow so dividers meet the corner; the request band and capture frames are 16px; the language switch, chips, pills and step numbers are pill or round. In the admin rows, facts, panels and filters use 12px, fields and edit fieldsets 8px.
+Corners are small and practical. Pills, tags and the price tag are 3px. The dish photo and pantry thumbnails are 4px. Rail links, chips and notices are 6px, tabs 8px. Buttons, row actions and danger buttons are 10px; nothing in the app is pill-shaped any more. The only large radius is the Mais sheet, with 14px top corners. Sections, sheets and side blocks have square edges and no border: a rule on top, hairlines inside. Dots are true circles. Icons are inline SVG strokes, 2px, with round caps.
 
 ## Components
 
 ### Buttons
-Soft, compact, 600 weight.
-- **Shape:** 10px radius, min height 44px, padding 0.5rem 1.15rem, 15px.
-- **Primary:** teal fill and border, Label White text (Cool Paper text in dark).
-- **Hover / Focus:** primary turns navy; secondary border turns ink; press nudges 1px; focus is a 2px teal outline offset 2px; disabled 50%.
-- **Secondary:** Label White, hairline border, ink text.
-- **Link button:** teal 14px 600 text, navy underline on hover; inline edits like "Mudar nome".
+Ink slabs that flush calendar red when you press toward an action.
+- **Shape:** gently rounded (10px). Minimum height 44px, or 52px for the large size used on Hoje.
+- **Primary:** ink ground, paper text, weight 600 (750 in the large size). Hover fills calendar red with white text. Active nudges down 1px.
+- **Secondary:** paper ground with a 2px ink border, ink text, on every page. Hover keeps the ink border.
+- **Link button:** ink text, 14px/650, underlined at 1px with a 0.2em offset; hover thickens the underline to 2px. Inside Semana's meal rows it starts ink-dim and turns ink on hover.
+- **Row action / danger:** small 10px-radius buttons with a hairline border on a transparent ground; an open row action inverts to ink. They never wrap.
+- **Phone:** the day actions and the page-head action stack full width.
+- **Focus:** 2px ink outline, 2px offset. Fields take an ink border plus a 1px ink ring.
 
-### Row Actions and Destructive Controls
-- **Row action:** Shelf Grey pill, 36px, 14px 550 ink; hover adds a 25% ink border; expanded (`aria-expanded`) turns teal tint with teal text. Used for the pantry verbs "Abrir" and "Usar".
-- **Danger button:** transparent pill with hairline border and dim text at rest; on hover red text, 45% red border and `danger-soft` fill. Separated from row actions by 0.6rem.
-- **Icon danger:** 40px round, transparent, dim inline-SVG bin (20px); hover red on `danger-soft`. Used for removing shopping-list items.
-
-### Chips
-- **Style:** 36px pills, hairline border on Label White, 14px 550. Aisle chips lead with a 10px aisle dot.
-- **State:** pressed fills navy with white text, the dot ringed 2px in Label White; hover darkens the border to ink.
-
-### Pills
-12.5px 600 pills (padding 0.15rem 0.6rem), tint with matching text: good (teal), navy (promotions, warnings), muted, danger. Status tags share the shape.
-
-### Cards / Containers
-- **Corner Style:** 12px for cards and panels.
-- **Background:** Label White on Cool Paper.
-- **Shadow Strategy:** none (see Elevation & Depth).
-- **Border:** 1px hairline; best option and today get the teal edge.
-- **Internal Padding:** cards 1rem 1.1rem (0.7rem 0.8rem on phone); panels 1.35rem 1.5rem 1.5rem.
-
-### Inputs / Fields
-- **Style:** 42px, 1px hairline, 8px radius, Label White, 15px, dim placeholder. Selects carry a drawn SVG chevron; search a drawn magnifier inset 0.8rem.
-- **Focus:** teal border and a 3px `accent-soft` ring.
-- **Error:** `danger-soft` block, 8px radius, red 600 text.
+### Sections, Tables and Notices
+A section, including every legacy panel, has no frame: a 6px black rule on top, a 22px uppercase title under it, rows split by hairlines, and 2.25rem below. Tables and the pantry list sit under a 2px rule; their heads use the small label style and rows wash paper-shade on hover. Empty states are left-aligned body text under a hairline. Notices are a paper-shade wash with 6px corners (the warning variant uses the calendar-red tint). Checkboxes are 26px in ink.
 
 ### Navigation
-64px top bar on Label White with a hairline bottom; not sticky. Wordmark 800 at 21px, "OS" navy, beside the two-roof mark. Links 500 at 14.5px dim in two groups split by a hairline; active link turns ink at 650 with a 2px navy underline at the bar's foot. Under 1100px a 40px "Menu" button opens a modal `<dialog>` drawer from the right (min(22rem, 88vw), 0.28s) over a 42% black scrim; rows are 52px with a 16.5px 600 name and 13px dim hint; the current page gets a navy tint, navy name and an 8px round navy dot.
+- **Rail (desktop):** yellow column with the wordmark at 900 weight, 78% width, 27px. It has three groups split by 1px rules at 28% ink. The four everyday destinations are bigger (18px, 800, 88% width, 46px tall), the rest are 15.5px/650, and Casa and Conta sit at the foot. Hover is a 9% ink wash. Active inverts to ink ground with yellow text.
+- **Tab bar (phone):** fixed yellow bar with a 2px ink top border. Each of the five slots has a 24px stroke icon over a 12.5px/750 label and is at least 54px tall. Active inverts the same way as the rail.
+- **Mais sheet (phone):** a native dialog that rises from the bottom (`sheet-up`, 0.32s). It is yellow with a 2px ink top border and 14px top corners, a 900/78%/24px title, and a 2px-bordered close button. Each link is 52px tall and carries a dimmed one-line hint.
+- **Guest header:** a 68px yellow bar holding the brand and bold ink links, which underline at 2px when active or hovered.
 
-### Photo Field (signature)
-The product image sits on its aisle's `-soft` tint: 16:10 on cards (edge to edge), square with 16px corners on the article (4:3 under 760px). Photos are contained at ~70-80% and multiplied into the tint (normal blend in dark). A Label White pill tag with the aisle dot and category name sits top-left. Without a photo, the aisle pictogram (single-stroke 24px SVG, 1.6 stroke, in the aisle hue) centres in a shorter field (16:7 card, 4:3 article); unknown categories show a shopping bag on Shelf Grey.
+### Today's Sheet (signature)
+The day sheet is opened by a 6px black rule. The left column holds the uppercase weekday, the red condensed day number, the uppercase month and, under a hairline, an almanac block: the season name in ink, then dim lines for the month's produce ("Da época: …") and the computed Lisbon sunrise and sunset ("Sol 07:12–17:24", never wrapped). To the right of the 1px black divider come the dish name as headline, then a meta line ("Jantar para 4 pessoas"), a 16:9 photo (max 22rem tall), the readiness line and the actions. The readiness line has a 12px dot: red when something is missing, green when you have everything. When the recipe's own readiness is unavailable it falls back to the plan's availability for the day; an unknown state reads ink-dim. Other meals of the day sit under a hairline as inline slot-label + dish pairs. When nothing is planned, "Jantar por decidir" stays in normal ink, as an invitation rather than a disabled control.
 
-### Verdict (signature)
-Maps the Api `PriceLabel`, always led by an 8px round dot. On a card it is a full-width foot row (13px 600, padding 0.55rem 1.1rem, hairline top); loose, it is a pill (14px, padding 0.4rem 0.85rem). Tones: 0 / none Shelf Grey with dim text and dim dot; 1 Historic low teal tint, teal text, teal dot ("Mínimo dos últimos N dias"); 2 Below average teal tint, teal dot; 3 Usual navy tint, navy dot; 4 Above average red tint, red dot; urgent red tint, red dot.
+### Next Days Strip
+This strip shows the edges of the sheets below today's. Each cell has a 44px condensed number (red if Sunday), the weekday, the dish, and a readiness line in red ("Falta N") or green ("Tens tudo"). An unplanned day is dimmed. Hover is a paper-shade wash.
 
-### Onde comprar (signature)
-One row per store in a 12px bordered list: chain and store/unit price, a 10px pill bar (Shelf Grey track) whose fill is the price as a share of the highest (min 8%), the price (700, 19px) with card price under it in teal, then a verdict pill and a drawn chevron. The cheapest row's bar is teal with a "Mais barato" pill; others fill in 45% dim ink; out-of-stock rows go dim with a danger pill. Bars grow left to right once on load (0.7s, 70ms stagger by price order, after 150ms). Each row opens (`<details>`) to seen date, card validity, promotion badge, the price range and insight notes. Under 640px the bar drops to its own line.
+### Urgency Dots (Usar primeiro, Despensa)
+Rows lay out as dot, name with meta, and when. Each dot sits in a fixed 22px slot, and its diameter carries the urgency on a fixed scale: 6px ink-dim (no expiry, or more than a week away), 10px ink (4–7 days), then 15px (1–3 days) and 20px (today or expired) in calendar red. At the two red steps the "when" text turns red too. Hoje and Despensa compute the level from one shared function, so a product never shows two urgencies. In Despensa the dot replaces the old aisle-hue dot, and a used-up row hides it.
 
-### Price Range
-An 8px pill track graded from teal through navy tint to red tint, a 2px dim tick at the average and an 18px Label White dot ringed 4px in ink at the current price, with a 12.5px legend (mín, média, máx).
-
-### Aisle Dot
-10px round dot in `--aisle`. Leads aisle chips, the photo tag, pantry rows (own grid column) and shopping-list group headings.
-
-### Settings List (Casa, Conta)
-Casa and Conta are left-aligned in a 54rem column. Facts and account actions sit in one 12px bordered list of rows (min 60px, padding 0.8rem 1.1rem, hairline dividers): a 10rem 600 label, then the value with a pill or a dim hint, and the action pushed right (a 14px 650 teal link, a secondary button, or a danger button for "Sair em todos"). Under 640px the label takes its own line. The household switcher is a chip row (pressed chip = current household).
-
-### Member Row
-One bordered list of members, the caller first, then by role and name. Each row is a 44px round initials avatar (Shelf Grey; navy tint for "tu"), name 600, a meta line (role pill: navy for Administrador, muted otherwise; age; an 8px dot, filled teal "Com conta" or hollow dim "Sem conta") and restriction tags (hairline pills). Actions on the right: "Editar" and "Ligar conta" as row actions, "Remover" / "Sair da casa" as a danger button. Editing, linking and removing open inline under the name on a faint Shelf Grey tint; removal asks once more with a 44px danger-outlined confirm. "Acrescentar membro" adds a two-column form as the list's last row (one column under 640px).
-
-### Disclosures
-Store breakdowns and event history are `<details>` in hairline containers; 600 summaries with Shelf Grey hover and open state; drawn CSS chevrons rotate on open.
-
-### Site: Header and Language Switch
-Sticky 64px bar on Label White with a hairline foot: wordmark (800, 21px, "OS" navy) and two-roof mark, menu links 500 at 14.5px dim (hover ink on a Shelf Grey fill, 8px), then at the right the language switch, a dim login link (hidden under 700px) and a 40px primary "Pedir acesso". The switch is a hairline pill holding pt and en links (12.5px 650, 28px); the current one (`aria-current`) fills navy with white text. Both languages ship from typed dictionaries (`site/i18n`); numbers format with `pt-PT` or `en-GB`.
-
-### Site: Shelf-label Demonstrator (signature)
-**The Shelf Label Rule.** The public site proves the product with one object: a label surface (Label White, 12px, hairline) holding the name, the price at 800 and the 90-day range, closed by a verdict foot. Only the verdict, the price and the range marker change between states; the label itself never gains imagery, shadow or decoration.
-- **Label:** Label White, 1px hairline, 12px, clipped; body padding 1.35rem 1.5rem 1.4rem. Top to bottom: a muted "Exemplo" pill, the product name (600), the unit line (14px dim), the price (price label, euro at 0.4em), the price range, then the verdict foot.
-- **Price range:** the app's range (8px track graded teal, navy tint, red tint; 2px dim tick at the average; 18px Label White dot ringed 4px in ink at the current price) with a 12.5px legend of min, average and max. The dot slides (0.45s ease-out) when the verdict changes.
-- **Verdict foot:** full-width row under a hairline, 14px 600, padding 0.65rem 1.5rem, led by an 8px dot, announced politely. Tones match the app's verdict: historic low (teal tint, teal text and dot), below average (teal tint, ink text, teal dot), usual (navy tint, navy dot), above average (red tint, red dot); Shelf Grey with a dim dot by default.
-- **Verdict chips:** four pills under the label (the standard chip: 36px, hairline, 14px 550), each led by an 8px dot in its tone (teal, teal, navy, red); `aria-pressed` fills navy with white text and rings the dot 2px in Label White. They flip the label between the four states; a caption above them and a note below say it is an example.
-**The Example Rule.** Every figure on the public site is example data and says so: the label carries a muted "Exemplo" pill and a note beneath it. No invented prices, savings or counts appear outside that label.
-
-### Site: Row Link List
-Menus are listed as one 12px bordered list of rows per group (min 60px, padding 0.8rem 1.1rem, hairline dividers): a 600 16.5px name, a 14px dim hint, a drawn 20px chevron right. Hover mixes Shelf Grey at 45%; no lift. The group heading is a dim 14px 650 h3.
-
-### Site: Strips, Request Band and Guide
-- **Judge list / Flow:** one bordered 12px strip of three cells (padding 1.35rem 1.5rem 1.4rem, hairline between cells), a 16px 600 h3 and 15px dim text each.
-- **Request band:** 16px corners, `accent-soft` fill with a 35% teal hairline, ink text (dim ink falls under 4.5:1 on the tint), headline left and a primary button right. The guide teaser shares the shape on Label White with a secondary button.
-- **Guide:** table of contents with a 1px left rule and dim links; steps separated by hairlines, each h2 led by a 32px round navy-tint number; step lists use navy markers; a notice is an 8px `accent-soft` block with a teal hairline; the FAQ is a bordered `<details>` list with a drawn chevron that rotates.
-- **Request form:** 34rem column, labels 14px 650, the standard 42px input (8px, hairline, 2px teal outline and 4px `accent-soft` ring on focus), a hidden honeypot field, an error block (`danger-soft`, red 600) and a confirmation panel on Label White.
-- **Capture (`Shot`):** a real app screenshot in a hairline frame with 16px corners and a 13px dim caption; the shopping-list capture is phone-width (19rem). If the file is missing the figure is omitted.
-- **Primary button, large:** 52px, padding 0.6rem 1.6rem, 16.5px, used for "Pedir acesso" in the hero; "Ver como funciona" is a 600 teal text link.
-
-### Admin: Shell, Rows and Facts
-- **Shell:** 64px Label White header with hairline foot; the nav reuses the app's active treatment (ink 650 with a 2px navy inset underline); the "Admin" tag is a navy-tint pill (12.5px 650).
-- **Row:** the flat row of the Flat Row Rule. Title is strong text with a dim email or secondary on the same baseline, an optional 14.5px note (60ch), a 13px dim meta line (figures lining and proportional), state pills right-aligned, actions right-aligned (min 9rem). Audit rows drop to two columns with a nowrap dim time; edit rows are a single column; slim rows (0.6rem) carry recipe steps and lines.
-- **Filter chips and search:** the standard chip row above the list (pressed navy), a 34rem search (input + button) and a bold 14px result count; the pager is two secondary buttons around a dim "Página X de Y".
-- **Facts list:** one 12px bordered list of rows (min 56px, padding 0.7rem 1.1rem) with a 600 label, a dim 14px value line led by a 16px 650 ink figure, and a pill or link pill at the right ("Ligada" good, "Só log" muted, "Ver pedidos" navy). Under 720px the detail drops to its own line.
-- **State line:** loading and empty states are plain dim text; errors are the `danger-soft` block with `role="alert"`.
-
-### Admin: Pills and ConfirmAction
-- **Pills:** the four app pill tones (good teal, navy, muted, danger), 12.5px 600. Status maps are fixed per page: Pendente navy, Aprovado good, Rejeitado muted, "Conta criada" good.
-- **ConfirmAction** (`admin/components.tsx`) has two tones.
-**The Armed Rule.** In the admin a consequential verb asks twice, inline, in place. At rest it is a neutral row action (or a neutral outlined danger button); pressed, it swaps to the armed tint with a longer confirm label plus a "Cancelar" link; the second press runs it and a failure shows as red text under the buttons. No modal, no red at rest.
-- **Neutral tone** (Aprovar, Reenviar convite): row action (Shelf Grey pill, 36px); armed it takes the teal tint, teal text and a 45% teal border.
-- **Danger tone** (Rejeitar, remover): the transparent outlined pill with dim text; hover and armed turn red text, 45% red border and `danger-soft` fill.
-- Disabled controls drop to 45%; under a coarse pointer row actions, danger buttons, chips and link buttons grow to 44px.
-
-### Admin: Edit Form and Panel
-A panel is a 12px hairline container on Label White (padding 0.25rem 1.25rem 1.25rem) holding an edit form: an auto-fill grid (15rem, gap 0.9rem 1.1rem) of fields (13.5px 650 label, 42px input, select or textarea at 8px, optional 12.5px dim hint; `wide` spans the row), a nutrition fieldset (8px hairline, 9.5rem columns), then a primary submit button (reads "A guardar…" while busy) beside a secondary "Cancelar". Focus is the teal border with an `accent-soft` ring; a saved confirmation is a 14px 600 teal line. Search, rename and add-line forms reuse the same inputs and buttons.
+### List Tally and Price Tag
+Each open list is one row with a 48px condensed count, the list name, and the cheapest store with its total on the yellow price tag. The tag is 3px radius, 800 weight, almanac ink on yellow. The lists index uses the same row: condensed count, then the list name as a dish in a row with a dim meta line, at least 76px tall, underlining at 2px on hover. A single list opens with a big condensed remaining-count in ink beside its title, and each line's cheapest price sits on the price tag.
 
 ### Motion
-Ease-out `cubic-bezier(0.16, 1, 0.3, 1)`. Pages fade up 6px (0.4s); cards rise 8px (0.45s, 30ms stagger, capped at 12); store bars grow once. All motion collapses under `prefers-reduced-motion`. The site has one authored entrance: hero copy, demo label (90ms later) and page heads rise 8px in 0.5s, plus the range marker slide and smooth anchor scrolling (off under reduced motion). The admin rises its page content 6px in 0.4s.
+When the day changes, the previous day's sheet tears upward once (`sheet-tear`, 0.9s, cubic-bezier(0.55, 0, 0.75, 0.2), 0.35s delay). It is held by its top rule, rotates to -7°, and its bottom edge ragged-clips. The clip is the same nine-point polygon in every keyframe, so the rag interpolates instead of jumping: the edge tears early and the sheet fades only after it has left. With reduced motion it doesn't appear. This has not been visually verified yet. Nothing else animates on arrival; the `.page` fade-in is switched off app-wide. State changes use 0.15s colour transitions.
+
+### Recipe Rows (Receitas, Cozinhar)
+A recipe in a list is a row, never a card: the dish name in the "dish in a row" style (900, 72% width, 22–26px), dim meta lines under it, and the photo at the right as a 7.5rem 4:3 thumbnail with 4px corners (5.5rem on phones). The photo only appears when the recipe has one and it loads, so names always align in one column; most of the catalog has no photo. Rows sit under a 2px rule (a hairline when they are inside a section that already has the 6px rule), are at least 76px tall, are split by hairlines, and flow into two newspaper columns when each can be at least 30rem wide. In Cozinhar each row carries the readiness line from Hoje at a smaller size (10px dot, 15px text): green "Tens tudo", red "Falta N" followed by what is missing, ink-dim "Deve dar" when the Api cannot be sure. Ingredients that are expiring read "Usar primeiro: …" with the days-left label from the shared urgency function, led by the urgency dot of the most urgent one on the fixed 6 / 10 / 15 / 20px scale; the text turns calendar red only at the two red steps. Both dots sit in a fixed 20px slot so the text always starts in the same place. The thumbnail keeps its place but stays invisible until the image loads, so a slow or broken photo never shows an empty grey box. A recipe that can no longer be opened keeps its name in ink-dim, unlinked, with "Já não está disponível" in its meta. In Receitas feitas the row has a fixed lead column holding the times cooked as a 48px condensed numeral over a small "vezes" label, like a day number. Row actions are link buttons under the text.
+
+### Recipe Sheet (recipe page)
+The recipe page is built like today's sheet. A 6px rule opens it; the left column (same width as the day column) stacks the facts as small labels over 30–40px condensed numerals (Tempo, Preparação, Cozedura, Porções, Dificuldade), split by hairlines. To the right of a 1px black divider come the dish name as headline, the dish type and protein as meta, the description as a dim lede, the 16:9 photo when there is one, and the large actions (Adicionar ao plano primary, Pôr na lista de compras and Guardar receita secondary). An open form or a saved recipe keeps the ink border and takes the paper-shade ground, so it never reads as a second primary; "Guardada" carries a drawn check icon. Tags and the original source sit under a hairline. Below, Ingredientes (sticky on desktop) and Preparação are sections under the 6px rule; ingredients are 26px ink checkboxes in rows at least 48px tall, and each step's number is a 36px condensed numeral in a fixed 3rem column. Under 640px the facts lie down into a wrapped row above the dish and the actions go full width.
+
+### Ementas (meal plan templates)
+The index has two sections under the 6px rule, "As minhas ementas" (only when the household has some) and "Todas as ementas" with its count on the right of the heading and the search inside the section. Each template is a recipe row whose lead column holds the length in days as a 48px condensed numeral over a small "dias" label; under the name come meals and servings, a two-line description and the tags, with "Dá para editar" on the household's drafts. A template's page has the page head (name, then days, meals and servings per meal as the sub-line) and a dim lede, then Semana's two-column grammar: the days as Semana day rows with a small "DIA" label over the condensed day number in the fixed column and the meals as slot label plus dish, and a sticky side column with "Aplicar ao plano" (the form stacked field by field), then "Personalizar" (copy to the household) or "Editar". A day being edited takes the paper-shade ground across its row; its meals become hairline rows of meal select, dish and link actions, and the recipe picker opens under a 2px rule. Below 1100px the side column drops under the days, and the page head gains a large "Aplicar ao plano" primary that jumps to the form (full width under 720px); from 1101px it is hidden, since the sticky side column is in view, and that column scrolls inside itself when taller than the screen. A recipe that is no longer published stays in its day as an unlinked ink-dim dish with "Já não está disponível" in its meta, and the editor says the same on its row. Opening, saving or cancelling the editor, removing a meal and closing the picker always leave focus on the next sensible control.
+
+### Legacy, pending migration
+Product cards, verdict chips and bands, shelf labels with aisle-hue fields, and aisle-hue dots still live on Nutrição, Preços/Produtos, Promoções, Casa, Conta and the auth pages, in the store comparison in Compras, and in the shopping list's item-group headings. The shared restyle squared their pills and removed panel frames, but their layouts are not part of this world. Don't copy them onto new surfaces.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** make the price the heaviest thing on any card or article (800; 34px card, up to 68px article) with the euro sign at 0.4-0.45em.
-- **Do** carry the aisle hue wherever a category appears: chip dot, photo field, pictogram, pantry row dot, list group dot.
-- **Do** fall back to Dim Ink / Shelf Grey when a category matches no aisle.
-- **Do** lead every verdict with an 8px round dot, as a foot row on cards and a pill elsewhere.
-- **Do** keep teal for "good now" and navy for structure.
-- **Do** keep destructive controls neutral at rest and red only on hover.
-- **Do** use `lining-nums proportional-nums` for every figure and right-align numeric columns.
-- **Do** keep controls at least 36px (primary buttons 44px, inputs 42px) and shopping-list rows at least 56px.
-- **Do** draw icons as inline SVG or CSS shapes.
-- **Do** keep the site's one 800 figure the demo price (and the wordmark), and label it as example data.
-- **Do** change only verdict, price and range marker when the demo label flips state.
-- **Do** arm consequential admin actions in two inline steps, neutral at rest, and show record state as pills on the right of a hairline row.
-- **Do** ship every site string in both pt-PT and en from the typed dictionaries.
+- **Do** head every section with a 6px black rule and split its rows with hairlines.
+- **Do** set day numbers and counts in Archivo at 900 weight and 62% width, and dish names at 70%.
+- **Do** keep a day's number in a fixed column wherever days are listed.
+- **Do** show urgency by dot diameter on the fixed 6 / 10 / 15 / 20px scale.
+- **Do** put prices on the yellow price tag.
+- **Do** keep almanac yellow on the shell: rail, tab bar, Mais sheet, guest header.
+- **Do** open a page with the title on the left and its primary action on the right.
 
 ### Don't:
-- **Don't** change or tune the base colour tokens, or add hues beyond the six aisle pairs.
-- **Don't** use aisle hues on buttons, prices, verdicts or text.
-- **Don't** use 800 weight for headings or titles.
-- **Don't** bring back top rails, square markers or solid verdict bands.
-- **Don't** put eyebrows or kickers above headings.
-- **Don't** use a coloured border-left as an accent.
-- **Don't** use emoji or text glyphs as icons, or gradient text.
-- **Don't** add shadows to cards, panels or rows.
-- **Don't** use tabular figures.
-- **Don't** add a second typeface.
-- **Don't** show unlabeled prices, savings or counts on the public site.
-- **Don't** give admin records their own cards or shadows, or put red on a control at rest.
-- **Don't** open a modal to confirm an admin action; confirm in the row.
+- **Don't** wrap content in cards, panels with chrome, or drop shadows.
+- **Don't** use calendar red for anything except today, Sundays and "running out".
+- **Don't** use green for anything except "tens tudo", including prices and savings.
+- **Don't** put an eyebrow or kicker above a heading.
+- **Don't** animate ordinary page mounts. The tear is the only entrance, and it happens once per day.
+- **Don't** treat the legacy route components or the aisle hues in `src/shared/tokens.css` as part of this world.

@@ -1,7 +1,7 @@
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { useSession } from "./auth/useSession";
-import { AppMenu } from "./components/AppMenu";
+import { AppRail, AppTabBar } from "./components/AppMenu";
 import { EmailVerificationNotice } from "./components/EmailVerificationNotice";
 import { AccountPage } from "./pages/AccountPage";
 import { AddPantryItemPage } from "./pages/AddPantryItemPage";
@@ -39,51 +39,46 @@ function App() {
   const showVerificationNotice =
     session !== null && !session.emailVerified && !PATHS_WITHOUT_VERIFICATION_NOTICE.includes(pathname);
 
+  const brand = (
+    <NavLink to="/" className="brand" aria-label="DomiOS, Hoje">
+      <svg className="brand-mark" viewBox="0 0 120 120" aria-hidden="true">
+        <polyline
+          points="30,72 30,46 60,20 90,46 90,72"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <polyline
+          points="52,88 52,62 82,36 112,62 112,88"
+          fill="none"
+          stroke="var(--today)"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <span className="wordmark">DomiOS</span>
+    </NavLink>
+  );
+
   return (
-    <div className="app">
-      <header className="app-header">
-        <NavLink to="/" className="brand">
-          <svg className="brand-mark" viewBox="0 0 120 120" aria-hidden="true">
-            <polyline
-              points="30,72 30,46 60,20 90,46 90,72"
-              fill="none"
-              stroke="var(--accent)"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <polyline
-              points="52,88 52,62 82,36 112,62 112,88"
-              fill="none"
-              stroke="var(--accent-2)"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="wordmark">
-            Domi<em>OS</em>
-          </span>
-        </NavLink>
-        {session && <AppMenu />}
-        <nav className={session ? "app-nav nav-end" : "app-nav nav-end nav-end-guest"} aria-label="Conta">
-          {session ? (
-            <>
-              <NavLink to="/casa">Casa</NavLink>
-              <NavLink to="/conta" className="nav-account" title={session.email}>
-                Conta
-              </NavLink>
-            </>
-          ) : (
-            <>
-              <a href={REQUEST_ACCESS_URL}>Pedir acesso</a>
-              <NavLink to="/entrar" className="nav-account">
-                Entrar
-              </NavLink>
-            </>
-          )}
-        </nav>
-      </header>
+    <div className={session ? "app" : "app app-guest"}>
+      {session && <AppRail brand={brand} />}
+
+      <div className="app-column">
+      {session ? (
+        <header className="app-topline">{brand}</header>
+      ) : (
+        <header className="guest-header">
+          {brand}
+          <nav className="guest-nav" aria-label="Conta">
+            <a href={REQUEST_ACCESS_URL}>Pedir acesso</a>
+            <NavLink to="/entrar">Entrar</NavLink>
+          </nav>
+        </header>
+      )}
 
       {showVerificationNotice && (
         <div className="app-notice">
@@ -124,6 +119,9 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Routes>
       </main>
+      </div>
+
+      {session && <AppTabBar />}
     </div>
   );
 }

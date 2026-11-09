@@ -18,7 +18,7 @@ export function SaveRecipeButton({ householdId, recipeId }: Props) {
     setSaved(null);
     listSavedRecipes(householdId)
       .then((list) => active && setSaved(list.some((s) => s.recipeId === recipeId)))
-      .catch(() => active && setSaved(false));
+      .catch(() => active && setError("Não deu para ver se está guardada."));
     return () => {
       active = false;
     };
@@ -46,12 +46,17 @@ export function SaveRecipeButton({ householdId, recipeId }: Props) {
     <>
       <button
         type="button"
-        className="button-secondary"
+        className="button-secondary button-lg save-recipe"
         aria-pressed={saved === true}
         disabled={saved === null || busy}
         onClick={toggle}
       >
-        {saved ? "Guardada ✓" : "Guardar receita"}
+        {saved && (
+          <svg className="save-recipe-check" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+        {saved ? "Guardada" : "Guardar receita"}
       </button>
       {error && (
         <p className="form-error" role="alert">

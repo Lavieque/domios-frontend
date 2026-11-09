@@ -1,69 +1,90 @@
 import { RecipeVerdict, SavedRecipeOrigin, type CookableRecipeDto } from "../api/savedRecipes";
+import { urgency, type UrgencyLevel } from "../pantry/urgency";
 import { shortDate } from "../plan/dates";
-import { RecipePhoto } from "./RecipePhoto";
-import { ShelfLabel } from "./ShelfLabel";
-
-const verdictLabels: Record<RecipeVerdict, string> = {
-  [RecipeVerdict.CanCook]: "Tens tudo",
-  [RecipeVerdict.Uncertain]: "Deve dar",
-  [RecipeVerdict.Missing]: "Falta algo",
-};
-
-const verdictPill: Record<RecipeVerdict, string> = {
-  [RecipeVerdict.CanCook]: "pill pill-accent2",
-  [RecipeVerdict.Uncertain]: "pill pill-warning",
-  [RecipeVerdict.Missing]: "pill pill-muted",
-};
+import { RecipeRow } from "./RecipeRow";
 
 interface Props {
   recipes: CookableRecipeDto[];
-  /** Mostra "Remover" nas guardadas. */
+  /** Mostra "Remover das guardadas" nas guardadas. */
   onRemove?: (recipeId: string) => void;
 }
 
-/** Receitas com o que a despensa cobre, em cartões como os de /receitas: veredito, o que falta e o que está a expirar. */
+/** A linha de prontidão, com o ponto de Hoje: verde tens tudo, vermelho falta, tinta fraca quando não se sabe. */
+function Readiness({ recipe }: { recipe: CookableRecipeDto }) {
+  const counts = `${recipe.availableCount} de ${recipe.requiredCount} ingredientes em casa`;
+  if (recipe.verdict === RecipeVerdict.CanCook) {
+    return (
+      <span className="readiness readiness-compact readiness-ready">
+        <span className="readiness-dot" aria-hidden="true" />
+        <span>
+          <strong>Tens tudo</strong> · {counts}
+        </span>
+      </span>
+    );
+  }
+  if (recipe.verdict === RecipeVerdict.Uncertain) {
+    return (
+      <span className="readiness readiness-compact readiness-unknown">
+        <span className="readiness-dot" aria-hidden="true" />
+        <span>
+          <strong>Deve dar</strong> · {counts}
+        </span>
+      </span>
+    );
+  }
+  const missing = recipe.missingIngredients.length;
+  return (
+    <span className="readiness readiness-compact">
+      <span className="readiness-dot" aria-hidden="true" />
+      <span>
+        <strong>{missing > 0 ? `Falta ${missing}` : "Falta algo"}</strong>
+        {missing > 0 && <>: {recipe.missingIngredients.map((i) => i.name).join(", ")}</>}
+      </span>
+    </span>
+  );
+}
+
+/** O que está a acabar, com o ponto de Usar primeiro: o tamanho diz a pressa do mais urgente. */
+function Expiring({ items }: { items: CookableRecipeDto["expiringIngredients"] }) {
+  const graded = items.map((i) => ({ ...i, ...urgency(i.expiresAt) }));
+  const level = Math.max(...graded.map((i) => i.level)) as UrgencyLevel;
+  return (
+    <span className={`recipe-row-expiring urgency-${level}`}>
+      <span className="urgency-dot" aria-hidden="true" />
+      <span>Usar primeiro: {graded.map((i) => `${i.name} (${i.label.toLowerCase()})`).join(", ")}</span>
+    </span>
+  );
+}
+
+/** Receitas com o que a despensa cobre, em linhas: prontidão, o que está a acabar, quando está no plano. */
 export function CookableRecipeList({ recipes, onRemove }: Props) {
   return (
-    <div className="recipe-grid">
-      {recipes.map((recipe, index) => (
-        <div key={recipe.recipeId} className="cook-card">
-          <ShelfLabel
+    <ul className="recipe-rows">
+      {recipes.map((recipe) => {
+        const notes = [
+          recipe.plannedOn.length > 0 ? `No plano: ${recipe.plannedOn.map(shortDate).join(", ")}` : null,
+          recipe.savedOrigin === SavedRecipeOrigin.ShoppingList ? "Compraste para esta" : null,
+        ].filter(Boolean);
+        return (
+          <RecipeRow
+            key={recipe.recipeId}
+            title={recipe.title}
             to={`/receitas/${recipe.recipeId}`}
-            index={index}
-            className="recipe-card"
-            media={<RecipePhoto imageUrl={recipe.imageUrl} />}
+            imageUrl={recipe.imageUrl}
+            action={
+              onRemove && recipe.savedOrigin !== null ? (
+                <button type="button" className="link-button" onClick={() => onRemove(recipe.recipeId)}>
+                  Remover das guardadas
+                </button>
+              ) : undefined
+            }
           >
-            <div className="recipe-card-title">{recipe.title}</div>
-            <div className="recipe-card-pills">
-              <span className={verdictPill[recipe.verdict]}>{verdictLabels[recipe.verdict]}</span>
-              <span className="pill pill-muted">
-                {recipe.availableCount}/{recipe.requiredCount} ingredientes
-              </span>
-              {recipe.savedOrigin === SavedRecipeOrigin.ShoppingList && (
-                <span className="pill pill-muted">Compraste para esta</span>
-              )}
-              {recipe.plannedOn.length > 0 && (
-                <span className="pill pill-muted">No plano: {recipe.plannedOn.map(shortDate).join(", ")}</span>
-              )}
-            </div>
-            {recipe.missingIngredients.length > 0 && (
-              <p className="muted cook-card-note clamp-3">
-                Falta: {recipe.missingIngredients.map((i) => i.name).join(", ")}
-              </p>
-            )}
-            {recipe.expiringIngredients.length > 0 && (
-              <p className="cook-card-note cook-card-expiring clamp-3">
-                A expirar: {recipe.expiringIngredients.map((i) => `${i.name} (${shortDate(i.expiresAt)})`).join(", ")}
-              </p>
-            )}
-          </ShelfLabel>
-          {onRemove && recipe.savedOrigin !== null && (
-            <button type="button" className="link-button cook-card-action" onClick={() => onRemove(recipe.recipeId)}>
-              Remover das guardadas
-            </button>
-          )}
-        </div>
-      ))}
-    </div>
+            <Readiness recipe={recipe} />
+            {recipe.expiringIngredients.length > 0 && <Expiring items={recipe.expiringIngredients} />}
+            {notes.length > 0 && <span className="recipe-row-meta">{notes.join(" · ")}</span>}
+          </RecipeRow>
+        );
+      })}
+    </ul>
   );
 }

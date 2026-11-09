@@ -20,14 +20,13 @@ import {
 import { lookupBarcode, type BarcodeLookupResult } from "../api/barcodes";
 import { ApiError } from "../api/http";
 import { measurementUnitLabels, type ProductDto } from "../api/types";
-import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
-import { useCategories } from "../catalog/useCategories";
 import { describeError } from "../auth/errors";
 import { BarcodeScanner } from "../components/BarcodeScanner";
 import { CookableTeaser } from "../components/CookableTeaser";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { AisleSign } from "../components/AisleSign";
+import { urgency } from "../pantry/urgency";
 import { SearchField } from "../components/SearchField";
 import { useProducts } from "../pantry/useProducts";
 import { daysBetween, longDate, shortDate, today } from "../plan/dates";
@@ -56,12 +55,13 @@ function isLive(item: PantryItemDto) {
 }
 
 function ExpiryLabel({ expiresAt }: { expiresAt: string | null }) {
-  if (!expiresAt) return <span className="muted">Sem validade</span>;
+  if (!expiresAt) return <span className="pantry-when">Sem validade</span>;
   const days = daysBetween(today(), expiresAt);
-  if (days < 0) return <span className="pill pill-danger">Expirou a {longDate(expiresAt)}</span>;
-  if (days === 0) return <span className="pill pill-danger">Expira hoje</span>;
-  if (days <= 3) return <span className="pill pill-warning">Expira em {days} {days === 1 ? "dia" : "dias"}</span>;
-  return <span>Até {shortDate(expiresAt)}</span>;
+  if (days < 0) return <span className="pantry-when">Expirou a {longDate(expiresAt)}</span>;
+  if (days === 0) return <span className="pantry-when">Expira hoje</span>;
+  if (days === 1) return <span className="pantry-when">Expira amanhã</span>;
+  if (days <= 7) return <span className="pantry-when">Expira em {days} dias</span>;
+  return <span className="pantry-when">Até {shortDate(expiresAt)}</span>;
 }
 
 function withoutPage(params: URLSearchParams): URLSearchParams {
@@ -91,7 +91,6 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const products = useProducts(items.map((item) => item.productId));
-  const categories = useCategories();
 
   useEffect(() => {
     const next = search.trim();
@@ -153,9 +152,19 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   }
 
   return (
-    <div className="page">
-      <h1>Despensa</h1>
-      <p className="page-sub">{household.name}</p>
+    <div className="page pantry-page">
+      <header className="page-head">
+        <div>
+          <h1>Despensa</h1>
+          <p className="page-head-sub">
+            {household.name}
+            {!loading && total > 0 && ` · ${total} ${total === 1 ? "artigo" : "artigos"}`}
+          </p>
+        </div>
+        <Link to="/despensa/adicionar" className="button-primary button-lg">
+          Adicionar à despensa
+        </Link>
+      </header>
       {notice && <p className="notice">{notice}</p>}
 
       <CookableTeaser householdId={household.householdId} version={version} />
@@ -187,9 +196,6 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
             </option>
           ))}
         </select>
-        <Link to="/despensa/adicionar" className="button-primary button-link">
-          Adicionar à despensa
-        </Link>
       </div>
 
       {error && (
@@ -219,7 +225,6 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
                 key={item.pantryItemId}
                 item={item}
                 product={products.get(item.productId)}
-                aisle={aisleFor(products.get(item.productId), categories)}
                 onAct={act}
                 householdId={householdId}
               />
@@ -233,21 +238,14 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   );
 }
 
-function aisleFor(product: ProductDto | undefined, categories: ReturnType<typeof useCategories>): string {
-  if (!product) return aisleClass(null);
-  return aisleClass(aisleOf((topCategory(product.category, categories) ?? product.category).name));
-}
-
 function PantryRow({
   item,
   product,
-  aisle,
   householdId,
   onAct,
 }: {
   item: PantryItemDto;
   product: ProductDto | undefined;
-  aisle: string;
   householdId: string;
   onAct: (action: () => Promise<unknown>) => void;
 }) {
@@ -305,8 +303,8 @@ function PantryRow({
   }
 
   return (
-    <li className={`pantry-row ${aisle}`}>
-      <span className="aisle-dot" title={product?.category.name} aria-hidden="true" />
+    <li className={live ? `pantry-row urgency-${urgency(item.expiresAt).level}` : "pantry-row is-gone"}>
+      <span className="urgency-dot" aria-hidden="true" />
       <div className="pantry-main">
         <div className={`pantry-thumb${thumb ? "" : " is-empty"}`}>
           {thumb ? <img src={thumb} alt="" loading="lazy" /> : <AisleSign aisle={null} />}

@@ -171,15 +171,24 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const notInPantry = purchased.filter((item) => !item.storedInPantryAt);
 
   return (
-    <div className="page">
+    <div className="page list-page">
       <Link to="/listas" className="back-link">
         Listas de compras
       </Link>
-      <ListName list={list} onRename={(name) => act(() => renameShoppingList(householdId, listId, name))} />
-      <p className="page-sub">
-        <span className={`status-tag status-${list.status}`}>{shoppingListStatusLabels[list.status]}</span>
-        {household.name} · {pending.length} por comprar de {list.items.length}
-      </p>
+      <header className="list-head">
+        <span className="list-tally-count" aria-hidden="true">
+          {pending.length}
+        </span>
+        <div className="list-head-text">
+          <ListName list={list} onRename={(name) => act(() => renameShoppingList(householdId, listId, name))} />
+          <p className="page-head-sub">
+            {list.status !== ShoppingListStatus.Open && (
+              <span className={`status-tag status-${list.status}`}>{shoppingListStatusLabels[list.status]}</span>
+            )}{" "}
+            {pending.length} por comprar de {list.items.length} · {household.name}
+          </p>
+        </div>
+      </header>
 
       {error && (
         <p className="form-error" role="alert">
@@ -187,116 +196,126 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
         </p>
       )}
 
-      {open && (
-        <AddItemForm
-          onAdd={(label, amount, unit, pick) =>
-            act(() =>
-              addShoppingListItem(householdId, listId, {
-                label,
-                quantity: { amount, unit },
-                productId: pick?.kind === "product" ? pick.id : null,
-                ingredientId: pick?.kind === "ingredient" ? pick.id : null,
-              }),
-            )
-          }
-        />
-      )}
-
-      {pending.length > 0 && (
-        <section className="panel comparison-panel">
-          <h2>Onde fica mais barato</h2>
-          {checkingLinks && unlinked.length > 0 && (
-            <UnlinkedWarning items={unlinked} onLink={link} onCompareAnyway={compare} onCancel={() => setCheckingLinks(false)} />
+      <div className="list-layout">
+        <div className="list-main">
+          {open && (
+            <AddItemForm
+              onAdd={(label, amount, unit, pick) =>
+                act(() =>
+                  addShoppingListItem(householdId, listId, {
+                    label,
+                    quantity: { amount, unit },
+                    productId: pick?.kind === "product" ? pick.id : null,
+                    ingredientId: pick?.kind === "ingredient" ? pick.id : null,
+                  }),
+                )
+              }
+            />
           )}
-          {!comparison ? (
-            !checkingLinks && (
-              <button type="button" className="button-secondary" onClick={startCompare} disabled={comparing}>
-                {comparing ? "A comparar…" : "Comparar lojas"}
-              </button>
-            )
+
+          {list.items.length === 0 ? (
+            <p className="empty-state">
+              Lista vazia. Acrescenta itens aqui, a partir de uma receita, ou com o que falta no <Link to="/plano">plano da semana</Link>.
+            </p>
           ) : (
-            <Comparison comparison={comparison} items={list.items} householdId={householdId} onRecompare={compare} />
+            <>
+              <div className="section-head pending-head">
+                <h2>Por comprar ({pending.length})</h2>
+                {open && pending.length > 1 && !draftOrder && (
+                  <button type="button" className="link-button" onClick={() => setDraftOrder(pending.map((item) => item.shoppingListItemId))}>
+                    Ordenar
+                  </button>
+                )}
+              </div>
+              {pending.length === 0 ? (
+                <p className="muted">Tudo comprado.</p>
+              ) : draftOrder ? (
+                <OrderItems
+                  items={draftOrder.flatMap((itemId) => pending.filter((item) => item.shoppingListItemId === itemId))}
+                  onMove={(index, delta) => setDraftOrder(moveItem(draftOrder, index, delta))}
+                  onDone={() => {
+                    const order = withPendingOrder(list.items, draftOrder);
+                    setDraftOrder(null);
+                    void act(() => reorderShoppingListItems(householdId, listId, order));
+                  }}
+                  onCancel={() => setDraftOrder(null)}
+                />
+              ) : (
+                <PendingItems
+                  items={pending}
+                  groups={categories && (products.size > 0 || !pending.some((item) => item.productId)) ? groupByTopCategory(pending, products, categories) : null}
+                  open={open}
+                  cheapest={cheapestByItem}
+                  packaging={packaging}
+                  thumbs={thumbs}
+                  onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
+                  onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
+                  onLink={link}
+                />
+              )}
+              {purchased.length > 0 && (
+                <>
+                  <h2>Comprados ({purchased.length})</h2>
+                  <ItemList items={purchased} open={open} packaging={packaging} thumbs={thumbs} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
+                </>
+              )}
+            </>
           )}
-        </section>
-      )}
 
-      {list.items.length === 0 ? (
-        <p className="empty-state">
-          Lista vazia. Acrescenta itens aqui, a partir de uma receita, ou com o que falta no <Link to="/plano">plano da semana</Link>.
-        </p>
-      ) : (
-        <>
-          <div className="section-head pending-head">
-            <h2>Por comprar ({pending.length})</h2>
-            {open && pending.length > 1 && !draftOrder && (
-              <button type="button" className="link-button" onClick={() => setDraftOrder(pending.map((item) => item.shoppingListItemId))}>
-                Ordenar
+          {list.status !== ShoppingListStatus.Cancelled && notInPantry.length > 0 && (
+            <StoreInPantryPanel
+              count={notInPantry.length}
+              onStore={async (location) => {
+                const result = await storeShoppingListInPantry(householdId, listId, location);
+                setVersion((v) => v + 1);
+                return result;
+              }}
+            />
+          )}
+
+          <div className="button-row list-status-actions">
+            {open ? (
+              <>
+                <button type="button" className="button-primary" onClick={() => act(() => completeShoppingList(householdId, listId))}>
+                  Concluir lista
+                </button>
+                <button type="button" className="button-secondary" onClick={() => act(() => cancelShoppingList(householdId, listId))}>
+                  Cancelar lista
+                </button>
+              </>
+            ) : (
+              <button type="button" className="button-secondary" onClick={() => act(() => reopenShoppingList(householdId, listId))}>
+                Reabrir lista
               </button>
             )}
           </div>
-          {pending.length === 0 ? (
-            <p className="muted">Tudo comprado.</p>
-          ) : draftOrder ? (
-            <OrderItems
-              items={draftOrder.flatMap((itemId) => pending.filter((item) => item.shoppingListItemId === itemId))}
-              onMove={(index, delta) => setDraftOrder(moveItem(draftOrder, index, delta))}
-              onDone={() => {
-                const order = withPendingOrder(list.items, draftOrder);
-                setDraftOrder(null);
-                void act(() => reorderShoppingListItems(householdId, listId, order));
-              }}
-              onCancel={() => setDraftOrder(null)}
-            />
-          ) : (
-            <PendingItems
-              items={pending}
-              groups={categories && (products.size > 0 || !pending.some((item) => item.productId)) ? groupByTopCategory(pending, products, categories) : null}
-              open={open}
-              cheapest={cheapestByItem}
-              packaging={packaging}
-              thumbs={thumbs}
-              onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
-              onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
-              onLink={link}
-            />
-          )}
-          {purchased.length > 0 && (
-            <>
-              <h2>Comprados ({purchased.length})</h2>
-              <ItemList items={purchased} open={open} packaging={packaging} thumbs={thumbs} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
-            </>
-          )}
-        </>
-      )}
+        </div>
 
-      {list.status !== ShoppingListStatus.Cancelled && notInPantry.length > 0 && (
-        <StoreInPantryPanel
-          count={notInPantry.length}
-          onStore={async (location) => {
-            const result = await storeShoppingListInPantry(householdId, listId, location);
-            setVersion((v) => v + 1);
-            return result;
-          }}
-        />
-      )}
-
-      <div className="button-row list-status-actions">
-        {open ? (
-          <>
-            <button type="button" className="button-primary" onClick={() => act(() => completeShoppingList(householdId, listId))}>
-              Concluir lista
-            </button>
-            <button type="button" className="button-secondary" onClick={() => act(() => cancelShoppingList(householdId, listId))}>
-              Cancelar lista
-            </button>
-          </>
-        ) : (
-          <button type="button" className="button-secondary" onClick={() => act(() => reopenShoppingList(householdId, listId))}>
-            Reabrir lista
-          </button>
+        {pending.length > 0 && (
+          <aside className="list-side">
+            <section className="side-block comparison-panel">
+              <div className="side-head">
+                <h2>Onde fica mais barato</h2>
+              </div>
+              {checkingLinks && unlinked.length > 0 && (
+                <UnlinkedWarning items={unlinked} onLink={link} onCompareAnyway={compare} onCancel={() => setCheckingLinks(false)} />
+              )}
+              {!comparison ? (
+                !checkingLinks && (
+                  <>
+                    <p className="side-empty">Os preços das lojas dos últimos 3 dias, item a item.</p>
+                    <button type="button" className="button-secondary" onClick={startCompare} disabled={comparing}>
+                      {comparing ? "A comparar…" : "Comparar lojas"}
+                    </button>
+                  </>
+                )
+              ) : (
+                <Comparison comparison={comparison} items={list.items} householdId={householdId} onRecompare={compare} />
+              )}
+            </section>
+          </aside>
         )}
       </div>
-
     </div>
   );
 }
@@ -637,7 +656,7 @@ function ItemList({
           {open && onLink && !item.isPurchased && !item.productId && !item.ingredientId && (
             <button
               type="button"
-              className="link-button"
+              className="link-button list-row-link"
               title="Sem produto ligado: não entra na comparação de lojas"
               onClick={() => setLinking(linking === item.shoppingListItemId ? null : item.shoppingListItemId)}
             >
@@ -655,8 +674,9 @@ function ItemList({
             />
           )}
           {cheapest?.get(item.shoppingListItemId) && (
-            <span className="pill pill-good">
-              {cheapest.get(item.shoppingListItemId)!.chainName} · {money.format(cheapest.get(item.shoppingListItemId)!.lineTotal)}
+            <span className="list-row-price">
+              {cheapest.get(item.shoppingListItemId)!.chainName}{" "}
+              <span className="price-tag">{money.format(cheapest.get(item.shoppingListItemId)!.lineTotal)}</span>
             </span>
           )}
           {open && (

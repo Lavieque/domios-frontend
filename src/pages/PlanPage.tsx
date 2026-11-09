@@ -33,6 +33,8 @@ export function PlanPage() {
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
 
+const isSunday = (date: string) => new Date(`${date}T12:00:00`).getDay() === 0;
+
 function WeekPlan({ household }: { household: CallerHouseholdDto }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const requested = searchParams.get("semana");
@@ -88,25 +90,34 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
   }
 
   const missingLines = availability?.lines.filter((line) => line.status !== AvailabilityLineStatus.Available) ?? [];
+  const now = today();
 
   return (
-    <div className="page">
-      <h1>Plano da semana</h1>
-      <p className="page-sub">{household.name}</p>
-      <div className="week-nav">
-        <button type="button" className="button-secondary" onClick={() => goToWeek(addDays(monday, -7))}>
-          Semana anterior
-        </button>
-        <span className="week-range">
-          {shortDate(monday)} – {longDate(sunday)}
-        </span>
-        <button type="button" className="button-secondary" onClick={() => goToWeek(addDays(monday, 7))}>
-          Semana seguinte
-        </button>
-        <Link to="/ementas" className="week-nav-link">
-          Aplicar uma ementa pronta
-        </Link>
-      </div>
+    <div className="page week-page">
+      <header className="week-head">
+        <h1>Plano da semana</h1>
+        <p className="week-head-sub">{household.name}</p>
+        <nav className="week-nav" aria-label="Semanas">
+          <button type="button" className="week-step" onClick={() => goToWeek(addDays(monday, -7))}>
+            <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Anterior
+          </button>
+          <span className="week-range">
+            {shortDate(monday)} – {longDate(sunday)}
+          </span>
+          <button type="button" className="week-step" onClick={() => goToWeek(addDays(monday, 7))}>
+            Seguinte
+            <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <Link to="/ementas" className="week-nav-link">
+            Aplicar uma ementa pronta
+          </Link>
+        </nav>
+      </header>
 
       {error && (
         <p className="form-error" role="alert">
@@ -115,160 +126,178 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
       )}
       {loading && <p className="muted loading">A carregar…</p>}
 
-      <div className="week-grid">
-        {days.map((day) => {
-          const dayMeals = meals.filter((meal) => meal.date === day);
-          return (
-            <section key={day} className={`day-card${day === today() ? " is-today" : ""}`}>
-              <h2 className="day-title">
-                <span>{weekdayTitle(day)}</span>
-                <span className="muted">{shortDate(day)}</span>
-              </h2>
-              {dayMeals.length === 0 ? (
-                <p className="muted day-empty">Nada planeado.</p>
-              ) : (
-                <ul className="day-meals">
-                  {dayMeals.map((meal) => (
-                    <li key={meal.plannedMealId} className={meal.status === PlannedMealStatus.Skipped ? "is-skipped" : ""}>
-                      <span className="meal-type">{mealTypeLabels[meal.mealType]}</span>
-                      {meal.recipeId ? (
-                        <Link to={`/receitas/${meal.recipeId}`} className="meal-title">
-                          {meal.title}
-                        </Link>
-                      ) : (
-                        <span className="meal-title">{meal.title}</span>
-                      )}
-                      <span className="meal-meta muted">
-                        {meal.servings} {meal.servings === 1 ? "dose" : "doses"}
-                        {meal.status !== PlannedMealStatus.Planned && ` · ${plannedMealStatusLabels[meal.status]}`}
-                      </span>
-                      {meal.status !== PlannedMealStatus.Cooked && (
-                        <span className="meal-actions">
-                          {meal.status === PlannedMealStatus.Planned ? (
-                            <button
-                              type="button"
-                              className="link-button"
-                              onClick={() => act(() => skipPlannedMeal(householdId, meal.plannedMealId))}
-                            >
-                              Saltar
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              className="link-button"
-                              onClick={() => act(() => unskipPlannedMeal(householdId, meal.plannedMealId))}
-                            >
-                              Repor
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            className="link-button"
-                            onClick={() => act(() => deletePlannedMeal(householdId, meal.plannedMealId))}
-                          >
-                            Remover
-                          </button>
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          );
-        })}
-      </div>
-
-      <div className="plan-panels">
-        <section className="panel">
-          <h2>O que falta na despensa</h2>
-          {availability && availability.plannedMealCount === 0 && (
-            <p className="muted">Sem refeições com receita nesta semana.</p>
-          )}
-          {availability && availability.plannedMealCount > 0 && missingLines.length === 0 && (
-            <p className="muted">Tens tudo o que as receitas desta semana pedem.</p>
-          )}
-          {missingLines.length > 0 && (
-            <ul className="ingredient-list">
-              {missingLines.map((line) => (
-                <li key={line.ingredientId}>
-                  <strong>{line.label}</strong>{" "}
-                  <span className="muted">
-                    {line.nominalQuantity
-                      ? "q.b."
-                      : `faltam ${quantityFormat.format(line.missing)} ${measurementUnitLabels[line.unit]}` +
-                        (line.status === AvailabilityLineStatus.Partial
-                          ? ` (tens ${quantityFormat.format(line.available)})`
-                          : "")}
+      <div className="week-layout">
+        {/* Os dias em linhas, por ordem; o número fica sempre na mesma coluna. */}
+        <ol className="week-days" aria-label="Dias da semana">
+          {days.map((day) => {
+            const dayMeals = meals.filter((meal) => meal.date === day);
+            const isToday = day === now;
+            const classes = ["week-day", isToday && "is-today", day < now && "is-past"].filter(Boolean).join(" ");
+            return (
+              <li key={day} className={classes} aria-current={isToday ? "date" : undefined}>
+                <div className="week-day-date">
+                  <span className={isToday || isSunday(day) ? "week-day-number is-red" : "week-day-number"}>
+                    {Number(day.slice(8, 10))}
                   </span>
+                  <span className="week-day-weekday">
+                    {weekdayTitle(day).replace("-feira", "")}
+                    {isToday && <span className="week-day-today">Hoje</span>}
+                  </span>
+                </div>
+                {dayMeals.length === 0 ? (
+                  <p className="week-day-empty">Nada planeado.</p>
+                ) : (
+                  <ul className="week-day-meals">
+                    {dayMeals.map((meal) => (
+                      <li
+                        key={meal.plannedMealId}
+                        className={meal.status === PlannedMealStatus.Skipped ? "week-meal is-skipped" : "week-meal"}
+                      >
+                        <span className="week-meal-slot">{mealTypeLabels[meal.mealType]}</span>
+                        <span className="week-meal-body">
+                          {meal.recipeId ? (
+                            <Link to={`/receitas/${meal.recipeId}`} className="week-meal-dish">
+                              {meal.title}
+                            </Link>
+                          ) : (
+                            <span className="week-meal-dish">{meal.title}</span>
+                          )}
+                          <span className="week-meal-meta">
+                            {meal.servings} {meal.servings === 1 ? "dose" : "doses"}
+                            {meal.status !== PlannedMealStatus.Planned && ` · ${plannedMealStatusLabels[meal.status]}`}
+                          </span>
+                        </span>
+                        {meal.status !== PlannedMealStatus.Cooked && (
+                          <span className="week-meal-actions">
+                            {meal.status === PlannedMealStatus.Planned ? (
+                              <button
+                                type="button"
+                                className="link-button"
+                                onClick={() => act(() => skipPlannedMeal(householdId, meal.plannedMealId))}
+                              >
+                                Saltar
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="link-button"
+                                onClick={() => act(() => unskipPlannedMeal(householdId, meal.plannedMealId))}
+                              >
+                                Repor
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className="link-button"
+                              onClick={() => act(() => deletePlannedMeal(householdId, meal.plannedMealId))}
+                            >
+                              Remover
+                            </button>
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+
+        <aside className="week-side">
+          <section className="side-block">
+            <div className="side-head">
+              <h2>O que falta</h2>
+            </div>
+            {availability && availability.plannedMealCount === 0 && (
+              <p className="side-empty">Sem refeições com receita nesta semana.</p>
+            )}
+            {availability && availability.plannedMealCount > 0 && missingLines.length === 0 && (
+              <p className="side-ok">Tens tudo o que as receitas desta semana pedem.</p>
+            )}
+            {missingLines.length > 0 && (
+              <ul className="missing-list">
+                {missingLines.map((line) => (
+                  <li key={line.ingredientId}>
+                    <span className="missing-name">{line.label}</span>
+                    <span className="missing-qty">
+                      {line.nominalQuantity
+                        ? "q.b."
+                        : `faltam ${quantityFormat.format(line.missing)} ${measurementUnitLabels[line.unit]}` +
+                          (line.status === AvailabilityLineStatus.Partial
+                            ? ` (tens ${quantityFormat.format(line.available)})`
+                            : "")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {missingLines.length > 0 && (
+              <SendToListForm
+                householdId={householdId}
+                newListName={`Compras da semana de ${shortDate(monday)}`}
+                submitLabel="Pôr o que falta na lista"
+                send={async (listId) => {
+                  const result = await addPlanToShoppingList(householdId, listId, monday, sunday);
+                  return { list: result.shoppingList, added: result.addedItemCount, covered: result.coveredByListCount };
+                }}
+              />
+            )}
+            {missingLines.length > 0 && <PlanToPantryForm householdId={householdId} lines={missingLines} onDone={reload} />}
+          </section>
+
+          <section className="side-block">
+            <div className="side-head">
+              <h2>Sugestões para {weekdayName(suggestionDate)}</h2>
+            </div>
+            {suggestions && suggestions.suggestions.length === 0 && (
+              <p className="side-empty">
+                Sem sugestões: as sugestões partem do que tens na despensa, e não há nada lá (ou nada que entre numa
+                receita).
+              </p>
+            )}
+            <ul className="suggestion-list">
+              {suggestions?.suggestions.map((suggestion) => (
+                <li key={suggestion.recipeId}>
+                  <Link to={`/receitas/${suggestion.recipeId}`} className="suggestion-dish">
+                    {suggestion.title}
+                  </Link>
+                  <p className={suggestion.missingIngredients.length === 0 ? "suggestion-meta is-ready" : "suggestion-meta"}>
+                    {suggestion.missingIngredients.length === 0
+                      ? "Tens tudo"
+                      : `${suggestion.availableCount} de ${suggestion.ingredientCount} ingredientes em casa`}
+                    {suggestion.reasons.length > 0 && (
+                      <span className="suggestion-reasons">
+                        {" · "}
+                        {suggestion.reasons.map((reason) => suggestionReasonLabels[reason]).join(" · ")}
+                      </span>
+                    )}
+                  </p>
+                  {suggestion.missingIngredients.length > 0 && (
+                    <p className="suggestion-note is-missing">
+                      Falta: {suggestion.missingIngredients.map((i) => i.name).join(", ")}
+                    </p>
+                  )}
+                  {suggestion.avoided && suggestion.avoided.avoidedBy.length > 0 && (
+                    <p className="suggestion-note">
+                      {suggestion.avoided.avoidedBy.some((a) => a.severity === "Avoid") ? "Evitam" : "Limitam"}:{" "}
+                      {suggestion.avoided.avoidedBy.map((a) => a.name).join(", ")}
+                    </p>
+                  )}
+                  {suggestion.restrictions === RestrictionResult.Unverifiable && (
+                    <p className="suggestion-note">Não deu para confirmar as restrições alimentares de todos os membros.</p>
+                  )}
+                  <AddToPlanForm
+                    householdId={householdId}
+                    recipeId={suggestion.recipeId}
+                    defaultDate={suggestionDate}
+                    onAdded={reload}
+                  />
                 </li>
               ))}
             </ul>
-          )}
-          {missingLines.length > 0 && (
-            <SendToListForm
-              householdId={householdId}
-              newListName={`Compras da semana de ${shortDate(monday)}`}
-              submitLabel="Pôr o que falta na lista"
-              send={async (listId) => {
-                const result = await addPlanToShoppingList(householdId, listId, monday, sunday);
-                return { list: result.shoppingList, added: result.addedItemCount, covered: result.coveredByListCount };
-              }}
-            />
-          )}
-          {missingLines.length > 0 && <PlanToPantryForm householdId={householdId} lines={missingLines} onDone={reload} />}
-        </section>
-
-        <section className="panel">
-          <h2>Sugestões para {weekdayName(suggestionDate)}</h2>
-          {suggestions && suggestions.suggestions.length === 0 && (
-            <p className="muted">
-              Sem sugestões: as sugestões partem do que tens na despensa, e não há nada lá (ou nada que entre numa
-              receita).
-            </p>
-          )}
-          <ul className="suggestion-list">
-            {suggestions?.suggestions.map((suggestion) => (
-              <li key={suggestion.recipeId}>
-                <Link to={`/receitas/${suggestion.recipeId}`} className="meal-title">
-                  {suggestion.title}
-                </Link>
-                <div className="recipe-card-pills">
-                  <span className="pill pill-accent2">
-                    {suggestion.availableCount}/{suggestion.ingredientCount} ingredientes
-                  </span>
-                  {suggestion.reasons.map((reason) => (
-                    <span key={reason} className="pill pill-muted">
-                      {suggestionReasonLabels[reason]}
-                    </span>
-                  ))}
-                </div>
-                {suggestion.missingIngredients.length > 0 && (
-                  <p className="muted suggestion-missing">
-                    Falta: {suggestion.missingIngredients.map((i) => i.name).join(", ")}
-                  </p>
-                )}
-                {suggestion.avoided && suggestion.avoided.avoidedBy.length > 0 && (
-                  <p className="muted suggestion-missing">
-                    {suggestion.avoided.avoidedBy.some((a) => a.severity === "Avoid") ? "Evitam" : "Limitam"}:{" "}
-                    {suggestion.avoided.avoidedBy.map((a) => a.name).join(", ")}
-                  </p>
-                )}
-                {suggestion.restrictions === RestrictionResult.Unverifiable && (
-                  <p className="muted suggestion-missing">
-                    Não deu para confirmar as restrições alimentares de todos os membros.
-                  </p>
-                )}
-                <AddToPlanForm
-                  householdId={householdId}
-                  recipeId={suggestion.recipeId}
-                  defaultDate={suggestionDate}
-                  onAdded={reload}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
+          </section>
+        </aside>
       </div>
     </div>
   );

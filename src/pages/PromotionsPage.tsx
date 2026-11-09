@@ -44,7 +44,10 @@ export function PromotionsPage() {
   // telemóvel. As cadeias ficam sempre à vista.
   const [showFilters, setShowFilters] = useState(false);
   const activeFilterCount =
-    (categoryId ? 1 : 0) + (requiresCard !== undefined ? 1 : 0) + (minDiscount !== undefined ? 1 : 0) + (groceryOnly ? 0 : 1);
+    (categoryId ? 1 : 0) +
+    (requiresCard !== undefined ? 1 : 0) +
+    (minDiscount !== undefined ? 1 : 0) +
+    (groceryOnly ? 0 : 1);
 
   function applyFilters(next: {
     chainId?: string | null;
@@ -90,13 +93,22 @@ export function PromotionsPage() {
   // GET /chains traz também as cadeias de teste fechadas; só as abertas
   // têm lojas com preços.
   const openChains = useMemo(
-    () => chains.filter((chain) => chain.status === ChainStatus.Active).sort((a, b) => a.name.localeCompare(b.name, "pt")),
+    () =>
+      chains.filter((chain) => chain.status === ChainStatus.Active).sort((a, b) => a.name.localeCompare(b.name, "pt")),
     [chains],
   );
 
   useEffect(() => {
     setLoading(true);
-    searchCurrentPromotions(chainId ?? undefined, page, PAGE_SIZE, categoryId ?? undefined, groceryOnly, requiresCard, minDiscount)
+    searchCurrentPromotions(
+      chainId ?? undefined,
+      page,
+      PAGE_SIZE,
+      categoryId ?? undefined,
+      groceryOnly,
+      requiresCard,
+      minDiscount,
+    )
       .then((result) => {
         setOffers(result.items);
         setTotal(result.total);
@@ -106,8 +118,12 @@ export function PromotionsPage() {
 
   return (
     <div className="page">
-      <h1>Promoções ativas</h1>
-      <p className="page-sub">Produtos em promoção na última leitura de cada loja, dos últimos 3 dias.</p>
+      <header className="page-head">
+        <div>
+          <h1>Promoções</h1>
+          <p className="page-head-sub">Em promoção na última leitura de cada loja, dos últimos 3 dias.</p>
+        </div>
+      </header>
 
       <div className="chip-row">
         <button
@@ -123,7 +139,15 @@ export function PromotionsPage() {
           <button
             type="button"
             className="chip"
-            onClick={() => applyFilters({ categoryId: null, requiresCard: null, minDiscount: null, groceryOnly: true, page: 1 })}
+            onClick={() =>
+              applyFilters({
+                categoryId: null,
+                requiresCard: null,
+                minDiscount: null,
+                groceryOnly: true,
+                page: 1,
+              })
+            }
           >
             Limpar
           </button>
@@ -149,7 +173,12 @@ export function PromotionsPage() {
             className="category-select"
             aria-label="Cartão"
             value={requiresCard === undefined ? "" : requiresCard ? "1" : "0"}
-            onChange={(e) => applyFilters({ requiresCard: parseCard(e.target.value) ?? null, page: 1 })}
+            onChange={(e) =>
+              applyFilters({
+                requiresCard: parseCard(e.target.value) ?? null,
+                page: 1,
+              })
+            }
           >
             <option value="">Com e sem cartão</option>
             <option value="1">Só com cartão</option>
@@ -159,7 +188,12 @@ export function PromotionsPage() {
             className="category-select"
             aria-label="Desconto mínimo"
             value={minDiscount ?? ""}
-            onChange={(e) => applyFilters({ minDiscount: parseMinDiscount(e.target.value) ?? null, page: 1 })}
+            onChange={(e) =>
+              applyFilters({
+                minDiscount: parseMinDiscount(e.target.value) ?? null,
+                page: 1,
+              })
+            }
           >
             <option value="">Qualquer desconto</option>
             {MIN_DISCOUNTS.map((value) => (
@@ -189,7 +223,12 @@ export function PromotionsPage() {
 
       {openChains.length > 1 && openChains.length <= MAX_CHAIN_CHIPS && (
         <div className="chip-row" role="group" aria-label="Cadeia">
-          <button type="button" className="chip" aria-pressed={chainId === null} onClick={() => applyFilters({ chainId: null, page: 1 })}>
+          <button
+            type="button"
+            className="chip"
+            aria-pressed={chainId === null}
+            onClick={() => applyFilters({ chainId: null, page: 1 })}
+          >
             Todas
           </button>
           {openChains.map((chain) => (
@@ -198,7 +237,12 @@ export function PromotionsPage() {
               type="button"
               className="chip"
               aria-pressed={chainId === chain.chainId}
-              onClick={() => applyFilters({ chainId: chainId === chain.chainId ? null : chain.chainId, page: 1 })}
+              onClick={() =>
+                applyFilters({
+                  chainId: chainId === chain.chainId ? null : chain.chainId,
+                  page: 1,
+                })
+              }
             >
               {chain.name}
             </button>
@@ -207,22 +251,29 @@ export function PromotionsPage() {
       )}
 
       <p className="results-count">
-        {loading || total === null ? "A procurar…" : `${count.format(total)} ${total === 1 ? "produto" : "produtos"} em promoção`}
+        {loading || total === null
+          ? "A procurar…"
+          : `${count.format(total)} ${total === 1 ? "produto" : "produtos"} em promoção`}
       </p>
 
       {!loading && offers.length === 0 ? (
         <p className="empty-state">Sem promoções ativas neste momento.</p>
       ) : (
         !loading && (
-          <div className="label-grid">
-            {offers.map((offer, index) => (
-              <PromotionOfferLabel key={offer.storeOfferId} offer={offer} index={index} />
+          <div className="price-rows">
+            {offers.map((offer) => (
+              <PromotionOfferLabel key={offer.storeOfferId} offer={offer} />
             ))}
           </div>
         )
       )}
 
-      <Pagination page={page} pageSize={PAGE_SIZE} total={total ?? 0} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+      <Pagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={total ?? 0}
+        onPageChange={(nextPage) => applyFilters({ page: nextPage })}
+      />
     </div>
   );
 }

@@ -66,22 +66,26 @@ export function HouseholdPage() {
 
   return (
     <div className="page settings-page">
-      {household && isAdmin ? (
-        <HouseholdName household={household} onSaved={setHousehold} />
-      ) : (
-        <h1>{current?.name}</h1>
-      )}
-      {current && (
-        <p className="page-sub">
-          És {memberRoleLabels[current.role].toLowerCase()} desta casa.
-          {household && (
-            <>
-              {" "}
-              {members.length} {members.length === 1 ? "membro" : "membros"}, {linkedCount} com conta.
-            </>
+      <header className="page-head">
+        <div>
+          {household && isAdmin ? (
+            <HouseholdName household={household} onSaved={setHousehold} />
+          ) : (
+            <h1>{current?.name}</h1>
           )}
-        </p>
-      )}
+          {current && (
+            <p className="page-head-sub">
+              És {memberRoleLabels[current.role].toLowerCase()} desta casa.
+              {household && (
+                <>
+                  {" "}
+                  {members.length} {members.length === 1 ? "membro" : "membros"}, {linkedCount} com conta.
+                </>
+              )}
+            </p>
+          )}
+        </div>
+      </header>
 
       {households.length > 1 && (
         <div className="chip-row household-switch" role="group" aria-label="As tuas casas">
@@ -108,81 +112,85 @@ export function HouseholdPage() {
 
       {household && (
         <>
-          <div className="section-head">
-            <h2>Membros</h2>
-            {isAdmin && !adding && (
-              <button type="button" className="row-action" onClick={() => setAdding(true)}>
-                Acrescentar membro
-              </button>
-            )}
-          </div>
-          <ul className="member-list">
-            {members.map((member) => (
-              <MemberRow
-                key={member.memberId}
-                householdId={household.householdId}
-                member={member}
-                isMe={member.memberId === current?.memberId}
-                isAdmin={isAdmin}
-                onSaved={setHousehold}
-                onRemoved={(left) => {
-                  if (left) {
-                    reload();
-                  } else {
-                    setHousehold({
-                      ...household,
-                      members: household.members.filter((m) => m.memberId !== member.memberId),
-                    });
-                  }
-                }}
-              />
-            ))}
-            {adding && (
-              <li className="member-row member-row-form">
-                <AddMemberForm
+          <section className="panel" aria-labelledby="household-members">
+            <div className="side-head">
+              <h2 id="household-members">Membros</h2>
+              {isAdmin && !adding && (
+                <button type="button" className="link-button" onClick={() => setAdding(true)}>
+                  Acrescentar membro
+                </button>
+              )}
+            </div>
+            <ul className="member-list">
+              {members.map((member) => (
+                <MemberRow
+                  key={member.memberId}
                   householdId={household.householdId}
-                  onSaved={(next) => {
-                    setHousehold(next);
-                    setAdding(false);
+                  member={member}
+                  isMe={member.memberId === current?.memberId}
+                  isAdmin={isAdmin}
+                  onSaved={setHousehold}
+                  onRemoved={(left) => {
+                    if (left) {
+                      reload();
+                    } else {
+                      setHousehold({
+                        ...household,
+                        members: household.members.filter((m) => m.memberId !== member.memberId),
+                      });
+                    }
                   }}
-                  onCancel={() => setAdding(false)}
                 />
-              </li>
+              ))}
+              {adding && (
+                <li className="member-row member-row-form">
+                  <AddMemberForm
+                    householdId={household.householdId}
+                    onSaved={(next) => {
+                      setHousehold(next);
+                      setAdding(false);
+                    }}
+                    onCancel={() => setAdding(false)}
+                  />
+                </li>
+              )}
+            </ul>
+            {!isAdmin && (
+              <p className="settings-note muted">Só um administrador acrescenta membros, muda papéis ou liga contas.</p>
             )}
-          </ul>
-          {!isAdmin && (
-            <p className="settings-note muted">Só um administrador acrescenta membros, muda papéis ou liga contas.</p>
-          )}
+          </section>
 
-          <h2>Casa</h2>
-          <dl className="settings-list">
-            <div className="settings-row">
-              <dt>Fuso horário</dt>
-              <dd>{household.timeZone}</dd>
-            </div>
-            <div className="settings-row">
-              <dt>Moeda</dt>
-              <dd>{household.currency}</dd>
-            </div>
-            <div className="settings-row">
-              <dt>Histórico</dt>
-              <dd>
-                <span className="muted">O que mudou na despensa, nas listas e no plano.</span>
-                <Link to="/casa/historico" className="settings-action">
-                  Ver histórico
-                </Link>
-              </dd>
-            </div>
-            <div className="settings-row">
-              <dt>Outra casa</dt>
-              <dd>
-                <span className="muted">Cada casa tem a sua despensa, listas e plano.</span>
-                <Link to="/casa/nova" className="settings-action">
-                  Criar casa
-                </Link>
-              </dd>
-            </div>
-          </dl>
+          <section className="panel" aria-labelledby="household-settings">
+            <h2 id="household-settings">Casa</h2>
+            <dl className="settings-list">
+              <div className="settings-row">
+                <dt>Fuso horário</dt>
+                <dd>{household.timeZone}</dd>
+              </div>
+              <div className="settings-row">
+                <dt>Moeda</dt>
+                <dd>{household.currency}</dd>
+              </div>
+              <div className="settings-row">
+                <dt>Histórico</dt>
+                <dd>
+                  <span className="muted">O que mudou na despensa, nas listas e no plano.</span>
+                  <Link to="/casa/historico" className="settings-action">
+                    Ver histórico
+                  </Link>
+                </dd>
+              </div>
+              <div className="settings-row">
+                <dt>Outra casa</dt>
+                <dd>
+                  <span className="muted">Cada casa tem a sua despensa, listas e plano.</span>
+                  <Link to="/casa/nova" className="settings-action">
+                    Criar casa
+                  </Link>
+                </dd>
+              </div>
+            </dl>
+          </section>
         </>
       )}
     </div>
@@ -238,7 +246,11 @@ function HouseholdName({ household, onSaved }: { household: HouseholdDto; onSave
       onSaved(await updateHousehold(household.householdId, { name: name.trim() }));
       setEditing(false);
     } catch (err) {
-      setError(describeError(err, { "invalid-argument": "A casa precisa de um nome." }));
+      setError(
+        describeError(err, {
+          "invalid-argument": "A casa precisa de um nome.",
+        }),
+      );
     } finally {
       setBusy(false);
     }
@@ -326,8 +338,16 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
 
   return (
     <li className={mode === "view" ? "member-row" : "member-row is-open"}>
-      <span className={isMe ? "member-avatar is-me" : "member-avatar"} aria-hidden="true">
-        {initials(member.name)}
+      {/* A idade numa coluna fixa, como o número de um dia; sem data de nascimento, as iniciais. */}
+      <span className="member-lead" aria-hidden="true">
+        {age !== null ? (
+          <>
+            <span className="member-lead-number">{age}</span>
+            <span className="recipe-row-lead-label">{age === 1 ? "ano" : "anos"}</span>
+          </>
+        ) : (
+          <span className="member-lead-number is-initials">{initials(member.name)}</span>
+        )}
       </span>
       <div className="member-main">
         <span className="member-name">
@@ -335,21 +355,11 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
           {isMe && <span className="muted"> (tu)</span>}
         </span>
         <span className="member-meta">
-          <span className={member.role === MemberRole.Admin ? "pill pill-accent2" : "pill pill-muted"}>
+          <span className={member.role === MemberRole.Admin ? "member-role is-admin" : "member-role"}>
             {memberRoleLabels[member.role]}
           </span>
-          {age !== null && <span className="muted">{age === 1 ? "1 ano" : `${age} anos`}</span>}
-          {member.userId ? (
-            <span className="member-account">
-              <span className="member-dot is-linked" aria-hidden="true" />
-              Com conta
-            </span>
-          ) : (
-            <span className="member-account muted">
-              <span className="member-dot" aria-hidden="true" />
-              Sem conta
-            </span>
-          )}
+          {age !== null && <span className="visually-hidden">, {age === 1 ? "1 ano" : `${age} anos`}</span>}
+          <span>{member.userId ? " · Com conta" : " · Sem conta"}</span>
         </span>
         {member.dietaryRestrictions.length > 0 && (
           <span className="member-restrictions" aria-label="Restrições alimentares">
@@ -364,19 +374,19 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
 
       {mode === "view" && (
         <div className="member-actions">
-          <button type="button" className="row-action" onClick={() => open("avoid")}>
+          <button type="button" className="link-button" onClick={() => open("avoid")}>
             Evitar
           </button>
-          <button type="button" className="row-action" onClick={() => open("goals")}>
+          <button type="button" className="link-button" onClick={() => open("goals")}>
             Objetivos
           </button>
           {canEdit && (
-            <button type="button" className="row-action" onClick={() => open("edit")}>
+            <button type="button" className="link-button" onClick={() => open("edit")}>
               Editar
             </button>
           )}
           {isAdmin && !member.userId && (
-            <button type="button" className="row-action" onClick={() => open("link")}>
+            <button type="button" className="link-button" onClick={() => open("link")}>
               Ligar conta
             </button>
           )}
@@ -402,11 +412,21 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
       )}
 
       {mode === "avoid" && (
-        <AvoidedIngredientsPanel householdId={householdId} member={member} canEdit={canEdit} onClose={() => setMode("view")} />
+        <AvoidedIngredientsPanel
+          householdId={householdId}
+          member={member}
+          canEdit={canEdit}
+          onClose={() => setMode("view")}
+        />
       )}
 
       {mode === "goals" && (
-        <NutritionGoalsPanel householdId={householdId} member={member} canEdit={canEdit} onClose={() => setMode("view")} />
+        <NutritionGoalsPanel
+          householdId={householdId}
+          member={member}
+          canEdit={canEdit}
+          onClose={() => setMode("view")}
+        />
       )}
 
       {mode === "link" && (
@@ -562,7 +582,14 @@ function LinkAccountForm({ householdId, member, onLinked, onCancel }: LinkAccoun
     <form className="member-panel member-form" onSubmit={handleSubmit}>
       <label className="form-field member-form-wide">
         <span>Email da conta de {member.name}</span>
-        <input type="email" required autoFocus autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input
+          type="email"
+          required
+          autoFocus
+          autoComplete="off"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
         <small>A pessoa passa a ver e a mudar tudo nesta casa: despensa, listas e plano.</small>
       </label>
       {error && (

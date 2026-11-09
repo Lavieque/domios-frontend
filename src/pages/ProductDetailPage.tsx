@@ -10,17 +10,19 @@ import {
   type ProductDto,
   type ProductStoreOfferDto,
 } from "../api/types";
-import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
+import { topCategory } from "../catalog/aisles";
 import { isOnSale, money, priceDigits, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { useCategories } from "../catalog/useCategories";
-import { AisleSign } from "../components/AisleSign";
 import { EventTimeline } from "../components/EventTimeline";
 import { PromotionBadge } from "../components/PromotionBadge";
 import { SendToListForm } from "../components/SendToListForm";
 import { InsightNotes, LabelPrice, PriceRange, VerdictBand } from "../components/ShelfLabel";
 import { useHouseholds } from "../household/useHouseholds";
 
-const dateFormat = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short" });
+const dateFormat = new Intl.DateTimeFormat("pt-PT", {
+  day: "numeric",
+  month: "short",
+});
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -45,7 +47,6 @@ export function ProductDetailPage() {
   const lowest = cheapest?.latestPrice?.price.amount;
   const highest = onSale[onSale.length - 1]?.latestPrice?.price.amount;
   const top = topCategory(product.category, categories) ?? product.category;
-  const aisle = aisleOf(top.name);
   const unit = cheapest ? unitPriceLabel(cheapest) : null;
   const pack = `${product.packageQuantity} ${measurementUnitLabels[product.packageUnit]}`;
 
@@ -65,48 +66,41 @@ export function ProductDetailPage() {
         )}
       </nav>
 
-      <section className={`article-hero ${aisleClass(aisle)}`}>
-        <div className={`article-photo${product.imageUrl ? "" : " is-empty"}`}>
-          <span className="product-photo-tag">
-            <span className="aisle-dot" />
-            {top.name}
-          </span>
-          {product.imageUrl ? (
-            <img src={product.imageUrl} alt={product.name} />
+      {/* O artigo como folha: o preço na coluna fixa, o nome à direita de um filete. */}
+      <section className="article-sheet">
+        <div className="article-sheet-price">
+          {offers === undefined ? (
+            <LabelPrice amount={undefined} />
           ) : (
-            <AisleSign aisle={aisle} />
+            <LabelPrice amount={lowest ?? null} from={onSale.length > 1 && highest !== lowest} />
+          )}
+          {cheapest && (
+            <>
+              <VerdictBand insight={cheapest.priceInsight} />
+              <span className="article-unit">
+                {unit && <strong>{unit}</strong>}
+                {unit && <br />}
+                {cheapest.chainName}
+                {cheapest.cardPrice && (
+                  <>
+                    <br />
+                    Com cartão {money.format(cheapest.cardPrice.amount)}
+                  </>
+                )}
+              </span>
+            </>
           )}
         </div>
 
-        <div className="article-info">
-          <h1>{product.name}</h1>
+        <div className="article-sheet-body">
+          <h1 className="article-name">{product.name}</h1>
           <p className="article-brand">
             {product.brand ?? "Sem marca"} · {pack}
           </p>
 
-          <div className="article-price">
-            {offers === undefined ? (
-              <LabelPrice amount={undefined} />
-            ) : (
-              <LabelPrice amount={lowest ?? null} from={onSale.length > 1 && highest !== lowest} />
-            )}
-            {cheapest && (
-              <div className="article-price-facts">
-                <VerdictBand insight={cheapest.priceInsight} pill />
-                <span className="article-unit">
-                  {unit && <strong>{unit}</strong>}
-                  {unit && " · "}
-                  {cheapest.chainName}
-                  {cheapest.cardPrice && <> · com cartão {money.format(cheapest.cardPrice.amount)}</>}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {cheapest?.priceInsight && (
-            <div className="article-insight">
-              <PriceRange insight={cheapest.priceInsight} />
-              <InsightNotes insight={cheapest.priceInsight} />
+          {product.imageUrl && (
+            <div className="article-photo">
+              <img src={product.imageUrl} alt={product.name} />
             </div>
           )}
 
@@ -132,7 +126,7 @@ export function ProductDetailPage() {
               )}
             </div>
           ) : (
-            <p className="notice" style={{ marginTop: "1.5rem" }}>
+            <p className="notice article-notice">
               Descontinuado: já não se vende nas lojas acompanhadas.
               {product.substitutedByProductId && (
                 <>
@@ -143,56 +137,63 @@ export function ProductDetailPage() {
             </p>
           )}
 
-          <ul className="article-specs">
-            <li>
-              <span>Marca</span>
-              <strong>{product.brand ?? "Sem marca"}</strong>
-            </li>
-            <li>
-              <span>Categoria</span>
-              <strong>{product.category.name}</strong>
-            </li>
-            <li>
-              <span>Embalagem</span>
-              <strong>{pack}</strong>
-            </li>
-            <li>
-              <span>EAN</span>
-              <strong>{product.barcode ?? "—"}</strong>
-            </li>
+          {cheapest?.priceInsight && (
+            <div className="article-insight">
+              <PriceRange insight={cheapest.priceInsight} />
+              <InsightNotes insight={cheapest.priceInsight} />
+            </div>
+          )}
+
+          <dl className="article-specs">
+            <div>
+              <dt>Categoria</dt>
+              <dd>{product.category.name}</dd>
+            </div>
+            <div>
+              <dt>Embalagem</dt>
+              <dd>{pack}</dd>
+            </div>
+            <div>
+              <dt>EAN</dt>
+              <dd>{product.barcode ?? "—"}</dd>
+            </div>
             {product.allergens.length > 0 && (
-              <li>
-                <span>Alergénios</span>
-                <strong>{product.allergens.join(", ")}</strong>
-              </li>
+              <div>
+                <dt>Alergénios</dt>
+                <dd>{product.allergens.join(", ")}</dd>
+              </div>
             )}
-          </ul>
+          </dl>
         </div>
       </section>
 
-      <div className="section-head">
-        <h2>Onde comprar</h2>
-        {onSale.length > 1 && <span className="muted">{onSale.length} lojas com preço</span>}
-      </div>
-      {offers === undefined && <p className="muted loading">A ler preços…</p>}
-      {offers === null && <p className="form-error">Não deu para ler os preços deste produto.</p>}
-      {offers && offers.length === 0 && <p className="empty-state">Nenhuma loja acompanhada vende este produto.</p>}
-      {offers && offers.length > 0 && (
-        <ul className="store-rows">
-          {sorted.map((offer, index) => (
-            <StoreRow
-              key={offer.storeOfferId}
-              offer={offer}
-              index={index}
-              highest={highest}
-              best={isOnSale(offer) && offer.latestPrice!.price.amount === lowest && onSale.length > 1}
-            />
-          ))}
-        </ul>
-      )}
+      <section className="panel article-stores" aria-labelledby="article-stores-title">
+        <div className="side-head">
+          <h2 id="article-stores-title">Onde comprar</h2>
+          {onSale.length > 1 && <span className="side-head-count">{onSale.length} lojas com preço</span>}
+        </div>
+        {offers === undefined && <p className="muted loading">A ler preços…</p>}
+        {offers === null && <p className="form-error">Não deu para ler os preços deste produto.</p>}
+        {offers && offers.length === 0 && <p className="empty-state">Nenhuma loja acompanhada vende este produto.</p>}
+        {offers && offers.length > 0 && (
+          <ul className="store-rows">
+            {sorted.map((offer, index) => (
+              <StoreRow
+                key={offer.storeOfferId}
+                offer={offer}
+                index={index}
+                highest={highest}
+                best={isOnSale(offer) && offer.latestPrice!.price.amount === lowest && onSale.length > 1}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
 
-      <h2>Histórico de eventos</h2>
-      <EventTimeline aggregateType="Product" aggregateId={product.productId} />
+      <section className="panel" aria-labelledby="article-history-title">
+        <h2 id="article-history-title">Histórico</h2>
+        <EventTimeline aggregateType="Product" aggregateId={product.productId} />
+      </section>
     </div>
   );
 }
@@ -223,7 +224,10 @@ function StoreRow({
   const width = price !== undefined && highest ? Math.max(8, (price / highest) * 100) : 0;
 
   return (
-    <li className={`store-row${best ? " is-best" : ""}${out ? " is-out" : ""}`} style={{ "--i": Math.min(index, 12) } as CSSProperties}>
+    <li
+      className={`store-row${best ? " is-best" : ""}${out ? " is-out" : ""}`}
+      style={{ "--i": Math.min(index, 12) } as CSSProperties}
+    >
       <details>
         <summary>
           <span className="store-row-name">
@@ -237,20 +241,18 @@ function StoreRow({
             {width > 0 && <span style={{ width: `${width}%` }} />}
           </span>
           <span className="store-row-price">
-            {price !== undefined ? `${priceDigits(price)} €` : "—"}
+            {price !== undefined ? <span className={best ? "price-tag" : undefined}>{priceDigits(price)} €</span> : "—"}
             {offer.cardPrice && <small>{money.format(offer.cardPrice.amount)} com cartão</small>}
           </span>
           <span className="store-row-tag">
             {best ? (
-              <VerdictBand tone="1" pill>
-                Mais barato
-              </VerdictBand>
+              <VerdictBand tone="1">Mais barato</VerdictBand>
             ) : out ? (
-              <span className="pill pill-danger">Indisponível</span>
+              <VerdictBand tone="none">Indisponível</VerdictBand>
             ) : offer.latestPrice ? (
-              <VerdictBand insight={offer.priceInsight} pill />
+              <VerdictBand insight={offer.priceInsight} />
             ) : (
-              <span className="pill pill-muted">Sem preço</span>
+              <VerdictBand tone="none">Sem preço</VerdictBand>
             )}
           </span>
         </summary>

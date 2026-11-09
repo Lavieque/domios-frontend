@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, resetPassword } from "../api/auth";
 import { ApiError } from "../api/http";
 import { describeError } from "../auth/errors";
+import { AuthSheet } from "../components/AuthSheet";
 import { tokenFromHash } from "../auth/links";
 import { sessionStore } from "../auth/sessionStore";
 
@@ -45,7 +46,10 @@ export function ResetPasswordPage() {
       await resetPassword(token!, password);
       // A Api termina todas as sessões do utilizador, incluindo a deste browser.
       sessionStore.clear();
-      navigate("/entrar", { replace: true, state: { notice: "Password alterada. Entra com a password nova." } });
+      navigate("/entrar", {
+        replace: true,
+        state: { notice: "Password alterada. Entra com a password nova." },
+      });
     } catch (err) {
       if (err instanceof ApiError && err.type === "invalid-token") {
         setLinkInvalid(true);
@@ -58,9 +62,7 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <div className="page auth-page">
-      <h1>Definir password nova</h1>
-
+    <AuthSheet title="Definir password nova">
       {linkInvalid ? (
         <>
           <p className="form-error" role="alert">
@@ -106,6 +108,6 @@ export function ResetPasswordPage() {
           </button>
         </form>
       )}
-    </div>
+    </AuthSheet>
   );
 }

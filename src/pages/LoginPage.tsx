@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { signIn } from "../auth/actions";
 import { describeError } from "../auth/errors";
+import { AuthSheet } from "../components/AuthSheet";
 import { safeNextPath } from "../auth/links";
 import { useSession } from "../auth/useSession";
 import { REQUEST_ACCESS_URL } from "../siteUrl";
@@ -31,14 +32,17 @@ export function LoginPage() {
       await signIn(email, password);
       navigate(next, { replace: true });
     } catch (err) {
-      setError(describeError(err, { "invalid-credentials": "Email ou password errados." }));
+      setError(
+        describeError(err, {
+          "invalid-credentials": "Email ou password errados.",
+        }),
+      );
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="page auth-page">
-      <h1>Entrar</h1>
+    <AuthSheet title="Entrar">
       {notice && <p className="notice">{notice}</p>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -76,6 +80,6 @@ export function LoginPage() {
           Pedir acesso
         </a>
       </div>
-    </div>
+    </AuthSheet>
   );
 }

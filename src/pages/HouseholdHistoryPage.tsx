@@ -9,10 +9,46 @@ import { useEventNames } from "../history/useEventNames";
 import { HouseholdGate } from "../household/HouseholdGate";
 
 const NO_EVENTS: DomainEventLogEntryDto[] = [];
-const when = new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeStyle: "short" });
+const time = new Intl.DateTimeFormat("pt-PT", {
+  timeZone: "Europe/Lisbon",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+// en-CA dá yyyy-mm-dd: a chave do dia em Lisboa.
+const dayKey = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Lisbon",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+const weekday = new Intl.DateTimeFormat("pt-PT", {
+  timeZone: "Europe/Lisbon",
+  weekday: "short",
+});
+const month = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", month: "long" });
+const year = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", year: "numeric" });
+const thisYear = year.format(new Date());
+const weekdayIndex = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Lisbon", weekday: "short" });
+
+/** Os eventos por dia, pela ordem em que chegam (do mais recente para o mais antigo). */
+function byDay(events: DomainEventLogEntryDto[]): { day: string; date: Date; events: DomainEventLogEntryDto[] }[] {
+  const days: { day: string; date: Date; events: DomainEventLogEntryDto[] }[] = [];
+  for (const event of events) {
+    const date = new Date(event.occurredOn);
+    const day = dayKey.format(date);
+    const last = days[days.length - 1];
+    if (last && last.day === day) last.events.push(event);
+    else days.push({ day, date, events: [event] });
+  }
+  return days;
+}
 
 export function HouseholdHistoryPage() {
-  return <HouseholdGate>{(household) => <HouseholdHistory householdId={household.householdId} name={household.name} />}</HouseholdGate>;
+  return (
+    <HouseholdGate>
+      {(household) => <HouseholdHistory householdId={household.householdId} name={household.name} />}
+    </HouseholdGate>
+  );
 }
 
 function HouseholdHistory({ householdId, name }: { householdId: string; name: string }) {
@@ -43,10 +79,14 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
           {name}
         </Link>
       </nav>
-      <h1>Histórico</h1>
-      <p className="page-sub">O que mudou na casa, do mais recente para o mais antigo.</p>
+      <header className="page-head">
+        <div>
+          <h1>Histórico</h1>
+          <p className="page-head-sub">O que mudou na casa, do mais recente para o mais antigo.</p>
+        </div>
+      </header>
 
-      <div className="chip-row aisle-row" role="group" aria-label="Área do histórico">
+      <div className="chip-row" role="group" aria-label="Área do histórico">
         {timelineAreas.map((option) => (
           <button
             key={option.label}
@@ -72,25 +112,51 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
       {result !== null && result.items.length === 0 && <p className="empty-state">Nada registado aqui ainda.</p>}
       {result !== null && result.items.length > 0 && (
         <>
-          <ul className="today-list history-list">
-            {result.items.map((event) => {
-              const link = eventLink(event);
-              const detail = eventDetail(event.payload) ?? names.get(event.eventId);
-              const label = detail ? `${eventLabel(event.eventType)}: ${detail}` : eventLabel(event.eventType);
-              return (
-                <li key={event.eventId}>
-                  <span className="meal-meta muted">{when.format(new Date(event.occurredOn))}</span>
-                  {link ? (
-                    <Link to={link} className="meal-title">
-                      {label}
-                    </Link>
-                  ) : (
-                    <span className="meal-title">{label}</span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          {/* Os dias em linhas, o número numa coluna fixa, como em Semana. */}
+          <ol className="week-days history-days">
+            {byDay(result.items).map(({ day, date, events }) => (
+              <li key={day} className="week-day">
+                <div className="week-day-date">
+                  <span
+                    className={
+                      day === dayKey.format(new Date()) || weekdayIndex.format(date) === "Sun"
+                        ? "week-day-number is-red"
+                        : "week-day-number"
+                    }
+                  >
+                    {Number(day.slice(8, 10))}
+                  </span>
+                  <span className="week-day-weekday">
+                    {weekday.format(date).replace(".", "")}
+                    <br />
+                    {month.format(date)}
+                    {year.format(date) !== thisYear && ` ${year.format(date)}`}
+                  </span>
+                </div>
+                <ul className="history-events">
+                  {events.map((event) => {
+                    const link = eventLink(event);
+                    const detail = eventDetail(event.payload) ?? names.get(event.eventId);
+                    const label = detail ? `${eventLabel(event.eventType)}: ${detail}` : eventLabel(event.eventType);
+                    return (
+                      <li key={event.eventId} className="history-event">
+                        <time className="history-time" dateTime={event.occurredOn}>
+                          {time.format(new Date(event.occurredOn))}
+                        </time>
+                        {link ? (
+                          <Link to={link} className="history-label">
+                            {label}
+                          </Link>
+                        ) : (
+                          <span className="history-label">{label}</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
+          </ol>
           <Pagination page={result.page} pageSize={result.pageSize} total={result.total} onPageChange={setPage} />
         </>
       )}

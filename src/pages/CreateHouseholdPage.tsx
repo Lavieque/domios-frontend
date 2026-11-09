@@ -32,7 +32,11 @@ export function CreateHouseholdPage() {
       storeHouseholdId(session.userId, household.householdId);
       navigate("/casa", { replace: true });
     } catch (err) {
-      setError(describeError(err, { "invalid-argument": "Preenche o nome da casa e o teu nome." }));
+      setError(
+        describeError(err, {
+          "invalid-argument": "Preenche o nome da casa e o teu nome.",
+        }),
+      );
       setSubmitting(false);
     }
   }
@@ -44,7 +48,9 @@ export function CreateHouseholdPage() {
           Casa
         </Link>
       </nav>
-      <h1>Criar casa</h1>
+      <header className="page-head">
+        <h1>Criar casa</h1>
+      </header>
       <p className="page-lede">
         A casa junta a despensa, as listas de compras e o plano de refeições. Ficas como administrador e podes
         acrescentar o resto da família depois.

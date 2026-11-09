@@ -45,21 +45,23 @@ function App() {
         <polyline
           points="30,72 30,46 60,20 90,46 90,72"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="10"
+          stroke="var(--accent)"
+          strokeWidth="8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <polyline
           points="52,88 52,62 82,36 112,62 112,88"
           fill="none"
-          stroke="var(--today)"
-          strokeWidth="10"
+          stroke="var(--accent-2)"
+          strokeWidth="8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
-      <span className="wordmark">DomiOS</span>
+      <span className="wordmark">
+        Domi<em>OS</em>
+      </span>
     </NavLink>
   );
 

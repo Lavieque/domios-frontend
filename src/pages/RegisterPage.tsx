@@ -4,6 +4,7 @@ import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, register } from "../api/auth"
 import { ApiError } from "../api/http";
 import { signIn } from "../auth/actions";
 import { describeError } from "../auth/errors";
+import { AuthSheet } from "../components/AuthSheet";
 import { inviteFromHash } from "../auth/links";
 import { useSession } from "../auth/useSession";
 import { REQUEST_ACCESS_URL } from "../siteUrl";
@@ -55,7 +56,9 @@ export function RegisterPage() {
       await signIn(email, password);
       navigate("/conta", {
         replace: true,
-        state: { notice: "Conta criada. Enviámos-te um email com um link para confirmares o endereço." },
+        state: {
+          notice: "Conta criada. Enviámos-te um email com um link para confirmares o endereço.",
+        },
       });
     } catch (err) {
       if (err instanceof ApiError && err.type === "duplicate-email") {
@@ -75,9 +78,11 @@ export function RegisterPage() {
 
   if (!invite) {
     return (
-      <div className="page auth-page">
-        <h1>Criar conta</h1>
-        <p>O DomiOS está aberto só a quem tem convite. Pede acesso e, quando for aprovado, recebes um email com o link para criares a conta.</p>
+      <AuthSheet title="Criar conta">
+        <p>
+          O DomiOS está aberto só a quem tem convite. Pede acesso e, quando for aprovado, recebes um email com o link
+          para criares a conta.
+        </p>
         <p>
           <a className="button-primary" href={REQUEST_ACCESS_URL}>
             Pedir acesso
@@ -86,13 +91,12 @@ export function RegisterPage() {
         <p className="form-links">
           Já tens conta? <Link to="/entrar">Entrar</Link>
         </p>
-      </div>
+      </AuthSheet>
     );
   }
 
   return (
-    <div className="page auth-page">
-      <h1>Criar conta</h1>
+    <AuthSheet title="Criar conta">
       <p className="muted">Acesso aprovado. Usa o email para onde enviámos o convite.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -142,6 +146,6 @@ export function RegisterPage() {
       <p className="form-links">
         Já tens conta? <Link to="/entrar">Entrar</Link>
       </p>
-    </div>
+    </AuthSheet>
   );
 }

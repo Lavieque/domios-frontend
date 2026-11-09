@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   PriceLabel,
@@ -12,12 +12,12 @@ import {
 import { formatPercent, money, priceDigits } from "../catalog/offers";
 
 /**
- * A etiqueta de prateleira: o contentor de tudo o que tem preço (produto,
- * oferta, promoção, loja). `index` escalona a entrada na grelha.
+ * Uma linha com preço (produto, oferta, promoção, loja): o nome à esquerda, a foto
+ * à direita, o veredicto por baixo. Sem cartão; as linhas partem-se por filetes.
+ * `index` fica por compatibilidade: já não há entrada escalonada.
  */
 export function ShelfLabel({
   to,
-  index = 0,
   best = false,
   className = "",
   children,
@@ -30,65 +30,92 @@ export function ShelfLabel({
   className?: string;
   children: ReactNode;
   band?: ReactNode;
-  /** Por cima do corpo: o campo da foto no cartão de produto. */
+  /** À direita do texto: a foto da embalagem, quando existe. */
   media?: ReactNode;
 }) {
-  const style = { "--i": Math.min(index, 12) } as CSSProperties;
-  const classes = `shelf-label${best ? " is-best" : ""}${className ? ` ${className}` : ""}`;
+  const classes = `price-row${best ? " is-best" : ""}${media ? " has-media" : ""}${className ? ` ${className}` : ""}`;
   const content = (
     <>
-      {media}
-      <div className="label-body">{children}</div>
-      {band}
+      <div className="price-row-body">
+        {children}
+        {band && <div className="price-row-verdict">{band}</div>}
+      </div>
+      {media && <div className="price-row-media">{media}</div>}
     </>
   );
   return to ? (
-    <Link to={to} className={classes} style={style}>
+    <Link to={to} className={classes}>
       {content}
     </Link>
   ) : (
-    <div className={classes} style={style}>
-      {content}
-    </div>
+    <div className={classes}>{content}</div>
   );
 }
 
-/** O número da etiqueta: "0,89 €". `from` antepõe "desde". */
+/** O preço na etiqueta amarela do almanaque: "0,89 €". `from` antepõe "desde". */
 export function LabelPrice({ amount, from = false }: { amount: number | null | undefined; from?: boolean }) {
   if (amount === undefined) return <div className="label-price is-empty loading">A ler preços…</div>;
   if (amount === null) return <div className="label-price is-empty">Sem preço observado</div>;
   return (
-    <div className="label-price" aria-label={money.format(amount)}>
+    <div className="label-price" aria-label={`${from ? "desde " : ""}${money.format(amount)}`}>
       {from && <span className="label-price-from">desde</span>}
-      {priceDigits(amount)}
-      <small>€</small>
+      <span className="price-tag">
+        {priceDigits(amount)}
+        <small> €</small>
+      </span>
     </div>
   );
 }
 
-/** A faixa do veredicto, com o rótulo da Api (PriceLabel) ou um texto livre. */
+/** Ordem da escala, do mais barato ao mais caro: a casa cheia diz onde está o preço. */
+const SCALE: PriceLabel[] = [
+  PriceLabel.HistoricLow,
+  PriceLabel.BelowAverage,
+  PriceLabel.Usual,
+  PriceLabel.AboveAverage,
+];
+
+/**
+ * O veredicto do histórico: uma escala de quatro casas (mínimo, abaixo, habitual, acima)
+ * com a do preço preenchida, e o rótulo da Api ao lado. Só tinta: o verde é "tens tudo"
+ * e o vermelho é o que está a acabar. Com texto livre (`children`) fica só o texto.
+ * `tone="urgent"` é uma promoção a acabar; `tone="1"` é o melhor da comparação.
+ */
 export function VerdictBand({
   insight,
   children,
   tone,
-  pill = false,
 }: {
   insight?: PriceInsightDto | null;
   children?: ReactNode;
   tone?: string;
-  /** Solto, fora do cartão: pastilha em vez de faixa. */
+  /** Mantido por compatibilidade: o veredicto já não muda de forma fora da linha. */
   pill?: boolean;
 }) {
-  const Tag = pill ? "span" : "div";
-  const shape = pill ? " verdict-pill" : "";
   if (children !== undefined) {
-    return <Tag className={`verdict verdict-${tone ?? "none"}${shape}`}>{children}</Tag>;
+    const kind = tone === "urgent" ? " is-urgent" : tone === "1" ? " is-strong" : tone === "none" ? " is-quiet" : "";
+    return <span className={`price-verdict${kind}`}>{children}</span>;
   }
-  if (!insight) return <Tag className={`verdict verdict-none${shape}`}>Sem histórico de preços</Tag>;
+  if (!insight || insight.label === PriceLabel.InsufficientHistory) {
+    return (
+      <span className="price-verdict is-quiet">
+        {insight ? priceLabelLabels[insight.label] : "Sem histórico de preços"}
+      </span>
+    );
+  }
   const days = insight.windowDays;
   const text =
     insight.label === PriceLabel.HistoricLow ? `Mínimo dos últimos ${days} dias` : priceLabelLabels[insight.label];
-  return <Tag className={`verdict verdict-${insight.label}${shape}`}>{text}</Tag>;
+  return (
+    <span className={`price-verdict${insight.label === PriceLabel.HistoricLow ? " is-strong" : ""}`}>
+      <span className="price-scale" aria-hidden="true">
+        {SCALE.map((step) => (
+          <span key={step} className={step === insight.label ? "is-on" : undefined} />
+        ))}
+      </span>
+      {text}
+    </span>
+  );
 }
 
 /** Régua mínimo–máximo do período, com a média e o preço atual. */
@@ -97,9 +124,14 @@ export function PriceRange({ insight }: { insight: PriceInsightDto }) {
   if (lowest === null || highest === null || highest <= lowest) return null;
   const at = (value: number) => `${Math.min(100, Math.max(0, ((value - lowest) / (highest - lowest)) * 100))}%`;
   return (
-    <div className="price-range" aria-label={`Entre ${money.format(lowest)} e ${money.format(highest)} nos últimos ${insight.windowDays} dias`}>
+    <div
+      className="price-range"
+      aria-label={`Entre ${money.format(lowest)} e ${money.format(highest)} nos últimos ${insight.windowDays} dias`}
+    >
       <div className="price-range-track">
-        {average !== null && <span className="price-range-avg" style={{ left: at(average) }} title={`Média ${money.format(average)}`} />}
+        {average !== null && (
+          <span className="price-range-avg" style={{ left: at(average) }} title={`Média ${money.format(average)}`} />
+        )}
         <span className="price-range-now" style={{ left: at(current) }} title={`Agora ${money.format(current)}`} />
       </div>
       <div className="price-range-legend">
@@ -111,7 +143,11 @@ export function PriceRange({ insight }: { insight: PriceInsightDto }) {
   );
 }
 
-const dateFormat = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short", year: "numeric" });
+const dateFormat = new Intl.DateTimeFormat("pt-PT", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 
 /** O que o histórico diz: observações, verificação Omnibus, frequência de promoção. */
 export function InsightNotes({ insight }: { insight: PriceInsightDto }) {
@@ -131,7 +167,9 @@ export function InsightNotes({ insight }: { insight: PriceInsightDto }) {
               {": "}
               {formatPercent(check.realDiscountPercent)} contra o mínimo de 30 dias
               {check.lowest30Days !== null && <> ({money.format(check.lowest30Days)})</>}
-              {check.announcedDiscountPercent !== null && <>, anunciado {formatPercent(check.announcedDiscountPercent)}</>}
+              {check.announcedDiscountPercent !== null && (
+                <>, anunciado {formatPercent(check.announcedDiscountPercent)}</>
+              )}
             </>
           )}
         </li>

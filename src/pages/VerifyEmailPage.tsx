@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { verifyEmail } from "../api/auth";
 import { ApiError } from "../api/http";
 import { describeError } from "../auth/errors";
+import { AuthSheet } from "../components/AuthSheet";
 import { tokenFromHash } from "../auth/links";
 import { sessionStore } from "../auth/sessionStore";
 import { useSession } from "../auth/useSession";
@@ -44,9 +45,7 @@ export function VerifyEmailPage() {
   }, [hashToken, navigate]);
 
   return (
-    <div className="page auth-page">
-      <h1>Confirmar email</h1>
-
+    <AuthSheet title="Confirmar email">
       {status === "verifying" && <p className="muted loading">A confirmar…</p>}
       {status === "verified" && <p className="notice">Email confirmado. Obrigado!</p>}
       {status === "invalid" && (
@@ -64,6 +63,6 @@ export function VerifyEmailPage() {
       <p className="form-links">
         {session ? <Link to="/conta">Ir para a conta</Link> : <Link to="/entrar">Entrar</Link>}
       </p>
-    </div>
+    </AuthSheet>
   );
 }

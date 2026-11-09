@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "../api/auth";
 import { describeError } from "../auth/errors";
+import { AuthSheet } from "../components/AuthSheet";
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -24,9 +25,7 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <div className="page auth-page">
-      <h1>Recuperar password</h1>
-
+    <AuthSheet title="Recuperar password">
       {sentTo ? (
         // A Api responde igual exista ou não a conta: a mensagem também.
         <p className="notice">
@@ -38,7 +37,13 @@ export function ForgotPasswordPage() {
           <p className="muted">Indica o email da tua conta e enviamos-te um link para definires uma password nova.</p>
           <label className="form-field">
             <span>Email</span>
-            <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </label>
           {error && (
             <p className="form-error" role="alert">
@@ -54,6 +59,6 @@ export function ForgotPasswordPage() {
       <p className="form-links">
         <Link to="/entrar">Voltar a entrar</Link>
       </p>
-    </div>
+    </AuthSheet>
   );
 }

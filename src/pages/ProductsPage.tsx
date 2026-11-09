@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
 import { CategoryScope, measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
-import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
+import { topCategory } from "../catalog/aisles";
 import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
-import { AisleSign } from "../components/AisleSign";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
+import { ProductThumb } from "../components/ProductThumb";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
 
 const count = new Intl.NumberFormat("pt-PT");
@@ -70,7 +70,10 @@ export function ProductsPage() {
         .sort((a, b) => a.name.localeCompare(b.name, "pt")),
     [categories, groceryOnly],
   );
-  const categoriesById = useMemo(() => new Map(categories.map((category) => [category.categoryId, category])), [categories]);
+  const categoriesById = useMemo(
+    () => new Map(categories.map((category) => [category.categoryId, category])),
+    [categories],
+  );
 
   // No telemóvel a barra lateral fecha-se atrás de "Filtros", como em
   // Promoções; no ecrã largo fica sempre à vista, à esquerda da grelha.
@@ -133,8 +136,12 @@ export function ProductsPage() {
 
   return (
     <div className="page">
-      <h1>Produtos</h1>
-      <p className="page-sub">Preços observados nas lojas, com o veredicto do histórico de cada oferta.</p>
+      <header className="page-head">
+        <div>
+          <h1>Produtos</h1>
+          <p className="page-head-sub">Preços observados nas lojas, com o veredicto do histórico de cada oferta.</p>
+        </div>
+      </header>
 
       <div className="catalog-layout">
         <div className="toolbar catalog-toolbar">
@@ -155,11 +162,7 @@ export function ProductsPage() {
           </button>
         </div>
 
-        <aside
-          className={`filter-sidebar${showFilters ? " is-open" : ""}`}
-          id="product-filters"
-          aria-label="Filtros"
-        >
+        <aside className={`filter-sidebar${showFilters ? " is-open" : ""}`} id="product-filters" aria-label="Filtros">
           <label className="filter-check">
             <input
               type="checkbox"
@@ -190,7 +193,9 @@ export function ProductsPage() {
             // A escolhida fica sempre à vista, mesmo para lá do corte.
             const shown = expanded
               ? group.categories
-              : group.categories.filter((category, index) => index < GROUP_PREVIEW || category.categoryId === categoryId);
+              : group.categories.filter(
+                  (category, index) => index < GROUP_PREVIEW || category.categoryId === categoryId,
+                );
             const rest = group.categories.length - shown.length;
             return (
               <section key={group.scope} className="filter-group">
@@ -211,21 +216,27 @@ export function ProductsPage() {
                         <li key={category.categoryId}>
                           <button
                             type="button"
-                            className={`filter-option ${aisleClass(aisleOf(category.name))}`}
+                            className="filter-option"
                             aria-pressed={categoryId === category.categoryId}
                             onClick={() => {
-                              applyFilters({ categoryId: category.categoryId, page: 1 });
+                              applyFilters({
+                                categoryId: category.categoryId,
+                                page: 1,
+                              });
                               setShowFilters(false);
                             }}
                           >
-                            <span className="aisle-dot" aria-hidden="true" />
                             {category.name}
                           </button>
                         </li>
                       ))}
                     </ul>
                     {group.categories.length > GROUP_PREVIEW && (expanded || rest > 0) && (
-                      <button type="button" className="link-button filter-more" onClick={() => toggleExpanded(group.scope)}>
+                      <button
+                        type="button"
+                        className="link-button filter-more"
+                        onClick={() => toggleExpanded(group.scope)}
+                      >
                         {expanded ? "Mostrar menos" : `Mais ${rest}`}
                       </button>
                     )}
@@ -244,11 +255,10 @@ export function ProductsPage() {
             {selectedCategory && (
               <button
                 type="button"
-                className={`active-filter ${aisleClass(aisleOf(selectedCategory.name))}`}
+                className="active-filter"
                 aria-label={`Tirar filtro ${selectedCategory.name}`}
                 onClick={() => applyFilters({ categoryId: null, page: 1 })}
               >
-                <span className="aisle-dot" aria-hidden="true" />
                 {selectedCategory.name}
                 <span className="active-filter-x" aria-hidden="true" />
               </button>
@@ -271,7 +281,7 @@ export function ProductsPage() {
             </p>
           ) : (
             products.length > 0 && (
-              <div className={`label-grid${loading ? " is-loading" : ""}`}>
+              <div className={`price-rows${loading ? " is-loading" : ""}`}>
                 {products.map((product, index) => (
                   <ProductLabel
                     key={product.productId}
@@ -284,7 +294,12 @@ export function ProductsPage() {
             )
           )}
 
-          <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={total}
+            onPageChange={(nextPage) => applyFilters({ page: nextPage })}
+          />
         </div>
       </div>
     </div>
@@ -292,10 +307,9 @@ export function ProductsPage() {
 }
 
 /** O produto com a oferta mais barata que a Api conhece (GET /products não traz preços). */
-function ProductLabel({ product, index, top }: { product: ProductDto; index: number; top: CategoryDto | null }) {
+function ProductLabel({ product, top }: { product: ProductDto; index: number; top: CategoryDto | null }) {
   const offers = useOffers(product.productId);
   const aisleName = (top ?? product.category).name;
-  const aisle = aisleOf(aisleName);
   const priced = offers ? sortOffers(offers).filter(isOnSale) : [];
   const cheapest = priced[0];
   const unit = cheapest ? unitPriceLabel(cheapest) : null;
@@ -309,40 +323,31 @@ function ProductLabel({ product, index, top }: { product: ProductDto; index: num
   return (
     <ShelfLabel
       to={`/produtos/${product.productId}`}
-      index={index}
       band={band}
-      className={`product-card ${aisleClass(aisle)}`}
-      media={
-        <div className={`product-photo${product.imageUrl ? "" : " is-empty"}`}>
-          <span className="product-photo-tag">
-            <span className="aisle-dot" aria-hidden="true" />
-            {aisleName}
-          </span>
-          {product.imageUrl ? (
-            <img src={product.imageUrl} alt="" loading="lazy" />
-          ) : (
-            <AisleSign aisle={aisle} />
-          )}
-        </div>
-      }
+      className="product-row"
+      media={product.imageUrl ? <ProductThumb src={product.imageUrl} /> : undefined}
     >
       <div className="label-name">{product.name}</div>
       <div className="label-meta">
-        {product.brand ?? "Sem marca"} · {product.packageQuantity} {measurementUnitLabels[product.packageUnit]}
+        {product.brand ?? "Sem marca"} · {product.packageQuantity} {measurementUnitLabels[product.packageUnit]} ·{" "}
+        {aisleName}
       </div>
       {(offers === undefined || cheapest) && (
-        <LabelPrice amount={offers === undefined ? undefined : cheapest?.latestPrice?.price.amount} from={priced.length > 1} />
-      )}
-      {cheapest && (
-        <div className="label-unit">
-          {unit && <strong>{unit}</strong>}
-          {unit && " · "}
-          {cheapest.chainName}
-          {priced.length > 1 && ` · ${priced.length} lojas`}
+        <div className="label-price-line">
+          <LabelPrice
+            amount={offers === undefined ? undefined : cheapest?.latestPrice?.price.amount}
+            from={priced.length > 1}
+          />
+          {cheapest && (
+            <span className="label-unit">
+              {unit && <strong>{unit}</strong>}
+              {unit && " · "}
+              {cheapest.chainName}
+              {priced.length > 1 && ` · ${priced.length} lojas`}
+              {cheapest.cardPrice && ` · ${money.format(cheapest.cardPrice.amount)} com cartão`}
+            </span>
+          )}
         </div>
-      )}
-      {cheapest?.cardPrice && (
-        <div className="label-card">{money.format(cheapest.cardPrice.amount)} com cartão</div>
       )}
     </ShelfLabel>
   );

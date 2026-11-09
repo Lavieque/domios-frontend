@@ -14,9 +14,13 @@ import {
 import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { goalRows, mealsOverFatLimit, type GoalRow } from "../household/nutritionView";
-import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today } from "../plan/dates";
+import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekdayTitle } from "../plan/dates";
 
-const numberFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
+const isSunday = (date: string) => new Date(`${date}T12:00:00`).getDay() === 0;
+
+const numberFormat = new Intl.NumberFormat("pt-PT", {
+  maximumFractionDigits: 1,
+});
 
 const componentLabels: Record<NutritionScoreComponent, string> = {
   [NutritionScoreComponent.Balance]: "Equilíbrio",
@@ -106,32 +110,53 @@ function Nutrition({ household }: { household: CallerHouseholdDto }) {
   const overFat = summary && goals?.isSet ? mealsOverFatLimit(summary) : null;
 
   return (
-    <div className="page">
-      <h1>Nutrição</h1>
-      <p className="page-sub">{household.name}</p>
-
-      <div className="week-nav">
-        <button type="button" className="button-secondary" onClick={() => change({ semana: addDays(monday, -7) })}>
-          Semana anterior
-        </button>
-        <span className="week-range">
-          {shortDate(monday)} – {longDate(sunday)}
-        </span>
-        <button type="button" className="button-secondary" onClick={() => change({ semana: addDays(monday, 7) })}>
-          Semana seguinte
-        </button>
-        <label className="nutrition-who">
-          <span>Ver</span>
-          <select value={memberId ?? ""} onChange={(e) => change({ quem: e.target.value })}>
-            <option value="">A casa toda</option>
-            {members.map((member) => (
-              <option key={member.memberId} value={member.memberId}>
-                {member.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+    <div className="page nutrition-page">
+      <header className="week-head">
+        <h1>Nutrição</h1>
+        <p className="week-head-sub">{memberName ?? household.name}</p>
+        <nav className="week-nav" aria-label="Semanas">
+          <button type="button" className="week-step" onClick={() => change({ semana: addDays(monday, -7) })}>
+            <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M15 6l-6 6 6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Anterior
+          </button>
+          <span className="week-range">
+            {shortDate(monday)} – {longDate(sunday)}
+          </span>
+          <button type="button" className="week-step" onClick={() => change({ semana: addDays(monday, 7) })}>
+            Seguinte
+            <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9 6l6 6-6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <label className="nutrition-who">
+            <span>Ver</span>
+            <select value={memberId ?? ""} onChange={(e) => change({ quem: e.target.value })}>
+              <option value="">A casa toda</option>
+              {members.map((member) => (
+                <option key={member.memberId} value={member.memberId}>
+                  {member.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </nav>
+      </header>
 
       {error && (
         <p className="form-error" role="alert">
@@ -182,7 +207,7 @@ function ScorePanel({ score }: { score: NutritionScoreDto }) {
     return (
       <section className="panel nutrition-score" aria-labelledby="nutrition-score-title">
         <h2 id="nutrition-score-title">Score da semana</h2>
-        <p className="muted">
+        <p className="nutrition-empty">
           {score.unavailableReason === NutritionScoreUnavailableReason.NoData
             ? "Sem refeições registadas nem planeadas nesta semana."
             : "Há poucos alimentos com dados nutricionais para dar um score fiável."}
@@ -192,19 +217,25 @@ function ScorePanel({ score }: { score: NutritionScoreDto }) {
   }
 
   return (
-    <section className="panel nutrition-score" aria-labelledby="nutrition-score-title">
-      <h2 id="nutrition-score-title">Score da semana</h2>
+    <section className="nutrition-sheet" aria-labelledby="nutrition-score-title">
+      <div className="nutrition-score-value">
+        <h2 id="nutrition-score-title" className="nutrition-score-label">
+          Score da semana
+        </h2>
+        <strong>{score.score}</strong>
+        <span className="nutrition-score-of">de 100</span>
+      </div>
       <div className="nutrition-score-body">
-        <p className="nutrition-score-value">
-          <strong>{score.score}</strong>
-          <span> / 100</span>
-        </p>
         <ul className="nutrition-components">
           {score.components.map((part) => (
             <li key={part.component}>
               <span className="nutrition-component-name">{componentLabels[part.component]}</span>
               <span className="meter" aria-hidden="true">
-                <span style={{ width: `${Math.min(100, (part.points / part.maxPoints) * 100)}%` }} />
+                <span
+                  style={{
+                    width: `${Math.min(100, (part.points / part.maxPoints) * 100)}%`,
+                  }}
+                />
               </span>
               <span className="nutrition-component-points">
                 {numberFormat.format(part.points)} / {part.maxPoints}
@@ -213,13 +244,14 @@ function ScorePanel({ score }: { score: NutritionScoreDto }) {
             </li>
           ))}
         </ul>
+        <p className="muted nutrition-note">
+          {score.source === NutritionScoreSource.Plan
+            ? "Calculado a partir do plano da semana."
+            : "Calculado a partir das refeições registadas."}
+          {score.personalGoalsApplied &&
+            " Os limites e a fibra são medidos contra os alvos definidos para esta pessoa."}
+        </p>
       </div>
-      <p className="muted nutrition-note">
-        {score.source === NutritionScoreSource.Plan
-          ? "Calculado a partir do plano da semana."
-          : "Calculado a partir das refeições registadas."}
-        {score.personalGoalsApplied && " Os limites e a fibra são medidos contra os alvos definidos para esta pessoa."}
-      </p>
     </section>
   );
 }
@@ -287,36 +319,84 @@ function GoalsPanel({
 function DaysTable({ summary }: { summary: NutritionSummaryDto }) {
   const showFatLimit = summary.days.some((day) => day.mealsOverFatLimit !== null);
   return (
-    <div className="table-wrap nutrition-days">
-      <table>
-        <caption className="visually-hidden">Totais por dia</caption>
-        <thead>
-          <tr>
-            <th scope="col">Dia</th>
-            <th scope="col" className="num">Refeições</th>
-            <th scope="col" className="num">kcal</th>
-            <th scope="col" className="num">Proteína (g)</th>
-            <th scope="col" className="num">Hidratos (g)</th>
-            <th scope="col" className="num">Gordura (g)</th>
-            <th scope="col" className="num">Sal (g)</th>
-            {showFatLimit && <th scope="col" className="num">Acima do máx. de gordura</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {summary.days.map((day) => (
-            <tr key={day.date} className={day.mealCount === 0 ? "is-empty" : undefined}>
-              <th scope="row">{shortDate(day.date)}</th>
-              <td className="num">{day.mealCount}</td>
-              <td className="num">{numberFormat.format(day.nutrients.energyKcal)}</td>
-              <td className="num">{numberFormat.format(day.nutrients.protein)}</td>
-              <td className="num">{numberFormat.format(day.nutrients.carbs)}</td>
-              <td className="num">{numberFormat.format(day.nutrients.fat)}</td>
-              <td className="num">{numberFormat.format(day.nutrients.salt)}</td>
-              {showFatLimit && <td className="num">{day.mealsOverFatLimit ?? "–"}</td>}
+    <section className="panel" aria-labelledby="nutrition-days-title">
+      <h2 id="nutrition-days-title">Dia a dia</h2>
+      <div className="table-wrap nutrition-days">
+        <table>
+          <caption className="visually-hidden">Totais por dia</caption>
+          <thead>
+            <tr>
+              <th scope="col">Dia</th>
+              <th scope="col" className="num">
+                Refeições
+              </th>
+              <th scope="col" className="num">
+                kcal
+              </th>
+              <th scope="col" className="num">
+                Proteína (g)
+              </th>
+              <th scope="col" className="num">
+                Hidratos (g)
+              </th>
+              <th scope="col" className="num">
+                Gordura (g)
+              </th>
+              <th scope="col" className="num">
+                Sal (g)
+              </th>
+              {showFatLimit && (
+                <th scope="col" className="num">
+                  Acima do máx. de gordura
+                </th>
+              )}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {summary.days.map((day) => (
+              <tr key={day.date} className={day.mealCount === 0 ? "is-empty" : undefined}>
+                <th scope="row">
+                  <span className="nutrition-day">
+                    <span
+                      className={
+                        isSunday(day.date) || day.date === today()
+                          ? "nutrition-day-number is-red"
+                          : "nutrition-day-number"
+                      }
+                    >
+                      {Number(day.date.slice(8, 10))}
+                    </span>
+                    <span className="nutrition-day-weekday">{weekdayTitle(day.date).replace("-feira", "")}</span>
+                  </span>
+                </th>
+                <td className="num" data-label="Refeições">
+                  {day.mealCount}
+                </td>
+                <td className="num" data-label="kcal">
+                  {numberFormat.format(day.nutrients.energyKcal)}
+                </td>
+                <td className="num" data-label="Proteína (g)">
+                  {numberFormat.format(day.nutrients.protein)}
+                </td>
+                <td className="num" data-label="Hidratos (g)">
+                  {numberFormat.format(day.nutrients.carbs)}
+                </td>
+                <td className="num" data-label="Gordura (g)">
+                  {numberFormat.format(day.nutrients.fat)}
+                </td>
+                <td className="num" data-label="Sal (g)">
+                  {numberFormat.format(day.nutrients.salt)}
+                </td>
+                {showFatLimit && (
+                  <td className="num" data-label="Acima do máx. de gordura">
+                    {day.mealsOverFatLimit ?? "–"}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }

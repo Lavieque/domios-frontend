@@ -1,28 +1,19 @@
 @import "./shared/tokens.css";
 
 /* ---------- Mundo: a Folha do Dia ----------
-   Calendário de folhas e almanaque português: papel branco, tinta preta, amarelo do almanaque na
-   moldura da app, vermelho de calendário para hoje e para o que está a acabar, verde para "tens tudo".
-   Só a app; o site e o admin continuam nos tokens partilhados até serem redesenhados. */
+   Calendário de folhas e almanaque português na forma (folha do dia, réguas, letra condensada),
+   com a paleta antiga do DomiOS (src/shared/tokens.css): fundo cinza-azulado, tinta verde-escura,
+   azul-petróleo como acento, azul-marinho como segundo acento. A moldura da app é um azul-petróleo
+   pálido; o vermelho fica para hoje e para o que está a acabar. Só a app; o site e o admin usam
+   os tokens partilhados sem esta camada. */
 :root {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --surface-2: #f1f1ef;
-  --ink: #141414;
-  --ink-dim: #5a5a57;
-  --line: rgb(20 20 20 / 0.15);
-  --rule: #141414;
-  --accent: #23683a;
-  --accent-soft: #e2efe5;
-  --accent-2: #141414;
-  --accent-2-soft: #ededeb;
-  --danger: #c8231a;
-  --danger-soft: rgb(200 35 26 / 0.1);
-  --today: #d4261c;
-  --today-soft: #fbe6e4;
-  --almanac: #f2c230;
-  --almanac-ink: #141414;
-  --shadow: 0 2px 4px rgb(20 20 20 / 0.08), 0 12px 28px -12px rgb(20 20 20 / 0.28);
+  /* --bg, --surface, --surface-2, --ink, --ink-dim, --line, --accent*, --danger* vêm dos tokens partilhados. */
+  --rule: var(--ink);
+  --today: var(--danger);
+  --today-soft: var(--danger-soft);
+  --almanac: var(--accent-soft);
+  --almanac-ink: var(--ink);
+  --shadow: 0 2px 4px rgb(22 36 31 / 0.08), 0 12px 28px -12px rgb(22 36 31 / 0.28);
   --font: "Archivo Variable", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --radius-sm: 6px;
   --radius: 8px;
@@ -33,21 +24,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #141414;
-    --surface: #1b1b1a;
-    --surface-2: #252523;
-    --ink: #f2f1ed;
-    --ink-dim: #a8a7a2;
-    --line: rgb(242 241 237 / 0.16);
-    --rule: #f2f1ed;
-    --accent: #7cc78e;
-    --accent-soft: rgb(124 199 142 / 0.14);
-    --accent-2: #f2f1ed;
-    --accent-2-soft: rgb(242 241 237 / 0.1);
-    --danger: #ff7a6e;
-    --danger-soft: rgb(255 122 110 / 0.14);
-    --today: #ff6a5c;
-    --today-soft: rgb(255 106 92 / 0.14);
+    --almanac: var(--surface);
     --shadow: 0 2px 4px rgb(0 0 0 / 0.4), 0 12px 28px -12px rgb(0 0 0 / 0.7);
   }
 }
@@ -254,22 +231,23 @@ td.num,
   color: var(--almanac-ink);
 }
 
+/* O logótipo antigo do DomiOS: as duas casas em azul-petróleo e azul-marinho, "OS" a marinho. */
 .brand-mark {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   flex: none;
 }
 
 .wordmark {
-  font-weight: 900;
-  font-stretch: 78%;
-  font-size: 27px;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  font-size: 21px;
+  letter-spacing: -0.03em;
   color: var(--almanac-ink);
 }
 
 .wordmark em {
   font-style: normal;
+  color: var(--accent-2);
 }
 
 .rail-nav {
@@ -281,7 +259,7 @@ td.num,
 .rail-group + .rail-group {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid rgb(20 20 20 / 0.28);
+  border-top: 1px solid color-mix(in srgb, var(--almanac-ink) 28%, transparent);
 }
 
 .rail-link {
@@ -308,7 +286,7 @@ td.num,
 }
 
 .rail-link:hover {
-  background: rgb(20 20 20 / 0.09);
+  background: color-mix(in srgb, var(--almanac-ink) 9%, transparent);
   text-decoration: none;
 }
 
@@ -389,7 +367,6 @@ td.num,
 
 .app-topline .wordmark {
   color: var(--ink);
-  font-size: 23px;
 }
 
 .tab {
@@ -920,7 +897,7 @@ select,
   width: 18px;
   height: 18px;
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: var(--ink);
 }
 
 .filter-check-hint {
@@ -2324,7 +2301,7 @@ a.meal-title:hover {
   height: 18px;
   margin: 0;
   align-self: center;
-  accent-color: var(--accent);
+  accent-color: var(--ink);
 }
 
 .ingredient-checklist .qty {
@@ -2900,7 +2877,7 @@ a.meal-title:hover {
   height: 22px;
   flex: none;
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: var(--ink);
 }
 
 .checkbox-field {
@@ -6768,5 +6745,1294 @@ a.recipe-row-name:hover {
 @media (max-width: 720px) {
   .template-jump {
     width: 100%;
+  }
+}
+
+/* ---------- Quinta passagem: Preços, Promoções, Nutrição, Casa, Conta e entrar ----------
+   O que faltava do mundo antigo (etiquetas de prateleira, faixas de veredicto, tons de corredor,
+   cartões de membros) passa a linhas sob régua, a coluna fixa dos números e a etiqueta amarela. */
+
+/* Linhas com preço: produto, promoção, loja. Duas colunas de jornal quando cabem, como as receitas. */
+.price-rows,
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+  column-gap: clamp(1.75rem, 3vw, 3rem);
+  margin: 0 0 2rem;
+  border-top: 2px solid var(--rule);
+}
+
+.store-grid {
+  grid-template-columns: minmax(0, 1fr);
+  margin-bottom: 1rem;
+}
+
+.price-rows.is-loading {
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+
+.price-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 1.25rem;
+  min-width: 0;
+  min-height: 76px;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.price-row.has-media {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.price-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.price-row .label-name {
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 900;
+  font-stretch: 72%;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+a.price-row:hover .label-name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+.price-row .label-meta,
+.price-row .label-unit,
+.price-row .label-foot {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+}
+
+.price-row .label-meta {
+  font-weight: 650;
+}
+
+.price-row .label-foot {
+  margin: 0;
+}
+
+.price-row .label-card {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.label-price-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  margin-top: 0.15rem;
+}
+
+/* O preço vai sempre na etiqueta amarela. */
+.label-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.2;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.label-price .price-tag small {
+  font-size: 1em;
+  font-weight: 800;
+}
+
+.label-price .label-price-from {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  margin: 0;
+}
+
+.label-price.is-empty {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ink-dim);
+}
+
+.promotion-discount {
+  font-size: 15px;
+  font-weight: 850;
+  font-stretch: 80%;
+  white-space: nowrap;
+}
+
+.price-row-verdict {
+  margin-top: 0.1rem;
+}
+
+.price-row.is-best .label-name::after {
+  content: " · mais barato";
+  font-size: 0.62em;
+  font-weight: 800;
+  font-stretch: 85%;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.store-grid .price-row-verdict {
+  display: none;
+}
+
+/* A foto da embalagem: inteira, sobre papel. */
+.price-row-media {
+  display: block;
+}
+
+.product-thumb {
+  display: grid;
+  place-items: center;
+  width: 6rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+.product-thumb[data-state="loading"] {
+  visibility: hidden;
+}
+
+.product-thumb img {
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+@media (prefers-color-scheme: dark) {
+  .product-thumb {
+    background: #f1f1ef;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-thumb {
+    width: 4.75rem;
+  }
+}
+
+/* O veredicto: quatro casas do mais barato ao mais caro, a do preço cheia. Só tinta. */
+.price-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.price-verdict.is-quiet {
+  color: var(--ink-dim);
+}
+
+.price-verdict.is-urgent {
+  color: var(--today);
+}
+
+.price-scale {
+  display: inline-grid;
+  grid-template-columns: repeat(4, 9px);
+  gap: 2px;
+}
+
+.price-scale > span {
+  height: 9px;
+  border: 1.5px solid var(--ink);
+  border-radius: 1px;
+}
+
+.price-scale > span.is-on {
+  background: var(--ink);
+}
+
+/* Régua do histórico: um filete do mínimo ao máximo, o tique da média, o ponto de agora. */
+.price-range-track {
+  height: 2px;
+  margin: 0.9rem 0 0.6rem;
+  border-radius: 0;
+  background: var(--ink);
+}
+
+.price-range-avg {
+  top: -6px;
+  height: 14px;
+  background: var(--ink);
+}
+
+.price-range-now {
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border: 0;
+  background: var(--ink);
+}
+
+.price-range-legend {
+  font-size: 13px;
+}
+
+.insight-notes {
+  font-size: 14px;
+}
+
+/* Filtros do catálogo sem tons de corredor. */
+.filter-option .aisle-dot,
+.active-filter .aisle-dot {
+  display: none;
+}
+
+.filter-option[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.active-filter {
+  border-color: var(--ink);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Compras: grupos de itens sem o ponto do corredor. */
+.item-group > h3 .aisle-dot {
+  display: none;
+}
+
+/* ---------- O artigo como folha ---------- */
+
+.article-sheet {
+  display: grid;
+  grid-template-columns: clamp(9rem, 15vw, 13rem) minmax(0, 1fr);
+  border-top: 6px solid var(--rule);
+  margin-bottom: 2.25rem;
+}
+
+.article-sheet-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.1rem clamp(1rem, 2vw, 1.75rem) 1.25rem 0;
+}
+
+.article-sheet-price .label-price {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.article-sheet-price .price-tag {
+  padding: 0.1rem 0.35rem 0.05rem;
+  font-size: clamp(44px, 5.4vw, 72px);
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.article-sheet-price .price-verdict {
+  flex-wrap: wrap;
+}
+
+.article-unit {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+.article-sheet-body {
+  min-width: 0;
+  padding: 1.1rem 0 1.25rem clamp(1rem, 2.5vw, 2.25rem);
+  border-left: 1px solid var(--rule);
+}
+
+.article-name {
+  max-width: 22ch;
+  margin: 0;
+  font-size: clamp(34px, 4.4vw, 56px);
+  font-weight: 900;
+  font-stretch: 70%;
+  line-height: 0.98;
+  word-spacing: 0.08em;
+}
+
+.article-brand {
+  margin: 0.5rem 0 0;
+  font-weight: 650;
+  color: var(--ink-dim);
+}
+
+.article-sheet .article-photo {
+  display: grid;
+  place-items: center;
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  margin-top: 1.25rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+@media (prefers-color-scheme: dark) {
+  .article-sheet .article-photo {
+    background: #f1f1ef;
+  }
+}
+
+.article-sheet .article-actions {
+  margin-top: 1.5rem;
+}
+
+.article-notice {
+  margin-top: 1.5rem;
+}
+
+.article-insight {
+  max-width: 36rem;
+  margin-top: 1.75rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.article-specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem 1.5rem;
+  margin: 1.5rem 0 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.article-specs div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.article-specs dt {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+
+.article-specs dd {
+  margin: 0;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+@media (max-width: 640px) {
+  .article-sheet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Como na receita: os números deitam-se numa fila por cima do nome. */
+  .article-sheet-price {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.5rem 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .article-sheet-price .price-tag {
+    font-size: 52px;
+  }
+
+  .article-sheet-body {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .article-sheet .article-actions > * {
+    flex: 1 1 100%;
+  }
+}
+
+/* Onde comprar: uma loja por linha, o preço em condensado, a mais barata na etiqueta. */
+.store-rows {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+}
+
+.store-row > details > summary {
+  padding: 0.85rem 0;
+  min-height: 64px;
+}
+
+.store-row > details > summary:hover {
+  background: var(--surface-2);
+}
+
+.store-row-name strong {
+  font-size: 20px;
+  font-weight: 900;
+  font-stretch: 75%;
+  line-height: 1.1;
+}
+
+.store-row-name span {
+  font-size: 13.5px;
+}
+
+.store-bar {
+  height: 2px;
+  border-radius: 0;
+  background: var(--line);
+  overflow: visible;
+}
+
+.store-bar span {
+  height: 6px;
+  margin-top: -2px;
+  border-radius: 0;
+  background: var(--ink-dim);
+  animation: none;
+}
+
+.store-row.is-best .store-bar span {
+  background: var(--ink);
+}
+
+.store-row-price {
+  font-size: 24px;
+  font-weight: 900;
+  font-stretch: 70%;
+}
+
+.store-row-price small {
+  font-size: 13px;
+  font-weight: 650;
+  font-stretch: 100%;
+  color: var(--ink-dim);
+}
+
+.store-row-detail {
+  padding: 0 0 1.1rem;
+}
+
+.store-row.is-out .store-row-price {
+  color: var(--ink-dim);
+}
+
+/* ---------- Nutrição: o score numa coluna fixa, como o número de um dia ---------- */
+
+.nutrition-who {
+  margin-left: 0;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.nutrition-who select {
+  min-height: 44px;
+}
+
+.nutrition-sheet {
+  display: grid;
+  grid-template-columns: clamp(9rem, 15vw, 13rem) minmax(0, 1fr);
+  margin-bottom: 2.25rem;
+  border-top: 6px solid var(--rule);
+}
+
+.nutrition-score-value {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem clamp(1rem, 2vw, 1.75rem) 1rem 0;
+  white-space: normal;
+}
+
+.nutrition-score-label {
+  margin: 0 0 0.4rem;
+  font-size: clamp(14px, 1.4vw, 17px);
+  font-weight: 850;
+  font-stretch: 75%;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.nutrition-score-value strong {
+  font-size: clamp(96px, 11vw, 150px);
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.82;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.nutrition-score-of {
+  margin-top: 0.35rem;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+
+.nutrition-sheet .nutrition-score-body {
+  display: block;
+  min-width: 0;
+  padding: 1rem 0 0.5rem clamp(1rem, 2.5vw, 2.25rem);
+  border-left: 1px solid var(--rule);
+}
+
+.nutrition-components,
+.nutrition-goal-list {
+  gap: 0;
+}
+
+.nutrition-components li,
+.nutrition-goal-list li {
+  grid-template-columns: minmax(7rem, 11rem) minmax(5rem, 1fr) 5rem;
+  gap: 0.2rem 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.nutrition-component-name,
+.nutrition-goal-name {
+  font-size: 18px;
+  font-weight: 900;
+  font-stretch: 75%;
+}
+
+.nutrition-component-points,
+.nutrition-goal-percent {
+  font-size: 18px;
+  font-weight: 850;
+  font-stretch: 75%;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.nutrition-goal-list .is-over .nutrition-goal-percent {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.nutrition-component-hint,
+.nutrition-goal-detail {
+  font-size: 14px;
+}
+
+/* Medidor: um filete de tinta, a parte feita em barra grossa. */
+.meter {
+  height: 2px;
+  border-radius: 0;
+  background: var(--line);
+  overflow: visible;
+}
+
+.meter > span {
+  height: 8px;
+  margin-top: -3px;
+  border-radius: 0;
+  background: var(--ink);
+}
+
+.meter-over > span {
+  background: repeating-linear-gradient(-45deg, var(--ink) 0 3px, transparent 3px 6px);
+  outline: 1px solid var(--ink);
+}
+
+.nutrition-fat-limit.is-over {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.nutrition-note {
+  font-size: 14px;
+}
+
+.nutrition-empty {
+  margin: 0;
+  color: var(--ink-dim);
+}
+
+.nutrition-day {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+.nutrition-day-number {
+  min-width: 2.25rem;
+  font-size: 32px;
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.9;
+  color: var(--ink);
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.nutrition-day-number.is-red {
+  color: var(--today);
+}
+
+.nutrition-day-weekday {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+
+.nutrition-days tbody th {
+  font-weight: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: middle;
+}
+
+.nutrition-days td {
+  vertical-align: middle;
+  font-size: 15px;
+}
+
+.nutrition-days tr.is-empty .nutrition-day-number:not(.is-red) {
+  color: var(--ink-dim);
+}
+
+@media (max-width: 640px) {
+  .nutrition-sheet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .nutrition-score-value {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.75rem;
+    padding-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nutrition-score-label {
+    flex-basis: 100%;
+  }
+
+  .nutrition-sheet .nutrition-score-body {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ---------- Casa e Conta: secções sob régua, a idade numa coluna fixa ---------- */
+
+.settings-page {
+  max-width: 60rem;
+}
+
+.settings-page .page-head h1 {
+  margin: 0;
+}
+
+.settings-page .title-row {
+  align-items: baseline;
+}
+
+.settings-list,
+.member-list {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+  margin-bottom: 0;
+}
+
+.settings-row {
+  padding: 0.8rem 0;
+  min-height: 60px;
+}
+
+.settings-row > dt,
+.settings-row-title {
+  font-weight: 750;
+}
+
+.settings-flag {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+
+.settings-flag.is-pending {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.settings-note {
+  margin: 0.75rem 0 0;
+}
+
+.panel .side-head .link-button {
+  white-space: nowrap;
+}
+
+.member-row {
+  grid-template-columns: 4.25rem minmax(0, 1fr) auto;
+  align-items: start;
+  padding: 0.9rem 0;
+}
+
+.member-row:not(.is-open):not(.member-row-form):hover {
+  background: none;
+}
+
+.member-row.is-open {
+  margin: 0 -0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  background: var(--surface-2);
+}
+
+.member-row-form {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.member-lead {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-lead-number {
+  font-size: 48px;
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.member-lead-number.is-initials {
+  font-size: 34px;
+  line-height: 1;
+  color: var(--ink-dim);
+}
+
+.member-name {
+  font-size: clamp(22px, 2.2vw, 26px);
+  font-weight: 900;
+  font-stretch: 72%;
+  line-height: 1.08;
+}
+
+.member-name .muted {
+  font-size: 0.7em;
+  font-weight: 750;
+  font-stretch: 85%;
+}
+
+.member-meta {
+  display: block;
+  font-weight: 650;
+  color: var(--ink-dim);
+}
+
+.member-role.is-admin {
+  color: var(--ink);
+}
+
+.member-restriction {
+  border: 0;
+  background: var(--surface-2);
+}
+
+.member-actions {
+  gap: 0.35rem 1rem;
+  padding-top: 0.25rem;
+}
+
+@media (max-width: 720px) {
+  .member-row {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: 0.5rem 0.9rem;
+  }
+
+  .member-actions {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+}
+
+/* Histórico da casa: os dias em linhas, como em Semana. */
+.history-days {
+  margin: 0 0 1.5rem;
+}
+
+.history-days .week-day-weekday {
+  line-height: 1.35;
+}
+
+.history-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.history-event {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.4rem 0;
+}
+
+.history-event + .history-event {
+  border-top: 1px solid var(--line);
+}
+
+.history-time {
+  font-size: 15px;
+  font-weight: 850;
+  font-stretch: 75%;
+  color: var(--ink-dim);
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.history-label {
+  color: var(--ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+a.history-label:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+/* ---------- Entrar, criar conta, recuperar: a folha de hoje com o formulário ---------- */
+
+.auth-page {
+  max-width: 50rem;
+  margin: clamp(1.5rem, 5vw, 4rem) auto 0;
+}
+
+.auth-sheet {
+  display: grid;
+  grid-template-columns: clamp(8.5rem, 14vw, 12rem) minmax(0, 1fr);
+  border-top: 6px solid var(--rule);
+}
+
+.auth-sheet-day {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem clamp(1rem, 2vw, 1.75rem) 1rem 0;
+}
+
+.auth-sheet-weekday,
+.auth-sheet-month {
+  font-size: clamp(14px, 1.4vw, 17px);
+  font-weight: 850;
+  font-stretch: 75%;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.auth-sheet-number {
+  margin: 0.15rem 0 0.25rem;
+  font-size: clamp(96px, 11vw, 150px);
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.8;
+  letter-spacing: -0.035em;
+  color: var(--today);
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.auth-sheet-body {
+  min-width: 0;
+  padding: 1rem 0 1.25rem clamp(1rem, 2.5vw, 2.25rem);
+  border-left: 1px solid var(--rule);
+}
+
+.auth-sheet-body h1 {
+  margin: 0 0 0.25rem;
+}
+
+.auth-sheet-body .auth-form {
+  max-width: 26rem;
+}
+
+.auth-sheet-body .form-links {
+  font-weight: 650;
+}
+
+.auth-sheet-body .request-access {
+  max-width: 26rem;
+}
+
+@media (max-width: 640px) {
+  .auth-sheet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-sheet-day {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .auth-sheet-number {
+    order: -1;
+    margin: 0;
+    font-size: 72px;
+  }
+
+  .auth-sheet-weekday,
+  .auth-sheet-month {
+    padding-bottom: 0.2rem;
+  }
+
+  .auth-sheet-body {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ---------- Adicionar à despensa: linhas sob régua, sem pontos de corredor ---------- */
+
+.draft-list {
+  border: 0;
+  border-top: 2px solid var(--rule);
+  border-radius: 0;
+  background: none;
+}
+
+.draft-row {
+  grid-template-columns: minmax(8rem, 1fr) auto 40px;
+  padding: 0.8rem 0;
+}
+
+.draft-row .meal-title {
+  font-size: 20px;
+  font-weight: 900;
+  font-stretch: 75%;
+  line-height: 1.1;
+}
+
+.add-basket > h2 {
+  padding-top: 0.75rem;
+  border-top: 6px solid var(--rule);
+  font-size: 22px;
+  text-transform: uppercase;
+}
+
+.add-basket .draft-list {
+  border-top-width: 1px;
+  border-top-color: var(--line);
+}
+
+.product-results button:hover {
+  background: var(--surface-2);
+}
+
+.product-results li.result-group {
+  background: none;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.draft-more {
+  grid-column: 1 / -1;
+  background: var(--surface-2);
+}
+
+@media (max-width: 720px) {
+  .draft-row {
+    grid-template-columns: minmax(0, 1fr) 40px;
+  }
+
+  .draft-controls {
+    grid-column: 1 / -1;
+  }
+
+  .draft-row > .icon-danger {
+    grid-column: 2;
+  }
+}
+
+/* ---------- Quinta passagem: correções da revisão final ---------- */
+
+/* Onde comprar: preço e veredicto em colunas fixas, as barras com a mesma pista em todas as lojas. */
+.store-row > details > summary {
+  grid-template-columns: minmax(9rem, 13rem) minmax(4rem, 1fr) 6.5rem 12.5rem;
+}
+
+.store-row-price {
+  justify-self: end;
+  text-align: right;
+}
+
+.store-row-tag {
+  justify-self: stretch;
+  justify-content: space-between;
+}
+
+@media (max-width: 640px) {
+  .store-row > details > summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .store-row-tag {
+    justify-self: start;
+    justify-content: flex-start;
+  }
+}
+
+/* O foco igual ao passar: o nome sublinha, o anel afasta-se do filete. */
+a.price-row:focus-visible .label-name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+.price-row:focus-visible {
+  outline-offset: 4px;
+}
+
+/* Nutrição: a última linha da tabela fecha sem filete, também na célula do dia. */
+.nutrition-days tbody tr:last-child th {
+  border-bottom: none;
+}
+
+/* Nutrição no telefone: cada dia numa linha, como em Semana; os valores com o seu nome. */
+@media (max-width: 640px) {
+  .nutrition-days table,
+  .nutrition-days tbody {
+    display: block;
+  }
+
+  .nutrition-days thead {
+    display: none;
+  }
+
+  .nutrition-days tbody tr {
+    display: grid;
+    grid-template-columns: 4.25rem repeat(2, minmax(0, 1fr));
+    gap: 0.15rem 0.75rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nutrition-days tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .nutrition-days tbody th {
+    grid-row: span 4;
+    padding: 0;
+    border: 0;
+  }
+
+  .nutrition-days tbody th .nutrition-day {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .nutrition-days tbody td {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0;
+    border: 0;
+    text-align: right;
+  }
+
+  .nutrition-days tbody td::before {
+    content: attr(data-label);
+    color: var(--ink-dim);
+    text-align: left;
+  }
+
+  .nutrition-days tbody tr:hover td {
+    background: none;
+  }
+
+  .nutrition-days.table-wrap {
+    overflow: visible;
+  }
+
+  .week-head .week-range {
+    margin-left: 0;
+    padding-left: 0;
+  }
+}
+
+/* Compras: a melhor loja fecha com um só filete; o detalhe abre com o chevron de Onde comprar. */
+.store-grid .price-row:last-child {
+  border-bottom: none;
+}
+
+.store-breakdown summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  list-style: none;
+}
+
+.store-breakdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.store-breakdown summary::after {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--ink-dim);
+  border-bottom: 1.5px solid var(--ink-dim);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.18s ease;
+}
+
+.store-breakdown[open] summary::after {
+  transform: rotate(-135deg) translateY(-2px);
+}
+
+/* Casa e Conta correm à largura das outras páginas. */
+.settings-page {
+  max-width: none;
+}
+
+/* Casa no telefone: Remover alinha com as ligações. */
+@media (max-width: 720px) {
+  .member-actions .button-danger {
+    margin-left: 0;
+  }
+}
+
+/* O detalhe de uma loja vive numa coluna estreita: cada item numa linha, o preço à direita. */
+.store-breakdown > .table-wrap {
+  margin: 0 0 0.75rem;
+  overflow: visible;
+}
+
+.breakdown-table,
+.breakdown-table tbody {
+  display: block;
+}
+
+.breakdown-table thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.breakdown-table tbody tr {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "item price" "need price" "buy buy";
+  gap: 0.1rem 1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.breakdown-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.breakdown-table tbody td {
+  padding: 0;
+  border: 0;
+}
+
+.breakdown-table tbody tr:hover td {
+  background: none;
+}
+
+.breakdown-table td:nth-child(1) {
+  grid-area: item;
+  font-weight: 750;
+}
+
+.breakdown-table td:nth-child(2) {
+  grid-area: need;
+  color: var(--ink-dim);
+}
+
+.breakdown-table td:nth-child(2)::before {
+  content: "Precisas ";
+}
+
+.breakdown-table td:nth-child(3) {
+  grid-area: buy;
+  margin-top: 0.2rem;
+}
+
+.breakdown-table td:nth-child(4) {
+  grid-area: price;
+  font-weight: 850;
+  font-stretch: 80%;
+  font-size: 17px;
+}
+
+/* Revisão, segunda ronda: o veredicto da loja numa só linha; Remover sempre na sua linha no telefone. */
+.store-row .price-verdict {
+  white-space: nowrap;
+}
+
+.store-row > details > summary {
+  grid-template-columns: minmax(9rem, 13rem) minmax(4rem, 1fr) 6.5rem 14rem;
+}
+
+@media (max-width: 640px) {
+  .store-row > details > summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+@media (max-width: 720px) {
+  /* A margem do tamanho da fila obriga o botão a ir sempre para a sua linha. */
+  .member-actions .button-danger {
+    margin-right: 100%;
   }
 }

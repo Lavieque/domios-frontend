@@ -36,7 +36,9 @@ function fromProduct(product: ProductDto, location: PantryLocation): Draft {
     kind: "product",
     id: product.productId,
     name: product.name,
-    detail: [product.brand, `${product.packageQuantity} ${measurementUnitLabels[product.packageUnit]}`].filter(Boolean).join(" · "),
+    detail: [product.brand, `${product.packageQuantity} ${measurementUnitLabels[product.packageUnit]}`]
+      .filter(Boolean)
+      .join(" · "),
     // Por omissão, uma embalagem inteira.
     amount: String(product.packageQuantity),
     unit: product.packageUnit,
@@ -89,7 +91,9 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
   useEffect(() => {
     if (productIdParam) {
       getProduct(productIdParam)
-        .then((product) => setDrafts((current) => (current.length === 0 ? [fromProduct(product, PantryLocation.Pantry)] : current)))
+        .then((product) =>
+          setDrafts((current) => (current.length === 0 ? [fromProduct(product, PantryLocation.Pantry)] : current)),
+        )
         .catch(() => undefined);
     }
   }, [productIdParam]);
@@ -165,10 +169,17 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
     setSubmitting(true);
     try {
       await addPantryItemsBatch(household.householdId, items);
-      const notice = items.length === 1 ? `${drafts[0].name} adicionado à despensa.` : `${items.length} itens adicionados à despensa.`;
+      const notice =
+        items.length === 1
+          ? `${drafts[0].name} adicionado à despensa.`
+          : `${items.length} itens adicionados à despensa.`;
       navigate("/despensa", { state: { notice } });
     } catch (err) {
-      setError(describeError(err, { "invalid-argument": "Algum item não pode ser adicionado (um produto pode ter sido descontinuado)." }));
+      setError(
+        describeError(err, {
+          "invalid-argument": "Algum item não pode ser adicionado (um produto pode ter sido descontinuado).",
+        }),
+      );
       setSubmitting(false);
     }
   }
@@ -183,8 +194,12 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
           Despensa
         </Link>
       </nav>
-      <h1>Adicionar à despensa</h1>
-      <p className="page-sub">{household.name}</p>
+      <header className="page-head">
+        <div>
+          <h1>Adicionar à despensa</h1>
+          <p className="page-head-sub">{household.name}</p>
+        </div>
+      </header>
 
       <div className="add-layout">
         <section className="add-picker" aria-label="Procurar">
@@ -204,14 +219,15 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                 onKeyDown={(e) => e.key === "Escape" && setSearch("")}
               />
             </div>
-            {searching && !hasResults && <p className="add-search-empty muted">Nada encontrado para “{search.trim()}”.</p>}
+            {searching && !hasResults && (
+              <p className="add-search-empty muted">Nada encontrado para “{search.trim()}”.</p>
+            )}
             {hasResults && (
               <ul className="product-results">
                 {ingredients.length > 0 && <li className="result-group">Ingredientes sem marca</li>}
                 {ingredients.map((ingredient) => (
                   <li key={ingredient.ingredientId}>
                     <button type="button" onClick={() => add(fromIngredient(ingredient, location))}>
-                      <span className="aisle-dot" aria-hidden="true" />
                       <span className="result-text">
                         <strong>{ingredient.displayName ?? ingredient.name}</strong>
                         <span className="muted">Basta o nome, sem marca</span>
@@ -223,7 +239,6 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                 {products.map((product) => (
                   <li key={product.productId} className={aisleFor(product.category, categories)}>
                     <button type="button" onClick={() => add(fromProduct(product, location))}>
-                      <span className="aisle-dot" title={product.category.name} aria-hidden="true" />
                       <span className="result-text">
                         <strong>{product.name}</strong>
                         <span className="muted">
@@ -244,14 +259,21 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
             </span>
             <div className="chip-row" role="group" aria-labelledby="add-where-label">
               {pantryLocations.map((loc) => (
-                <button key={loc} type="button" className="chip" aria-pressed={location === loc} onClick={() => applyLocationToAll(loc)}>
+                <button
+                  key={loc}
+                  type="button"
+                  className="chip"
+                  aria-pressed={location === loc}
+                  onClick={() => applyLocationToAll(loc)}
+                >
                   {pantryLocationLabels[loc]}
                 </button>
               ))}
             </div>
           </div>
           <p className="add-hint muted">
-            Para “2 cebolas” serve o ingrediente; para uma marca em concreto, o produto. Junta vários e guarda tudo de uma vez.
+            Para “2 cebolas” serve o ingrediente; para uma marca em concreto, o produto. Junta vários e guarda tudo de
+            uma vez.
           </p>
         </section>
 
@@ -281,9 +303,15 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                 </p>
               )}
               <div className="add-submit">
-                <span className="muted">{drafts.length === 1 ? "1 item por guardar" : `${drafts.length} itens por guardar`}</span>
+                <span className="muted">
+                  {drafts.length === 1 ? "1 item por guardar" : `${drafts.length} itens por guardar`}
+                </span>
                 <button type="submit" className="button-primary" disabled={submitting}>
-                  {submitting ? "A guardar…" : drafts.length === 1 ? "Guardar na despensa" : `Guardar ${drafts.length} itens`}
+                  {submitting
+                    ? "A guardar…"
+                    : drafts.length === 1
+                      ? "Guardar na despensa"
+                      : `Guardar ${drafts.length} itens`}
                 </button>
               </div>
             </form>
@@ -310,7 +338,6 @@ function DraftRow({
 
   return (
     <li className={`draft-row ${aisle}`}>
-      <span className="aisle-dot" title={draft.category?.name} aria-hidden="true" />
       <div className="pantry-main">
         <span className="meal-title">{draft.name}</span>
         <span className="meal-meta muted">{draft.detail}</span>
@@ -367,7 +394,13 @@ function DraftRow({
           </label>
           <label className="form-field">
             <span>Preço pago (€)</span>
-            <input type="text" inputMode="decimal" placeholder="Opcional" value={draft.price} onChange={(e) => onChange({ price: e.target.value })} />
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="Opcional"
+              value={draft.price}
+              onChange={(e) => onChange({ price: e.target.value })}
+            />
           </label>
         </div>
       )}

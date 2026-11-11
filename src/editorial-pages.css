@@ -1287,6 +1287,95 @@
   }
 }
 
+/* ---------- Hoje: a primeira fila mais baixa, com fotografia atrás ---------- */
+
+/* Uma só fila de cartões compactos e três artigos a usar: os dois painéis ficam da mesma altura, mais baixos. */
+.editorial .home-grid-top .photo-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.editorial .home-grid-top .photo-card-media {
+  height: 112px;
+}
+
+.editorial .home-grid-top .photo-card-body {
+  gap: 4px;
+  padding: 11px 12px 12px;
+}
+
+.editorial .home-grid-top .photo-card-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.editorial .home-grid-top .section-head {
+  margin-bottom: 14px;
+}
+
+.editorial .use-first-panel .use-row {
+  gap: 12px;
+  padding: 9px 0;
+}
+
+.editorial .use-first-panel .use-row-thumb {
+  width: 40px;
+  height: 40px;
+}
+
+.editorial .use-first-panel .use-row-text strong {
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.editorial .use-first-panel .use-row-text span {
+  font-size: 12px;
+}
+
+.editorial .use-first-panel .arrow-link {
+  padding-bottom: 0;
+}
+
+/* Fotografia suave: atrás do painel inteiro, sem reservar coluna para ela
+   (o conteúdo destes painéis ocupa a largura toda). */
+.editorial .panel.edge-photo.edge-soft {
+  padding-right: clamp(1rem, 2vw, 1.5rem);
+}
+
+.editorial .edge-soft::before {
+  width: 62%;
+  opacity: 0.55;
+}
+
+.editorial .edge-plan {
+  --edge-image: url("/editorial/scene-plano.jpg");
+}
+
+.editorial .edge-pantry {
+  --edge-image: url("/editorial/pantry.png");
+}
+
+.editorial .use-first-panel.edge-soft::before {
+  width: 85%;
+  opacity: 0.7;
+}
+
+@media (max-width: 899px) {
+  .editorial .home-grid-top .photo-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .home-grid-top .photo-card-media {
+    height: auto;
+  }
+}
+
 /* Despensa: "Deitar fora" existe em todos os cartões; fica discreto até ser preciso. */
 .editorial .pantry-page .pantry-actions .button-danger {
   padding: 6px 11px;

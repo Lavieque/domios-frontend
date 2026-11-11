@@ -151,8 +151,8 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
         <Stat to="/despensa" value={useSoon} label="alimentos a usar" icon="M12 7v5l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0" />
       </div>
 
-      <div className="home-grid">
-        <section className="panel">
+      <div className="home-grid home-grid-top">
+        <section className="panel edge-photo edge-soft edge-plan">
           <div className="section-head">
             <h2>À mesa esta semana</h2>
             <Link to="/plano" className="arrow-link">
@@ -201,7 +201,7 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
           )}
         </section>
 
-        <section className="panel">
+        <section className="panel edge-photo edge-soft edge-pantry use-first-panel">
           <div className="section-head">
             <h2>Usar primeiro</h2>
           </div>
@@ -212,7 +212,7 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
             </p>
           )}
           {pantry !== null &&
-            pantry.slice(0, 4).map((item) => {
+            pantry.slice(0, 3).map((item) => {
               const u = urgency(item.expiresAt);
               const product = products.get(item.productId);
               return (

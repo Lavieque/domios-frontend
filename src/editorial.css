@@ -105,6 +105,7 @@ body {
 }
 
 .editorial .page-head h1,
+.editorial .week-head h1,
 .editorial .article-name {
   font-size: clamp(40px, 4.6vw, 60px);
   line-height: 1.05;
@@ -141,7 +142,8 @@ body {
 }
 
 /* Um eyebrow por área, como no preview. */
-.editorial[data-area] .page-head h1::before {
+.editorial[data-area] .page-head h1::before,
+.editorial[data-area] .week-head h1::before {
   display: block;
   margin-bottom: 0.7rem;
   font-family: var(--font);
@@ -154,17 +156,18 @@ body {
   color: #eff0df;
 }
 
-.editorial[data-area="hoje"] .page-head h1::before { content: "A casa, em harmonia"; }
 .editorial[data-area="despensa"] .page-head h1::before { content: "Organizar"; }
 .editorial[data-area="plano"] .page-head h1::before { content: "À mesa"; }
 .editorial[data-area="compras"] .page-head h1::before { content: "Comprar"; }
-.editorial[data-area="cozinhar"] .page-head h1::before { content: "Cozinhar"; }
+.editorial[data-area="cozinhar"] .page-head h1::before { content: "Aproveitar"; }
 .editorial[data-area="receitas"] .page-head h1::before { content: "Descobrir"; }
-.editorial[data-area="ementas"] .page-head h1::before { content: "Inspiração para planear"; }
+.editorial[data-area="ementas"] .page-head h1::before { content: "Planear"; }
 .editorial[data-area="nutricao"] .page-head h1::before { content: "Nutrição"; }
 .editorial[data-area="produtos"] .page-head h1::before { content: "Comprar melhor"; }
 .editorial[data-area="promocoes"] .page-head h1::before { content: "Promoções"; }
 .editorial[data-area="casa"] .page-head h1::before { content: "A tua casa"; }
+.editorial[data-area="conta"] .page-head h1::before { content: "Perfil"; }
+.editorial[data-area="plano"] .week-head h1::before { content: "À mesa"; }
 
 .editorial .eyebrow {
   margin: 0 0 0.7rem;

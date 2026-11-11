@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { useSession } from "./auth/useSession";
-import { AppRail, AppTabBar } from "./components/AppMenu";
+import { AppRail } from "./components/AppMenu";
 import { EditorialBar } from "./components/EditorialBar";
 import { EmailVerificationNotice } from "./components/EmailVerificationNotice";
 import { AccountPage } from "./pages/AccountPage";
@@ -44,7 +44,14 @@ function App() {
 
   const scene = editorialScene(pathname);
   const [railCollapsed, setRailCollapsed] = useState(readRailCollapsed);
+  // No telemóvel o mesmo botão abre o menu por cima da página; no ecrã largo recolhe-o.
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => setMenuOpen(false), [pathname]);
   function toggleRail() {
+    if (window.matchMedia("(max-width: 899px)").matches) {
+      setMenuOpen((open) => !open);
+      return;
+    }
     setRailCollapsed((collapsed) => {
       writeRailCollapsed(!collapsed);
       return !collapsed;
@@ -80,16 +87,16 @@ function App() {
   return (
     <div
       data-area={scene.area}
-      className={`app editorial${session ? "" : " app-guest"}${session && railCollapsed ? " rail-collapsed" : ""}`}
+      className={`app editorial${session ? "" : " app-guest"}${session && railCollapsed ? " rail-collapsed" : ""}${menuOpen ? " menu-open" : ""}`}
     >
       <div className="editorial-scene" style={{ backgroundImage: `url(${scene.image})` }} aria-hidden="true" />
       {session && <AppRail brand={brand} />}
+      {menuOpen && <button type="button" className="menu-backdrop" aria-label="Fechar menu" onClick={() => setMenuOpen(false)} />}
 
       <div className="app-column">
       {session ? (
         <>
-          <header className="app-topline">{brand}</header>
-          <EditorialBar collapsed={railCollapsed} onToggle={toggleRail} />
+          <EditorialBar collapsed={railCollapsed} menuOpen={menuOpen} onToggle={toggleRail} />
         </>
       ) : (
         <header className="guest-header">
@@ -140,9 +147,12 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Routes>
       </main>
-      </div>
 
-      {session && <AppTabBar />}
+      <footer className="app-footer">
+        <span>DomiOS · A casa, em harmonia</span>
+        <span>Preços observados nas lojas acompanhadas</span>
+      </footer>
+      </div>
     </div>
   );
 }

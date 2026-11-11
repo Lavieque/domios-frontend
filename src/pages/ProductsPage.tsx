@@ -349,6 +349,7 @@ function ProductLabel({ product, top }: { product: ProductDto; index: number; to
           )}
         </div>
       )}
+      <span className="arrow-link">Ver detalhe de preços →</span>
     </ShelfLabel>
   );
 }

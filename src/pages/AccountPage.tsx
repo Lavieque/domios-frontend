@@ -51,6 +51,23 @@ export function AccountPage() {
       </header>
       {notice && <p className="notice">{notice}</p>}
 
+      <section className="panel profile-card">
+        <span className="profile-avatar" aria-hidden="true">
+          {session.email.charAt(0).toUpperCase()}
+        </span>
+        <div>
+          <h2>{session.email}</h2>
+          <p className="muted">
+            {households.current
+              ? `${households.current.name} · ${memberRoleLabels[households.current.role]}`
+              : "Ainda sem casa"}
+          </p>
+        </div>
+        <Link to="/casa" className="button-primary">
+          Gerir a minha casa
+        </Link>
+      </section>
+
       <section className="panel" aria-labelledby="account-access">
         <h2 id="account-access">Acesso</h2>
         <dl className="settings-list">

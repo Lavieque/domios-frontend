@@ -6,6 +6,7 @@ import '@fontsource-variable/dm-sans/index.css'
 import '@fontsource/libre-caslon-display/400.css'
 import './index.css'
 import './editorial.css'
+import './editorial-pages.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

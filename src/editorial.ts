@@ -10,7 +10,8 @@ const SCENES: { match: (pathname: string) => boolean; image: string; area: strin
   { match: (p) => p.startsWith("/nutricao"), image: "/editorial/scene-nutricao.jpg", area: "nutricao" },
   { match: (p) => p.startsWith("/produtos"), image: "/editorial/scene-produtos.jpg", area: "produtos" },
   { match: (p) => p.startsWith("/promocoes"), image: "/editorial/scene-promocoes.jpg", area: "promocoes" },
-  { match: (p) => p.startsWith("/casa") || p.startsWith("/conta"), image: "/editorial/scene-casa.jpg", area: "casa" },
+  { match: (p) => p.startsWith("/conta"), image: "/editorial/scene-casa.jpg", area: "conta" },
+  { match: (p) => p.startsWith("/casa"), image: "/editorial/scene-casa.jpg", area: "casa" },
 ];
 
 /** A fotografia de fundo da área onde o utilizador está; as páginas sem área (entrar, registar…) usam a da cozinha. */

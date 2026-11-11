@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
-import { getCookableRecipes, removeSavedRecipe, type CookableRecipesDto } from "../api/savedRecipes";
+import { getCookableRecipes, RecipeVerdict, removeSavedRecipe, type CookableRecipesDto } from "../api/savedRecipes";
 import { describeError } from "../auth/errors";
+import { FeatureCard } from "../components/FeatureCard";
 import { CookableRecipeList } from "../components/CookableRecipeList";
 import { HouseholdGate } from "../household/HouseholdGate";
 
@@ -37,6 +38,10 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
     }
   }
 
+  // O destaque: a primeira que dá para fazer já, das guardadas e depois das outras.
+  const all = result ? [...result.saved, ...result.others] : [];
+  const suggestion = all.find((r) => r.verdict === RecipeVerdict.CanCook) ?? all[0] ?? null;
+
   return (
     <div className="page cook-page">
       <header className="page-head">
@@ -55,6 +60,16 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
         </p>
       )}
       {!result && !error && <p className="muted loading">A carregar…</p>}
+
+      {result && suggestion && (
+        <FeatureCard
+          eyebrow="Sugestão para hoje"
+          title={suggestion.title}
+          meta={`${suggestion.servings} ${suggestion.servings === 1 ? "pessoa" : "pessoas"} · ${suggestion.availableCount} de ${suggestion.requiredCount} ingredientes em casa`}
+          imageUrl={suggestion.imageUrl}
+          to={`/receitas/${suggestion.recipeId}`}
+        />
+      )}
 
       {result && (
         <div className="cook-sections">

@@ -641,7 +641,7 @@ function ItemList({
                 )}
               </span>
             )}
-            <span className="meal-title">{item.label}</span>
+            <span className="meal-title" title={item.label}>{item.label}</span>
           </label>
           <span className="muted">
             {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]}

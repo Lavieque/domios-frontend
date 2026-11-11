@@ -320,6 +320,13 @@ export const recipeDifficultyLabels: Record<RecipeDifficulty, string> = {
   [RecipeDifficulty.Hard]: "Difícil",
 };
 
+/** Como a Api espera a dificuldade em query (`?difficulty=Easy`). */
+export const recipeDifficultyNames: Record<RecipeDifficulty, string> = {
+  [RecipeDifficulty.Easy]: "Easy",
+  [RecipeDifficulty.Medium]: "Medium",
+  [RecipeDifficulty.Hard]: "Hard",
+};
+
 export const RecipeStatus = {
   Draft: 0,
   Published: 1,

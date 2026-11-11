@@ -1376,6 +1376,120 @@
   }
 }
 
+/* ---------- Planeamento: "O que falta" e "Sugestões" baixos e transparentes ---------- */
+
+/* Sem vidro: um véu verde que desvanece para a direita, para a fotografia da página se ver. */
+.editorial .week-side .side-block {
+  padding: 20px 22px;
+  border: 1px solid rgb(248 245 223 / 0.16);
+  border-right-color: transparent;
+  background: linear-gradient(90deg, rgb(12 40 29 / 0.62) 0%, rgb(12 40 29 / 0.38) 55%, rgb(12 40 29 / 0) 100%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  text-shadow: 0 1px 8px rgb(8 22 16 / 0.55);
+}
+
+.editorial .week-side {
+  align-items: start;
+}
+
+.editorial .week-side .side-head {
+  margin-bottom: 10px;
+}
+
+.editorial .week-side .side-head h2 {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 26px);
+}
+
+.editorial .week-side :is(.side-empty, .side-ok) {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* O que falta: linhas curtas, e as ações numa só fila. */
+.editorial .week-side .missing-list {
+  margin: 0 0 12px;
+}
+
+.editorial .week-side .missing-list li {
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom-color: rgb(255 249 220 / 0.14);
+}
+
+.editorial .week-side .missing-list li:last-child {
+  border-bottom: 0;
+}
+
+.editorial .week-side .inline-form {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.editorial .week-side :is(.inline-form select, .inline-form input) {
+  min-height: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  text-shadow: none;
+}
+
+.editorial .week-side .inline-form select {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.editorial .week-side .inline-form input[type="date"] {
+  flex: 0 0 8.6rem;
+}
+
+.editorial .week-side .inline-form :is(.button-primary, .button-secondary) {
+  flex: none;
+  padding: 9px 13px;
+  text-shadow: none;
+}
+
+.editorial .week-side .have-it-already {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* Sugestões: título e meta numa linha, e o "Adicionar ao plano" logo por baixo, numa fila. */
+.editorial .week-side .suggestion-list li {
+  gap: 6px;
+  padding: 10px 0;
+  border-top-color: rgb(255 249 220 / 0.14);
+}
+
+.editorial .week-side .suggestion-list li:first-child {
+  padding-top: 0;
+}
+
+.editorial .week-side .suggestion-dish {
+  font-size: 15px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.editorial .week-side :is(.suggestion-meta, .suggestion-note) {
+  margin: 0;
+  font-size: 12px;
+}
+
+@media (max-width: 899px) {
+  .editorial .week-side .inline-form {
+    flex-wrap: wrap;
+  }
+
+  .editorial .week-side .side-block {
+    background: linear-gradient(180deg, rgb(12 40 29 / 0.6), rgb(12 40 29 / 0.25));
+  }
+}
+
 /* Despensa: "Deitar fora" existe em todos os cartões; fica discreto até ser preciso. */
 .editorial .pantry-page .pantry-actions .button-danger {
   padding: 6px 11px;

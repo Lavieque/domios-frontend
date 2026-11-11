@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
 import type { PlannedMealDto } from "../api/planning";
-import { addItemsFromRecipe, getShoppingList } from "../api/shopping";
+import {
+  addItemsFromRecipe,
+  createShoppingList,
+  getShoppingList,
+  listShoppingLists,
+  ShoppingListStatus,
+} from "../api/shopping";
 import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
 import { RecipeAvoidedNotice } from "../components/RecipeAvoidedNotice";
 import { SaveRecipeButton } from "../components/SaveRecipeButton";
-import { SendToListForm } from "../components/SendToListForm";
 import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useHouseholds } from "../household/useHouseholds";
@@ -32,7 +37,7 @@ function duration(minutes: number): string {
 }
 
 /** O que se abre por baixo do cabeçalho: um formulário de cada vez. */
-type Task = "plan" | "list" | null;
+type Task = "plan" | null;
 
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +45,10 @@ export function RecipeDetailPage() {
   const { current } = useHouseholds();
   const [recipe, setRecipe] = useState<RecipeDto | null>(null);
   const [added, setAdded] = useState<PlannedMealDto | null>(null);
-  const [onlyMissing, setOnlyMissing] = useState(true);
+  // "Pôr na lista de compras": um clique, o que falta na despensa vai para a lista aberta.
+  const [listResult, setListResult] = useState<{ listId: string; name: string; added: number } | null>(null);
+  const [listBusy, setListBusy] = useState(false);
+  const [listError, setListError] = useState<string | null>(null);
   const [task, setTask] = useState<Task>(null);
   // Riscar ingredientes enquanto se cozinha; não sai deste ecrã.
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
@@ -52,6 +60,8 @@ export function RecipeDetailPage() {
     setRecipe(null);
     setError(null);
     setChecked(new Set());
+    setListResult(null);
+    setListError(null);
     getRecipe(id)
       .then((data) => active && setRecipe(data))
       .catch((err: unknown) => active && setError(describeError(err)));
@@ -87,6 +97,30 @@ export function RecipeDetailPage() {
 
   function toggleTask(next: Exclude<Task, null>) {
     setTask((current) => (current === next ? null : next));
+  }
+
+  /**
+   * Acrescenta logo à primeira lista aberta os ingredientes que a despensa não cobre;
+   * sem lista aberta, cria uma. Sem formulário pelo meio.
+   */
+  async function sendMissingToList() {
+    if (!current || !recipe) return;
+    setListBusy(true);
+    setListError(null);
+    setListResult(null);
+    try {
+      const householdId = current.householdId;
+      const open = await listShoppingLists(householdId, ShoppingListStatus.Open, 1, 1);
+      const target = open.items[0] ?? null;
+      const listId = target ? target.shoppingListId : (await createShoppingList(householdId, "Compras")).shoppingListId;
+      const before = target ? (await getShoppingList(householdId, listId)).items.length : 0;
+      const list = await addItemsFromRecipe(householdId, listId, recipe.recipeId, true);
+      setListResult({ listId, name: list.name, added: list.items.length - before });
+    } catch (err) {
+      setListError(describeError(err, { "invalid-state-transition": "Essa lista já está fechada." }));
+    } finally {
+      setListBusy(false);
+    }
   }
 
   function toggleIngredient(ingredientId: string) {
@@ -169,18 +203,32 @@ export function RecipeDetailPage() {
             >
               Adicionar ao plano
             </button>
-            <button
-              type="button"
-              className="button-secondary button-lg"
-              aria-expanded={task === "list"}
-              aria-controls="recipe-task"
-              onClick={() => toggleTask("list")}
-            >
-              Pôr na lista de compras
-            </button>
+            {current ? (
+              <button type="button" className="button-secondary button-lg" onClick={sendMissingToList} disabled={listBusy}>
+                {listBusy ? "A pôr na lista…" : "Pôr na lista de compras"}
+              </button>
+            ) : (
+              <Link to="/casa/nova" className="button-secondary button-lg">
+                Pôr na lista de compras
+              </Link>
+            )}
             {/* Sem casa não há onde guardar: o botão simplesmente não aparece. */}
             {current && <SaveRecipeButton householdId={current.householdId} recipeId={recipe.recipeId} />}
           </div>
+
+          {listResult && (
+            <p className="notice inline-notice" role="status">
+              {listResult.added === 0
+                ? `Nada a acrescentar a «${listResult.name}»: o que a receita pede já está em casa ou na lista.`
+                : `${listResult.added} ${listResult.added === 1 ? "ingrediente que falta foi" : "ingredientes que faltam foram"} para «${listResult.name}».`}{" "}
+              <Link to={`/listas/${listResult.listId}`}>Ver a lista</Link>
+            </p>
+          )}
+          {listError && (
+            <p className="form-error" role="alert">
+              {listError}
+            </p>
+          )}
 
           {(recipe.tags.length > 0 || recipe.sourceUrl) && (
             <p className="recipe-source">
@@ -228,36 +276,7 @@ export function RecipeDetailPage() {
                 )}
               </HouseholdGate>
             </>
-          ) : (
-            <>
-              <h2>Pôr na lista de compras</h2>
-              <HouseholdGate
-                withoutHousehold={
-                  <p className="muted">
-                    Para ter listas de compras, <Link to="/casa/nova">cria primeiro a tua casa</Link>.
-                  </p>
-                }
-              >
-                {(household) => (
-                  <SendToListForm
-                    householdId={household.householdId}
-                    newListName={recipe.title}
-                    submitLabel="Acrescentar ingredientes"
-                    send={async (listId) => {
-                      const before = await getShoppingList(household.householdId, listId);
-                      const list = await addItemsFromRecipe(household.householdId, listId, recipe.recipeId, onlyMissing);
-                      return { list, added: list.items.length - before.items.length };
-                    }}
-                  >
-                    <label className="checkbox-field">
-                      <input type="checkbox" checked={onlyMissing} onChange={(e) => setOnlyMissing(e.target.checked)} />
-                      Só o que não há na despensa
-                    </label>
-                  </SendToListForm>
-                )}
-              </HouseholdGate>
-            </>
-          )}
+          ) : null}
         </section>
       )}
 

@@ -1421,6 +1421,206 @@
   text-shadow: none;
 }
 
+/* ---------- Comparação de lojas (lista de compras) ---------- */
+
+.editorial .chain-logo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #fbf8f1;
+}
+
+/* Logótipos são largos: a caixa também, para não ficarem minúsculos. */
+.editorial .chain-logo-md {
+  width: 58px;
+  height: 42px;
+  padding: 4px 5px;
+}
+
+.editorial .chain-logo-sm {
+  width: 38px;
+  height: 26px;
+  padding: 2px 3px;
+  border-radius: 6px;
+}
+
+.editorial .chain-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.editorial .chain-logo.is-initials {
+  padding: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.editorial .chain-logo-sm.is-initials {
+  font-size: 10px;
+}
+
+/* Cartões de loja compactos, uns por baixo dos outros. */
+.editorial .store-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  border-top: 0;
+}
+
+.editorial .store-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "logo text price"
+    "logo badge price";
+  align-items: center;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border: 1px solid rgb(248 245 223 / 0.18);
+  border-radius: 10px;
+  background: rgb(255 255 240 / 0.05);
+}
+
+.editorial .store-card.is-best {
+  border-color: rgb(225 237 190 / 0.55);
+  background: rgb(210 230 174 / 0.12);
+}
+
+.editorial .store-card > .chain-logo {
+  grid-area: logo;
+}
+
+.editorial .store-card-text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.editorial .store-card-text strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.editorial .store-card-text span {
+  font-size: 11px;
+  color: #e3e7d8;
+}
+
+.editorial .store-card > .badge {
+  grid-area: badge;
+  justify-self: start;
+  padding: 3px 7px;
+  font-size: 9.5px;
+}
+
+.editorial .badge-soft {
+  background: rgb(255 255 240 / 0.16);
+  color: #f0f1e5;
+}
+
+.editorial .store-card-price {
+  grid-area: price;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.editorial .store-card-price .price-tag {
+  padding: 0;
+  background: none;
+  color: #fffdf3;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.editorial .store-card-price span:not(.price-tag) {
+  font-size: 10.5px;
+  color: #e3e7d8;
+}
+
+/* "O que comprar no X": linhas simples, alinhadas, com o total à direita e a seta no fim. */
+.editorial .store-breakdown {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid rgb(255 249 220 / 0.16);
+  border-radius: 0;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.editorial .store-breakdown:last-of-type {
+  border-bottom: 1px solid rgb(255 249 220 / 0.16);
+}
+
+.editorial .store-breakdown > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 2px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editorial .store-breakdown > summary::-webkit-details-marker {
+  display: none;
+}
+
+.editorial .store-breakdown > summary::after {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin: 0 4px 3px 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.editorial .store-breakdown[open] > summary::after {
+  margin-bottom: -3px;
+  transform: rotate(-135deg);
+}
+
+.editorial .store-breakdown > summary:hover,
+.editorial .store-breakdown[open] > summary {
+  background: none;
+  color: #fff2c9;
+}
+
+.editorial .store-breakdown-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.editorial .store-breakdown-total {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.editorial .store-breakdown > .table-wrap,
+.editorial .store-breakdown > p {
+  margin: 4px 0 12px;
+}
+
+.editorial .breakdown-table {
+  font-size: 12px;
+}
+
 /* ---------- Cartões clicáveis em toda a área ----------
    A ligação do nome estica-se por cima do cartão inteiro; os botões e campos de cada
    cartão ficam por cima dela e continuam a funcionar. */

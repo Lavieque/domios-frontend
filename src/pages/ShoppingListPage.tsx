@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import {
@@ -32,7 +32,7 @@ import { MeasurementUnit, measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
 import { aisleClass, aisleOf } from "../catalog/aisles";
 import { useCategories } from "../catalog/useCategories";
-import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
+import { ChainLogo } from "../components/ChainLogo";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
 import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/groups";
@@ -739,23 +739,22 @@ function Comparison({
             const isBest = store.storeId === best?.storeId;
             const complete = store.coveredItemCount === comparison.itemCount;
             return (
-              <ShelfLabel
-                key={store.storeId}
-                index={index}
-                best={isBest}
-                band={
-                  <VerdictBand tone={isBest ? "1" : complete ? "3" : "none"}>
-                    {isBest ? "Mais barato" : complete ? "Tem tudo" : `Falta ${comparison.itemCount - store.coveredItemCount}`}
-                  </VerdictBand>
-                }
-              >
-                <div className="label-name">{store.chainName}</div>
-                <div className="label-meta">
-                  {store.coveredItemCount} de {comparison.itemCount} itens com preço
+              <div key={store.storeId} className={`store-card${isBest ? " is-best" : ""}`} style={{ "--i": index } as CSSProperties}>
+                <ChainLogo chainName={store.chainName} />
+                <div className="store-card-text">
+                  <strong>{store.chainName}</strong>
+                  <span>
+                    {store.coveredItemCount} de {comparison.itemCount} itens com preço
+                  </span>
                 </div>
-                <LabelPrice amount={store.total} />
-                {store.cardTotal < store.total && <div className="label-card">{money.format(store.cardTotal)} com cartão</div>}
-              </ShelfLabel>
+                <div className="store-card-price">
+                  <span className="price-tag">{money.format(store.total)}</span>
+                  {store.cardTotal < store.total && <span>{money.format(store.cardTotal)} com cartão</span>}
+                </div>
+                <span className={isBest ? "badge" : complete ? "badge badge-soft" : "badge badge-warn"}>
+                  {isBest ? "Mais barato" : complete ? "Tem tudo" : `Falta ${comparison.itemCount - store.coveredItemCount}`}
+                </span>
+              </div>
             );
           })}
         </div>
@@ -892,7 +891,9 @@ function StoreBreakdown({
   return (
     <details className="store-breakdown">
       <summary>
-        O que comprar no {store.chainName} · {money.format(store.total)}
+        <ChainLogo chainName={store.chainName} size="sm" />
+        <span className="store-breakdown-name">O que comprar no {store.chainName}</span>
+        <span className="store-breakdown-total">{money.format(store.total)}</span>
       </summary>
       <div className="table-wrap">
       <table className="comparison-table breakdown-table">

@@ -111,38 +111,32 @@ function Nutrition({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <div className="page nutrition-page">
-      <header className="week-head">
-        <h1>Nutrição</h1>
-        <p className="week-head-sub">{memberName ?? household.name}</p>
-        <nav className="week-nav" aria-label="Semanas">
-          <button type="button" className="week-step" onClick={() => change({ semana: addDays(monday, -7) })}>
-            <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M15 6l-6 6 6 6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Anterior
-          </button>
-          <span className="week-range">
+      <header className="page-head">
+        <div>
+          <h1>Equilíbrio, dia após dia.</h1>
+          <p className="page-head-sub">
+            Uma visão das refeições registadas {memberName ? `por ${memberName}` : `em ${household.name}`}.
+          </p>
+        </div>
+      </header>
+
+      <section className="panel" aria-labelledby="nutrition-week-title">
+        <div className="section-head">
+          <h2 id="nutrition-week-title">A semana em perspetiva</h2>
+          <span className="badge">
             {shortDate(monday)} – {longDate(sunday)}
           </span>
-          <button type="button" className="week-step" onClick={() => change({ semana: addDays(monday, 7) })}>
-            Seguinte
-            <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M9 6l6 6-6 6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+        </div>
+
+        <nav className="nutrition-controls" aria-label="Semanas">
+          <button type="button" className="chip" onClick={() => change({ semana: addDays(monday, -7) })}>
+            ← Anterior
+          </button>
+          <button type="button" className="chip" onClick={() => change({ semana: startOfWeek(today()) })}>
+            Esta semana
+          </button>
+          <button type="button" className="chip" onClick={() => change({ semana: addDays(monday, 7) })}>
+            Seguinte →
           </button>
           <label className="nutrition-who">
             <span>Ver</span>
@@ -156,103 +150,141 @@ function Nutrition({ household }: { household: CallerHouseholdDto }) {
             </select>
           </label>
         </nav>
-      </header>
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
-      {loading && <p className="muted loading">A carregar…</p>}
-
-      {!loading && summary && score && (
-        <>
-          <ScorePanel score={score} />
-
-          {memberId ? (
-            <GoalsPanel
-              rows={rows}
-              hasGoals={goals?.isSet === true}
-              overFat={overFat}
-              maxFatPerMealG={goals?.maxFatPerMealG ?? null}
-              memberName={memberName ?? ""}
-            />
-          ) : (
-            <p className="muted nutrition-note">
-              Os objetivos são de cada pessoa. Escolhe um membro em «Ver» para os comparar com o que comeu.
-            </p>
-          )}
-
-          <DaysTable summary={summary} />
-
-          {summary.uncoveredItemCount > 0 && (
-            <p className="muted nutrition-note">
-              {summary.uncoveredItemCount}{" "}
-              {summary.uncoveredItemCount === 1 ? "alimento não entra" : "alimentos não entram"} nas contas por não ter
-              dados nutricionais. Os totais podem ficar abaixo do real.
-            </p>
-          )}
-          <p className="muted nutrition-note">
-            {last !== sunday && "A semana em curso conta até hoje. "}É informação das refeições registadas, não um
-            conselho médico.
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
           </p>
-        </>
+        )}
+        {loading && <p className="muted loading">A carregar…</p>}
+
+        {!loading && summary && score && (
+          <>
+            <ScoreStatus score={score} />
+            <WeekMetrics summary={summary} />
+            <p className="muted">
+              {summary.mealCount === 0
+                ? "Ainda não há refeições registadas nesta semana. Abre uma receita e escolhe “Já cozinhei” para começar."
+                : `${last !== sunday ? "A semana em curso conta até hoje; " : ""}os valores são médias por dia das refeições registadas.`}
+            </p>
+            <div className="panel-actions">
+              <Link to="/cozinhar" className="button-primary">
+                Escolher uma receita
+              </Link>
+            </div>
+          </>
+        )}
+      </section>
+
+      {!loading && summary && memberId && (
+        <GoalsPanel
+          rows={rows}
+          hasGoals={goals?.isSet === true}
+          overFat={overFat}
+          maxFatPerMealG={goals?.maxFatPerMealG ?? null}
+          memberName={memberName ?? ""}
+        />
+      )}
+
+      <div className="home-grid home-grid-bottom">
+        <section className="panel edge-photo edge-nutrition">
+          <h2>Os teus objetivos</h2>
+          <p className="muted">
+            {memberId
+              ? "Os objetivos diários de cada pessoa definem-se em Casa."
+              : "Os objetivos são de cada pessoa: escolhe alguém em «Ver» para comparar com o que comeu."}
+          </p>
+          <div className="panel-actions">
+            <Link to="/casa" className="button-secondary">
+              Editar objetivos
+            </Link>
+          </div>
+        </section>
+        <section className="panel edge-photo edge-balanced">
+          <h2>Comer com atenção.</h2>
+          <p className="muted">
+            Informação das refeições registadas, não um conselho médico.
+            {summary && summary.uncoveredItemCount > 0 && (
+              <>
+                {" "}
+                {summary.uncoveredItemCount}{" "}
+                {summary.uncoveredItemCount === 1 ? "alimento não entra" : "alimentos não entram"} nas contas por não
+                ter dados nutricionais.
+              </>
+            )}
+          </p>
+        </section>
+      </div>
+
+      {!loading && summary && summary.mealCount > 0 && (
+        <details className="panel nutrition-days-panel">
+          <summary>
+            <h2>Dia a dia</h2>
+            <span className="arrow-link">Ver os totais de cada dia</span>
+          </summary>
+          <DaysTable summary={summary} />
+        </details>
       )}
     </div>
   );
 }
 
-function ScorePanel({ score }: { score: NutritionScoreDto }) {
-  if (score.score === null) {
-    return (
-      <section className="panel nutrition-score" aria-labelledby="nutrition-score-title">
-        <h2 id="nutrition-score-title">Score da semana</h2>
-        <p className="nutrition-empty">
-          {score.unavailableReason === NutritionScoreUnavailableReason.NoData
-            ? "Sem refeições registadas nem planeadas nesta semana."
-            : "Há poucos alimentos com dados nutricionais para dar um score fiável."}
-        </p>
-      </section>
-    );
-  }
-
+/** O círculo do preview com o score da semana e as quatro partes que o compõem. */
+function ScoreStatus({ score }: { score: NutritionScoreDto }) {
+  const available = score.score !== null;
   return (
-    <section className="nutrition-sheet" aria-labelledby="nutrition-score-title">
-      <div className="nutrition-score-value">
-        <h2 id="nutrition-score-title" className="nutrition-score-label">
-          Score da semana
-        </h2>
-        <strong>{score.score}</strong>
-        <span className="nutrition-score-of">de 100</span>
+    <div className="status-card">
+      <div className="status-circle" aria-hidden="true">
+        {available ? score.score : "–"}
       </div>
-      <div className="nutrition-score-body">
-        <ul className="nutrition-components">
-          {score.components.map((part) => (
-            <li key={part.component}>
-              <span className="nutrition-component-name">{componentLabels[part.component]}</span>
-              <span className="meter" aria-hidden="true">
-                <span
-                  style={{
-                    width: `${Math.min(100, (part.points / part.maxPoints) * 100)}%`,
-                  }}
-                />
-              </span>
-              <span className="nutrition-component-points">
-                {numberFormat.format(part.points)} / {part.maxPoints}
-              </span>
-              <span className="muted nutrition-component-hint">{componentHints[part.component]}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="muted nutrition-note">
-          {score.source === NutritionScoreSource.Plan
-            ? "Calculado a partir do plano da semana."
-            : "Calculado a partir das refeições registadas."}
-          {score.personalGoalsApplied &&
-            " Os limites e a fibra são medidos contra os alvos definidos para esta pessoa."}
+      <div className="status-body">
+        <h3>{available ? `Score da semana: ${score.score} de 100` : "Começa pela primeira refeição"}</h3>
+        <p className="muted">
+          {!available
+            ? score.unavailableReason === NutritionScoreUnavailableReason.NoData
+              ? "Regista uma refeição em Cozinhar para ver este resumo. Ainda não há informação para comparar com os objetivos."
+              : "Há poucos alimentos com dados nutricionais para dar um score fiável."
+            : `${score.source === NutritionScoreSource.Plan ? "Calculado a partir do plano da semana." : "Calculado a partir das refeições registadas."}${score.personalGoalsApplied ? " Os limites e a fibra são medidos contra os alvos desta pessoa." : ""}`}
         </p>
+        {available && (
+          <ul className="status-parts">
+            {score.components.map((part) => (
+              <li key={part.component} title={componentHints[part.component]}>
+                <span>{componentLabels[part.component]}</span>
+                <span className="meter" aria-hidden="true">
+                  <span style={{ width: `${Math.min(100, (part.points / part.maxPoints) * 100)}%` }} />
+                </span>
+                <span className="status-part-points">
+                  {numberFormat.format(part.points)}/{part.maxPoints}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-    </section>
+    </div>
+  );
+}
+
+/** As quatro caixas do preview: refeições e a média por dia de energia, proteína e fibra. */
+function WeekMetrics({ summary }: { summary: NutritionSummaryDto }) {
+  const days = Math.max(1, summary.days.length);
+  const metrics = [
+    { label: "Refeições registadas", value: numberFormat.format(summary.mealCount), hint: "Nesta semana" },
+    { label: "Energia", value: `${numberFormat.format(Math.round(summary.total.energyKcal / days))} kcal`, hint: "Por dia, em média" },
+    { label: "Proteína", value: `${numberFormat.format(summary.total.protein / days)} g`, hint: "Por dia, em média" },
+    { label: "Fibra", value: `${numberFormat.format(summary.total.fiber / days)} g`, hint: "Por dia, em média" },
+  ];
+  return (
+    <div className="metrics">
+      {metrics.map((metric) => (
+        <div key={metric.label} className="metric">
+          <span className="muted">{metric.label}</span>
+          <b>{metric.value}</b>
+          <span className="metric-hint">{metric.hint}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -319,9 +351,7 @@ function GoalsPanel({
 function DaysTable({ summary }: { summary: NutritionSummaryDto }) {
   const showFatLimit = summary.days.some((day) => day.mealsOverFatLimit !== null);
   return (
-    <section className="panel" aria-labelledby="nutrition-days-title">
-      <h2 id="nutrition-days-title">Dia a dia</h2>
-      <div className="table-wrap nutrition-days">
+    <div className="table-wrap nutrition-days">
         <table>
           <caption className="visually-hidden">Totais por dia</caption>
           <thead>
@@ -396,7 +426,6 @@ function DaysTable({ summary }: { summary: NutritionSummaryDto }) {
             ))}
           </tbody>
         </table>
-      </div>
-    </section>
+    </div>
   );
 }

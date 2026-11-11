@@ -138,7 +138,6 @@ export function ProductsPage() {
     <div className="page">
       <header className="page-head">
         <div>
-          <p className="eyebrow">Catálogo</p>
           <h1>Produtos</h1>
           <p className="page-head-sub">Preços observados nas lojas, com o veredicto do histórico de cada oferta.</p>
         </div>

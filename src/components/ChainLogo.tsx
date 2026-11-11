@@ -9,7 +9,7 @@ const logos: Record<string, string> = {
   auchan: "/chains/auchan.svg",
   continente: "/chains/continente.svg",
   lidl: "/chains/lidl.svg",
-  "pingo doce": "/chains/pingo-doce.svg",
+  "pingo doce": "/chains/pingo-doce.png",
 };
 
 const brandColors: Record<string, string> = {

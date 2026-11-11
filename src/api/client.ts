@@ -1,6 +1,8 @@
 import {
   dishTypeNames,
   mainProteinNames,
+  recipeDifficultyNames,
+  type RecipeDifficulty,
   type CategoryDto,
   type ChainDto,
   type CurrentPromotionDto,
@@ -64,6 +66,7 @@ export function searchActivePromotions(page = 1, pageSize = 20): Promise<PagedRe
 export interface RecipeFilters {
   dishType?: DishType;
   mainProtein?: MainProtein;
+  difficulty?: RecipeDifficulty;
 }
 
 export function searchRecipes(
@@ -78,6 +81,7 @@ export function searchRecipes(
     pageSize,
     dishType: filters.dishType === undefined ? undefined : dishTypeNames[filters.dishType],
     mainProtein: filters.mainProtein === undefined ? undefined : mainProteinNames[filters.mainProtein],
+    difficulty: filters.difficulty === undefined ? undefined : recipeDifficultyNames[filters.difficulty],
   });
 }
 

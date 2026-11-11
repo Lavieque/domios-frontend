@@ -11,6 +11,7 @@ import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { RecipeRow } from "../components/RecipeRow";
+import { templateImage } from "../plan/templateImage";
 import { withoutNamePrefix } from "../plan/templates";
 
 const count = new Intl.NumberFormat("pt-PT");
@@ -110,7 +111,7 @@ function TemplateRow({ template, note }: { template: MealPlanTemplateSummaryDto;
     <RecipeRow
       title={template.name}
       to={`/ementas/${template.mealPlanTemplateId}`}
-      imageUrl={null}
+      imageUrl={templateImage(template.tags)}
       lead={
         <>
           <span className="list-tally-count">{template.durationDays}</span>

@@ -6,6 +6,7 @@ import {
   dishTypeLabels,
   MainProtein,
   mainProteinLabels,
+  RecipeDifficulty,
   recipeDifficultyLabels,
   type RecipeSummaryDto,
 } from "../api/types";
@@ -18,6 +19,7 @@ import { RecipeRow } from "../components/RecipeRow";
 const count = new Intl.NumberFormat("pt-PT");
 const dishTypes = Object.values(DishType) as DishType[];
 const proteins = Object.values(MainProtein) as MainProtein[];
+const difficulties = Object.values(RecipeDifficulty) as RecipeDifficulty[];
 
 function parseEnum<T extends number>(value: string | null, allowed: T[]): T | undefined {
   if (value === null) return undefined;
@@ -31,23 +33,32 @@ export function RecipesPage() {
   const page = Number(searchParams.get("page") ?? "1") || 1;
   const dishType = parseEnum(searchParams.get("prato"), dishTypes);
   const mainProtein = parseEnum(searchParams.get("proteina"), proteins);
+  const difficulty = parseEnum(searchParams.get("dificuldade"), difficulties);
 
   const [recipes, setRecipes] = useState<RecipeSummaryDto[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const filtered = search !== "" || dishType !== undefined || mainProtein !== undefined;
+  const filtered = search !== "" || dishType !== undefined || mainProtein !== undefined || difficulty !== undefined;
 
-  function applyFilters(next: { search?: string; page?: number; dishType?: DishType | null; mainProtein?: MainProtein | null }) {
+  function applyFilters(next: {
+    search?: string;
+    page?: number;
+    dishType?: DishType | null;
+    mainProtein?: MainProtein | null;
+    difficulty?: RecipeDifficulty | null;
+  }) {
     const nextSearch = next.search ?? search;
     const nextPage = next.page ?? page;
     const nextDish = next.dishType === undefined ? dishType : next.dishType;
     const nextProtein = next.mainProtein === undefined ? mainProtein : next.mainProtein;
+    const nextDifficulty = next.difficulty === undefined ? difficulty : next.difficulty;
 
     const params = new URLSearchParams();
     if (nextSearch) params.set("search", nextSearch);
     if (nextDish !== undefined && nextDish !== null) params.set("prato", String(nextDish));
     if (nextProtein !== undefined && nextProtein !== null) params.set("proteina", String(nextProtein));
+    if (nextDifficulty !== undefined && nextDifficulty !== null) params.set("dificuldade", String(nextDifficulty));
     if (nextPage > 1) params.set("page", String(nextPage));
     setSearchParams(params, { replace: true });
   }
@@ -56,7 +67,7 @@ export function RecipesPage() {
     let active = true;
     setLoading(true);
     setError(null);
-    searchRecipes(search, page, 20, { dishType, mainProtein })
+    searchRecipes(search, page, 20, { dishType, mainProtein, difficulty })
       .then((result) => {
         if (!active) return;
         setRecipes(result.items);
@@ -67,7 +78,7 @@ export function RecipesPage() {
     return () => {
       active = false;
     };
-  }, [search, page, dishType, mainProtein]);
+  }, [search, page, dishType, mainProtein, difficulty]);
 
   // O total só se diz quando a Api o deu; com filtros é o que eles encontram, não o catálogo.
   const countLine = loading
@@ -125,6 +136,21 @@ export function RecipesPage() {
           {dishTypes.map((type) => (
             <option key={type} value={type}>
               {dishTypeLabels[type]}
+            </option>
+          ))}
+        </select>
+        <select
+          className="category-select"
+          aria-label="Dificuldade"
+          value={difficulty ?? ""}
+          onChange={(e) =>
+            applyFilters({ difficulty: e.target.value === "" ? null : (Number(e.target.value) as RecipeDifficulty), page: 1 })
+          }
+        >
+          <option value="">Qualquer dificuldade</option>
+          {difficulties.map((level) => (
+            <option key={level} value={level}>
+              {recipeDifficultyLabels[level]}
             </option>
           ))}
         </select>

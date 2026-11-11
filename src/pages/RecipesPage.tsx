@@ -12,6 +12,7 @@ import {
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { describeError } from "../auth/errors";
+import { FeatureCard } from "../components/FeatureCard";
 import { RecipeRow } from "../components/RecipeRow";
 
 const count = new Intl.NumberFormat("pt-PT");
@@ -87,6 +88,25 @@ export function RecipesPage() {
           </p>
         </div>
       </header>
+
+      {!filtered && page === 1 && !loading && recipes[0] && (
+        <FeatureCard
+          eyebrow="Da nossa seleção"
+          title={recipes[0].title}
+          meta={[
+            recipes[0].dishType !== null ? dishTypeLabels[recipes[0].dishType] : null,
+            recipeDifficultyLabels[recipes[0].difficulty],
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+          imageUrl={recipes[0].imageUrl}
+          to={`/receitas/${recipes[0].recipeId}`}
+        />
+      )}
+
+      <div className="section-head section-head-loose">
+        <h2>Explorar receitas</h2>
+      </div>
 
       <div className="toolbar">
         <SearchField

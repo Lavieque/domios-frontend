@@ -1,0 +1,818 @@
+/* =====================================================================
+   Editorial, segunda passagem: o que ainda divergia do preview.
+   Carregado depois de editorial.css; vale só dentro de `.app.editorial`.
+   ===================================================================== */
+
+/* Títulos nunca em maiúsculas; as secções dentro de painéis seguem o h2 serifado. */
+.editorial :is(h1, h2, .side-head h2, .panel > h2, .panel > h2:first-child, .list-main > h2, .recipe-section-head h2) {
+  text-transform: none;
+  letter-spacing: -0.3px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+}
+
+.editorial .panel > h2,
+.editorial .side-head h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(26px, 2.4vw, 32px);
+  line-height: 1.08;
+}
+
+.editorial .side-head {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* Listas dentro de painéis: sem caixa por dentro da caixa. */
+.editorial :is(.panel, .side-block, .list-main, .list-side) :is(.settings-list, .member-list, .store-rows, .table-wrap, .event-timeline, .pantry-list) {
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.editorial .side-block {
+  border-top: 0;
+}
+
+/* Cabeçalho de secção e ligações com seta. */
+.editorial .section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 0 0 19px;
+}
+
+.editorial :is(.home-grid, .stats) .panel {
+  margin: 0;
+}
+
+.editorial a:not([class]) {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.editorial a:not([class]):hover {
+  text-decoration: underline;
+}
+
+.editorial .section-head h2 {
+  margin: 0;
+}
+
+.editorial .section-head-loose {
+  margin: 28px 0 18px;
+}
+
+.editorial .arrow-link,
+.editorial .side-head a,
+.editorial .link-button,
+.editorial .settings-action {
+  display: inline-block;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: #fff2c9;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.editorial .arrow-link:hover,
+.editorial .side-head a:hover,
+.editorial .link-button:hover,
+.editorial .settings-action:hover {
+  text-decoration: underline;
+}
+
+/* Botões do preview: pequenos, verdes ou salva. */
+.editorial :is(.button-primary, .button-secondary, .button-danger, .button-sage) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 11px 17px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.editorial .button-lg {
+  padding: 13px 20px;
+  font-size: 13px;
+}
+
+.editorial :is(.button-secondary, .button-sage) {
+  background: #b8c8a7;
+  border: 1px solid #d6dfcb;
+  color: #172c21;
+}
+
+.editorial :is(.button-secondary, .button-sage):hover:not(:disabled) {
+  background: #d0ddc0;
+  color: #172c21;
+}
+
+.editorial .button-danger {
+  background: #874a35;
+  border: 1px solid #a5604a;
+  color: #fffdf3;
+}
+
+.editorial .row-action {
+  padding: 6px 11px;
+  border: 1px solid rgb(255 255 230 / 0.35);
+  border-radius: 7px;
+  background: rgb(255 255 240 / 0.1);
+  color: #fffdf3;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.editorial .chip {
+  padding: 8px 15px;
+  border-radius: 25px;
+  font-size: 12px;
+}
+
+.editorial .chip[aria-pressed="true"] {
+  background: var(--green);
+  border-color: #d6dfcb;
+  color: #fff;
+}
+
+/* Etiquetas pequenas (badges). */
+.editorial :is(.badge, .pill, .settings-flag, .status-tag) {
+  display: inline-block;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 20px;
+  background: #e5ebdd;
+  color: #35503b;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.editorial :is(.badge-warn, .settings-flag.is-pending) {
+  background: #f5ddb0;
+  color: #805317;
+}
+
+/* Rodapé. */
+.editorial .app-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 clamp(16px, 2.4vw, 34px);
+  padding: 16px 0 22px;
+  border-top: 1px solid rgb(255 255 255 / 0.25);
+  color: #f0e7d7;
+  font-size: 10px;
+}
+
+/* ---------- Hoje ---------- */
+
+.editorial .today-intro .eyebrow {
+  margin-bottom: 1rem;
+}
+
+.editorial .stats {
+  display: flex;
+  gap: 14px;
+  max-width: 790px;
+  margin: 8px 0 25px;
+}
+
+.editorial .stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(26px) saturate(0.8);
+  -webkit-backdrop-filter: blur(26px) saturate(0.8);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.editorial .stat svg {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  color: #dfedca;
+}
+
+.editorial .stat b {
+  display: block;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.editorial .stat small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: #f0f1e5;
+}
+
+.editorial .home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr);
+  gap: 19px;
+  align-items: stretch;
+}
+
+.editorial .home-grid-bottom {
+  margin: 19px 0;
+}
+
+.editorial .photo-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.editorial .photo-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--glass-edge);
+  border-radius: 9px;
+  background: rgb(255 255 240 / 0.04);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.editorial a.photo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgb(6 23 14 / 0.25);
+}
+
+.editorial .photo-card-media {
+  display: block;
+  height: 155px;
+  background: rgb(255 255 240 / 0.08);
+}
+
+.editorial .photo-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial .photo-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+}
+
+.editorial .photo-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.editorial .photo-card-meta {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #f0f1e5;
+}
+
+.editorial .use-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgb(255 249 220 / 0.19);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.editorial .use-row-thumb {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #e8e2d4;
+}
+
+.editorial .use-row-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial .use-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.editorial .use-row-text strong {
+  font-size: 16px;
+}
+
+.editorial .use-row-text span {
+  font-size: 13px;
+  color: #f0f1e5;
+}
+
+/* Painéis com fotografia na extremidade direita. */
+.editorial .panel.edge-photo {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-right: calc(clamp(78px, 31%, 280px) + 18px);
+}
+
+.editorial .edge-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -1;
+  width: 68%;
+  background: var(--edge-image) center / cover no-repeat;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgb(0 0 0 / 0.03) 14%,
+    rgb(0 0 0 / 0.12) 29%,
+    rgb(0 0 0 / 0.32) 45%,
+    rgb(0 0 0 / 0.62) 63%,
+    rgb(0 0 0 / 0.88) 82%,
+    #000 100%
+  );
+  pointer-events: none;
+}
+
+.editorial .edge-shopping {
+  --edge-image: url("/editorial/scene-compras.jpg");
+}
+
+.editorial .edge-offers {
+  --edge-image: url("/editorial/scene-promocoes.jpg");
+}
+
+.editorial .shop-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.editorial .shop-banner h2 {
+  max-width: 310px;
+  font-size: 35px;
+}
+
+.editorial .panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 17px;
+}
+
+/* ---------- Destaque (Receitas, Cozinhar) ---------- */
+
+.editorial .feature-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  margin-bottom: 25px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: var(--glass-shadow);
+}
+
+.editorial .feature-card-media {
+  min-height: 290px;
+  max-height: 290px;
+  background: rgb(255 255 240 / 0.08);
+}
+
+.editorial .feature-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial .feature-card-body {
+  align-self: center;
+  padding: 30px;
+}
+
+.editorial .feature-card-body h2 {
+  margin: 10px 0;
+  font-size: clamp(30px, 3vw, 39px);
+}
+
+.editorial .feature-card-meta {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: #f0f1e5;
+}
+
+/* ---------- Planeamento: a semana como calendário ---------- */
+
+.editorial .week-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.editorial .week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(125px, 1fr));
+  gap: 0;
+  padding: 0;
+  overflow-x: auto;
+  border-top: 1px solid var(--glass-edge);
+}
+
+.editorial .week-day {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 270px;
+  padding: 0 8px 12px;
+  border-bottom: 0;
+  border-right: 1px solid rgb(215 215 203 / 0.25);
+}
+
+.editorial .week-day:last-child {
+  border-right: 0;
+}
+
+.editorial .week-day.is-today {
+  background: rgb(228 235 211 / 0.12);
+}
+
+.editorial .week-day-date {
+  flex-direction: column-reverse;
+  align-items: center;
+  margin: 0 -8px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgb(215 215 203 / 0.25);
+  background: rgb(245 245 233 / 0.08);
+}
+
+.editorial .week-day-number {
+  margin-top: 8px;
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  font-stretch: 100%;
+  color: var(--ink);
+}
+
+.editorial .week-day-number.is-red {
+  color: #f5ddb0;
+}
+
+.editorial .week-day-weekday {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: #f0f1e5;
+}
+
+.editorial .week-day-today {
+  display: block;
+  color: #f5ddb0;
+}
+
+.editorial .week-day-empty {
+  align-self: center;
+  font-size: 12px;
+}
+
+.editorial .week-meal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 1px solid rgb(255 249 220 / 0.19);
+  border-radius: 6px;
+  background: rgb(228 235 211 / 0.14);
+}
+
+.editorial .week-meal + .week-meal {
+  border-top: 1px solid rgb(255 249 220 / 0.19);
+  padding-top: 8px;
+}
+
+.editorial .week-meal-slot {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: #e3e8da;
+}
+
+.editorial .week-meal-dish {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  font-stretch: 100%;
+  line-height: 1.3;
+}
+
+.editorial .week-meal-meta {
+  font-size: 11px;
+}
+
+.editorial .week-meal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.editorial .week-meal-actions .link-button {
+  padding: 2px 0;
+  font-size: 11px;
+}
+
+.editorial .week-side {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 19px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.editorial .week-side .side-block {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ---------- Despensa: cartões com a fotografia em cima ---------- */
+
+.editorial .pantry-page .pantry-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 20px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.editorial .pantry-page .pantry-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+.editorial .pantry-page .pantry-row > .urgency-dot {
+  display: none;
+}
+
+.editorial .pantry-page .pantry-main {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.editorial .pantry-page .pantry-thumb {
+  width: 100%;
+  height: 185px;
+  border-radius: 0;
+  background: rgb(255 255 240 / 0.08);
+}
+
+.editorial .pantry-page .pantry-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: normal;
+}
+
+.editorial .pantry-page :is(.pantry-text, .pantry-expiry, .pantry-actions, .pantry-inline) {
+  padding: 0 18px;
+}
+
+.editorial .pantry-page .pantry-text .meal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.editorial .pantry-page .pantry-expiry {
+  font-size: 12px;
+}
+
+.editorial .pantry-page .pantry-actions {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.editorial .pantry-page .pantry-actions .button-danger {
+  margin-left: 0;
+}
+
+/* ---------- Conta e Casa: avatares em círculo ---------- */
+
+.editorial .profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.editorial .profile-card h2 {
+  margin: 0 0 4px;
+  font-size: clamp(24px, 2.4vw, 32px);
+  overflow-wrap: anywhere;
+}
+
+.editorial .profile-card .muted {
+  margin: 0;
+}
+
+.editorial .profile-card .button-primary {
+  margin-left: auto;
+}
+
+.editorial .profile-avatar,
+.editorial .member-lead-number.is-initials {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #dce6d4;
+  color: var(--green);
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* Produtos: a ligação ao detalhe no fim do cartão. */
+.editorial .price-row .arrow-link {
+  padding-bottom: 0;
+}
+
+.editorial .price-row .price-row-body {
+  gap: 0.45rem;
+}
+
+/* ---------- Telemóvel: o menu desliza por cima, como no preview ---------- */
+
+.menu-backdrop {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .editorial .rail-toggle {
+    display: grid;
+  }
+
+  .editorial.menu-open .app-rail {
+    display: flex;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 40;
+    width: 230px;
+    height: 100%;
+  }
+
+  .editorial.menu-open .menu-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    border: 0;
+    background: rgb(33 27 22 / 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .editorial .app-topline,
+  .editorial .tabbar {
+    display: none;
+  }
+
+  .editorial .app-main {
+    padding-bottom: 2rem;
+  }
+
+  .editorial .stats {
+    gap: 7px;
+  }
+
+  .editorial .stat {
+    display: block;
+    padding: 12px;
+  }
+
+  .editorial .stat svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin-bottom: 5px;
+  }
+
+  .editorial .stat b {
+    font-size: 19px;
+  }
+
+  .editorial .stat small {
+    font-size: 10px;
+  }
+
+  .editorial .home-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .photo-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .photo-card {
+    flex-direction: row;
+  }
+
+  .editorial .photo-card-media {
+    width: 38%;
+    height: auto;
+    min-height: 125px;
+  }
+
+  .editorial .photo-card-body {
+    align-self: center;
+  }
+
+  .editorial .shop-banner {
+    display: block;
+  }
+
+  .editorial .feature-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .feature-card-media {
+    min-height: 180px;
+    max-height: 180px;
+  }
+
+  .editorial .feature-card-body {
+    padding: 23px;
+  }
+
+  .editorial .week-days {
+    grid-template-columns: repeat(7, 155px);
+  }
+
+  .editorial .app-footer {
+    display: block;
+    line-height: 2;
+  }
+
+  .editorial .app-footer span {
+    display: block;
+  }
+}

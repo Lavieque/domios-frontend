@@ -4,7 +4,15 @@ import { useSession } from "../auth/useSession";
 import { useHouseholds } from "../household/useHouseholds";
 
 /** Cabeçalho da app: botão do menu, pesquisa, a casa escolhida e a conta. */
-export function EditorialBar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+export function EditorialBar({
+  collapsed,
+  menuOpen,
+  onToggle,
+}: {
+  collapsed: boolean;
+  menuOpen: boolean;
+  onToggle: () => void;
+}) {
   const navigate = useNavigate();
   const session = useSession();
   const { current } = useHouseholds();
@@ -21,9 +29,10 @@ export function EditorialBar({ collapsed, onToggle }: { collapsed: boolean; onTo
       <button
         type="button"
         className="rail-toggle"
-        aria-expanded={!collapsed}
         aria-controls="app-rail"
-        aria-label={collapsed ? "Mostrar menu lateral" : "Recolher menu lateral"}
+        aria-label={collapsed && !menuOpen ? "Mostrar menu lateral" : "Menu lateral"}
+        data-collapsed={collapsed}
+        data-open={menuOpen}
         onClick={onToggle}
       >
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

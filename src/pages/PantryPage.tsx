@@ -22,7 +22,6 @@ import { ApiError } from "../api/http";
 import { measurementUnitLabels, type ProductDto } from "../api/types";
 import { describeError } from "../auth/errors";
 import { BarcodeScanner } from "../components/BarcodeScanner";
-import { CookableTeaser } from "../components/CookableTeaser";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { AisleSign } from "../components/AisleSign";
@@ -166,8 +165,6 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
         </Link>
       </header>
       {notice && <p className="notice">{notice}</p>}
-
-      <CookableTeaser householdId={household.householdId} version={version} />
 
       <div className="filter-row">
         <SearchField value={search} label="Pesquisar na despensa" placeholder="Pesquisar artigo…" onChange={setSearch} />

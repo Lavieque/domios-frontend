@@ -1009,6 +1009,284 @@
   box-shadow: var(--glass-shadow);
 }
 
+/* ---------- Grelhas de cartões: todos do mesmo tamanho ---------- */
+
+.editorial .price-rows,
+.editorial .catalog-results .price-rows,
+.editorial .recipe-rows,
+.editorial .pantry-page .pantry-list {
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+
+.editorial .price-row,
+.editorial .recipe-row,
+.editorial .pantry-page .pantry-row {
+  height: 100%;
+}
+
+/* A fotografia ocupa sempre o mesmo espaço, mesmo quando a Api não tem imagem. */
+.editorial .price-row-media,
+.editorial .price-row .product-thumb {
+  height: 185px;
+  min-height: 185px;
+  background: #fbf8f1;
+}
+
+.editorial .price-row:not(.has-media)::before,
+.editorial .recipe-row:not(.has-lead):not(:has(.recipe-row-photo))::before {
+  content: "";
+  display: block;
+  order: 1;
+  flex: none;
+  background: rgb(255 255 240 / 0.08)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e3e7d8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' opacity='.55'%3E%3Cpath d='M6 8h12l-1 12H7z M9 8V6a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E")
+    center / 34px no-repeat;
+}
+
+.editorial .price-row:not(.has-media)::before {
+  height: 185px;
+}
+
+.editorial .recipe-row:not(.has-lead):not(:has(.recipe-row-photo))::before {
+  aspect-ratio: 16 / 10;
+}
+
+.editorial .price-row .price-row-body,
+.editorial .recipe-row-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+/* Nomes até duas linhas, para os cartões não crescerem com títulos compridos. */
+.editorial :is(.price-row .label-name, .recipe-row-name, .pantry-page .pantry-text .meal-title) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.editorial .price-row .arrow-link {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.editorial .pantry-page .pantry-actions {
+  margin-top: auto;
+}
+
+/* ---------- Paginação ---------- */
+
+.editorial .pagination {
+  border-top-color: rgb(255 255 255 / 0.22);
+  color: #f0f1e5;
+}
+
+.editorial .pagination button {
+  min-height: 0;
+  padding: 8px 15px;
+  border: 1px solid rgb(255 255 230 / 0.35);
+  border-radius: 25px;
+  background: rgb(255 255 240 / 0.14);
+  color: #fffdf3;
+  font-size: 12px;
+}
+
+.editorial .pagination button:hover:not(:disabled) {
+  background: rgb(255 255 240 / 0.24);
+  border-color: rgb(255 255 230 / 0.6);
+}
+
+/* ---------- Nutrição, como no preview ---------- */
+
+.editorial .nutrition-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -6px 0 18px;
+}
+
+.editorial .nutrition-controls .nutrition-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 12px;
+  color: #f0f1e5;
+}
+
+.editorial .nutrition-controls select {
+  min-height: 0;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.editorial .status-card {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  margin: 0 0 20px;
+  padding: 25px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 9px;
+  background: rgb(255 255 240 / 0.04);
+}
+
+.editorial .status-circle {
+  display: grid;
+  place-items: center;
+  width: 110px;
+  height: 110px;
+  border: 8px solid rgb(224 231 212 / 0.85);
+  border-radius: 50%;
+  font-family: var(--serif);
+  font-size: 35px;
+  color: #fffdf3;
+}
+
+.editorial .status-body h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.editorial .status-body p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.editorial .status-parts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editorial .status-parts li {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.editorial .status-part-points {
+  font-family: var(--serif);
+  font-size: 14px;
+}
+
+.editorial .meter {
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: rgb(222 222 209 / 0.25);
+}
+
+.editorial .meter > span {
+  display: block;
+  height: 100%;
+  border-radius: 9px;
+  background: #b8c8a7;
+}
+
+.editorial .metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.editorial .metric {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 9px;
+  background: rgb(255 255 240 / 0.04);
+}
+
+.editorial .metric .muted {
+  font-size: 13px;
+}
+
+.editorial .metric b {
+  display: block;
+  margin: 10px 0;
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.editorial .metric-hint {
+  font-size: 11px;
+  color: #f0f1e5;
+}
+
+.editorial .edge-nutrition {
+  --edge-image: url("/editorial/scene-nutricao.jpg");
+}
+
+.editorial .edge-balanced {
+  --edge-image: url("/editorial/salad.jpg");
+}
+
+.editorial .nutrition-days-panel > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.editorial .nutrition-days-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.editorial .nutrition-days-panel > summary h2 {
+  margin: 0;
+}
+
+.editorial .nutrition-days-panel[open] > summary {
+  margin-bottom: 18px;
+}
+
+.editorial .nutrition-days-panel[open] .arrow-link {
+  visibility: hidden;
+}
+
+@media (max-width: 899px) {
+  .editorial .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .editorial .metric {
+    padding: 13px;
+  }
+
+  .editorial .status-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .editorial .status-parts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .nutrition-controls .nutrition-who {
+    margin-left: 0;
+  }
+}
+
 /* Despensa: "Deitar fora" existe em todos os cartões; fica discreto até ser preciso. */
 .editorial .pantry-page .pantry-actions .button-danger {
   padding: 6px 11px;

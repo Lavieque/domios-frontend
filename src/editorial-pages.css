@@ -1390,8 +1390,79 @@
   text-shadow: 0 1px 8px rgb(8 22 16 / 0.55);
 }
 
+/* "O que falta" com a mesma altura das Sugestões. */
 .editorial .week-side {
-  align-items: start;
+  align-items: stretch;
+}
+
+/* O calendário com a mesma transparência dos painéis de baixo. */
+.editorial .week-days {
+  border: 1px solid rgb(248 245 223 / 0.16);
+  border-right-color: transparent;
+  background: linear-gradient(90deg, rgb(12 40 29 / 0.62) 0%, rgb(12 40 29 / 0.38) 55%, rgb(12 40 29 / 0) 100%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  text-shadow: 0 1px 8px rgb(8 22 16 / 0.55);
+}
+
+.editorial .week-day-date {
+  background: rgb(12 40 29 / 0.18);
+}
+
+.editorial .week-day.is-today {
+  background: rgb(228 235 211 / 0.1);
+}
+
+/* Do lado transparente, as refeições ganham fundo próprio para se lerem sobre a fotografia. */
+.editorial .week-meal {
+  background: rgb(14 42 31 / 0.55);
+  border-color: rgb(255 249 220 / 0.22);
+  text-shadow: none;
+}
+
+/* ---------- Cartões clicáveis em toda a área ----------
+   A ligação do nome estica-se por cima do cartão inteiro; os botões e campos de cada
+   cartão ficam por cima dela e continuam a funcionar. */
+.editorial :is(.recipe-row, .pantry-page .pantry-row, .week-meal) {
+  position: relative;
+}
+
+.editorial :is(a.recipe-row-name, .pantry-page .pantry-text .meal-title, a.week-meal-dish)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.editorial :is(.recipe-row-action, .pantry-page .pantry-actions, .pantry-page .pantry-inline, .pantry-page .pantry-scan, .week-meal-actions) {
+  position: relative;
+  z-index: 2;
+}
+
+.editorial :is(.recipe-row, .pantry-page .pantry-row, .week-meal):has(:is(a.recipe-row-name, .meal-title, a.week-meal-dish)) {
+  cursor: pointer;
+}
+
+.editorial .recipe-row:hover,
+.editorial .pantry-page .pantry-row:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+}
+
+.editorial .week-meal:hover {
+  border-color: rgb(255 249 220 / 0.45);
+}
+
+/* O foco do teclado continua a marcar o cartão inteiro. */
+.editorial :is(a.recipe-row-name, .pantry-page .pantry-text .meal-title, a.week-meal-dish):focus-visible {
+  outline: none;
+}
+
+.editorial :is(a.recipe-row-name, .pantry-page .pantry-text .meal-title, a.week-meal-dish):focus-visible::after {
+  outline: 2px solid #fff2c9;
+  outline-offset: -2px;
+  border-radius: inherit;
 }
 
 .editorial .week-side .side-head {

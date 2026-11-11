@@ -1,37 +1,40 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useSession } from "../auth/useSession";
 
 interface MenuLink {
   to: string;
   label: string;
   /** Uma linha a dizer para que serve a página (na gaveta "Mais"). */
   hint: string;
+  /** Caminho do ícone de linha do rail (viewBox 24). */
+  icon: string;
   end?: boolean;
 }
 
 /** O dia a dia da casa: os quatro destinos que contam. */
 const mainLinks: MenuLink[] = [
-  { to: "/", label: "Hoje", hint: "O que se come hoje", end: true },
-  { to: "/plano", label: "Semana", hint: "Refeições da semana" },
-  { to: "/despensa", label: "Despensa", hint: "O que há em casa" },
-  { to: "/listas", label: "Compras", hint: "Listas por fazer" },
+  { to: "/", label: "Hoje", hint: "O que se come hoje", icon: "M12 7v5l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0", end: true },
+  { to: "/plano", label: "Planeamento", hint: "Refeições da semana", icon: "M3 5h18v16H3z M7 3v4 M17 3v4 M3 10h18 M8 14h2m4 0h2m-8 3h2" },
+  { to: "/despensa", label: "Despensa", hint: "O que há em casa", icon: "M4 3h16v18H4z M4 12h16 M10 8h4m-4 8h4" },
+  { to: "/listas", label: "Compras", hint: "Listas por fazer", icon: "M2 3h3l3 12h11l2-8H6 M9 20h.01m9 0h.01" },
 ];
 
 const kitchenLinks: MenuLink[] = [
-  { to: "/cozinhar", label: "Cozinhar", hint: "Com o que tens" },
-  { to: "/receitas", label: "Receitas", hint: "Para escolher" },
-  { to: "/ementas", label: "Ementas", hint: "Semanas prontas" },
-  { to: "/nutricao", label: "Nutrição", hint: "O que se come" },
+  { to: "/cozinhar", label: "Cozinhar", hint: "Com o que tens", icon: "M5 10h14v9H5z M3 12h2m14 0h2 M4 8h16 M10 5h4" },
+  { to: "/receitas", label: "Receitas", hint: "Para escolher", icon: "M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v14" },
+  { to: "/ementas", label: "Ementas", hint: "Semanas prontas", icon: "M6 3h12v18H6z M9 8h6m-6 4h6m-6 4h4" },
+  { to: "/nutricao", label: "Nutrição", hint: "O que se come", icon: "M12 20 4 12a5 5 0 0 1 8-6 5 5 0 0 1 8 6z M8 12h2l2-3 2 5 2-2" },
 ];
 
 const priceLinks: MenuLink[] = [
-  { to: "/produtos", label: "Preços", hint: "Produtos nas lojas" },
-  { to: "/promocoes", label: "Promoções", hint: "Descontos em vigor" },
+  { to: "/produtos", label: "Produtos", hint: "Produtos nas lojas", icon: "M3 7 12 3l9 4v10l-9 4-9-4z M3 7l9 4 9-4m-9 4v10" },
+  { to: "/promocoes", label: "Promoções", hint: "Descontos em vigor", icon: "M3 4h8l10 10-7 7L3 10z M7 8h.01" },
 ];
 
 const accountLinks: MenuLink[] = [
-  { to: "/casa", label: "Casa", hint: "Membros da casa" },
-  { to: "/conta", label: "Conta", hint: "Email e password" },
+  { to: "/casa", label: "Casa", hint: "Membros da casa", icon: "M3 11l9-8 9 8 M5 10v11h14V10 M10 21v-6h4v6" },
+  { to: "/conta", label: "Definições", hint: "Email e password", icon: "M4 6h16 M4 12h16 M4 18h16 M8 4v4 M16 10v4 M10 16v4" },
 ];
 
 const tabIcons: Record<string, ReactNode> = {
@@ -63,11 +66,14 @@ const tabIcons: Record<string, ReactNode> = {
   ),
 };
 
-function RailGroup({ links, main = false }: { links: MenuLink[]; main?: boolean }) {
+function RailGroup({ links }: { links: MenuLink[] }) {
   return (
-    <div className={main ? "rail-group rail-group-main" : "rail-group"}>
+    <div className="rail-group">
       {links.map((link) => (
         <NavLink key={link.to} to={link.to} end={link.end} className="rail-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d={link.icon} />
+          </svg>
           {link.label}
         </NavLink>
       ))}
@@ -75,19 +81,23 @@ function RailGroup({ links, main = false }: { links: MenuLink[]; main?: boolean 
   );
 }
 
-/** Rail do almanaque no desktop. */
+/** Menu lateral: o logótipo, as duas famílias de destinos e a pessoa com sessão. */
 export function AppRail({ brand }: { brand: ReactNode }) {
+  const session = useSession();
   return (
     <aside className="app-rail" id="app-rail">
       {brand}
+      <p className="rail-tagline">A casa, em harmonia</p>
       <nav className="rail-nav" aria-label="Principal">
-        <RailGroup links={mainLinks} main />
-        <RailGroup links={kitchenLinks} />
-        <RailGroup links={priceLinks} />
+        <RailGroup links={[...mainLinks, ...kitchenLinks.slice(0, 3)]} />
+        <RailGroup links={[kitchenLinks[3], ...priceLinks, ...accountLinks]} />
       </nav>
-      <nav className="rail-nav rail-foot" aria-label="Conta">
-        <RailGroup links={accountLinks} />
-      </nav>
+      {session && (
+        <NavLink to="/conta" className="rail-user">
+          <span className="rail-user-dot" aria-hidden="true" />
+          {session.email}
+        </NavLink>
+      )}
     </aside>
   );
 }

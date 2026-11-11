@@ -1,38 +1,83 @@
-/* ---------- Editorial: fotografia por área, vidro translúcido, menu recolhível ----------
-   Só vale dentro de `.app.editorial` (ver src/editorial.ts); as restantes páginas continuam na Folha do Dia.
-   O logótipo não muda: o rail é vidro claro para as duas casas e o "OS" manterem as cores de origem. */
+/* ---------- Editorial: o desenho do preview aplicado à app toda ----------
+   Fundo fotográfico por área, vidro translúcido sobre um véu verde, títulos serifados (Libre Caslon Display),
+   corpo em DM Sans e menu lateral recolhível. Reescreve os tokens da Folha do Dia dentro de `.app.editorial`,
+   por isso os componentes existentes herdam as cores novas. O logótipo não muda: vai sempre numa placa creme
+   para as duas casas e o "OS" manterem as cores de origem. */
 
 .app.editorial {
-  /* Superfícies claras mesmo com o sistema em escuro: o vidro é sempre claro sobre a fotografia. */
-  --bg: #f0f3f5;
-  --surface: rgb(250 251 252 / 0.9);
-  --surface-2: rgb(227 233 235 / 0.7);
-  --ink: #16241f;
-  --ink-dim: #4b5f62;
-  --line: rgba(22, 36, 31, 0.16);
-  --accent: #2a6a78;
-  --accent-soft: #dde8ea;
-  --accent-2: #1e3a5c;
-  --accent-2-soft: #dfe6ec;
-  --danger: #b91c1c;
+  --green: #204e39;
+  --green-deep: #102c23;
+  --cream: #faf7f0;
+  --bg: #17392c;
+  --surface: rgb(14 45 31 / 0.34);
+  --surface-2: rgb(255 255 240 / 0.1);
+  --ink: #fffdf3;
+  --ink-dim: #e3e7d8;
+  --line: rgb(248 245 223 / 0.26);
+  --rule: rgb(248 245 223 / 0.42);
+  --accent: #d9e6c3;
+  --accent-soft: rgb(217 230 195 / 0.16);
+  --accent-2: #cfe1f3;
+  --accent-2-soft: rgb(207 225 243 / 0.16);
+  --danger: #ffb4a8;
+  --danger-soft: rgb(255 180 168 / 0.18);
+  --today: #ffb4a8;
+  --today-soft: rgb(255 180 168 / 0.18);
   --almanac: transparent;
-  --glass: rgb(250 251 252 / 0.74);
-  --glass-edge: rgb(255 255 255 / 0.55);
-  --glass-shadow: 0 12px 36px rgb(10 24 28 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.5);
-  --on-photo: #fff;
-  color-scheme: light;
-  background: #17333a;
+  --almanac-ink: var(--ink);
+  --shadow: 0 12px 36px rgb(6 23 14 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.1);
+  --shadow-lift: 0 14px 38px rgb(6 23 14 / 0.3);
+  --font: "DM Sans Variable", "DM Sans", "Segoe UI", Arial, sans-serif;
+  --serif: "Libre Caslon Display", Georgia, "Times New Roman", serif;
+  --radius-sm: 7px;
+  --radius: 9px;
+  --radius-lg: 16px;
+  --aisle-fresh: #f09a86;
+  --aisle-fresh-soft: rgb(240 154 134 / 0.18);
+  --aisle-fish: #8fb4e6;
+  --aisle-fish-soft: rgb(143 180 230 / 0.18);
+  --aisle-pantry: #b5cf72;
+  --aisle-pantry-soft: rgb(181 207 114 / 0.18);
+  --aisle-bakery: #e8c25c;
+  --aisle-bakery-soft: rgb(232 194 92 / 0.18);
+  --aisle-dairy: #86c8e6;
+  --aisle-dairy-soft: rgb(134 200 230 / 0.18);
+  --aisle-home: #c9a2d8;
+  --aisle-home-soft: rgb(201 162 216 / 0.18);
+
+  --glass-bg: linear-gradient(120deg, rgb(14 45 31 / 0.3), rgb(14 35 25 / 0.16));
+  --glass-edge: rgb(248 245 223 / 0.24);
+  --glass-shadow: 0 12px 36px rgb(6 23 14 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.1);
+
+  font-family: var(--font);
+  color: var(--ink);
+  color-scheme: dark;
+  background: var(--bg);
   position: relative;
   isolation: isolate;
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  grid-template-areas: "rail main";
 }
 
-/* Fundo fotográfico fixo, com um véu para o título ler bem por cima. */
+.app.editorial.app-guest {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "main";
+}
+
+body {
+  background: #17392c;
+}
+
+/* ---------- Fotografia e véu ---------- */
+
 .editorial-scene {
   position: fixed;
   inset: 0;
   z-index: -1;
   background-size: cover;
   background-position: center;
+  background-color: #17392c;
   pointer-events: none;
 }
 
@@ -40,33 +85,333 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgb(10 28 34 / 0.55), rgb(10 28 34 / 0.22) 60%, rgb(10 28 34 / 0.18));
+  background: linear-gradient(90deg, rgb(12 49 35 / 0.86) 0%, rgb(17 52 37 / 0.7) 36%, rgb(23 48 33 / 0.42) 70%, rgb(27 43 29 / 0.3) 100%);
 }
 
-/* Rail: vidro claro. */
+/* ---------- Tipografia ---------- */
+
+.editorial :is(h1, h2),
+.editorial .page-head h1,
+.editorial .article-name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-variation-settings: normal;
+  letter-spacing: -0.5px;
+  text-transform: none;
+  word-spacing: normal;
+  color: var(--ink);
+  text-shadow: 0 2px 16px rgb(10 37 28 / 0.28);
+}
+
+.editorial .page-head h1,
+.editorial .article-name {
+  font-size: clamp(40px, 4.6vw, 60px);
+  line-height: 1.05;
+  max-width: none;
+}
+
+.editorial h2 {
+  font-size: clamp(26px, 2.4vw, 32px);
+  line-height: 1.1;
+}
+
+.editorial h3 {
+  font-family: var(--font);
+  font-weight: 700;
+  font-stretch: 100%;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.editorial :is(.price-tag, .store-row-price, .meter-value) {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+
+.editorial .page-head-sub,
+.editorial .page-sub,
+.editorial .page-lede {
+  color: #f4eee3;
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 36rem;
+}
+
+/* Um eyebrow por área, como no preview. */
+.editorial[data-area] .page-head h1::before {
+  display: block;
+  margin-bottom: 0.7rem;
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: none;
+  color: #eff0df;
+}
+
+.editorial[data-area="hoje"] .page-head h1::before { content: "A casa, em harmonia"; }
+.editorial[data-area="despensa"] .page-head h1::before { content: "Organizar"; }
+.editorial[data-area="plano"] .page-head h1::before { content: "À mesa"; }
+.editorial[data-area="compras"] .page-head h1::before { content: "Comprar"; }
+.editorial[data-area="cozinhar"] .page-head h1::before { content: "Cozinhar"; }
+.editorial[data-area="receitas"] .page-head h1::before { content: "Descobrir"; }
+.editorial[data-area="ementas"] .page-head h1::before { content: "Inspiração para planear"; }
+.editorial[data-area="nutricao"] .page-head h1::before { content: "Nutrição"; }
+.editorial[data-area="produtos"] .page-head h1::before { content: "Comprar melhor"; }
+.editorial[data-area="promocoes"] .page-head h1::before { content: "Promoções"; }
+.editorial[data-area="casa"] .page-head h1::before { content: "A tua casa"; }
+
+.editorial .eyebrow {
+  margin: 0 0 0.7rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #eff0df;
+}
+
+/* ---------- Menu lateral ---------- */
+
 .editorial .app-rail {
-  background: var(--glass);
-  backdrop-filter: blur(24px) saturate(1.1);
-  -webkit-backdrop-filter: blur(24px) saturate(1.1);
-  border-right: 1px solid var(--glass-edge);
+  grid-area: rail;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 28px 18px 22px;
+  background: rgb(16 44 35 / 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgb(231 230 203 / 0.14);
+  color: #f5f0e6;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(164 180 155 / 0.55) transparent;
 }
 
-.editorial .rail-link.active {
-  background: var(--ink);
+/* O logótipo de sempre, na sua placa creme. */
+.editorial .brand {
+  --accent: #2a6a78;
+  --accent-2: #1e3a5c;
+  --ink: #16241f;
+  color: #16241f;
+}
+
+.editorial .brand .wordmark {
+  color: #16241f;
+}
+
+.editorial .brand .wordmark em {
+  color: #1e3a5c;
+}
+
+.editorial .brand {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.5rem 0.85rem 0.5rem 0.7rem;
+  border-radius: 12px;
+  background: var(--cream);
+  box-shadow: 0 6px 18px rgb(6 23 14 / 0.25);
+}
+
+.editorial .rail-tagline {
+  margin: 0.85rem 0.3rem 1.6rem;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c8bdab;
+}
+
+.editorial .rail-nav {
+  gap: 0;
+}
+
+.editorial .rail-group + .rail-group {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(255 255 255 / 0.14);
+}
+
+.editorial .rail-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  min-height: 0;
+  margin: 2px 0;
+  padding: 10px 15px;
+  border-radius: 7px;
+  color: #ddd5c8;
+  font-size: 14px;
+  font-weight: 500;
+  font-stretch: 100%;
+}
+
+.editorial .rail-link svg {
+  width: 19px;
+  height: 19px;
+  flex: none;
+}
+
+.editorial .rail-link:hover {
+  background: rgb(255 255 255 / 0.1);
   color: #fff;
 }
 
-/* Menu recolhível (ecrã largo). */
-.editorial-bar {
-  display: none;
+.editorial .rail-link.active {
+  background: rgb(255 255 255 / 0.1);
+  color: #fff;
+  box-shadow: inset 3px 0 #d6be94;
+}
+
+.editorial .rail-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 18px 8px 0;
+  border-top: 1px solid rgb(255 255 255 / 0.15);
+  color: #fff;
+  font-size: 12px;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editorial .rail-user-dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: #d6be94;
+}
+
+/* ---------- Cabeçalho: menu, pesquisa, casa e conta ---------- */
+
+.editorial .app-column {
+  grid-area: main;
+  min-width: 0;
+}
+
+.editorial .editorial-bar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 26px clamp(16px, 2.4vw, 34px) 0;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.2);
+}
+
+.editorial .rail-toggle {
+  display: grid;
+  place-items: center;
+  flex: 0 0 37px;
+  width: 37px;
+  height: 37px;
+  padding: 0;
+  border: 1px solid rgb(247 239 204 / 0.28);
+  border-radius: 50%;
+  background: rgb(23 57 44 / 0.7);
+  color: #fffdf3;
+  cursor: pointer;
+}
+
+.editorial .rail-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+.editorial .rail-toggle:hover {
+  background: rgb(23 57 44 / 0.95);
+}
+
+.editorial .bar-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(380px, 100%);
+  padding: 10px 18px;
+  border: 1px solid rgb(255 255 255 / 0.53);
+  border-radius: 30px;
+  background: rgb(250 247 240 / 0.91);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #29271f;
+}
+
+.editorial .bar-search svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+.editorial .bar-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: #29271f;
+  font: inherit;
+  font-size: 13px;
+  box-shadow: none;
+}
+
+.editorial .bar-search input::placeholder {
+  color: #736c60;
+}
+
+.editorial .bar-house {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 11px 17px;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  border-radius: 30px;
+  background: rgb(40 34 25 / 0.4);
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.editorial .bar-house svg {
+  width: 15px;
+  height: 15px;
+}
+
+.editorial .bar-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 39px;
+  height: 39px;
+  border: 1px solid #dfd5bd;
+  border-radius: 50%;
+  background: #eadfc8;
+  color: #2b402e;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.editorial .app-main {
+  max-width: 1900px;
+  padding: 2rem clamp(16px, 2.4vw, 34px) 4rem;
 }
 
 @media (min-width: 900px) {
-  .editorial-bar {
-    display: block;
-    padding: 1rem clamp(16px, 3.2vw, 48px) 0;
-  }
-
   .editorial.rail-collapsed {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "main";
@@ -75,138 +420,299 @@
   .editorial.rail-collapsed .app-rail {
     display: none;
   }
+
+  .editorial .app-topline {
+    display: none;
+  }
 }
 
-.rail-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 40px;
-  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+/* ---------- Vidro translúcido ---------- */
+
+.editorial :is(
+    .panel,
+    .filter-sidebar,
+    .price-row,
+    .article-sheet,
+    .store-rows,
+    .day-card,
+    .week-step,
+    .torn-sheet,
+    .recipe-ingredients,
+    .event-timeline,
+    .settings-list,
+    .member-list,
+    .store-breakdown,
+    .product-results,
+    .add-item-form,
+    .table-wrap,
+    .notice,
+    .auth-sheet,
+    .pantry-list,
+    .recipe-row,
+    .week-days,
+    .list-main,
+    .list-side,
+    .week-side,
+    .day-sheet,
+    .day-others,
+    .side-block,
+    .next-days,
+    .recipe-sheet,
+    .recipe-method,
+    .nutrition-sheet,
+    .nutrition-days,
+    .cook-section,
+    .lists-rows
+  ) {
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
   border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-  background: var(--glass);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  color: var(--ink);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.rail-toggle svg {
-  width: 18px;
-  height: 18px;
-}
-
-.rail-toggle:hover {
-  background: rgb(255 255 255 / 0.9);
-}
-
-.rail-toggle:focus-visible {
-  outline: 2px solid var(--on-photo);
-  outline-offset: 2px;
-}
-
-.editorial .app-main {
-  padding-top: 1.25rem;
-}
-
-/* Cabeçalho da página sobre a fotografia. */
-.editorial .eyebrow {
-  margin: 0 0 0.5rem;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 0.85);
-}
-
-.editorial .page-head h1,
-.editorial .page-head .page-head-sub {
-  color: var(--on-photo);
-  text-shadow: 0 2px 18px rgb(8 22 26 / 0.45);
-}
-
-.editorial .page-head .page-head-sub {
-  color: rgb(255 255 255 / 0.92);
-}
-
-/* Cartões translúcidos. */
-.editorial :is(.panel, .filter-sidebar, .article-sheet, .price-row, .toolbar .search-wrap input) {
-  background: var(--glass);
-  backdrop-filter: blur(26px) saturate(1.05);
-  -webkit-backdrop-filter: blur(26px) saturate(1.05);
-  border: 1px solid var(--glass-edge);
-  box-shadow: var(--glass-shadow);
   border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  color: var(--ink);
 }
 
-.editorial .panel,
-.editorial .article-sheet {
-  padding: clamp(1.1rem, 2.2vw, 1.75rem);
+.editorial :is(
+    .panel,
+    .article-sheet,
+    .store-rows,
+    .table-wrap,
+    .auth-sheet,
+    .pantry-list,
+    .recipe-row,
+    .week-days,
+    .list-main,
+    .list-side,
+    .week-side,
+    .day-sheet,
+    .day-others,
+    .side-block,
+    .next-days,
+    .recipe-sheet,
+    .nutrition-sheet,
+    .cook-section
+  ) {
+  padding: clamp(1rem, 2vw, 1.5rem);
 }
 
 .editorial .filter-sidebar {
   padding: 0.9rem;
   margin-right: 0;
-  max-height: calc(100vh - 6rem);
-  top: 1rem;
 }
 
-/* Produtos como cartões numa grelha. */
-.editorial .price-rows {
+/* Painéis dentro de painéis ficam planos. */
+.editorial :is(.panel, .article-sheet, .auth-sheet, .day-sheet, .week-side) :is(.panel, .notice, .day-others, .side-block) {
+  background: rgb(255 255 240 / 0.06);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .editorial :is(.panel, .filter-sidebar, .price-row, .article-sheet, .auth-sheet) {
+    background: rgb(23 57 44 / 0.88);
+  }
+}
+
+/* ---------- Botões, campos, filtros ---------- */
+
+.editorial .button-primary {
+  background: var(--green);
+  color: #fffdf3;
+  border: 1px solid rgb(214 223 203 / 0.55);
+  border-radius: 7px;
+  font-weight: 600;
+}
+
+.editorial .button-primary:hover:not(:disabled) {
+  background: #163a29;
+  color: #fff;
+}
+
+.editorial :is(.button-secondary, .chip, .filters-toggle) {
+  background: rgb(255 255 240 / 0.14);
+  color: #fffdf3;
+  border: 1px solid rgb(255 255 230 / 0.35);
+}
+
+.editorial :is(.button-secondary, .chip, .filters-toggle):hover:not(:disabled) {
+  background: rgb(255 255 240 / 0.24);
+}
+
+.editorial :is(input:not([type="checkbox"], [type="radio"], [type="range"], .bar-search input), select, textarea) {
+  background: rgb(16 45 35 / 0.45);
+  color: #fffdf3;
+  border: 1px solid rgb(255 255 227 / 0.3);
+  border-radius: 7px;
+  color-scheme: dark;
+}
+
+.editorial :is(input, textarea)::placeholder {
+  color: #e2e4d1;
+  opacity: 1;
+}
+
+.editorial select option {
+  background: #18362b;
+  color: #fffdf3;
+}
+
+.editorial :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: #adc497;
+}
+
+.editorial a:not([class]) {
+  color: #fff2c9;
+}
+
+.editorial .link-button {
+  color: #fff2c9;
+}
+
+.editorial .muted,
+.editorial .results-count,
+.editorial .results-head {
+  color: #e8ebdc;
+}
+
+.editorial :is(.empty-state, .loading) {
+  color: #f0f1e5;
+}
+
+.editorial .filter-option[aria-pressed="true"],
+.editorial .filter-option-all[aria-pressed="true"] {
+  background: rgb(255 255 240 / 0.18);
+  color: #fff;
+}
+
+/* ---------- Produtos: cartões com a fotografia em cima ---------- */
+
+.editorial .price-rows,
+.editorial .store-grid {
   border-top: 0;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
-  column-gap: 14px;
+  gap: 20px;
+  column-gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  align-items: start;
 }
 
 .editorial .price-row {
-  padding: 1rem 1.1rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
   min-height: 0;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .editorial a.price-row:hover {
   transform: translateY(-3px);
-  background: rgb(255 255 255 / 0.88);
+  box-shadow: var(--shadow-lift);
+}
+
+.editorial .price-row-body {
+  order: 2;
+  padding: 18px;
+}
+
+.editorial .price-row-media {
+  order: 1;
+  width: 100%;
+}
+
+.editorial .price-row .product-thumb {
+  display: block;
+  width: 100%;
+  height: 185px;
+  border-radius: 0;
+  background: rgb(255 255 240 / 0.08);
+}
+
+.editorial .price-row .product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .editorial .price-row .label-name {
-  font-size: clamp(18px, 1.6vw, 21px);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
-.editorial .price-row-media img {
-  border-radius: 10px;
+.editorial .price-row .label-meta {
+  font-size: 12px;
+  color: #e8ebdc;
 }
 
-.editorial .results-count,
-.editorial .results-head {
-  color: rgb(255 255 255 / 0.95);
-  text-shadow: 0 1px 10px rgb(8 22 26 / 0.5);
+/* ---------- Receitas: cartões com a fotografia em cima ---------- */
+
+.editorial .recipe-rows {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 20px;
+  column-gap: 20px;
+  border-top: 0;
+  align-items: start;
 }
 
-.editorial .results-head .pill,
-.editorial .results-head .active-filter {
-  text-shadow: none;
+.editorial .panel .recipe-rows {
+  border-top: 0;
 }
 
-.editorial .results-head .link-button {
-  color: #fff;
+.editorial .recipe-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--glass-edge);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.editorial .empty-state,
-.editorial .loading {
-  color: #fff;
+.editorial .recipe-row:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
 }
 
-.editorial .toolbar .search-wrap input {
-  border-radius: 999px;
+.editorial .recipe-row-text {
+  order: 2;
+  padding: 18px;
 }
 
-/* Detalhe do produto: a folha vira cartão de vidro. */
+.editorial .recipe-row-lead {
+  order: 2;
+  padding: 18px 18px 0;
+}
+
+.editorial .recipe-row-photo {
+  order: 1;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+  background: rgb(255 255 240 / 0.08);
+}
+
+.editorial .recipe-row-name {
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  font-stretch: 100%;
+  line-height: 1.35;
+}
+
+.editorial :is(.recipe-row-meta, .recipe-row-tags) {
+  font-size: 12px;
+  color: #e8ebdc;
+}
+
+/* ---------- Detalhe do produto ---------- */
+
 .editorial .article-sheet {
   border-top: 1px solid var(--glass-edge);
 }
@@ -216,34 +722,17 @@
 }
 
 .editorial .article-sheet .article-photo {
-  background: rgb(255 255 255 / 0.85);
-  border-radius: 12px;
+  background: rgb(255 255 240 / 0.08);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.editorial .crumb,
-.editorial .crumb a,
-.editorial .crumb .back-link {
-  color: #fff;
-  text-shadow: 0 1px 10px rgb(8 22 26 / 0.5);
+.editorial .article-sheet .article-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.editorial .panel :is(h2, h3) {
-  color: var(--ink);
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .editorial :is(.panel, .filter-sidebar, .article-sheet, .price-row, .app-rail) {
-    background: rgb(250 251 252 / 0.95);
-  }
-}
-
-@media (max-width: 899px) {
-  .editorial .filter-sidebar {
-    background: rgb(250 251 252 / 0.94);
-  }
-}
-
-/* Detalhe: a fotografia ocupa a coluna da direita em vez de deixar o cartão vazio. */
 @media (min-width: 900px) {
   .editorial .article-sheet-body {
     display: grid;
@@ -264,35 +753,112 @@
     align-self: start;
   }
 
-  .editorial .article-sheet-body > .article-specs,
-  .editorial .article-sheet-body > .article-insight {
+  .editorial .article-sheet-body > :is(.article-specs, .article-insight) {
     grid-column: 1 / -1;
   }
 }
 
-/* Telemóvel: o logótipo e a barra de baixo ganham vidro claro para manterem as cores de origem. */
+.editorial :is(.crumb, .crumb a, .crumb .back-link) {
+  color: #fff2c9;
+}
+
+/* ---------- Entrar, registar, recuperar ---------- */
+
+.editorial .guest-header {
+  padding-top: 1.25rem;
+  background: transparent;
+  color: var(--ink);
+}
+
+.editorial .guest-nav a {
+  color: #fffdf3;
+}
+
+.editorial .auth-page {
+  max-width: 34rem;
+  margin: clamp(1.5rem, 6vw, 4.5rem) auto 0;
+}
+
+.editorial .auth-sheet {
+  display: block;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+
+.editorial .auth-sheet-body {
+  padding: 0;
+  border: 0;
+}
+
+.editorial .auth-sheet-body h1 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(38px, 5vw, 52px);
+}
+
+.editorial .auth-form,
+.editorial .auth-sheet-body .request-access {
+  max-width: none;
+}
+
+.editorial .form-field > span {
+  color: #f0f1e5;
+}
+
+/* ---------- Telemóvel ---------- */
+
 @media (max-width: 899px) {
+  .app.editorial {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "main";
+  }
+
+  .editorial .app-rail,
+  .editorial .rail-toggle,
+  .editorial .bar-house {
+    display: none;
+  }
+
+  .editorial .bar-search {
+    flex: 1;
+    width: auto;
+  }
+
+  .editorial .editorial-bar {
+    margin-top: 14px;
+    padding-bottom: 14px;
+  }
+
   .editorial .app-topline {
-    margin: 0.75rem 16px 0;
-    padding: 0.45rem 0.9rem;
-    width: fit-content;
-    border: 1px solid var(--glass-edge);
-    border-radius: 999px;
-    background: var(--glass);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    display: flex;
+    padding: 0.85rem 16px 0;
   }
 
   .editorial .tabbar {
-    background: rgb(250 251 252 / 0.88);
+    background: rgb(16 44 35 / 0.9);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--glass-edge);
+    border-top: 1px solid rgb(255 255 255 / 0.18);
   }
-}
 
-.editorial .filters-toggle {
-  border: 1px solid var(--glass-edge);
-  background: var(--glass);
-  color: var(--ink);
+  .editorial .tab {
+    color: #ddd5c8;
+  }
+
+  .editorial .tab.active {
+    background: rgb(255 255 255 / 0.14);
+    color: #fff;
+  }
+
+  .editorial .more-drawer-panel {
+    background: #17392c;
+    color: var(--ink);
+  }
+
+  .editorial .more-drawer .rail-link {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .editorial .filter-sidebar {
+    background: rgb(16 44 35 / 0.92);
+  }
 }

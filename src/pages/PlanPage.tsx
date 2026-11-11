@@ -60,7 +60,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
       listPlannedMeals(householdId, monday, sunday),
       getPlanAvailability(householdId, monday, sunday),
       // As sugestões são um extra: se falharem, o plano mostra-se na mesma.
-      getSuggestions(householdId, suggestionDate).catch(() => null),
+      getSuggestions(householdId, suggestionDate, 3).catch(() => null),
     ])
       .then(([plannedMeals, planAvailability, mealSuggestions]) => {
         if (cancelled) return;

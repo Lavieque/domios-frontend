@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { useSession } from "./auth/useSession";
@@ -28,6 +29,7 @@ import { ShoppingListPage } from "./pages/ShoppingListPage";
 import { ShoppingListsPage } from "./pages/ShoppingListsPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+import { editorialScene, readRailCollapsed, writeRailCollapsed } from "./editorial";
 import { REQUEST_ACCESS_URL } from "./siteUrl";
 
 /** Onde o próprio ecrã já trata do email por confirmar. */
@@ -38,6 +40,15 @@ function App() {
   const { pathname } = useLocation();
   const showVerificationNotice =
     session !== null && !session.emailVerified && !PATHS_WITHOUT_VERIFICATION_NOTICE.includes(pathname);
+
+  const scene = session ? editorialScene(pathname) : null;
+  const [railCollapsed, setRailCollapsed] = useState(readRailCollapsed);
+  function toggleRail() {
+    setRailCollapsed((collapsed) => {
+      writeRailCollapsed(!collapsed);
+      return !collapsed;
+    });
+  }
 
   const brand = (
     <NavLink to="/" className="brand" aria-label="DomiOS, Hoje">
@@ -66,10 +77,31 @@ function App() {
   );
 
   return (
-    <div className={session ? "app" : "app app-guest"}>
+    <div
+      className={
+        !session ? "app app-guest" : scene ? `app editorial${railCollapsed ? " rail-collapsed" : ""}` : "app"
+      }
+    >
+      {scene && <div className="editorial-scene" style={{ backgroundImage: `url(${scene})` }} aria-hidden="true" />}
       {session && <AppRail brand={brand} />}
 
       <div className="app-column">
+      {scene && (
+        <div className="editorial-bar">
+          <button
+            type="button"
+            className="rail-toggle"
+            aria-expanded={!railCollapsed}
+            aria-controls="app-rail"
+            onClick={toggleRail}
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            {railCollapsed ? "Mostrar menu" : "Recolher menu"}
+          </button>
+        </div>
+      )}
       {session ? (
         <header className="app-topline">{brand}</header>
       ) : (

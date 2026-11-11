@@ -78,7 +78,7 @@ function RailGroup({ links, main = false }: { links: MenuLink[]; main?: boolean 
 /** Rail do almanaque no desktop. */
 export function AppRail({ brand }: { brand: ReactNode }) {
   return (
-    <aside className="app-rail">
+    <aside className="app-rail" id="app-rail">
       {brand}
       <nav className="rail-nav" aria-label="Principal">
         <RailGroup links={mainLinks} main />

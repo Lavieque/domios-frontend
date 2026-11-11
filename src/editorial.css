@@ -1,0 +1,298 @@
+/* ---------- Editorial: fotografia por área, vidro translúcido, menu recolhível ----------
+   Só vale dentro de `.app.editorial` (ver src/editorial.ts); as restantes páginas continuam na Folha do Dia.
+   O logótipo não muda: o rail é vidro claro para as duas casas e o "OS" manterem as cores de origem. */
+
+.app.editorial {
+  /* Superfícies claras mesmo com o sistema em escuro: o vidro é sempre claro sobre a fotografia. */
+  --bg: #f0f3f5;
+  --surface: rgb(250 251 252 / 0.9);
+  --surface-2: rgb(227 233 235 / 0.7);
+  --ink: #16241f;
+  --ink-dim: #4b5f62;
+  --line: rgba(22, 36, 31, 0.16);
+  --accent: #2a6a78;
+  --accent-soft: #dde8ea;
+  --accent-2: #1e3a5c;
+  --accent-2-soft: #dfe6ec;
+  --danger: #b91c1c;
+  --almanac: transparent;
+  --glass: rgb(250 251 252 / 0.74);
+  --glass-edge: rgb(255 255 255 / 0.55);
+  --glass-shadow: 0 12px 36px rgb(10 24 28 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.5);
+  --on-photo: #fff;
+  color-scheme: light;
+  background: #17333a;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Fundo fotográfico fixo, com um véu para o título ler bem por cima. */
+.editorial-scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.editorial-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(10 28 34 / 0.55), rgb(10 28 34 / 0.22) 60%, rgb(10 28 34 / 0.18));
+}
+
+/* Rail: vidro claro. */
+.editorial .app-rail {
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.1);
+  border-right: 1px solid var(--glass-edge);
+}
+
+.editorial .rail-link.active {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* Menu recolhível (ecrã largo). */
+.editorial-bar {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .editorial-bar {
+    display: block;
+    padding: 1rem clamp(16px, 3.2vw, 48px) 0;
+  }
+
+  .editorial.rail-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "main";
+  }
+
+  .editorial.rail-collapsed .app-rail {
+    display: none;
+  }
+}
+
+.rail-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rail-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.rail-toggle:hover {
+  background: rgb(255 255 255 / 0.9);
+}
+
+.rail-toggle:focus-visible {
+  outline: 2px solid var(--on-photo);
+  outline-offset: 2px;
+}
+
+.editorial .app-main {
+  padding-top: 1.25rem;
+}
+
+/* Cabeçalho da página sobre a fotografia. */
+.editorial .eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.85);
+}
+
+.editorial .page-head h1,
+.editorial .page-head .page-head-sub {
+  color: var(--on-photo);
+  text-shadow: 0 2px 18px rgb(8 22 26 / 0.45);
+}
+
+.editorial .page-head .page-head-sub {
+  color: rgb(255 255 255 / 0.92);
+}
+
+/* Cartões translúcidos. */
+.editorial :is(.panel, .filter-sidebar, .article-sheet, .price-row, .toolbar .search-wrap input) {
+  background: var(--glass);
+  backdrop-filter: blur(26px) saturate(1.05);
+  -webkit-backdrop-filter: blur(26px) saturate(1.05);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-shadow);
+  border-radius: 16px;
+}
+
+.editorial .panel,
+.editorial .article-sheet {
+  padding: clamp(1.1rem, 2.2vw, 1.75rem);
+}
+
+.editorial .filter-sidebar {
+  padding: 0.9rem;
+  margin-right: 0;
+  max-height: calc(100vh - 6rem);
+  top: 1rem;
+}
+
+/* Produtos como cartões numa grelha. */
+.editorial .price-rows {
+  border-top: 0;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  column-gap: 14px;
+}
+
+.editorial .price-row {
+  padding: 1rem 1.1rem;
+  min-height: 0;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.editorial a.price-row:hover {
+  transform: translateY(-3px);
+  background: rgb(255 255 255 / 0.88);
+}
+
+.editorial .price-row .label-name {
+  font-size: clamp(18px, 1.6vw, 21px);
+}
+
+.editorial .price-row-media img {
+  border-radius: 10px;
+}
+
+.editorial .results-count,
+.editorial .results-head {
+  color: rgb(255 255 255 / 0.95);
+  text-shadow: 0 1px 10px rgb(8 22 26 / 0.5);
+}
+
+.editorial .results-head .pill,
+.editorial .results-head .active-filter {
+  text-shadow: none;
+}
+
+.editorial .results-head .link-button {
+  color: #fff;
+}
+
+.editorial .empty-state,
+.editorial .loading {
+  color: #fff;
+}
+
+.editorial .toolbar .search-wrap input {
+  border-radius: 999px;
+}
+
+/* Detalhe do produto: a folha vira cartão de vidro. */
+.editorial .article-sheet {
+  border-top: 1px solid var(--glass-edge);
+}
+
+.editorial .article-sheet-body {
+  border-left-color: var(--line);
+}
+
+.editorial .article-sheet .article-photo {
+  background: rgb(255 255 255 / 0.85);
+  border-radius: 12px;
+}
+
+.editorial .crumb,
+.editorial .crumb a,
+.editorial .crumb .back-link {
+  color: #fff;
+  text-shadow: 0 1px 10px rgb(8 22 26 / 0.5);
+}
+
+.editorial .panel :is(h2, h3) {
+  color: var(--ink);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .editorial :is(.panel, .filter-sidebar, .article-sheet, .price-row, .app-rail) {
+    background: rgb(250 251 252 / 0.95);
+  }
+}
+
+@media (max-width: 899px) {
+  .editorial .filter-sidebar {
+    background: rgb(250 251 252 / 0.94);
+  }
+}
+
+/* Detalhe: a fotografia ocupa a coluna da direita em vez de deixar o cartão vazio. */
+@media (min-width: 900px) {
+  .editorial .article-sheet-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem);
+    column-gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-content: start;
+  }
+
+  .editorial .article-sheet-body > * {
+    grid-column: 1;
+  }
+
+  .editorial .article-sheet-body > .article-photo {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    width: 100%;
+    margin-top: 0;
+    align-self: start;
+  }
+
+  .editorial .article-sheet-body > .article-specs,
+  .editorial .article-sheet-body > .article-insight {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Telemóvel: o logótipo e a barra de baixo ganham vidro claro para manterem as cores de origem. */
+@media (max-width: 899px) {
+  .editorial .app-topline {
+    margin: 0.75rem 16px 0;
+    padding: 0.45rem 0.9rem;
+    width: fit-content;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .editorial .tabbar {
+    background: rgb(250 251 252 / 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--glass-edge);
+  }
+}
+
+.editorial .filters-toggle {
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  color: var(--ink);
+}

@@ -816,3 +816,208 @@
     display: block;
   }
 }
+
+/* =====================================================================
+   Terceira passagem: revisão com os dados reais da Api.
+   ===================================================================== */
+
+/* Grelhas com dezenas de cartões: sem desfoque por cartão (pesa a deslocar a página);
+   o vidro fica só nos painéis grandes. */
+.editorial :is(.price-row, .recipe-row, .photo-card),
+.editorial .pantry-page .pantry-row {
+  background: linear-gradient(135deg, rgb(24 52 39 / 0.84), rgb(38 46 32 / 0.78));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* As fotos da Api são embalagens em fundo branco: inteiras numa placa creme, nunca cortadas. */
+.editorial .price-row .product-thumb,
+.editorial .pantry-page .pantry-thumb:not(.is-empty),
+.editorial .article-sheet .article-photo,
+.editorial .use-row-thumb,
+.editorial .list-thumb,
+.editorial .label-thumb {
+  background: #fbf8f1;
+}
+
+.editorial .price-row .product-thumb img,
+.editorial .pantry-page .pantry-thumb img,
+.editorial .article-sheet .article-photo img,
+.editorial .use-row-thumb img {
+  object-fit: contain;
+  padding: 8%;
+  mix-blend-mode: multiply;
+}
+
+.editorial .use-row-thumb img {
+  padding: 4px;
+}
+
+/* Botões nunca partem a seta para a linha de baixo. */
+.editorial :is(.button-primary, .button-secondary, .button-danger, .button-sage, .arrow-link, .row-action) {
+  white-space: nowrap;
+}
+
+.editorial .link-button {
+  font-family: var(--font);
+  letter-spacing: 0;
+}
+
+/* Números grandes das listas em serifa, como os preços do preview. */
+.editorial .list-tally-count,
+.editorial .member-lead-number {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+
+/* Todos os números e nomes de destaque da Folha do Dia (letra condensada e pesada) passam à serifa. */
+.editorial :is(
+    .dish-name,
+    .next-day-number,
+    .week-range,
+    .recipe-facts dd,
+    .promotion-discount,
+    .store-row-price,
+    .nutrition-score-value strong,
+    .nutrition-component-points,
+    .nutrition-goal-percent,
+    .nutrition-day-number,
+    .history-time,
+    .breakdown-table td:nth-child(4)
+  ),
+.editorial .recipe-page .step-list li::before {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+
+/* Nomes dentro de listas: DM Sans a negrito, sem a condensada. */
+.editorial :is(
+    .suggestion-dish,
+    .lists-row-name,
+    .cookable-picks a,
+    .store-row-name strong,
+    .nutrition-component-name,
+    .nutrition-goal-name,
+    .nutrition-score-label,
+    .member-name,
+    .draft-row .meal-title
+  ) {
+  font-family: var(--font);
+  font-weight: 700;
+  font-stretch: 100%;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.editorial :is(.suggestion-dish, .lists-row-name, .member-name) {
+  font-size: 17px;
+}
+
+.editorial .recipe-page .recipe-section-head h2 {
+  font-size: clamp(26px, 2.4vw, 32px);
+}
+
+.editorial[data-area="nutricao"] .week-head h1::before {
+  content: "Nutrição";
+}
+
+.editorial .week-range {
+  font-size: clamp(20px, 2vw, 26px);
+}
+
+.editorial .week-nav-link {
+  color: #fff2c9;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.editorial .week-nav-link:hover {
+  text-decoration: underline;
+}
+
+.editorial :is(.week-nav button, .week-nav a:not(.week-nav-link), .week-step) {
+  padding: 8px 15px;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Produtos: três colunas ao lado dos filtros; a ligação ao detalhe fica no fim do cartão. */
+.editorial .catalog-results .price-rows {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+}
+
+.editorial .price-row .price-row-body {
+  height: 100%;
+}
+
+.editorial .price-row .arrow-link {
+  order: 3;
+  margin-top: auto;
+}
+
+/* Adicionar à despensa: o cesto é um painel de vidro, sem a régua antiga. */
+.editorial .add-basket {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+.editorial .add-basket > h2 {
+  padding-top: 0;
+  border-top: 0;
+  font-size: clamp(26px, 2.4vw, 32px);
+}
+
+.editorial .add-basket .draft-list {
+  border-top: 0;
+}
+
+.editorial .list-main h2 {
+  font-size: clamp(24px, 2.2vw, 30px);
+  line-height: 1.1;
+}
+
+/* A última linha de uma lista não fecha com filete. */
+.editorial :is(.lists-row, .settings-row, .member-row, .use-row, .store-row):last-child {
+  border-bottom: 0;
+}
+
+/* Colunas que só agrupam painéis não são elas próprias um painel. */
+.editorial .list-side {
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.editorial .list-side > .panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Despensa: "Deitar fora" existe em todos os cartões; fica discreto até ser preciso. */
+.editorial .pantry-page .pantry-actions .button-danger {
+  padding: 6px 11px;
+  border-color: rgb(255 180 168 / 0.45);
+  background: none;
+  color: #ffc9bf;
+}
+
+.editorial .pantry-page .pantry-actions .button-danger:hover {
+  background: #874a35;
+  color: #fffdf3;
+}

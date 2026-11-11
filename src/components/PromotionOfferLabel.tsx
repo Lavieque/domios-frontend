@@ -1,4 +1,5 @@
-import { measurementUnitLabels, promotionTypeLabels, type CurrentPromotionDto } from "../api/types";
+import { promotionTypeLabels, type CurrentPromotionDto } from "../api/types";
+import { formatPackage } from "../catalog/package";
 import { formatPercent, money, unitPriceLabel } from "../catalog/offers";
 import { daysLeft, daysLeftLabel } from "../catalog/promotions";
 import { ProductThumb } from "./ProductThumb";
@@ -30,7 +31,7 @@ export function PromotionOfferLabel({ offer }: { offer: CurrentPromotionDto; ind
     >
       <div className="label-name">{offer.productName}</div>
       <div className="label-meta">
-        {offer.chainName} · {offer.packageQuantity} {measurementUnitLabels[offer.packageUnit]}
+        {offer.chainName} · {formatPackage(offer.packageQuantity, offer.packageUnit)}
       </div>
       <div className="label-price-line">
         <LabelPrice amount={offer.price.amount} />

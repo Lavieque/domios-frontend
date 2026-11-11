@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getCategories, searchProducts } from "../api/client";
-import { CategoryScope, measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
+import { CategoryScope, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
 import { topCategory } from "../catalog/aisles";
+import { formatPackage } from "../catalog/package";
 import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
@@ -329,7 +330,7 @@ function ProductLabel({ product, top }: { product: ProductDto; index: number; to
     >
       <div className="label-name">{product.name}</div>
       <div className="label-meta">
-        {product.brand ?? "Sem marca"} · {product.packageQuantity} {measurementUnitLabels[product.packageUnit]} ·{" "}
+        {product.brand ?? "Sem marca"} · {formatPackage(product.packageQuantity, product.packageUnit)} ·{" "}
         {aisleName}
       </div>
       {(offers === undefined || cheapest) && (

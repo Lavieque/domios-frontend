@@ -123,13 +123,14 @@ export function RecipeDetailPage() {
               <dd>{duration(totalTime)}</dd>
             </div>
           )}
-          {recipe.prepTimeMinutes !== null && totalTime !== recipe.prepTimeMinutes && (
+          {/* A Api manda 0 quando a fonte não separa os tempos: "0 min" não diz nada. */}
+          {recipe.prepTimeMinutes !== null && recipe.prepTimeMinutes > 0 && totalTime !== recipe.prepTimeMinutes && (
             <div>
               <dt>Preparação</dt>
               <dd>{duration(recipe.prepTimeMinutes)}</dd>
             </div>
           )}
-          {recipe.cookTimeMinutes !== null && totalTime !== recipe.cookTimeMinutes && (
+          {recipe.cookTimeMinutes !== null && recipe.cookTimeMinutes > 0 && totalTime !== recipe.cookTimeMinutes && (
             <div>
               <dt>Cozedura</dt>
               <dd>{duration(recipe.cookTimeMinutes)}</dd>

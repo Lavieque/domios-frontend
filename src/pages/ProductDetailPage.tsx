@@ -4,13 +4,13 @@ import { getProduct } from "../api/client";
 import { addShoppingListItem } from "../api/shopping";
 import {
   MeasurementUnit,
-  measurementUnitLabels,
   ProductStatus,
   StoreOfferAvailability,
   type ProductDto,
   type ProductStoreOfferDto,
 } from "../api/types";
 import { topCategory } from "../catalog/aisles";
+import { allergenLabel, formatPackage } from "../catalog/package";
 import { isOnSale, money, priceDigits, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { useCategories } from "../catalog/useCategories";
 import { EventTimeline } from "../components/EventTimeline";
@@ -48,7 +48,7 @@ export function ProductDetailPage() {
   const highest = onSale[onSale.length - 1]?.latestPrice?.price.amount;
   const top = topCategory(product.category, categories) ?? product.category;
   const unit = cheapest ? unitPriceLabel(cheapest) : null;
-  const pack = `${product.packageQuantity} ${measurementUnitLabels[product.packageUnit]}`;
+  const pack = formatPackage(product.packageQuantity, product.packageUnit);
 
   return (
     <div className="page">
@@ -160,7 +160,7 @@ export function ProductDetailPage() {
             {product.allergens.length > 0 && (
               <div>
                 <dt>Alergénios</dt>
-                <dd>{product.allergens.join(", ")}</dd>
+                <dd>{product.allergens.map(allergenLabel).join(", ")}</dd>
               </div>
             )}
           </dl>

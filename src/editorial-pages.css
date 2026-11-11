@@ -1621,6 +1621,155 @@
   font-size: 12px;
 }
 
+/* ---------- Itens da lista de compras numa só linha ----------
+   O nome encolhe e corta com "…" (o nome inteiro fica no title); quantidade, embalagem,
+   loja e apagar mantêm o tamanho e ficam alinhados. */
+.editorial .list-row {
+  flex-wrap: nowrap;
+  gap: 10px 14px;
+  padding: 10px 0;
+}
+
+.editorial .list-row > .item-check {
+  flex: 1 1 0;
+  min-width: 5rem;
+  overflow: hidden;
+}
+
+.editorial .list-row .meal-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.editorial .list-row > :not(.item-check) {
+  flex: none;
+  white-space: nowrap;
+}
+
+.editorial .list-row .pill {
+  padding: 4px 9px;
+  font-size: 11px;
+}
+
+.editorial .list-row-price {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editorial .list-row-price .price-tag {
+  padding: 0;
+  background: none;
+  color: #fffdf3;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* Duas linhas: em cima o nome, a loja e o apagar; por baixo, pequenos, a quantidade, a embalagem
+   e o "Ligar a produto". O ::after é a quebra de linha entre as duas (é um item do flex). */
+.editorial .list-row {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.editorial .list-row > .item-check {
+  order: 1;
+}
+
+.editorial .list-row > .list-row-price {
+  order: 2;
+}
+
+.editorial .list-row > .icon-danger {
+  order: 3;
+}
+
+.editorial .list-row::after {
+  content: "";
+  order: 4;
+  flex-basis: 100%;
+  height: 0;
+}
+
+.editorial .list-row > :is(.muted, .pill, .link-button) {
+  order: 5;
+}
+
+.editorial .list-row > .muted {
+  margin-left: 34px;
+  font-size: 12px;
+}
+
+.editorial .list-row:has(.list-thumb) > .muted {
+  margin-left: 86px;
+}
+
+.editorial .list-row > .pill {
+  padding: 2px 8px;
+  font-size: 10.5px;
+}
+
+.editorial .list-row > .link-button {
+  padding: 0;
+  font-size: 11px;
+}
+
+.editorial .list-row > .item-check {
+  min-height: 0;
+}
+
+.editorial .list-row .list-thumb {
+  width: 40px;
+  height: 40px;
+}
+
+/* O seletor de produto (Ligar a produto) abre por baixo da linha, a toda a largura. */
+.editorial .list-row > .link-picker {
+  order: 6;
+}
+
+/* O seletor de produto (Ligar a produto) abre por baixo da linha, a toda a largura. */
+.editorial .list-row:has(.link-picker) {
+  flex-wrap: wrap;
+}
+
+.editorial .list-row .link-picker {
+  flex: 1 1 100%;
+  white-space: normal;
+}
+
+/* Telemóvel: a mesma organização em duas linhas (anula a grelha antiga do corredor);
+   a loja e o preço descem para a segunda linha para o nome ter a largura toda. */
+@media (max-width: 640px) {
+  .editorial .list-main .list-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .editorial .list-main .list-row > :is(.list-row-link, .list-row-price, .pill) {
+    grid-column: auto;
+    grid-row: auto;
+    margin-left: 0;
+  }
+
+  .editorial .list-main .list-row > .list-row-price {
+    order: 5;
+    margin-left: auto;
+  }
+
+  .editorial .list-main .list-row > .muted {
+    margin-left: 34px;
+  }
+
+  .editorial .list-main .list-row:has(.list-thumb) > .muted {
+    margin-left: 86px;
+  }
+}
+
 /* ---------- Cartões clicáveis em toda a área ----------
    A ligação do nome estica-se por cima do cartão inteiro; os botões e campos de cada
    cartão ficam por cima dela e continuam a funcionar. */

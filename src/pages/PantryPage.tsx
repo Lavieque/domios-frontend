@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import {
   consumePantryItem,
+  eatLeftovers,
   DiscardReason,
   discardPantryItem,
   discardReasonLabels,
@@ -160,9 +161,14 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
             {!loading && total > 0 && ` · ${total} ${total === 1 ? "artigo" : "artigos"}`}
           </p>
         </div>
-        <Link to="/despensa/adicionar" className="button-primary button-lg">
-          Adicionar à despensa
-        </Link>
+        <div className="button-row">
+          <Link to="/despensa/desperdicio" className="button-secondary">
+            Desperdício
+          </Link>
+          <Link to="/despensa/adicionar" className="button-primary button-lg">
+            Adicionar à despensa
+          </Link>
+        </div>
       </header>
       {notice && <p className="notice">{notice}</p>}
 
@@ -332,7 +338,17 @@ function PantryRow({
               </option>
             ))}
           </select>
-          {item.state === PantryState.Sealed && (
+          {item.sourceMealId && item.quantity.amount >= 1 && (
+            <button
+              type="button"
+              className="row-action"
+              title="Regista uma refeição com 1 dose destas sobras"
+              onClick={() => onAct(() => eatLeftovers(householdId, item.pantryItemId, mealTypeNow(), 1))}
+            >
+              Comer 1 dose
+            </button>
+          )}
+          {item.state === PantryState.Sealed && !item.sourceMealId && (
             <button type="button" className="row-action" onClick={() => onAct(() => openPantryItem(householdId, item.pantryItemId))}>
               Abrir
             </button>
@@ -451,4 +467,13 @@ function PantryRow({
       )}
     </li>
   );
+}
+
+/** A refeição pela hora local: pequeno-almoço até às 11h, almoço até às 16h, lanche até às 19h, depois jantar. */
+function mealTypeNow(now = new Date()): number {
+  const hour = now.getHours();
+  if (hour < 11) return 0;
+  if (hour < 16) return 1;
+  if (hour < 19) return 3;
+  return 2;
 }

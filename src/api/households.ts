@@ -34,6 +34,8 @@ export interface MemberDto {
   dateOfBirth: string | null;
   dietaryRestrictions: string[];
   userId: string | null;
+  /** Porção habitual: 0,25 a 3,00 (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.2). */
+  defaultPortion?: number;
 }
 
 export interface HouseholdDto {
@@ -109,6 +111,8 @@ export interface UpdateMemberRequest {
   name?: string;
   role?: MemberRole;
   dietaryRestrictions?: string[];
+  /** 0,25 a 3,00, até 2 casas decimais. */
+  defaultPortion?: number;
 }
 
 /** Só Admin. Devolve a casa atualizada. */

@@ -30,6 +30,7 @@ import { ShoppingListPage } from "./pages/ShoppingListPage";
 import { ShoppingListsPage } from "./pages/ShoppingListsPage";
 import { SpendingPage } from "./pages/SpendingPage";
 import { NearbyStoresPage } from "./pages/NearbyStoresPage";
+import { PantryWastePage } from "./pages/PantryWastePage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/VerifyEmailPage";
 import { editorialScene, readRailCollapsed, writeRailCollapsed } from "./editorial";
@@ -132,6 +133,7 @@ function App() {
             <Route path="/nutricao" element={<NutritionPage />} />
             <Route path="/despensa" element={<PantryPage />} />
             <Route path="/despensa/adicionar" element={<AddPantryItemPage />} />
+            <Route path="/despensa/desperdicio" element={<PantryWastePage />} />
             <Route path="/cozinhar" element={<CookPage />} />
             <Route path="/cozinhar/feitas" element={<CookedRecipesPage />} />
             <Route path="/listas" element={<ShoppingListsPage />} />

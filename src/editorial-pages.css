@@ -1378,16 +1378,26 @@
 
 /* ---------- Planeamento: "O que falta" e "Sugestões" baixos e transparentes ---------- */
 
-/* Sem vidro: um véu verde que desvanece para a direita, para a fotografia da página se ver. */
-.editorial .week-side .side-block {
-  padding: 20px 22px;
+/* Sem vidro: um véu verde que desvanece para a direita, para a fotografia da página se ver.
+   Os painéis do Planeamento, o calendário e os painéis das Ementas. */
+.editorial .week-side .side-block,
+.editorial .week-days,
+.editorial .templates-page > .panel {
   border: 1px solid rgb(248 245 223 / 0.16);
   border-right-color: transparent;
   background: linear-gradient(90deg, rgb(12 40 29 / 0.62) 0%, rgb(12 40 29 / 0.38) 55%, rgb(12 40 29 / 0) 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
+}
+
+.editorial .week-side .side-block,
+.editorial .week-days {
   text-shadow: 0 1px 8px rgb(8 22 16 / 0.55);
+}
+
+.editorial .week-side .side-block {
+  padding: 20px 22px;
 }
 
 /* "O que falta" com a mesma altura das Sugestões. */
@@ -1395,30 +1405,8 @@
   align-items: stretch;
 }
 
-/* O calendário com a mesma transparência dos painéis de baixo. */
-.editorial .week-days {
-  border: 1px solid rgb(248 245 223 / 0.16);
-  border-right-color: transparent;
-  background: linear-gradient(90deg, rgb(12 40 29 / 0.62) 0%, rgb(12 40 29 / 0.38) 55%, rgb(12 40 29 / 0) 100%);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  box-shadow: none;
-  text-shadow: 0 1px 8px rgb(8 22 16 / 0.55);
-}
-
 .editorial .week-day-date {
   background: rgb(12 40 29 / 0.18);
-}
-
-/* Ementas: o mesmo véu, para a fotografia da página se ver quando há poucas ementas. */
-.editorial .templates-page > .panel,
-.editorial .templates-page > section.panel {
-  border: 1px solid rgb(248 245 223 / 0.16);
-  border-right-color: transparent;
-  background: linear-gradient(90deg, rgb(12 40 29 / 0.62) 0%, rgb(12 40 29 / 0.38) 55%, rgb(12 40 29 / 0) 100%);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  box-shadow: none;
 }
 
 .editorial .templates-page > .panel :is(h2, .muted, .page-head-sub) {
@@ -1940,7 +1928,7 @@
 
 /* ---------- Cozinhar: cartões de receita compactos ---------- */
 
-.editorial .recipe-row-text {
+.editorial .recipe-row:has(.readiness) .recipe-row-text {
   gap: 8px;
 }
 

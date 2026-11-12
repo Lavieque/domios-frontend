@@ -2075,3 +2075,96 @@
   font-size: 12px;
   text-align: center;
 }
+
+/* ---------- Loja e preço da compra ----------
+   A loja da lista por baixo do título; o preço de cada linha comprada no lugar do preço da
+   comparação (em cima, à direita); o formulário abre por baixo, a toda a largura. */
+.editorial .list-store {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.editorial .list-store .category-select {
+  min-height: 0;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.editorial .purchased-total {
+  margin: -4px 0 8px;
+  font-size: 13px;
+}
+
+.editorial .list-row > .paid-price {
+  order: 2;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.editorial .list-row > .paid-price .muted {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.editorial .list-row > .paid-price-form {
+  order: 6;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  white-space: normal;
+}
+
+.editorial .list-row > .paid-price-form .amount-input {
+  width: 6rem;
+}
+
+/* ---------- Gastos ---------- */
+.editorial .spending-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  align-items: baseline;
+}
+
+.editorial .spending-month {
+  margin-top: 18px;
+}
+
+.editorial .spending-month h2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.editorial .spending-chains {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.editorial .spending-chains li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.editorial .spending-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.editorial .last-paid {
+  margin: 10px 0 0;
+  font-size: 14px;
+}

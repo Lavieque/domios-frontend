@@ -45,7 +45,28 @@ export interface ShoppingListItemDto {
   purchasedAt: string | null;
   /** Quando foi para a despensa; null se ainda não foi. */
   storedInPantryAt: string | null;
+  /** Exceção da linha; null segue a loja da lista (adenda 2026-11-09). */
+  chainId?: string | null;
+  physicalStoreId?: string | null;
+  /** A da linha, senão a da lista. */
+  effectiveChainId?: string | null;
+  effectivePhysicalStoreId?: string | null;
+  /** Total da linha; só nas compradas. */
+  paidPrice?: MoneyDto | null;
+  paidPriceSource?: PaidPriceSource | null;
 }
+
+export interface MoneyDto {
+  amount: number;
+  currency: string;
+}
+
+/** Escrito pelo membro, ou o preço da prateleira na data da compra. */
+export const PaidPriceSource = {
+  Typed: 0,
+  Offer: 1,
+} as const;
+export type PaidPriceSource = (typeof PaidPriceSource)[keyof typeof PaidPriceSource];
 
 export interface ShoppingListDto {
   shoppingListId: string;
@@ -57,6 +78,9 @@ export interface ShoppingListDto {
   completedAt: string | null;
   /** Por ordem de criação. */
   items: ShoppingListItemDto[];
+  /** Onde se compra a lista (adenda 2026-11-09). */
+  chainId?: string | null;
+  physicalStoreId?: string | null;
 }
 
 export interface AddItemRequest {
@@ -142,6 +166,32 @@ export function cancelShoppingList(householdId: string, listId: string): Promise
 /** Ordem à mão: todos os itens da lista, pela ordem nova. */
 export function reorderShoppingListItems(householdId: string, listId: string, itemIds: string[]): Promise<void> {
   return authedRequest<void>(`${listPath(householdId, listId)}/items/order`, { method: "PUT", body: { itemIds } });
+}
+
+// --- Loja e preço da compra (DomiOS_API_Fase1.md, adenda 2026-11-09) ---
+
+/** `chainId: null` limpa. Recalcula os preços da prateleira das linhas compradas. */
+export function setShoppingListStore(householdId: string, listId: string, chainId: string | null): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/store`, {
+    method: "PUT",
+    body: { chainId, physicalStoreId: null },
+  });
+}
+
+/** Exceção de uma linha; `null` volta à loja da lista. */
+export function setShoppingListItemStore(householdId: string, listId: string, itemId: string, chainId: string | null): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/items/${itemId}/store`, {
+    method: "PUT",
+    body: { chainId, physicalStoreId: null },
+  });
+}
+
+/** Total pago pela linha, em EUR; `null` apaga o escrito e volta ao preço da prateleira. */
+export function setShoppingListItemPaidPrice(householdId: string, listId: string, itemId: string, amount: number | null): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/items/${itemId}/paid-price`, {
+    method: "PUT",
+    body: { amount },
+  });
 }
 
 export function reopenShoppingList(householdId: string, listId: string): Promise<void> {

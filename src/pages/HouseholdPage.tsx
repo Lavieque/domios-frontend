@@ -361,6 +361,9 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
           </span>
           {age !== null && <span className="visually-hidden">, {age === 1 ? "1 ano" : `${age} anos`}</span>}
           <span>{member.userId ? " · Com conta" : " · Sem conta"}</span>
+          {member.defaultPortion !== undefined && member.defaultPortion !== 1 && (
+            <span> · porção {member.defaultPortion.toLocaleString("pt-PT")}</span>
+          )}
         </span>
         {member.dietaryRestrictions.length > 0 && (
           <span className="member-restrictions" aria-label="Restrições alimentares">
@@ -481,11 +484,17 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
   const [name, setName] = useState(member.name);
   const [role, setRole] = useState<MemberRole>(member.role);
   const [restrictions, setRestrictions] = useState(member.dietaryRestrictions.join(", "));
+  const [portion, setPortion] = useState(String(member.defaultPortion ?? 1).replace(".", ","));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    const portionValue = Number(portion.replace(",", "."));
+    if (!(portionValue >= 0.25 && portionValue <= 3)) {
+      setError("A porção vai de 0,25 a 3 (1 é uma dose normal).");
+      return;
+    }
     setError(null);
     setBusy(true);
     try {
@@ -495,6 +504,7 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
           // O papel só vai quando muda: mandá-lo, mesmo igual, é só para o Admin.
           ...(canChangeRole && role !== member.role ? { role } : {}),
           dietaryRestrictions: parseRestrictions(restrictions),
+          defaultPortion: Math.round(portionValue * 100) / 100,
         }),
       );
     } catch (err) {
@@ -530,6 +540,11 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
           onChange={(e) => setRestrictions(e.target.value)}
         />
         <small>Separa por vírgulas.</small>
+      </label>
+      <label className="form-field">
+        <span>Porção habitual</span>
+        <input type="text" inputMode="decimal" value={portion} onChange={(e) => setPortion(e.target.value)} />
+        <small>1 é uma dose; 0,5 come metade, 1,5 come uma vez e meia. Divide a nutrição das refeições.</small>
       </label>
       {error && (
         <p className="form-error member-form-wide" role="alert">

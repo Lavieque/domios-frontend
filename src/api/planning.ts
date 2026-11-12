@@ -220,3 +220,15 @@ export interface ApplyTemplateResultDto {
 export function applyTemplate(householdId: string, request: ApplyTemplateRequest): Promise<ApplyTemplateResultDto> {
   return authedRequest<ApplyTemplateResultDto>(`${base(householdId)}/from-template`, { method: "POST", body: request });
 }
+
+/**
+ * Cozinha a receita planeada: regista a refeição e gasta a despensa (DomiOS_API_Fase6.md, 1.6). Idempotente.
+ * `leftoverServings`: doses feitas e não comidas, de 0 a `servings` - 1; entram na despensa como "Sobras"
+ * (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.3).
+ */
+export function cookPlannedMeal(householdId: string, plannedMealId: string, leftoverServings: number): Promise<{ plannedMeal: PlannedMealDto }> {
+  return authedRequest<{ plannedMeal: PlannedMealDto }>(`${base(householdId)}/${plannedMealId}/cook`, {
+    method: "POST",
+    body: { consumePantry: true, leftoverServings },
+  });
+}

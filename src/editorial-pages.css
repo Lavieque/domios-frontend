@@ -2219,3 +2219,37 @@
   margin-top: 12px;
   font-size: 12px;
 }
+
+/* ---------- Desperdício e sobras ---------- */
+.editorial .waste-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.editorial .waste-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.editorial .waste-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.editorial .waste-list li > :last-child {
+  flex: none;
+  text-align: right;
+}
+
+.editorial .cook-form {
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}

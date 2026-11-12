@@ -95,12 +95,30 @@ export interface AvoidedMatchDto {
   note: string | null;
 }
 
+/** Uma restrição declarada do membro contra a receita (DomiOS_API_Fase4.md 2.3 e adenda 2026-11-09, D.1). */
+export interface RestrictionCheckDto {
+  restriction: string;
+  /** Número do `RestrictionResult` (Conflict 0, NoKnownConflict 1, Unverifiable 2). */
+  result: number;
+  conflictingIngredients: {
+    ingredientId: string;
+    name: string;
+    /** Alergénio, nome da categoria ou palavra do nome, conforme `source`. */
+    allergen: string;
+    source?: "Allergen" | "Category" | "Name";
+  }[];
+  ingredientsWithoutAllergenData: { ingredientId: string; name: string }[];
+  /** Número do `MainProtein` que quebra a dieta, ou null. */
+  conflictingMainProtein?: number | null;
+}
+
 /** Só o que o ecrã da receita usa de `GET .../recipes/{id}/restrictions` (adenda 2026-11-06, 5.3). */
 export interface RecipeRestrictionsDto {
   members: {
     memberId: string;
     name: string;
     avoided: { matches: AvoidedMatchDto[]; optionalMatches: AvoidedMatchDto[] } | null;
+    restrictions?: RestrictionCheckDto[];
   }[];
 }
 

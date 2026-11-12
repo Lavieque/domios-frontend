@@ -11,6 +11,7 @@ import {
   PlannedMealStatus,
   plannedMealStatusLabels,
   RestrictionResult,
+  cookPlannedMeal,
   skipPlannedMeal,
   suggestionReasonLabels,
   unskipPlannedMeal,
@@ -169,6 +170,9 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                         </span>
                         {meal.status !== PlannedMealStatus.Cooked && (
                           <span className="week-meal-actions">
+                            {meal.status === PlannedMealStatus.Planned && meal.recipeId && day <= now && (
+                              <CookButton meal={meal} onCook={(leftovers) => act(() => cookPlannedMeal(householdId, meal.plannedMealId, leftovers))} />
+                            )}
                             {meal.status === PlannedMealStatus.Planned ? (
                               <button
                                 type="button"
@@ -300,5 +304,52 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
         </aside>
       </div>
     </div>
+  );
+}
+
+/** "Cozinhei": regista a refeição e gasta a despensa; as doses que sobram voltam à despensa como "Sobras". */
+function CookButton({ meal, onCook }: { meal: PlannedMealDto; onCook: (leftoverServings: number) => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [leftovers, setLeftovers] = useState(0);
+  const [busy, setBusy] = useState(false);
+
+  if (!open) {
+    return (
+      <button type="button" className="link-button" onClick={() => setOpen(true)}>
+        Cozinhei
+      </button>
+    );
+  }
+
+  return (
+    <form
+      className="inline-form cook-form"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        setBusy(true);
+        await onCook(leftovers);
+        setBusy(false);
+        setOpen(false);
+      }}
+    >
+      {meal.servings > 1 && (
+        <label>
+          <span className="muted">Sobraram</span>{" "}
+          <select className="category-select" value={leftovers} onChange={(e) => setLeftovers(Number(e.target.value))}>
+            {Array.from({ length: meal.servings }, (_, n) => (
+              <option key={n} value={n}>
+                {n === 0 ? "nada" : n === 1 ? "1 dose" : `${n} doses`}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <button type="submit" className="button-primary" disabled={busy}>
+        {busy ? "A registar…" : "Registar"}
+      </button>
+      <button type="button" className="link-button" onClick={() => setOpen(false)}>
+        Cancelar
+      </button>
+    </form>
   );
 }

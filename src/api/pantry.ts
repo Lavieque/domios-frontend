@@ -95,6 +95,8 @@ export interface PantryItemDto {
   confidence: number;
   /** O que a casa leu na embalagem que comprou; independente do produto de qualquer cadeia. */
   scanned: ScannedProductDto | null;
+  /** Sobras de uma refeição (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.3). */
+  sourceMealId?: string | null;
 }
 
 export interface ScannedProductDto {
@@ -198,4 +200,45 @@ export function scanPantryItem(
     method: "PATCH",
     body: { location: null, quantity: null, scanned, expiresAt: expiresAt ?? null },
   });
+}
+
+// --- Sobras e desperdício (DomiOS_API_Fase4.md, adenda 2026-11-09, D.3 e D.5) ---
+
+/** Come `servings` doses de um item de sobras: regista a refeição com a nutrição da de origem. */
+export function eatLeftovers(householdId: string, pantryItemId: string, mealType: number, servings = 1): Promise<unknown> {
+  return authedRequest<unknown>(`/households/${householdId}/meals/from-leftovers`, {
+    method: "POST",
+    body: { pantryItemId, mealType, servings, eatenAt: null, participantMemberIds: [], notes: null },
+  });
+}
+
+export interface PantryWasteItemDto {
+  pantryItemId: string;
+  productId: string;
+  productName: string;
+  /** O que restava quando foi deitado fora. */
+  quantity: QuantityDto;
+  reason: DiscardReason | null;
+  discardedAt: string;
+  estimatedValue: MoneyDto | null;
+}
+
+/** `Mistake` fica fora das contas e do valor; aparece em `byReason` e `items`. */
+export interface PantryWasteDto {
+  from: string;
+  to: string;
+  discardedItemCount: number;
+  consumedItemCount: number;
+  /** null sem consumidos nem descartados. */
+  wastePercent: number | null;
+  estimatedValue: MoneyDto | null;
+  valuedItemCount: number;
+  byReason: { reason: DiscardReason | null; itemCount: number; estimatedValue: MoneyDto | null }[];
+  byCategory: { categoryId: string | null; name: string; itemCount: number; estimatedValue: MoneyDto | null }[];
+  items: PantryWasteItemDto[];
+}
+
+/** `from`/`to` yyyy-MM-dd no fuso da casa, ambos incluídos, até 366 dias. */
+export function getPantryWaste(householdId: string, from: string, to: string): Promise<PantryWasteDto> {
+  return authedRequest<PantryWasteDto>(`/households/${householdId}/pantry/waste`, { params: { from, to } });
 }

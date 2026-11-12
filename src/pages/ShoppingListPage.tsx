@@ -43,6 +43,7 @@ import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
 import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/groups";
 import { moveItem, withPendingOrder } from "../shopping/order";
+import { rankStores } from "../shopping/storeRanking";
 import { LinkPicker, SuggestionList, useCatalogSuggestions, type CatalogPick } from "../shopping/CatalogSuggestions";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
@@ -926,10 +927,16 @@ function Comparison({
 }) {
   const labelOf = (itemId: string) => items.find((i) => i.shoppingListItemId === itemId)?.label ?? "?";
   const { split } = comparison;
-  const best = comparison.stores[0];
+  // A loja de referência da Api para a divisão de compra (sem deslocação).
+  const splitBest = comparison.stores.find((s) => s.storeId === split.bestStoreId) ?? comparison.stores[0];
 
   // A Api devolve todas as lojas abertas, mesmo sem nenhum item; só interessam as que têm algum.
-  const stores = comparison.stores.filter((s) => s.coveredItemCount > 0);
+  // Com a deslocação contada, o "Mais barato" é pelo total com a ida à loja (rankStores).
+  const stores = rankStores(
+    comparison.stores.filter((s) => s.coveredItemCount > 0),
+    comparison.travel?.status === "Included",
+  );
+  const best = stores[0];
   const anyPrice = stores.length > 0;
 
   // Divisão agrupada por loja, pela ordem do ranking: "No Lidl: Leite, Massa".
@@ -998,10 +1005,10 @@ function Comparison({
           {kmFormat.format(comparison.splitWithTravel.routeKm)} km).
         </div>
       )}
-      {split.storeCount > 1 && split.savingVsBestStore > 0 && !comparison.travel && (
+      {split.storeCount > 1 && split.savingVsBestStore > 0 && comparison.travel?.status !== "Included" && (
         <div className="notice">
           Dividindo a compra por {split.storeCount} lojas: {money.format(split.total)} ({money.format(split.cardTotal)} com cartão),
-          menos {money.format(split.savingVsBestStore)} do que tudo no {best?.chainName}.
+          menos {money.format(split.savingVsBestStore)} do que tudo no {splitBest?.chainName}.
           <ul className="split-list">
             {splitByStore.map((group) => (
               <li key={group.chainName}>

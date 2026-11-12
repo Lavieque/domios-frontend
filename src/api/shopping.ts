@@ -304,6 +304,47 @@ export interface StoreComparisonStoreDto {
   cardTotal: number;
   missingItemIds: string[];
   items: StoreComparisonItemDto[];
+  /** Só com a deslocação pedida (adenda 2026-11-09, E.4); `null` sem loja física da cadeia no raio. */
+  nearestStore?: NearestStoreDto | null;
+  /** Ida e volta, em EUR; os totais sem deslocação continuam em `total`/`cardTotal`. */
+  travelCost?: number | null;
+  totalWithTravel?: number | null;
+  cardTotalWithTravel?: number | null;
+}
+
+export interface NearestStoreDto {
+  physicalStoreId: string;
+  name: string;
+  address: string | null;
+  roadKm: number;
+  roundTripKm: number;
+  openingHours: string | null;
+}
+
+/** A divisão escolhida com a deslocação contada: pode ter menos lojas do que `split`. */
+export interface SplitWithTravelDto {
+  coveredItemCount: number;
+  storeCount: number;
+  total: number;
+  cardTotal: number;
+  bestStoreId: string | null;
+  savingVsBestStore: number;
+  cardSavingVsBestStore: number;
+  items: { itemId: string; itemIds: string[]; storeId: string; productId: string; lineTotal: number }[];
+  /** Lojas físicas pela ordem do percurso. */
+  route: string[];
+  routeKm: number;
+  travelCost: number;
+  totalWithTravel: number;
+  cardTotalWithTravel: number;
+}
+
+export interface TravelInfoDto {
+  status: "Included" | "NoStoresInRange";
+  origin: { latitude: number; longitude: number };
+  costPerKm: number;
+  roadFactor: number;
+  radiusKm: number;
 }
 
 export interface StoreComparisonDto {
@@ -324,6 +365,9 @@ export interface StoreComparisonDto {
     cardSavingVsBestStore: number;
     items: { itemId: string; itemIds: string[]; storeId: string; productId: string; lineTotal: number }[];
   };
+  /** Só com a deslocação pedida; `null` sem nenhuma loja no raio com artigos. */
+  splitWithTravel?: SplitWithTravelDto | null;
+  travel?: TravelInfoDto;
 }
 
 export interface MissingConversionDto {
@@ -352,6 +396,13 @@ export function fillIngredientConversion(
   });
 }
 
-export function getStoreComparison(householdId: string, listId: string): Promise<StoreComparisonDto> {
-  return authedRequest<StoreComparisonDto>(`${listPath(householdId, listId)}/store-comparison`);
+/** Com `origin` (posição do dispositivo, não guardada), conta a ida às lojas físicas mais perto. */
+export function getStoreComparison(
+  householdId: string,
+  listId: string,
+  origin?: { latitude: number; longitude: number },
+): Promise<StoreComparisonDto> {
+  return authedRequest<StoreComparisonDto>(`${listPath(householdId, listId)}/store-comparison`, {
+    params: origin ? { lat: origin.latitude, lng: origin.longitude, includeTravel: true } : {},
+  });
 }

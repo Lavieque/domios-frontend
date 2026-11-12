@@ -43,6 +43,9 @@ export interface HouseholdDto {
   currency: string;
   locale: string;
   members: MemberDto[];
+  /** Valores efetivos, com os por omissão (adenda 2026-11-09 de DomiOS_API_Fase5.md, E.2). */
+  travelCostPerKm?: number;
+  maxStoreDistanceKm?: number;
 }
 
 export interface CreateHouseholdRequest {
@@ -88,6 +91,10 @@ export interface UpdateHouseholdRequest {
   timeZone?: string;
   currency?: string;
   locale?: string;
+  /** 0 a 2 €/km; `null` volta ao valor por omissão. */
+  travelCostPerKm?: number | null;
+  /** 1 a 50 km; `null` volta ao valor por omissão. */
+  maxStoreDistanceKm?: number | null;
 }
 
 export interface AddMemberRequest {

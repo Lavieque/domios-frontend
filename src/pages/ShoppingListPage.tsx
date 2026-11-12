@@ -37,6 +37,7 @@ import { describeError } from "../auth/errors";
 import { aisleClass, aisleOf } from "../catalog/aisles";
 import { useCategories } from "../catalog/useCategories";
 import { useActiveChains } from "../catalog/useChains";
+import { getDevicePosition, PositionError } from "../catalog/devicePosition";
 import { ChainLogo } from "../components/ChainLogo";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
@@ -46,6 +47,7 @@ import { LinkPicker, SuggestionList, useCatalogSuggestions, type CatalogPick } f
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
 const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
+const kmFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
 const units = Object.values(MeasurementUnit) as MeasurementUnit[];
 
 export function ShoppingListPage() {
@@ -61,6 +63,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [version, setVersion] = useState(0);
   const [comparison, setComparison] = useState<StoreComparisonDto | null>(null);
   const [comparing, setComparing] = useState(false);
+  // "Contar deslocação": pede a posição do dispositivo e soma a ida às lojas físicas mais perto.
+  const [withTravel, setWithTravel] = useState(false);
   // Aviso antes de comparar: linhas escritas à mão que ainda não estão ligadas a um produto.
   const [checkingLinks, setCheckingLinks] = useState(false);
   const [packaging, setPackaging] = useState<Map<string, ShoppingItemPackagingDto>>(new Map());
@@ -135,16 +139,23 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     await compare();
   }
 
-  async function compare() {
+  async function compare(travel = withTravel) {
     setCheckingLinks(false);
     setComparing(true);
     try {
-      setComparison(await getStoreComparison(householdId, listId));
+      const origin = travel ? await getDevicePosition() : undefined;
+      setComparison(await getStoreComparison(householdId, listId, origin));
     } catch (err) {
-      setError(describeError(err));
+      if (err instanceof PositionError) setWithTravel(false);
+      setError(err instanceof PositionError ? err.message : describeError(err, { "invalid-argument": "As lojas físicas só existem em Portugal." }));
     } finally {
       setComparing(false);
     }
+  }
+
+  function toggleTravel(on: boolean) {
+    setWithTravel(on);
+    if (comparison) void compare(on);
   }
 
   if (!list) {
@@ -336,19 +347,23 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                 <h2>Onde fica mais barato</h2>
               </div>
               {checkingLinks && unlinked.length > 0 && (
-                <UnlinkedWarning items={unlinked} onLink={link} onCompareAnyway={compare} onCancel={() => setCheckingLinks(false)} />
+                <UnlinkedWarning items={unlinked} onLink={link} onCompareAnyway={() => void compare()} onCancel={() => setCheckingLinks(false)} />
               )}
+              <label className="travel-toggle">
+                <input type="checkbox" checked={withTravel} disabled={comparing} onChange={(e) => toggleTravel(e.target.checked)} />
+                Contar deslocação <span className="muted">(usa a tua localização, que não fica guardada)</span>
+              </label>
               {!comparison ? (
                 !checkingLinks && (
                   <>
                     <p className="side-empty">Os preços das lojas dos últimos 3 dias, item a item.</p>
-                    <button type="button" className="button-secondary" onClick={startCompare} disabled={comparing}>
+                    <button type="button" className="button-secondary" onClick={() => void startCompare()} disabled={comparing}>
                       {comparing ? "A comparar…" : "Comparar lojas"}
                     </button>
                   </>
                 )
               ) : (
-                <Comparison comparison={comparison} items={list.items} householdId={householdId} onRecompare={compare} />
+                <Comparison comparison={comparison} items={list.items} householdId={householdId} onRecompare={() => compare()} />
               )}
             </section>
           </aside>
@@ -947,9 +962,16 @@ function Comparison({
                   </span>
                 </div>
                 <div className="store-card-price">
-                  <span className="price-tag">{money.format(store.total)}</span>
-                  {store.cardTotal < store.total && <span>{money.format(store.cardTotal)} com cartão</span>}
+                  <span className="price-tag">{money.format(store.totalWithTravel ?? store.total)}</span>
+                  {store.totalWithTravel != null && store.travelCost != null && store.nearestStore ? (
+                    <span>
+                      Artigos {money.format(store.total)} + deslocação {money.format(store.travelCost)} ({kmFormat.format(store.nearestStore.roundTripKm)} km)
+                    </span>
+                  ) : (
+                    store.cardTotal < store.total && <span>{money.format(store.cardTotal)} com cartão</span>
+                  )}
                 </div>
+                {store.nearestStore && <span className="store-card-near muted">{store.nearestStore.name}</span>}
                 <span className={isBest ? "badge" : complete ? "badge badge-soft" : "badge badge-warn"}>
                   {isBest ? "Mais barato" : complete ? "Tem tudo" : `Falta ${comparison.itemCount - store.coveredItemCount}`}
                 </span>
@@ -963,7 +985,20 @@ function Comparison({
         <StoreBreakdown key={store.storeId} store={store} labelOf={labelOf} householdId={householdId} onRecompare={onRecompare} />
       ))}
 
-      {split.storeCount > 1 && split.savingVsBestStore > 0 && (
+      {comparison.travel?.status === "NoStoresInRange" && (
+        <p className="muted">
+          Nenhuma loja destas cadeias a menos de {kmFormat.format(comparison.travel.radiusKm)} km: os totais não contam a deslocação. O raio muda-se
+          em <Link to="/casa">Casa</Link>.
+        </p>
+      )}
+      {comparison.splitWithTravel && comparison.splitWithTravel.storeCount > 1 && (
+        <div className="notice">
+          Contando a deslocação, dividir por {comparison.splitWithTravel.storeCount} lojas dá {money.format(comparison.splitWithTravel.totalWithTravel)}:
+          artigos {money.format(comparison.splitWithTravel.total)} + deslocação {money.format(comparison.splitWithTravel.travelCost)} (
+          {kmFormat.format(comparison.splitWithTravel.routeKm)} km).
+        </div>
+      )}
+      {split.storeCount > 1 && split.savingVsBestStore > 0 && !comparison.travel && (
         <div className="notice">
           Dividindo a compra por {split.storeCount} lojas: {money.format(split.total)} ({money.format(split.cardTotal)} com cartão),
           menos {money.format(split.savingVsBestStore)} do que tudo no {best?.chainName}.
@@ -1000,6 +1035,8 @@ function Comparison({
         <p className="muted comparison-note">
           Os preços são das embalagens inteiras que tens de comprar, não da parte que a receita usa: 20 g de arroz contam como um pacote de 1 kg.
           Itens iguais de várias receitas contam juntos. Preços dos últimos 3 dias nas lojas online.
+          {comparison.travel?.status === "Included" &&
+            ` Deslocação: ida e volta à loja mais perto de cada cadeia, a ${money.format(comparison.travel.costPerKm)}/km. Lojas © OpenStreetMap contributors.`}
         </p>
       )}
     </div>

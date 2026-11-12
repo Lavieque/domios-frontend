@@ -2168,3 +2168,54 @@
   margin: 10px 0 0;
   font-size: 14px;
 }
+
+/* ---------- Lojas perto e deslocação ---------- */
+.editorial .travel-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.editorial .store-card-near {
+  grid-column: 2 / -1;
+  font-size: 12px;
+}
+
+.editorial .nearby-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.editorial .nearby-store {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+}
+
+.editorial .nearby-store-text,
+.editorial .nearby-store-distance {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.editorial .nearby-store-distance {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.editorial .nearby-store .muted {
+  font-size: 12px;
+}
+
+.editorial .nearby-attribution {
+  margin-top: 12px;
+  font-size: 12px;
+}

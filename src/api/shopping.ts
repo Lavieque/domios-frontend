@@ -170,19 +170,25 @@ export function reorderShoppingListItems(householdId: string, listId: string, it
 
 // --- Loja e preço da compra (DomiOS_API_Fase1.md, adenda 2026-11-09) ---
 
-/** `chainId: null` limpa. Recalcula os preços da prateleira das linhas compradas. */
-export function setShoppingListStore(householdId: string, listId: string, chainId: string | null): Promise<ShoppingListDto> {
+/** `chainId: null` limpa. Recalcula os preços da prateleira das linhas compradas. A loja física tem de ser da cadeia. */
+export function setShoppingListStore(householdId: string, listId: string, chainId: string | null, physicalStoreId: string | null = null): Promise<ShoppingListDto> {
   return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/store`, {
     method: "PUT",
-    body: { chainId, physicalStoreId: null },
+    body: { chainId, physicalStoreId },
   });
 }
 
 /** Exceção de uma linha; `null` volta à loja da lista. */
-export function setShoppingListItemStore(householdId: string, listId: string, itemId: string, chainId: string | null): Promise<ShoppingListDto> {
+export function setShoppingListItemStore(
+  householdId: string,
+  listId: string,
+  itemId: string,
+  chainId: string | null,
+  physicalStoreId: string | null = null,
+): Promise<ShoppingListDto> {
   return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/items/${itemId}/store`, {
     method: "PUT",
-    body: { chainId, physicalStoreId: null },
+    body: { chainId, physicalStoreId },
   });
 }
 

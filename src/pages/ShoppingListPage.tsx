@@ -44,6 +44,7 @@ import { useProducts } from "../pantry/useProducts";
 import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/groups";
 import { moveItem, withPendingOrder } from "../shopping/order";
 import { rankStores } from "../shopping/storeRanking";
+import { physicalStoreNames, planForStore, planFromSplit, type StorePlan } from "../shopping/storePlan";
 import { LinkPicker, SuggestionList, useCatalogSuggestions, type CatalogPick } from "../shopping/CatalogSuggestions";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
@@ -68,6 +69,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [withTravel, setWithTravel] = useState(false);
   // Aviso antes de comparar: linhas escritas à mão que ainda não estão ligadas a um produto.
   const [checkingLinks, setCheckingLinks] = useState(false);
+  // Nomes das lojas físicas vistas na comparação: a lista só guarda o id. Fica só em memória.
+  const [storeNames, setStoreNames] = useState<Map<string, string>>(new Map());
   const [packaging, setPackaging] = useState<Map<string, ShoppingItemPackagingDto>>(new Map());
   // Modo "Ordenar": ids dos itens por comprar pela ordem que se está a montar; null fora do modo.
   const [draftOrder, setDraftOrder] = useState<string[] | null>(null);
@@ -159,6 +162,31 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     if (comparison) void compare(on);
   }
 
+  /**
+   * Grava a escolha feita na comparação: a loja da lista e a exceção de cada item por comprar.
+   * Se a loja da lista muda, as compradas que a seguiam ficam presas à loja onde já foram compradas.
+   */
+  function choosePlan(current: ShoppingListDto, from: StoreComparisonDto, plan: StorePlan) {
+    setStoreNames((names) => new Map([...names, ...physicalStoreNames(from)]));
+    void act(async () => {
+      const listMoves = current.chainId !== plan.list.chainId || (current.physicalStoreId ?? null) !== plan.list.physicalStoreId;
+      if (current.chainId && listMoves) {
+        for (const item of current.items) {
+          if (item.isPurchased && !item.chainId) {
+            await setShoppingListItemStore(householdId, listId, item.shoppingListItemId, current.chainId, current.physicalStoreId ?? null);
+          }
+        }
+      }
+      if (listMoves) await setShoppingListStore(householdId, listId, plan.list.chainId, plan.list.physicalStoreId);
+      for (const { itemId, choice } of plan.items) {
+        const item = current.items.find((i) => i.shoppingListItemId === itemId);
+        if (!item) continue;
+        const same = (item.chainId ?? null) === (choice?.chainId ?? null) && (item.physicalStoreId ?? null) === (choice?.physicalStoreId ?? null);
+        if (!same) await setShoppingListItemStore(householdId, listId, itemId, choice?.chainId ?? null, choice?.physicalStoreId ?? null);
+      }
+    });
+  }
+
   if (!list) {
     return error ? (
       <p className="form-error" role="alert">
@@ -187,6 +215,19 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     if (imageUrl) thumbs.set(item.shoppingListItemId, imageUrl);
   }
   const notInPantry = purchased.filter((item) => !item.storedInPantryAt);
+  // Onde se planeou comprar: "Lidl", ou "Lidl · Lidl Matosinhos" se a loja física foi vista na comparação.
+  const storeLabel = (chainId: string | null | undefined, physicalStoreId: string | null | undefined) => {
+    if (!chainId || !chains) return null;
+    const name = chains.find((c) => c.chainId === chainId)?.name ?? "Loja fechada";
+    const place = physicalStoreId ? storeNames.get(physicalStoreId) : undefined;
+    return place ? `${name} · ${place}` : name;
+  };
+  // Por comprar com exceção: a loja planeada para a linha, diferente da da lista.
+  const plannedElsewhere = new Map<string, string>();
+  for (const item of pending) {
+    const label = item.chainId ? storeLabel(item.chainId, item.physicalStoreId) : null;
+    if (label) plannedElsewhere.set(item.shoppingListItemId, label);
+  }
 
   return (
     <div className="page list-page">
@@ -209,6 +250,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
             <ListStore
               chains={chains}
               chainId={list.chainId ?? null}
+              place={list.physicalStoreId ? (storeNames.get(list.physicalStoreId) ?? null) : null}
+              elsewhere={plannedElsewhere.size}
               onChange={(chainId) => act(() => setShoppingListStore(householdId, listId, chainId))}
             />
           )}
@@ -271,6 +314,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                   groups={categories && (products.size > 0 || !pending.some((item) => item.productId)) ? groupByTopCategory(pending, products, categories) : null}
                   open={open}
                   cheapest={cheapestByItem}
+                  planned={plannedElsewhere}
                   packaging={packaging}
                   thumbs={thumbs}
                   onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
@@ -369,7 +413,22 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                   </>
                 )
               ) : (
-                <Comparison comparison={comparison} items={list.items} householdId={householdId} onRecompare={() => compare()} />
+                <Comparison
+                  comparison={comparison}
+                  items={list.items}
+                  householdId={householdId}
+                  onRecompare={() => compare()}
+                  choice={
+                    open
+                      ? {
+                          pendingIds: pending.map((item) => item.shoppingListItemId),
+                          listChainId: list.chainId ?? null,
+                          hasExceptions: plannedElsewhere.size > 0,
+                          onChoose: (plan) => choosePlan(list, comparison, plan),
+                        }
+                      : null
+                  }
+                />
               )}
             </section>
           </aside>
@@ -635,6 +694,7 @@ function PendingItems({
   groups: ItemGroup[] | null;
   open: boolean;
   cheapest: Map<string, { chainName: string; lineTotal: number }>;
+  planned: Map<string, string>;
   packaging: Map<string, ShoppingItemPackagingDto>;
   thumbs: Map<string, string>;
   onToggle: (item: ShoppingListItemDto) => void;
@@ -661,6 +721,7 @@ function ItemList({
   items,
   open,
   cheapest,
+  planned,
   packaging,
   thumbs,
   onToggle,
@@ -671,6 +732,8 @@ function ItemList({
   items: ShoppingListItemDto[];
   open: boolean;
   cheapest?: Map<string, { chainName: string; lineTotal: number }>;
+  /** Por comprar: a loja planeada para a linha, quando não é a da lista. */
+  planned?: Map<string, string>;
   packaging?: Map<string, ShoppingItemPackagingDto>;
   /** Imagem por linha; sem nenhuma nesta lista, não se reserva o espaço. */
   thumbs?: Map<string, string>;
@@ -715,6 +778,11 @@ function ItemList({
             </span>
           )}
           {item.storedInPantryAt && <span className="pill pill-muted">Na despensa</span>}
+          {!item.isPurchased && planned?.get(item.shoppingListItemId) && (
+            <span className="pill pill-muted" title="Planeado comprar nesta loja, não na da lista">
+              no {planned.get(item.shoppingListItemId)}
+            </span>
+          )}
           {pricing && item.isPurchased && <PaidPrice item={item} {...pricing} />}
           {open && onLink && !item.isPurchased && !item.productId && !item.ingredientId && (
             <button
@@ -763,7 +831,21 @@ interface PricingProps {
 }
 
 /** Onde se fez (ou se vai fazer) a compra: dá o preço da prateleira às linhas compradas. */
-function ListStore({ chains, chainId, onChange }: { chains: ChainDto[] | null; chainId: string | null; onChange: (chainId: string | null) => void }) {
+function ListStore({
+  chains,
+  chainId,
+  place,
+  elsewhere,
+  onChange,
+}: {
+  chains: ChainDto[] | null;
+  chainId: string | null;
+  /** A loja física escolhida, se o nome é conhecido. */
+  place: string | null;
+  /** Itens por comprar planeados noutra loja. */
+  elsewhere: number;
+  onChange: (chainId: string | null) => void;
+}) {
   if (!chains) return null;
   return (
     <label className="list-store">
@@ -778,6 +860,8 @@ function ListStore({ chains, chainId, onChange }: { chains: ChainDto[] | null; c
         {/* A cadeia guardada pode ter fechado entretanto: mostra-se na mesma. */}
         {chainId && !chains.some((c) => c.chainId === chainId) && <option value={chainId}>Loja fechada</option>}
       </select>
+      {place && <span className="muted">{place}</span>}
+      {elsewhere > 0 && <span className="muted">· {elsewhere === 1 ? "1 item noutra loja" : `${elsewhere} itens noutra loja`}</span>}
     </label>
   );
 }
@@ -933,11 +1017,14 @@ function Comparison({
   items,
   householdId,
   onRecompare,
+  choice,
 }: {
   comparison: StoreComparisonDto;
   items: ShoppingListItemDto[];
   householdId: string;
   onRecompare: () => Promise<void>;
+  /** Só com a lista aberta: escolher onde comprar grava a loja da lista e as exceções. */
+  choice: { pendingIds: string[]; listChainId: string | null; hasExceptions: boolean; onChoose: (plan: StorePlan) => void } | null;
 }) {
   const labelOf = (itemId: string) => items.find((i) => i.shoppingListItemId === itemId)?.label ?? "?";
   const { split } = comparison;
@@ -952,6 +1039,12 @@ function Comparison({
   );
   const best = stores[0];
   const anyPrice = stores.length > 0;
+  const splitPlan = choice ? planFromSplit(comparison, choice.pendingIds) : null;
+  const followSplit = splitPlan && choice && (
+    <button type="button" className="button-secondary" onClick={() => choice.onChoose(splitPlan)}>
+      Seguir esta divisão
+    </button>
+  );
 
   // Divisão agrupada por loja, pela ordem do ranking: "No Lidl: Leite, Massa".
   const splitByStore = comparison.stores
@@ -996,6 +1089,21 @@ function Comparison({
                 <span className={isBest ? "badge" : complete ? "badge badge-soft" : "badge badge-warn"}>
                   {isBest ? "Mais barato" : complete ? "Tem tudo" : `Falta ${comparison.itemCount - store.coveredItemCount}`}
                 </span>
+                {choice &&
+                  (choice.listChainId === store.chainId && !choice.hasExceptions ? (
+                    <span className="store-card-choose muted">É onde vais comprar</span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="link-button store-card-choose"
+                      onClick={() => {
+                        const plan = planForStore(comparison, store.storeId, choice.pendingIds);
+                        if (plan) choice.onChoose(plan);
+                      }}
+                    >
+                      Vou comprar aqui
+                    </button>
+                  ))}
               </div>
             );
           })}
@@ -1017,6 +1125,7 @@ function Comparison({
           Contando a deslocação, dividir por {comparison.splitWithTravel.storeCount} lojas dá {money.format(comparison.splitWithTravel.totalWithTravel)}:
           artigos {money.format(comparison.splitWithTravel.total)} + deslocação {money.format(comparison.splitWithTravel.travelCost)} (
           {kmFormat.format(comparison.splitWithTravel.routeKm)} km).
+          {comparison.travel?.status === "Included" && <div>{followSplit}</div>}
         </div>
       )}
       {split.storeCount > 1 && split.savingVsBestStore > 0 && comparison.travel?.status !== "Included" && (
@@ -1030,6 +1139,7 @@ function Comparison({
               </li>
             ))}
           </ul>
+          {followSplit}
         </div>
       )}
 

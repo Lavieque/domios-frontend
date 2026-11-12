@@ -140,7 +140,7 @@ export function ProductDetailPage() {
             </p>
           )}
 
-          {lastPaid && <LastPaid purchase={lastPaid} />}
+          {lastPaid && <LastPaid purchase={lastPaid} product={product} />}
 
           {cheapest?.priceInsight && (
             <div className="article-insight">
@@ -302,13 +302,35 @@ function useLastPaid(householdId: string | null, productId: string | null): Prod
 }
 
 /** "Pagaste 1,29 € a 2 nov. no Continente" (DomiOS_API_Fase1.md, adenda 2026-11-09). */
-function LastPaid({ purchase }: { purchase: ProductPurchaseDto }) {
+function LastPaid({ purchase, product }: { purchase: ProductPurchaseDto; product: ProductDto }) {
   const where = purchase.physicalStoreName ?? purchase.chainName;
+  const total = purchase.paidPrice!.amount;
+  // O preço pago é o da linha toda; com várias embalagens, mostra também o de cada uma, como a prateleira.
+  const packs = packagesOf(purchase.quantity.amount, purchase.quantity.unit, product.packageQuantity, product.packageUnit);
   return (
     <p className="muted last-paid">
-      Pagaste <strong>{money.format(purchase.paidPrice!.amount)}</strong> a {dateFormat.format(new Date(purchase.purchasedAt))}
+      Pagaste{" "}
+      {packs !== null && packs > 1 ? (
+        <>
+          <strong>{money.format(total / packs)}</strong> por embalagem ({money.format(total)} por {packs})
+        </>
+      ) : (
+        <strong>{money.format(total)}</strong>
+      )}{" "}
+      a {dateFormat.format(new Date(purchase.purchasedAt))}
       {where && ` no ${where}`}
       {purchase.paidPriceSource === PaidPriceSource.Offer && " (preço da prateleira)"}.
     </p>
   );
+}
+
+/** Embalagens inteiras numa compra; null quando a unidade não se compara com a da embalagem. */
+function packagesOf(amount: number, unit: MeasurementUnit, packageQuantity: number, packageUnit: MeasurementUnit): number | null {
+  if (unit === MeasurementUnit.Unit) return Math.max(1, Math.round(amount));
+  const base = (u: MeasurementUnit, q: number) =>
+    u === MeasurementUnit.Kilogram ? { dim: "g", q: q * 1000 } : u === MeasurementUnit.Liter ? { dim: "ml", q: q * 1000 } : { dim: u === MeasurementUnit.Gram ? "g" : "ml", q };
+  const bought = base(unit, amount);
+  const pack = base(packageUnit, packageQuantity);
+  if (packageUnit === MeasurementUnit.Unit || bought.dim !== pack.dim || !(pack.q > 0)) return null;
+  return Math.max(1, Math.ceil(bought.q / pack.q - 1e-9));
 }

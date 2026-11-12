@@ -54,6 +54,17 @@ export interface ShoppingListItemDto {
   /** Total da linha; só nas compradas. */
   paidPrice?: MoneyDto | null;
   paidPriceSource?: PaidPriceSource | null;
+  /** Nome da loja física efetiva (adenda 2026-11-12). */
+  physicalStoreName?: string | null;
+  /** O plano da linha, fixo desde a escolha; null sem plano. */
+  plannedChainId?: string | null;
+  plannedPhysicalStoreId?: string | null;
+  plannedPhysicalStoreName?: string | null;
+  plannedPrice?: MoneyDto | null;
+  /** Comprada na cadeia planeada; null por comprar ou sem plano. */
+  followedPlan?: boolean | null;
+  /** Pago menos planeado. */
+  priceDifference?: MoneyDto | null;
 }
 
 export interface MoneyDto {
@@ -81,6 +92,32 @@ export interface ShoppingListDto {
   /** Onde se compra a lista (adenda 2026-11-09). */
   chainId?: string | null;
   physicalStoreId?: string | null;
+  physicalStoreName?: string | null;
+  /** O plano e como correu (adenda 2026-11-12); null sem plano. */
+  plan?: ShoppingPlanDto | null;
+}
+
+/** Os totais somam só as compradas com plano e os dois preços. */
+export interface ShoppingPlanDto {
+  plannedAt: string;
+  chainId: string;
+  chainName: string | null;
+  physicalStoreId: string | null;
+  physicalStoreName: string | null;
+  travelCost: MoneyDto | null;
+  plannedTotal: number;
+  paidTotal: number;
+  boughtAsPlanned: number;
+  boughtElsewhere: number;
+  notBought: number;
+  outsidePlan: number;
+}
+
+export interface SetShoppingPlanRequest {
+  list: { chainId: string; physicalStoreId: string | null };
+  /** Só as linhas por comprar noutra loja que não a da lista. */
+  items: { itemId: string; chainId: string; physicalStoreId: string | null }[];
+  travelCost: number | null;
 }
 
 export interface AddItemRequest {
@@ -149,9 +186,17 @@ export function deleteShoppingListItem(householdId: string, listId: string, item
   return authedRequest<void>(`${listPath(householdId, listId)}/items/${itemId}`, { method: "DELETE" });
 }
 
-export function setItemPurchased(householdId: string, listId: string, itemId: string, purchased: boolean): Promise<void> {
+/** `boughtAt`: "comprei noutro sítio" — a compra da linha vai para essa cadeia; o plano fica. */
+export function setItemPurchased(
+  householdId: string,
+  listId: string,
+  itemId: string,
+  purchased: boolean,
+  boughtAt?: { chainId: string; physicalStoreId: string | null },
+): Promise<void> {
   return authedRequest<void>(`${listPath(householdId, listId)}/items/${itemId}/${purchased ? "purchase" : "unpurchase"}`, {
     method: "POST",
+    ...(purchased && boughtAt ? { body: boughtAt } : {}),
   });
 }
 
@@ -176,6 +221,16 @@ export function setShoppingListStore(householdId: string, listId: string, chainI
     method: "PUT",
     body: { chainId, physicalStoreId },
   });
+}
+
+/** Grava o plano escolhido na comparação; a Api calcula o preço planeado de cada linha (adenda 2026-11-12). */
+export function setShoppingPlan(householdId: string, listId: string, plan: SetShoppingPlanRequest): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/plan`, { method: "PUT", body: plan });
+}
+
+/** Apaga o plano das linhas por comprar; a compra fica como está. */
+export function clearShoppingPlan(householdId: string, listId: string): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/plan`, { method: "DELETE" });
 }
 
 /** Exceção de uma linha; `null` volta à loja da lista. */

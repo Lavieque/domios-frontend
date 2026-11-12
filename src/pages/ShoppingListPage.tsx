@@ -295,15 +295,20 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                         : {
                             chains,
                             listChainId: list.chainId ?? null,
-                            onSave: (item, amount, chainId) =>
-                              act(async () => {
+                            // Sem act(): um erro fica no formulário da linha, que não fecha.
+                            onSave: async (item, amount, chainId) => {
+                              try {
                                 if (chainId !== (item.chainId ?? null)) {
                                   await setShoppingListItemStore(householdId, listId, item.shoppingListItemId, chainId);
                                 }
                                 if (amount !== undefined) {
                                   await setShoppingListItemPaidPrice(householdId, listId, item.shoppingListItemId, amount);
                                 }
-                              }),
+                              } finally {
+                                // A loja pode ter mudado mesmo que o preço falhe.
+                                setVersion((v) => v + 1);
+                              }
+                            },
                           }
                     }
                   />
@@ -815,9 +820,18 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
 
   async function save(nextAmount: number | null | undefined) {
     setSaving(true);
+    setError(null);
     try {
       await onSave(item, nextAmount, chainId || null);
       setEditing(false);
+    } catch (err) {
+      setError(
+        describeError(err, {
+          "invalid-state-transition": "A lista foi cancelada: já não aceita preços.",
+          "invalid-argument": "Escreve um valor entre 0 e 10 000 €.",
+          "not-found": "Esta loja já não existe.",
+        }),
+      );
     } finally {
       setSaving(false);
     }

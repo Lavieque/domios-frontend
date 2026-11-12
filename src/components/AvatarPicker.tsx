@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from "react";
+import { ApiError } from "../api/http";
 import { AVATAR_MAX_BYTES, prepareAvatar } from "../auth/avatarImage";
 import { describeError } from "../auth/errors";
 import { removeAvatar, saveAvatar, useAvatar } from "../auth/useAvatar";
@@ -39,7 +40,12 @@ export function AvatarPicker({ userId, email }: { userId: string; email: string 
       }
       await saveAvatar(userId, image);
     } catch (err) {
-      setError(describeError(err, avatarErrors));
+      // 404 sem tipo: a Api deste ambiente ainda não tem a rota do avatar.
+      setError(
+        err instanceof ApiError && err.status === 404 && !err.type
+          ? "As fotografias ainda não estão disponíveis. Tenta mais tarde."
+          : describeError(err, avatarErrors),
+      );
     } finally {
       setBusy(false);
     }

@@ -15,6 +15,8 @@ import { shortDate } from "../plan/dates";
 import { opportunityAction } from "./actions";
 import { useOpportunities } from "./useOpportunities";
 
+const paidDate = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short" });
+
 /**
  * Sugestões da casa (DomiOS_API_Fase8.md): só as que o orçamento de atenção
  * deixa mostrar. Sem nenhuma, o painel não aparece.
@@ -88,6 +90,13 @@ function OpportunityCard({
         )}
       </div>
       <p className="muted">{opportunity.explanation}</p>
+      {opportunity.type === OpportunityType.BelowLastPaid && (
+        <p className="opportunity-detail">
+          Agora {money.format(opportunity.payload.current)}; pagaste {money.format(opportunity.payload.lastPaid)} a{" "}
+          {paidDate.format(new Date(opportunity.payload.lastPaidAt))}
+          {opportunity.payload.priceSource === "Offer" && " (preço da prateleira)"}.
+        </p>
+      )}
 
       {/* O formulário fica depois de enviar: é ele que mostra "Ver a lista". */}
       {opportunity.type === OpportunityType.PlannedMealMissingItems && (
@@ -109,16 +118,18 @@ function OpportunityCard({
 
       {!closed && (
         <div className="button-row">
-          <Link to={action.to} className="button-secondary">
-            {action.linkLabel}
-          </Link>
+          {action && (
+            <Link to={action.to} className="button-secondary">
+              {action.linkLabel}
+            </Link>
+          )}
           <button
             type="button"
             className="button-secondary"
             disabled={busy}
             onClick={() => close(() => actOnOpportunity(householdId, opportunity.opportunityId))}
           >
-            {action.doneLabel}
+            {action?.doneLabel ?? "Feito"}
           </button>
           <button
             type="button"

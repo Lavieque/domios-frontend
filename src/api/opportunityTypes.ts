@@ -6,6 +6,8 @@ export const OpportunityType = {
   PlannedMealMissingItems: 1,
   GoodPrice: 2,
   ShoppingListSplit: 3,
+  /** Mais barato do que a casa pagou da última vez (adenda 2026-11-10 de DomiOS_API_Fase8.md). */
+  BelowLastPaid: 4,
 } as const;
 export type OpportunityType = (typeof OpportunityType)[keyof typeof OpportunityType];
 
@@ -47,6 +49,19 @@ export interface ShoppingListSplitPayload {
   savingVsBestStore: number;
 }
 
+/** `current` e `lastPaid` por embalagem, na moeda da casa. */
+export interface BelowLastPaidPayload {
+  productId: string;
+  storeOfferId: string;
+  storeId: string;
+  current: number;
+  lastPaid: number;
+  lastPaidAt: string;
+  lastPaidChainId: string | null;
+  /** De onde veio o preço pago: escrito pelo membro ou da prateleira. */
+  priceSource: "Typed" | "Offer";
+}
+
 interface OpportunityBase {
   opportunityId: string;
   householdId: string;
@@ -68,6 +83,7 @@ export type OpportunityDto = OpportunityBase &
     | { type: typeof OpportunityType.PlannedMealMissingItems; payload: PlannedMealMissingItemsPayload }
     | { type: typeof OpportunityType.GoodPrice; payload: GoodPricePayload }
     | { type: typeof OpportunityType.ShoppingListSplit; payload: ShoppingListSplitPayload }
+    | { type: typeof OpportunityType.BelowLastPaid; payload: BelowLastPaidPayload }
   );
 
 export interface OpportunityListDto {

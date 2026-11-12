@@ -171,6 +171,7 @@ export function HouseholdPage() {
                 <dt>Moeda</dt>
                 <dd>{household.currency}</dd>
               </div>
+              <TravelSettings household={household} isAdmin={isAdmin} onSaved={setHousehold} />
               <div className="settings-row">
                 <dt>Histórico</dt>
                 <dd>
@@ -691,5 +692,96 @@ function AddMemberForm({ householdId, onSaved, onCancel }: AddMemberFormProps) {
         </button>
       </div>
     </form>
+  );
+}
+
+const kmFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
+const perKmFormat = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", maximumFractionDigits: 3 });
+
+/** Custo por km e distância máxima das lojas (adenda 2026-11-09 de DomiOS_API_Fase5.md, E.2). Só Admin muda. */
+function TravelSettings({ household, isAdmin, onSaved }: { household: HouseholdDto; isAdmin: boolean; onSaved: (h: HouseholdDto) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [cost, setCost] = useState("");
+  const [distance, setDistance] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const costPerKm = household.travelCostPerKm;
+  const maxKm = household.maxStoreDistanceKm;
+  if (costPerKm === undefined || maxKm === undefined) return null;
+
+  function start() {
+    setCost(String(costPerKm).replace(".", ","));
+    setDistance(String(maxKm).replace(".", ","));
+    setError(null);
+    setEditing(true);
+  }
+
+  async function save(request: { travelCostPerKm: number | null; maxStoreDistanceKm: number | null }) {
+    setBusy(true);
+    setError(null);
+    try {
+      onSaved(await updateHousehold(household.householdId, request));
+      setEditing(false);
+    } catch (err) {
+      setError(describeError(err, { "invalid-argument": "Custo entre 0 e 2 € por km; distância entre 1 e 50 km." }));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    const costValue = Number(cost.replace(",", "."));
+    const distanceValue = Number(distance.replace(",", "."));
+    if (!(costValue >= 0 && costValue <= 2) || !(distanceValue >= 1 && distanceValue <= 50)) {
+      setError("Custo entre 0 e 2 € por km; distância entre 1 e 50 km.");
+      return;
+    }
+    void save({ travelCostPerKm: Math.round(costValue * 1000) / 1000, maxStoreDistanceKm: Math.round(distanceValue * 10) / 10 });
+  }
+
+  return (
+    <div className="settings-row">
+      <dt>Deslocação</dt>
+      <dd>
+        {!editing ? (
+          <>
+            <span className="muted">
+              {perKmFormat.format(costPerKm)}/km · lojas até {kmFormat.format(maxKm)} km
+            </span>
+            {isAdmin && (
+              <button type="button" className="link-button settings-action" onClick={start}>
+                Mudar
+              </button>
+            )}
+          </>
+        ) : (
+          <form className="inline-form" onSubmit={handleSubmit}>
+            <label>
+              <span className="muted">€ por km</span>{" "}
+              <input type="text" inputMode="decimal" className="amount-input" value={cost} onChange={(e) => setCost(e.target.value)} />
+            </label>
+            <label>
+              <span className="muted">Até (km)</span>{" "}
+              <input type="text" inputMode="decimal" className="amount-input" value={distance} onChange={(e) => setDistance(e.target.value)} />
+            </label>
+            <button type="submit" className="button-primary" disabled={busy}>
+              Guardar
+            </button>
+            <button type="button" className="link-button" disabled={busy} onClick={() => void save({ travelCostPerKm: null, maxStoreDistanceKm: null })}>
+              Valores por omissão
+            </button>
+            <button type="button" className="link-button" onClick={() => setEditing(false)}>
+              Cancelar
+            </button>
+            {error && (
+              <span className="form-error" role="alert">
+                {error}
+              </span>
+            )}
+          </form>
+        )}
+      </dd>
+    </div>
   );
 }

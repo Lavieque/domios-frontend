@@ -3,7 +3,7 @@ const SCENES: { match: (pathname: string) => boolean; image: string; area: strin
   { match: (p) => p === "/", image: "/editorial/background.png", area: "hoje" },
   { match: (p) => p.startsWith("/despensa"), image: "/editorial/pantry.png", area: "despensa" },
   { match: (p) => p.startsWith("/plano"), image: "/editorial/scene-plano.jpg", area: "plano" },
-  { match: (p) => p.startsWith("/listas"), image: "/editorial/scene-compras.jpg", area: "compras" },
+  { match: (p) => p.startsWith("/listas") || p.startsWith("/gastos"), image: "/editorial/scene-compras.jpg", area: "compras" },
   { match: (p) => p.startsWith("/cozinhar"), image: "/editorial/scene-cozinhar.jpg", area: "cozinhar" },
   { match: (p) => p.startsWith("/receitas"), image: "/editorial/scene-receitas.jpg", area: "receitas" },
   { match: (p) => p.startsWith("/ementas"), image: "/editorial/scene-ementas.jpg", area: "ementas" },

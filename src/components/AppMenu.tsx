@@ -30,6 +30,7 @@ const kitchenLinks: MenuLink[] = [
 const priceLinks: MenuLink[] = [
   { to: "/produtos", label: "Produtos", hint: "Produtos nas lojas", icon: "M3 7 12 3l9 4v10l-9 4-9-4z M3 7l9 4 9-4m-9 4v10" },
   { to: "/promocoes", label: "Promoções", hint: "Descontos em vigor", icon: "M3 4h8l10 10-7 7L3 10z M7 8h.01" },
+  { to: "/gastos", label: "Gastos", hint: "Quanto se gastou", icon: "M4 20V10m6 10V4m6 16v-7m4 7H2" },
 ];
 
 const accountLinks: MenuLink[] = [

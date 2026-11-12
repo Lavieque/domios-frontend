@@ -28,6 +28,7 @@ import { RecipeDetailPage } from "./pages/RecipeDetailPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ShoppingListPage } from "./pages/ShoppingListPage";
 import { ShoppingListsPage } from "./pages/ShoppingListsPage";
+import { SpendingPage } from "./pages/SpendingPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/VerifyEmailPage";
 import { editorialScene, readRailCollapsed, writeRailCollapsed } from "./editorial";
@@ -134,6 +135,7 @@ function App() {
             <Route path="/cozinhar/feitas" element={<CookedRecipesPage />} />
             <Route path="/listas" element={<ShoppingListsPage />} />
             <Route path="/listas/:id" element={<ShoppingListPage />} />
+            <Route path="/gastos" element={<SpendingPage />} />
             <Route path="/casa" element={<HouseholdPage />} />
             <Route path="/casa/nova" element={<CreateHouseholdPage />} />
             <Route path="/casa/historico" element={<HouseholdHistoryPage />} />

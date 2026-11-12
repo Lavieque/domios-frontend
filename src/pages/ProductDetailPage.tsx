@@ -1,7 +1,9 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../api/client";
+import { PaidPriceSource } from "../api/shopping";
 import { addShoppingListItem } from "../api/shopping";
+import { getProductPurchases, type ProductPurchaseDto } from "../api/spending";
 import {
   MeasurementUnit,
   ProductStatus,
@@ -31,6 +33,7 @@ export function ProductDetailPage() {
   const offers = useOffers(id ?? "");
   const categories = useCategories();
   const { current } = useHouseholds();
+  const lastPaid = useLastPaid(current?.householdId ?? null, id ?? null);
 
   useEffect(() => {
     if (!id) return;
@@ -136,6 +139,8 @@ export function ProductDetailPage() {
               )}
             </p>
           )}
+
+          {lastPaid && <LastPaid purchase={lastPaid} />}
 
           {cheapest?.priceInsight && (
             <div className="article-insight">
@@ -276,5 +281,34 @@ function StoreRow({
         </div>
       </details>
     </li>
+  );
+}
+
+/** A última compra deste produto pela casa com preço; null sem casa, sem compras ou se falhar. */
+function useLastPaid(householdId: string | null, productId: string | null): ProductPurchaseDto | null {
+  const [purchase, setPurchase] = useState<ProductPurchaseDto | null>(null);
+  useEffect(() => {
+    setPurchase(null);
+    if (!householdId || !productId) return;
+    let active = true;
+    getProductPurchases(householdId, productId, 10)
+      .then((result) => active && setPurchase(result.items.find((p) => p.paidPrice?.currency === "EUR") ?? null))
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [householdId, productId]);
+  return purchase;
+}
+
+/** "Pagaste 1,29 € a 2 nov. no Continente" (DomiOS_API_Fase1.md, adenda 2026-11-09). */
+function LastPaid({ purchase }: { purchase: ProductPurchaseDto }) {
+  const where = purchase.physicalStoreName ?? purchase.chainName;
+  return (
+    <p className="muted last-paid">
+      Pagaste <strong>{money.format(purchase.paidPrice!.amount)}</strong> a {dateFormat.format(new Date(purchase.purchasedAt))}
+      {where && ` no ${where}`}
+      {purchase.paidPriceSource === PaidPriceSource.Offer && " (preço da prateleira)"}.
+    </p>
   );
 }

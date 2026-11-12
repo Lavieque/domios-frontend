@@ -15,6 +15,10 @@ import {
   reopenShoppingList,
   reorderShoppingListItems,
   setItemPurchased,
+  setShoppingListItemPaidPrice,
+  setShoppingListItemStore,
+  setShoppingListStore,
+  PaidPriceSource,
   ShoppingListStatus,
   storeShoppingListInPantry,
   shoppingListStatusLabels,
@@ -28,10 +32,11 @@ import {
   type StoreInPantryResultDto,
 } from "../api/shopping";
 import { PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
-import { MeasurementUnit, measurementUnitLabels } from "../api/types";
+import { MeasurementUnit, measurementUnitLabels, type ChainDto } from "../api/types";
 import { describeError } from "../auth/errors";
 import { aisleClass, aisleOf } from "../catalog/aisles";
 import { useCategories } from "../catalog/useCategories";
+import { useActiveChains } from "../catalog/useChains";
 import { ChainLogo } from "../components/ChainLogo";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useProducts } from "../pantry/useProducts";
@@ -67,6 +72,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     ...[...packaging.values()].map((p) => p.productId),
   ]);
   const categories = useCategories();
+  const chains = useActiveChains();
 
   useEffect(() => {
     let cancelled = false;
@@ -187,6 +193,13 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
             )}{" "}
             {pending.length} por comprar de {list.items.length} · {household.name}
           </p>
+          {list.status !== ShoppingListStatus.Cancelled && (
+            <ListStore
+              chains={chains}
+              chainId={list.chainId ?? null}
+              onChange={(chainId) => act(() => setShoppingListStore(householdId, listId, chainId))}
+            />
+          )}
         </div>
       </header>
 
@@ -256,7 +269,32 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
               {purchased.length > 0 && (
                 <>
                   <h2>Comprados ({purchased.length})</h2>
-                  <ItemList items={purchased} open={open} packaging={packaging} thumbs={thumbs} onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))} onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))} />
+                  <PurchasedTotal items={purchased} />
+                  <ItemList
+                    items={purchased}
+                    open={open}
+                    packaging={packaging}
+                    thumbs={thumbs}
+                    onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))}
+                    onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
+                    pricing={
+                      list.status === ShoppingListStatus.Cancelled
+                        ? undefined
+                        : {
+                            chains,
+                            listChainId: list.chainId ?? null,
+                            onSave: (item, amount, chainId) =>
+                              act(async () => {
+                                if (chainId !== (item.chainId ?? null)) {
+                                  await setShoppingListItemStore(householdId, listId, item.shoppingListItemId, chainId);
+                                }
+                                if (amount !== undefined) {
+                                  await setShoppingListItemPaidPrice(householdId, listId, item.shoppingListItemId, amount);
+                                }
+                              }),
+                          }
+                    }
+                  />
                 </>
               )}
             </>
@@ -607,6 +645,7 @@ function ItemList({
   onToggle,
   onDelete,
   onLink,
+  pricing,
 }: {
   items: ShoppingListItemDto[];
   open: boolean;
@@ -617,6 +656,8 @@ function ItemList({
   onToggle: (item: ShoppingListItemDto) => void;
   onDelete: (item: ShoppingListItemDto) => void;
   onLink?: (item: ShoppingListItemDto, pick: CatalogPick) => void;
+  /** Só nas compradas: preço pago e loja da linha. */
+  pricing?: PricingProps;
 }) {
   const [linking, setLinking] = useState<string | null>(null);
   const withThumbs = thumbs !== undefined && items.some((item) => thumbs.has(item.shoppingListItemId));
@@ -653,6 +694,7 @@ function ItemList({
             </span>
           )}
           {item.storedInPantryAt && <span className="pill pill-muted">Na despensa</span>}
+          {pricing && item.isPurchased && <PaidPrice item={item} {...pricing} />}
           {open && onLink && !item.isPurchased && !item.productId && !item.ingredientId && (
             <button
               type="button"
@@ -689,6 +731,163 @@ function ItemList({
         </li>
       ))}
     </ul>
+  );
+}
+
+interface PricingProps {
+  chains: ChainDto[] | null;
+  listChainId: string | null;
+  /** `amount`: undefined não mexe no preço; null volta ao da prateleira. `chainId`: null segue a lista. */
+  onSave: (item: ShoppingListItemDto, amount: number | null | undefined, chainId: string | null) => Promise<void>;
+}
+
+/** Onde se fez (ou se vai fazer) a compra: dá o preço da prateleira às linhas compradas. */
+function ListStore({ chains, chainId, onChange }: { chains: ChainDto[] | null; chainId: string | null; onChange: (chainId: string | null) => void }) {
+  if (!chains) return null;
+  return (
+    <label className="list-store">
+      <span className="muted">Compras no</span>
+      <select className="category-select" value={chainId ?? ""} onChange={(e) => onChange(e.target.value || null)}>
+        <option value="">Loja por escolher</option>
+        {chains.map((chain) => (
+          <option key={chain.chainId} value={chain.chainId}>
+            {chain.name}
+          </option>
+        ))}
+        {/* A cadeia guardada pode ter fechado entretanto: mostra-se na mesma. */}
+        {chainId && !chains.some((c) => c.chainId === chainId) && <option value={chainId}>Loja fechada</option>}
+      </select>
+    </label>
+  );
+}
+
+/** Soma do que já se pagou nesta lista, com a parte estimada pela prateleira à parte. */
+function PurchasedTotal({ items }: { items: ShoppingListItemDto[] }) {
+  const priced = items.filter((item) => item.paidPrice?.currency === "EUR");
+  if (priced.length === 0) return null;
+  const total = priced.reduce((sum, item) => sum + item.paidPrice!.amount, 0);
+  const estimated = priced
+    .filter((item) => item.paidPriceSource === PaidPriceSource.Offer)
+    .reduce((sum, item) => sum + item.paidPrice!.amount, 0);
+  const missing = items.length - priced.length;
+  return (
+    <p className="muted purchased-total">
+      Pago: <strong className="price-tag">{money.format(total)}</strong>
+      {estimated > 0 && ` · ${money.format(estimated)} pelo preço da prateleira`}
+      {missing > 0 && ` · ${missing === 1 ? "1 item sem preço" : `${missing} itens sem preço`}`}
+    </p>
+  );
+}
+
+/** Preço de uma linha comprada: o escrito, o da prateleira, ou nenhum; abre um formulário curto. */
+function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListItemDto } & PricingProps) {
+  const [editing, setEditing] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [chainId, setChainId] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const typed = item.paidPriceSource === PaidPriceSource.Typed;
+  const chainName = (id: string | null | undefined) => chains?.find((c) => c.chainId === id)?.name ?? null;
+  const ownChain = item.chainId ? chainName(item.chainId) : null;
+
+  function start() {
+    setAmount(typed && item.paidPrice ? String(item.paidPrice.amount).replace(".", ",") : "");
+    setChainId(item.chainId ?? "");
+    setError(null);
+    setEditing(true);
+  }
+
+  async function save(nextAmount: number | null | undefined) {
+    setSaving(true);
+    try {
+      await onSave(item, nextAmount, chainId || null);
+      setEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    const text = amount.trim();
+    if (text === "") {
+      // Sem valor: só a loja muda; o preço escrito, se havia, fica.
+      void save(undefined);
+      return;
+    }
+    const value = Number(text.replace(",", "."));
+    if (!Number.isFinite(value) || value < 0 || value > 10000) {
+      setError("Escreve um valor entre 0 e 10 000 €.");
+      return;
+    }
+    void save(Math.round(value * 100) / 100);
+  }
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        className="link-button paid-price"
+        title={typed ? "Preço escrito por ti" : item.paidPrice ? "Preço da prateleira no dia da compra" : "Escrever quanto pagaste"}
+        onClick={start}
+      >
+        {item.paidPrice ? (
+          <>
+            <span className="price-tag">{money.format(item.paidPrice.amount)}</span>
+            {!typed && <span className="muted"> prateleira</span>}
+          </>
+        ) : (
+          "Quanto pagaste?"
+        )}
+        {ownChain && <span className="muted"> · {ownChain}</span>}
+      </button>
+    );
+  }
+
+  const listChain = chainName(listChainId);
+  return (
+    <form className="inline-form paid-price-form" onSubmit={submit}>
+      <label>
+        <span className="muted">Pago (total da linha)</span>{" "}
+        <input
+          type="text"
+          inputMode="decimal"
+          className="amount-input"
+          placeholder={item.paidPrice && !typed ? String(item.paidPrice.amount).replace(".", ",") : "0,00"}
+          aria-label={`Quanto pagaste por ${item.label}, em euros`}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          autoFocus
+        />{" "}
+        €
+      </label>
+      {chains && (
+        <select className="category-select" aria-label="Loja desta linha" value={chainId} onChange={(e) => setChainId(e.target.value)}>
+          <option value="">{listChain ? `Como a lista (${listChain})` : "Como a lista"}</option>
+          {chains.map((chain) => (
+            <option key={chain.chainId} value={chain.chainId}>
+              {chain.name}
+            </option>
+          ))}
+        </select>
+      )}
+      <button type="submit" className="button-primary" disabled={saving}>
+        {saving ? "A guardar…" : "Guardar"}
+      </button>
+      {typed && (
+        <button type="button" className="link-button" disabled={saving} onClick={() => void save(null)} title="Apaga o valor escrito">
+          Usar preço da prateleira
+        </button>
+      )}
+      <button type="button" className="link-button" onClick={() => setEditing(false)}>
+        Cancelar
+      </button>
+      {error && (
+        <span className="form-error" role="alert">
+          {error}
+        </span>
+      )}
+    </form>
   );
 }
 

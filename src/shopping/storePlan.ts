@@ -1,4 +1,4 @@
-import type { StoreComparisonDto } from "../api/shopping";
+import type { SetShoppingPlanRequest, StoreComparisonDto } from "../api/shopping";
 
 /** Onde se vai comprar: a cadeia e, com a deslocação contada, a loja física mais perto dela. */
 export interface StoreChoice {
@@ -6,10 +6,11 @@ export interface StoreChoice {
   physicalStoreId: string | null;
 }
 
-/** A loja da lista e a exceção de cada item por comprar (null segue a lista). */
+/** A loja da lista, a exceção de cada item por comprar (null segue a lista) e a deslocação que a comparação deu. */
 export interface StorePlan {
   list: StoreChoice;
   items: { itemId: string; choice: StoreChoice | null }[];
+  travelCost: number | null;
 }
 
 const travelIncluded = (comparison: StoreComparisonDto) => comparison.travel?.status === "Included";
@@ -27,7 +28,8 @@ export function choiceForStore(comparison: StoreComparisonDto, storeId: string):
 export function planForStore(comparison: StoreComparisonDto, storeId: string, pendingItemIds: string[]): StorePlan | null {
   const list = choiceForStore(comparison, storeId);
   if (!list) return null;
-  return { list, items: pendingItemIds.map((itemId) => ({ itemId, choice: null })) };
+  const travelCost = travelIncluded(comparison) ? (comparison.stores.find((s) => s.storeId === storeId)?.travelCost ?? null) : null;
+  return { list, items: pendingItemIds.map((itemId) => ({ itemId, choice: null })), travelCost };
 }
 
 /** A divisão que o ecrã mostra: com a deslocação contada, a que a conta (se divide mesmo); senão a da Api sem ela. */
@@ -59,8 +61,15 @@ export function planFromSplit(comparison: StoreComparisonDto, pendingItemIds: st
 
   const list = choiceForStore(comparison, main);
   if (!list) return null;
+  const mainStore = main;
+  const travelCost = !travelIncluded(comparison)
+    ? null
+    : split === comparison.splitWithTravel
+      ? comparison.splitWithTravel.travelCost
+      : (comparison.stores.find((s) => s.storeId === mainStore)?.travelCost ?? null);
   return {
     list,
+    travelCost,
     items: pendingItemIds.map((itemId) => {
       const storeId = storeOf.get(itemId);
       return { itemId, choice: storeId && storeId !== main ? choiceForStore(comparison, storeId) : null };
@@ -68,9 +77,11 @@ export function planFromSplit(comparison: StoreComparisonDto, pendingItemIds: st
   };
 }
 
-/** Nomes das lojas físicas que a comparação trouxe, para mostrar a escolhida na lista. */
-export function physicalStoreNames(comparison: StoreComparisonDto): Map<string, string> {
-  const names = new Map<string, string>();
-  for (const store of comparison.stores) if (store.nearestStore) names.set(store.nearestStore.physicalStoreId, store.nearestStore.name);
-  return names;
+/** O corpo de `PUT .../plan`: só as linhas que vão para outra loja. */
+export function toPlanRequest(plan: StorePlan): SetShoppingPlanRequest {
+  return {
+    list: plan.list,
+    items: plan.items.flatMap(({ itemId, choice }) => (choice ? [{ itemId, chainId: choice.chainId, physicalStoreId: choice.physicalStoreId }] : [])),
+    travelCost: plan.travelCost,
+  };
 }

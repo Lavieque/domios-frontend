@@ -18,12 +18,14 @@ import {
   setShoppingListItemPaidPrice,
   setShoppingListItemStore,
   setShoppingListStore,
+  setShoppingPlan,
   PaidPriceSource,
   ShoppingListStatus,
   storeShoppingListInPantry,
   shoppingListStatusLabels,
   UnpricedItemReason,
   type ShoppingListDto,
+  type ShoppingPlanDto,
   type ShoppingItemPackagingDto,
   type ShoppingListItemDto,
   type StoreComparisonDto,
@@ -44,7 +46,7 @@ import { useProducts } from "../pantry/useProducts";
 import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/groups";
 import { moveItem, withPendingOrder } from "../shopping/order";
 import { rankStores } from "../shopping/storeRanking";
-import { physicalStoreNames, planForStore, planFromSplit, type StorePlan } from "../shopping/storePlan";
+import { planForStore, planFromSplit, toPlanRequest, type StorePlan } from "../shopping/storePlan";
 import { LinkPicker, SuggestionList, useCatalogSuggestions, type CatalogPick } from "../shopping/CatalogSuggestions";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
@@ -69,8 +71,6 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   const [withTravel, setWithTravel] = useState(false);
   // Aviso antes de comparar: linhas escritas à mão que ainda não estão ligadas a um produto.
   const [checkingLinks, setCheckingLinks] = useState(false);
-  // Nomes das lojas físicas vistas na comparação: a lista só guarda o id. Fica só em memória.
-  const [storeNames, setStoreNames] = useState<Map<string, string>>(new Map());
   const [packaging, setPackaging] = useState<Map<string, ShoppingItemPackagingDto>>(new Map());
   // Modo "Ordenar": ids dos itens por comprar pela ordem que se está a montar; null fora do modo.
   const [draftOrder, setDraftOrder] = useState<string[] | null>(null);
@@ -163,28 +163,11 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   }
 
   /**
-   * Grava a escolha feita na comparação: a loja da lista e a exceção de cada item por comprar.
-   * Se a loja da lista muda, as compradas que a seguiam ficam presas à loja onde já foram compradas.
+   * Grava o plano escolhido na comparação (adenda 2026-11-12): a loja da lista, as linhas por comprar
+   * noutra loja e o preço planeado de cada uma, que a Api calcula. As compradas não mudam.
    */
-  function choosePlan(current: ShoppingListDto, from: StoreComparisonDto, plan: StorePlan) {
-    setStoreNames((names) => new Map([...names, ...physicalStoreNames(from)]));
-    void act(async () => {
-      const listMoves = current.chainId !== plan.list.chainId || (current.physicalStoreId ?? null) !== plan.list.physicalStoreId;
-      if (current.chainId && listMoves) {
-        for (const item of current.items) {
-          if (item.isPurchased && !item.chainId) {
-            await setShoppingListItemStore(householdId, listId, item.shoppingListItemId, current.chainId, current.physicalStoreId ?? null);
-          }
-        }
-      }
-      if (listMoves) await setShoppingListStore(householdId, listId, plan.list.chainId, plan.list.physicalStoreId);
-      for (const { itemId, choice } of plan.items) {
-        const item = current.items.find((i) => i.shoppingListItemId === itemId);
-        if (!item) continue;
-        const same = (item.chainId ?? null) === (choice?.chainId ?? null) && (item.physicalStoreId ?? null) === (choice?.physicalStoreId ?? null);
-        if (!same) await setShoppingListItemStore(householdId, listId, itemId, choice?.chainId ?? null, choice?.physicalStoreId ?? null);
-      }
-    });
+  function choosePlan(plan: StorePlan) {
+    void act(() => setShoppingPlan(householdId, listId, toPlanRequest(plan)));
   }
 
   if (!list) {
@@ -215,17 +198,16 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     if (imageUrl) thumbs.set(item.shoppingListItemId, imageUrl);
   }
   const notInPantry = purchased.filter((item) => !item.storedInPantryAt);
-  // Onde se planeou comprar: "Lidl", ou "Lidl · Lidl Matosinhos" se a loja física foi vista na comparação.
-  const storeLabel = (chainId: string | null | undefined, physicalStoreId: string | null | undefined) => {
+  // Onde se compra: "Lidl", ou "Lidl · Lidl Matosinhos" com a loja física.
+  const storeLabel = (chainId: string | null | undefined, physicalStoreName: string | null | undefined) => {
     if (!chainId || !chains) return null;
     const name = chains.find((c) => c.chainId === chainId)?.name ?? "Loja fechada";
-    const place = physicalStoreId ? storeNames.get(physicalStoreId) : undefined;
-    return place ? `${name} · ${place}` : name;
+    return physicalStoreName ? `${name} · ${physicalStoreName}` : name;
   };
-  // Por comprar com exceção: a loja planeada para a linha, diferente da da lista.
+  // Por comprar com exceção: a loja da linha, diferente da da lista.
   const plannedElsewhere = new Map<string, string>();
   for (const item of pending) {
-    const label = item.chainId ? storeLabel(item.chainId, item.physicalStoreId) : null;
+    const label = item.chainId ? storeLabel(item.chainId, item.physicalStoreName) : null;
     if (label) plannedElsewhere.set(item.shoppingListItemId, label);
   }
 
@@ -250,7 +232,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
             <ListStore
               chains={chains}
               chainId={list.chainId ?? null}
-              place={list.physicalStoreId ? (storeNames.get(list.physicalStoreId) ?? null) : null}
+              place={list.physicalStoreName ?? null}
               elsewhere={plannedElsewhere.size}
               onChange={(chainId) => act(() => setShoppingListStore(householdId, listId, chainId))}
             />
@@ -317,7 +299,11 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                   planned={plannedElsewhere}
                   packaging={packaging}
                   thumbs={thumbs}
+                  chains={chains}
                   onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true))}
+                  onBuyElsewhere={(item, chainId) =>
+                    act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, true, { chainId, physicalStoreId: null }))
+                  }
                   onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
                   onLink={link}
                 />
@@ -326,11 +312,13 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                 <>
                   <h2>Comprados ({purchased.length})</h2>
                   <PurchasedTotal items={purchased} />
+                  {list.plan && <PlanSummary plan={list.plan} />}
                   <ItemList
                     items={purchased}
                     open={open}
                     packaging={packaging}
                     thumbs={thumbs}
+                    chains={chains}
                     onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))}
                     onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
                     pricing={
@@ -424,7 +412,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                           pendingIds: pending.map((item) => item.shoppingListItemId),
                           listChainId: list.chainId ?? null,
                           hasExceptions: plannedElsewhere.size > 0,
-                          onChoose: (plan) => choosePlan(list, comparison, plan),
+                          onChoose: choosePlan,
                         }
                       : null
                   }
@@ -697,7 +685,9 @@ function PendingItems({
   planned: Map<string, string>;
   packaging: Map<string, ShoppingItemPackagingDto>;
   thumbs: Map<string, string>;
+  chains: ChainDto[] | null;
   onToggle: (item: ShoppingListItemDto) => void;
+  onBuyElsewhere: (item: ShoppingListItemDto, chainId: string) => void;
   onDelete: (item: ShoppingListItemDto) => void;
   onLink: (item: ShoppingListItemDto, pick: CatalogPick) => void;
 }) {
@@ -724,7 +714,9 @@ function ItemList({
   planned,
   packaging,
   thumbs,
+  chains,
   onToggle,
+  onBuyElsewhere,
   onDelete,
   onLink,
   pricing,
@@ -737,7 +729,10 @@ function ItemList({
   packaging?: Map<string, ShoppingItemPackagingDto>;
   /** Imagem por linha; sem nenhuma nesta lista, não se reserva o espaço. */
   thumbs?: Map<string, string>;
+  chains?: ChainDto[] | null;
   onToggle: (item: ShoppingListItemDto) => void;
+  /** Por comprar com plano: "Comprei noutro sítio". */
+  onBuyElsewhere?: (item: ShoppingListItemDto, chainId: string) => void;
   onDelete: (item: ShoppingListItemDto) => void;
   onLink?: (item: ShoppingListItemDto, pick: CatalogPick) => void;
   /** Só nas compradas: preço pago e loja da linha. */
@@ -782,6 +777,14 @@ function ItemList({
             <span className="pill pill-muted" title="Planeado comprar nesta loja, não na da lista">
               no {planned.get(item.shoppingListItemId)}
             </span>
+          )}
+          {item.isPurchased && item.followedPlan === false && (
+            <span className="pill pill-muted" title="Comprado noutra loja que não a do plano">
+              planeado no {chains?.find((c) => c.chainId === item.plannedChainId)?.name ?? "outra loja"}
+            </span>
+          )}
+          {open && !item.isPurchased && item.plannedChainId && onBuyElsewhere && chains && (
+            <BuyElsewhere item={item} chains={chains} onPick={(chainId) => onBuyElsewhere(item, chainId)} />
           )}
           {pricing && item.isPurchased && <PaidPrice item={item} {...pricing} />}
           {open && onLink && !item.isPurchased && !item.productId && !item.ingredientId && (
@@ -863,6 +866,59 @@ function ListStore({
       {place && <span className="muted">{place}</span>}
       {elsewhere > 0 && <span className="muted">· {elsewhere === 1 ? "1 item noutra loja" : `${elsewhere} itens noutra loja`}</span>}
     </label>
+  );
+}
+
+/** "Comprei noutro sítio": pica a linha como comprada noutra cadeia; o plano fica como estava. */
+function BuyElsewhere({ item, chains, onPick }: { item: ShoppingListItemDto; chains: ChainDto[]; onPick: (chainId: string) => void }) {
+  const [picking, setPicking] = useState(false);
+  if (!picking) {
+    return (
+      <button type="button" className="link-button list-row-link" onClick={() => setPicking(true)}>
+        Comprei noutro sítio
+      </button>
+    );
+  }
+  return (
+    <select
+      className="category-select"
+      aria-label={`Onde compraste ${item.label}`}
+      autoFocus
+      value=""
+      onBlur={() => setPicking(false)}
+      onChange={(e) => {
+        setPicking(false);
+        if (e.target.value) onPick(e.target.value);
+      }}
+    >
+      <option value="">Onde compraste?</option>
+      {chains
+        .filter((chain) => chain.chainId !== item.effectiveChainId)
+        .map((chain) => (
+          <option key={chain.chainId} value={chain.chainId}>
+            {chain.name}
+          </option>
+        ))}
+    </select>
+  );
+}
+
+/** Como a compra correu contra o plano: os totais só das linhas com os dois preços. */
+function PlanSummary({ plan }: { plan: ShoppingPlanDto }) {
+  const bought = plan.boughtAsPlanned + plan.boughtElsewhere;
+  if (bought === 0) return null;
+  const place = [plan.chainName, plan.physicalStoreName].filter(Boolean).join(" · ");
+  return (
+    <p className="muted purchased-total">
+      Plano{place && ` (${place})`}
+      {plan.plannedTotal > 0 && (
+        <>
+          : planeado {money.format(plan.plannedTotal)}, pago <strong className="price-tag">{money.format(plan.paidTotal)}</strong>
+        </>
+      )}
+      {plan.boughtElsewhere > 0 && ` · ${plan.boughtElsewhere === 1 ? "1 item comprado noutra loja" : `${plan.boughtElsewhere} itens comprados noutra loja`}`}
+      {plan.outsidePlan > 0 && ` · ${plan.outsidePlan === 1 ? "1 item fora do plano" : `${plan.outsidePlan} itens fora do plano`}`}
+    </p>
   );
 }
 

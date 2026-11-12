@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { StoreComparisonDto, StoreComparisonStoreDto } from "../api/shopping";
-import { planForStore, planFromSplit } from "./storePlan";
+import { planForStore, planFromSplit, toPlanRequest } from "./storePlan";
 
 function store(storeId: string, chainId: string, physicalStoreId: string | null): StoreComparisonStoreDto {
   return {
@@ -14,6 +14,7 @@ function store(storeId: string, chainId: string, physicalStoreId: string | null)
     missingItemIds: [],
     items: [],
     nearestStore: physicalStoreId ? { physicalStoreId, name: physicalStoreId, address: null, roadKm: 1, roundTripKm: 2, openingHours: null } : null,
+    travelCost: physicalStoreId ? 0.6 : null,
   };
 }
 
@@ -65,11 +66,14 @@ describe("plano de compra a partir da comparação", () => {
         { itemId: "a", choice: null },
         { itemId: "b", choice: null },
       ],
+      travelCost: null,
     });
   });
 
-  it("com a deslocação contada, guarda a loja física mais perto", () => {
-    expect(planForStore(comparison(true), "s-lidl", [])?.list).toEqual({ chainId: "lidl", physicalStoreId: "lidl-perto" });
+  it("com a deslocação contada, guarda a loja física mais perto e a ida à loja", () => {
+    const plan = planForStore(comparison(true), "s-lidl", []);
+    expect(plan?.list).toEqual({ chainId: "lidl", physicalStoreId: "lidl-perto" });
+    expect(plan?.travelCost).toBe(0.6);
   });
 
   it("na divisão, a lista fica na loja com mais itens e os outros ganham exceção; sem preço segue a lista", () => {
@@ -81,6 +85,7 @@ describe("plano de compra a partir da comparação", () => {
         { itemId: "c", choice: null },
         { itemId: "d", choice: null },
       ],
+      travelCost: null,
     });
   });
 
@@ -92,6 +97,15 @@ describe("plano de compra a partir da comparação", () => {
         { itemId: "b", choice: null },
         { itemId: "c", choice: { chainId: "continente", physicalStoreId: "cont-perto" } },
       ],
+      travelCost: 1,
+    });
+  });
+
+  it("o pedido leva só as linhas que vão para outra loja", () => {
+    expect(toPlanRequest(planFromSplit(comparison(true), ["a", "b", "c"])!)).toEqual({
+      list: { chainId: "lidl", physicalStoreId: "lidl-perto" },
+      items: [{ itemId: "c", chainId: "continente", physicalStoreId: "cont-perto" }],
+      travelCost: 1,
     });
   });
 });

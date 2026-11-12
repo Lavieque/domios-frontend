@@ -33,13 +33,19 @@ function Readiness({ recipe }: { recipe: CookableRecipeDto }) {
     );
   }
   const missing = recipe.missingIngredients.length;
+  const names = recipe.missingIngredients.map((i) => i.name).join(", ");
   return (
     <span className="readiness readiness-compact">
       <span className="readiness-dot" aria-hidden="true" />
       <span>
-        <strong>{missing > 0 ? `Falta ${missing}` : "Falta algo"}</strong>
-        {missing > 0 && <>: {recipe.missingIngredients.map((i) => i.name).join(", ")}</>}
+        <strong>{missing > 0 ? `Falta ${missing}` : "Falta algo"}</strong> · {counts}
       </span>
+      {/* A lista inteira fica no título; no cartão corta ao fim de poucas linhas. */}
+      {missing > 0 && (
+        <span className="readiness-list" title={names}>
+          {names}
+        </span>
+      )}
     </span>
   );
 }

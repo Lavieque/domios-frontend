@@ -14,6 +14,10 @@ export interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   params?: QueryParams;
   body?: unknown;
+  /** Corpo binário (ex. uma imagem), enviado tal como está com o tipo do próprio Blob. */
+  blob?: Blob;
+  /** "blob" devolve o corpo da resposta como Blob em vez de JSON. */
+  responseType?: "json" | "blob";
   accessToken?: string;
 }
 
@@ -45,17 +49,22 @@ export function buildUrl(path: string, params: QueryParams = {}): URL {
 export async function send<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const url = buildUrl(path, options.params);
   const headers: Record<string, string> = {};
-  if (options.body !== undefined) headers["Content-Type"] = "application/json";
+  if (options.blob) headers["Content-Type"] = options.blob.type;
+  else if (options.body !== undefined) headers["Content-Type"] = "application/json";
   if (options.accessToken) headers["Authorization"] = `Bearer ${options.accessToken}`;
 
   const response = await fetch(url, {
     method: options.method ?? "GET",
     headers,
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    body: options.blob ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
   });
 
   if (!response.ok) {
     throw await toApiError(response, url);
+  }
+
+  if (options.responseType === "blob") {
+    return (await response.blob()) as T;
   }
 
   // 204 (logout, reset, verify) não tem corpo.

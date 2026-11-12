@@ -2003,3 +2003,75 @@
   padding-top: 4px;
   font-weight: 600;
 }
+
+/* ---------- Avatar do utilizador ---------- */
+
+.editorial .bar-avatar.has-photo,
+.editorial .profile-avatar.has-photo {
+  overflow: hidden;
+  padding: 0;
+}
+
+.editorial :is(.bar-avatar, .profile-avatar) img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Largura fixa: o texto ao lado não salta quando aparece "Remover". */
+.editorial .avatar-picker {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 10.5rem;
+}
+
+/* Na conta o avatar é maior e é ele próprio o botão para mudar a fotografia. */
+.editorial .avatar-picker .profile-avatar {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  min-height: 0;
+  border: 2px solid rgb(248 245 223 / 0.5);
+  font-size: 32px;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.editorial .avatar-picker .profile-avatar:focus-visible {
+  outline: 2px solid #f6f1df;
+  outline-offset: 3px;
+}
+
+.editorial .avatar-picker-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #1f3b2c;
+  border-radius: 50%;
+  background: #f6f1df;
+  color: #1f3b2c;
+}
+
+.editorial .avatar-picker-badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.editorial .avatar-picker-actions {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.editorial .avatar-picker .form-error {
+  max-width: 14rem;
+  margin: 0;
+  font-size: 12px;
+  text-align: center;
+}

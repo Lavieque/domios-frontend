@@ -63,8 +63,8 @@ export interface MoneyDto {
 
 /** Escrito pelo membro, ou o preço da prateleira na data da compra. */
 export const PaidPriceSource = {
-  Typed: 0,
-  Offer: 1,
+  Typed: "Typed",
+  Offer: "Offer",
 } as const;
 export type PaidPriceSource = (typeof PaidPriceSource)[keyof typeof PaidPriceSource];
 

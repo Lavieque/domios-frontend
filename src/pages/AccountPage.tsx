@@ -4,6 +4,7 @@ import { memberRoleLabels } from "../api/households";
 import { signOut, signOutEverywhere } from "../auth/actions";
 import { describeError } from "../auth/errors";
 import { useSession } from "../auth/useSession";
+import { AvatarPicker } from "../components/AvatarPicker";
 import { EmailVerificationNotice } from "../components/EmailVerificationNotice";
 import { useHouseholds } from "../household/useHouseholds";
 
@@ -52,9 +53,7 @@ export function AccountPage() {
       {notice && <p className="notice">{notice}</p>}
 
       <section className="panel profile-card">
-        <span className="profile-avatar" aria-hidden="true">
-          {session.email.charAt(0).toUpperCase()}
-        </span>
+        <AvatarPicker userId={session.userId} email={session.email} />
         <div>
           <h2>{session.email}</h2>
           <p className="muted">

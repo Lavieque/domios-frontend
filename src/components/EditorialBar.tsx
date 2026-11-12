@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAvatar } from "../auth/useAvatar";
 import { useSession } from "../auth/useSession";
 import { useHouseholds } from "../household/useHouseholds";
 
@@ -15,6 +16,7 @@ export function EditorialBar({
 }) {
   const navigate = useNavigate();
   const session = useSession();
+  const avatar = useAvatar();
   const { current } = useHouseholds();
   const [query, setQuery] = useState("");
 
@@ -60,8 +62,8 @@ export function EditorialBar({
         </svg>
         {current?.name ?? "A minha casa"}
       </Link>
-      <Link to="/conta" className="bar-avatar" aria-label="Conta">
-        {(session?.email ?? "?").charAt(0).toUpperCase()}
+      <Link to="/conta" className={`bar-avatar${avatar ? " has-photo" : ""}`} aria-label="Conta">
+        {avatar ? <img src={avatar} alt="" /> : (session?.email ?? "?").charAt(0).toUpperCase()}
       </Link>
     </header>
   );

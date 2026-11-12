@@ -1922,3 +1922,69 @@
   background: #874a35;
   color: #fffdf3;
 }
+
+/* ---------- Cozinhar: cartões de receita compactos ---------- */
+
+.editorial .recipe-row-text {
+  gap: 8px;
+}
+
+/* Estado numa linha (ponto, "Falta 8 · 3 de 11 em casa"); o que falta por baixo, a toda a largura. */
+.editorial .recipe-row .readiness-compact {
+  grid-template-columns: 10px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.editorial .recipe-row .readiness-compact .readiness-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.editorial .recipe-row .readiness-list {
+  grid-column: 1 / -1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #dfe3d2;
+}
+
+.editorial .recipe-row .recipe-row-expiring {
+  grid-template-columns: 10px minmax(0, 1fr);
+  column-gap: 8px;
+  font-size: 12.5px;
+}
+
+.editorial .recipe-row .recipe-row-expiring .urgency-dot {
+  width: 8px;
+  height: 8px;
+}
+
+/* Numa só coluna não há fila para igualar: cada cartão fica com a sua altura. */
+@media (max-width: 640px) {
+  .editorial .recipe-rows {
+    grid-auto-rows: auto;
+  }
+}
+
+.editorial .recipe-row .recipe-row-expiring > span:last-child {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/* "No plano" encostado ao fundo, alinhado entre cartões da mesma fila. */
+.editorial .recipe-row:has(.readiness) .recipe-row-meta {
+  margin-top: auto;
+  padding-top: 4px;
+  font-weight: 600;
+}

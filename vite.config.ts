@@ -11,5 +11,6 @@ export default defineConfig({
   test: {
     // Os testes nunca falam com uma Api real: o fetch é sempre substituído.
     env: { VITE_API_BASE_URL: 'http://api.test/api/v1' },
+    setupFiles: ['./src/test/setup.ts'],
   },
 })

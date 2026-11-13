@@ -36,4 +36,20 @@ describe("describePurchase", () => {
   it("itens antigos sem os campos novos", () => {
     expect(describePurchase({ purchasedPrice: null }, chains)).toBeNull();
   });
+
+  it("loja física com o nome da cadeia", () => {
+    const text = describePurchase(
+      { purchasedPrice: null, purchasedChainId: "c1", purchasedPhysicalStoreName: "Continente Bom Dia Benfica" },
+      chains,
+    );
+    expect(text).toBe("Comprado em Continente Bom Dia Benfica");
+  });
+
+  it("loja física sem o nome da cadeia", () => {
+    const text = describePurchase(
+      { purchasedPrice: { amount: 1.29, currency: "EUR" }, purchasedChainId: "c1", purchasedPhysicalStoreName: "Loja Telheiras" },
+      chains,
+    );
+    expect(plain(text)).toBe("Comprado no Continente (Loja Telheiras) · 1,29 €");
+  });
 });

@@ -55,6 +55,14 @@ export function getProduct(productId: string): Promise<ProductDto> {
   return get<ProductDto>(`/products/${productId}`);
 }
 
+/** No máximo `MAX_BATCH_PRODUCT_IDS` ids por pedido; os desconhecidos ficam de fora da resposta. */
+export const MAX_BATCH_PRODUCT_IDS = 100;
+
+/** Vários produtos num só pedido (`GET /products/batch?ids=`), pela ordem pedida. */
+export function getProductsBatch(productIds: string[]): Promise<ProductDto[]> {
+  return get<ProductDto[]>("/products/batch", { ids: productIds.join(",") });
+}
+
 export function getProductStoreOffers(productId: string): Promise<ProductStoreOfferDto[]> {
   return get<ProductStoreOfferDto[]>(`/products/${productId}/store-offers`);
 }

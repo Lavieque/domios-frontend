@@ -1424,6 +1424,70 @@
   text-shadow: none;
 }
 
+/* Ementas: a foto do prato no cimo de cada refeição, para se reconhecer de relance.
+   Sem foto (ou enquanto carrega) fica um prato desenhado no mesmo lugar. */
+.editorial .week-meal-photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  aspect-ratio: 16 / 10;
+  margin: -2px -2px 4px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgb(228 235 211 / 0.08);
+  color: rgb(240 241 229 / 0.38);
+}
+
+.editorial .week-meal-photo-empty {
+  width: 30%;
+  max-width: 34px;
+  height: auto;
+}
+
+.editorial .week-meal-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.editorial .week-meal-photo[data-state="loaded"] img {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial .week-meal-photo img {
+    transition: none;
+  }
+}
+
+/* No telemóvel os dias são linhas: a foto passa a miniatura à esquerda do texto. */
+@media (max-width: 899px) {
+  .app.editorial .week-meal.has-photo {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-auto-rows: min-content;
+    column-gap: 12px;
+    row-gap: 2px;
+  }
+
+  .app.editorial .week-meal.has-photo > :not(.week-meal-photo) {
+    grid-column: 2;
+  }
+
+  .app.editorial .week-meal-photo {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    align-self: start;
+    aspect-ratio: 1;
+    margin: 0;
+  }
+}
+
 /* ---------- Comparação de lojas (lista de compras) ---------- */
 
 .editorial .chain-logo {

@@ -1416,6 +1416,11 @@
   align-items: stretch;
 }
 
+/* Com uma lista aberta, só esse cartão cresce: o outro fica do tamanho do que tem. */
+.editorial .week-side.is-expanded {
+  align-items: start;
+}
+
 .editorial .week-day-date {
   background: rgb(12 40 29 / 0.18);
 }

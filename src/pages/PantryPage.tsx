@@ -20,12 +20,14 @@ import {
 } from "../api/pantry";
 import { lookupBarcode, type BarcodeLookupResult } from "../api/barcodes";
 import { ApiError } from "../api/http";
-import { measurementUnitLabels, type ProductDto } from "../api/types";
+import { measurementUnitLabels, type ChainDto, type ProductDto } from "../api/types";
 import { describeError } from "../auth/errors";
 import { BarcodeScanner } from "../components/BarcodeScanner";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { AisleSign } from "../components/AisleSign";
+import { useActiveChains } from "../catalog/useChains";
+import { describePurchase } from "../pantry/purchase";
 import { urgency } from "../pantry/urgency";
 import { SearchField } from "../components/SearchField";
 import { useProducts } from "../pantry/useProducts";
@@ -92,6 +94,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const products = useProducts(items.map((item) => item.productId));
+  const chains = useActiveChains();
 
   useEffect(() => {
     const next = search.trim();
@@ -229,6 +232,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
                 key={item.pantryItemId}
                 item={item}
                 product={products.get(item.productId)}
+                chains={chains}
                 onAct={act}
                 householdId={householdId}
               />
@@ -245,11 +249,13 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
 function PantryRow({
   item,
   product,
+  chains,
   householdId,
   onAct,
 }: {
   item: PantryItemDto;
   product: ProductDto | undefined;
+  chains: ChainDto[] | null;
   householdId: string;
   onAct: (action: () => Promise<unknown>) => void;
 }) {
@@ -263,6 +269,7 @@ function PantryRow({
   // O que a casa leu na embalagem que comprou ganha ao produto da cadeia.
   const thumb = item.scanned?.imageUrl ?? product?.imageUrl;
   const title = item.scanned?.name ?? product?.name ?? "…";
+  const purchase = describePurchase(item, chains);
 
   async function onScanned(barcode: string) {
     setScan("searching");
@@ -322,6 +329,7 @@ function PantryRow({
             {quantityFormat.format(item.quantity.amount)} {unit} · {pantryStateLabels[item.state]}
             {!live && ` · ${pantryLocationLabels[item.location]}`}
           </span>
+          {purchase && <span className="meal-meta muted">{purchase}</span>}
         </div>
       </div>
       <div className="pantry-expiry">{live && <ExpiryLabel expiresAt={item.expiresAt} />}</div>

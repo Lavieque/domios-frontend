@@ -3,10 +3,11 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getProduct, searchIngredients, searchProducts, type IngredientDto } from "../api/client";
 import type { CallerHouseholdDto } from "../api/households";
 import { addPantryItemsBatch, PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
-import { MeasurementUnit, measurementUnitLabels, type CategoryDto, type ProductDto } from "../api/types";
+import { MeasurementUnit, measurementUnitLabels, type CategoryDto, type ChainDto, type ProductDto } from "../api/types";
 import { describeError } from "../auth/errors";
 import { aisleClass, aisleOf, topCategory } from "../catalog/aisles";
 import { useCategories } from "../catalog/useCategories";
+import { useActiveChains } from "../catalog/useChains";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { isIsoDate } from "../plan/dates";
 
@@ -24,13 +25,15 @@ interface Draft {
   location: PantryLocation;
   expiresAt: string;
   price: string;
+  /** Cadeia onde foi comprado; "" = não dito. */
+  chainId: string;
   /** Categoria do produto, para a cor do corredor; os ingredientes não têm. */
   category: CategoryDto | null;
 }
 
 let nextKey = 1;
 
-function fromProduct(product: ProductDto, location: PantryLocation): Draft {
+function fromProduct(product: ProductDto, location: PantryLocation, chainId: string): Draft {
   return {
     key: nextKey++,
     kind: "product",
@@ -45,11 +48,12 @@ function fromProduct(product: ProductDto, location: PantryLocation): Draft {
     location,
     expiresAt: "",
     price: "",
+    chainId,
     category: product.category,
   };
 }
 
-function fromIngredient(ingredient: IngredientDto, location: PantryLocation): Draft {
+function fromIngredient(ingredient: IngredientDto, location: PantryLocation, chainId: string): Draft {
   return {
     key: nextKey++,
     kind: "ingredient",
@@ -61,6 +65,7 @@ function fromIngredient(ingredient: IngredientDto, location: PantryLocation): Dr
     location,
     expiresAt: "",
     price: "",
+    chainId,
     category: null,
   };
 }
@@ -86,13 +91,15 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
   const [location, setLocation] = useState<PantryLocation>(PantryLocation.Pantry);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [chainId, setChainId] = useState("");
   const categories = useCategories();
+  const chains = useActiveChains();
 
   useEffect(() => {
     if (productIdParam) {
       getProduct(productIdParam)
         .then((product) =>
-          setDrafts((current) => (current.length === 0 ? [fromProduct(product, PantryLocation.Pantry)] : current)),
+          setDrafts((current) => (current.length === 0 ? [fromProduct(product, PantryLocation.Pantry, "")] : current)),
         )
         .catch(() => undefined);
     }
@@ -130,6 +137,11 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
     setDrafts((current) => current.map((d) => (d.key === key ? { ...d, ...patch } : d)));
   }
 
+  function applyChainToAll(next: string) {
+    setChainId(next);
+    setDrafts((current) => current.map((d) => ({ ...d, chainId: next })));
+  }
+
   function applyLocationToAll(next: PantryLocation) {
     setLocation(next);
     setDrafts((current) => current.map((d) => ({ ...d, location: next })));
@@ -162,6 +174,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
         location: draft.location,
         expiresAt: draft.expiresAt === "" ? null : draft.expiresAt,
         purchasedPrice: price === null ? null : { amount: price, currency: "EUR" },
+        chainId: draft.chainId === "" ? null : draft.chainId,
       });
     }
 
@@ -227,7 +240,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                 {ingredients.length > 0 && <li className="result-group">Ingredientes sem marca</li>}
                 {ingredients.map((ingredient) => (
                   <li key={ingredient.ingredientId}>
-                    <button type="button" onClick={() => add(fromIngredient(ingredient, location))}>
+                    <button type="button" onClick={() => add(fromIngredient(ingredient, location, chainId))}>
                       <span className="result-text">
                         <strong>{ingredient.displayName ?? ingredient.name}</strong>
                         <span className="muted">Basta o nome, sem marca</span>
@@ -238,7 +251,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                 {products.length > 0 && <li className="result-group">Produtos do catálogo</li>}
                 {products.map((product) => (
                   <li key={product.productId} className={aisleFor(product.category, categories)}>
-                    <button type="button" onClick={() => add(fromProduct(product, location))}>
+                    <button type="button" onClick={() => add(fromProduct(product, location, chainId))}>
                       <span className="result-text">
                         <strong>{product.name}</strong>
                         <span className="muted">
@@ -271,6 +284,12 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
               ))}
             </div>
           </div>
+          {chains && chains.length > 0 && (
+            <label className="add-where">
+              <span className="add-where-label">Comprado no</span>
+              <ChainSelect chains={chains} value={chainId} onChange={applyChainToAll} label="Onde compraste" />
+            </label>
+          )}
           <p className="add-hint muted">
             Para “2 cebolas” serve o ingrediente; para uma marca em concreto, o produto. Junta vários e guarda tudo de
             uma vez.
@@ -291,6 +310,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                     key={draft.key}
                     draft={draft}
                     aisle={aisleFor(draft.category, categories)}
+                    chains={chains}
                     onChange={(patch) => update(draft.key, patch)}
                     onRemove={() => setDrafts((current) => current.filter((d) => d.key !== draft.key))}
                   />
@@ -325,15 +345,17 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
 function DraftRow({
   draft,
   aisle,
+  chains,
   onChange,
   onRemove,
 }: {
   draft: Draft;
   aisle: string;
+  chains: ChainDto[] | null;
   onChange: (patch: Partial<Draft>) => void;
   onRemove: () => void;
 }) {
-  // Validade e preço são opcionais: ficam fechados até serem precisos.
+  // Validade, preço e loja são opcionais: ficam fechados até serem precisos.
   const [more, setMore] = useState(false);
 
   return (
@@ -378,7 +400,7 @@ function DraftRow({
           ))}
         </select>
         <button type="button" className="row-action" aria-expanded={more} onClick={() => setMore(!more)}>
-          Validade e preço
+          Validade, preço e loja
         </button>
       </div>
       <button type="button" className="icon-danger" aria-label={`Tirar ${draft.name}`} title="Tirar" onClick={onRemove}>
@@ -402,8 +424,42 @@ function DraftRow({
               onChange={(e) => onChange({ price: e.target.value })}
             />
           </label>
+          {chains && chains.length > 0 && (
+            <label className="form-field">
+              <span>Comprado no</span>
+              <ChainSelect
+                chains={chains}
+                value={draft.chainId}
+                onChange={(next) => onChange({ chainId: next })}
+                label={`Onde compraste ${draft.name}`}
+              />
+            </label>
+          )}
         </div>
       )}
     </li>
+  );
+}
+
+function ChainSelect({
+  chains,
+  value,
+  label,
+  onChange,
+}: {
+  chains: ChainDto[];
+  value: string;
+  label: string;
+  onChange: (chainId: string) => void;
+}) {
+  return (
+    <select className="category-select" aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
+      <option value="">Sem loja</option>
+      {chains.map((chain) => (
+        <option key={chain.chainId} value={chain.chainId}>
+          {chain.name}
+        </option>
+      ))}
+    </select>
   );
 }

@@ -4,6 +4,7 @@
 
 import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
+import type { PaidPriceSource } from "./shopping";
 import type { MeasurementUnit, MoneyDto, PagedResult } from "./types";
 
 export const PantryLocation = {
@@ -97,6 +98,10 @@ export interface PantryItemDto {
   scanned: ScannedProductDto | null;
   /** Sobras de uma refeição (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.3). */
   sourceMealId?: string | null;
+  /** Onde foi comprado e de onde vem o preço (adenda 2026-11-09 de DomiOS_API_Fase1.md). */
+  purchasedChainId?: string | null;
+  purchasedPhysicalStoreId?: string | null;
+  purchasedPriceSource?: PaidPriceSource | null;
 }
 
 export interface ScannedProductDto {
@@ -129,6 +134,8 @@ export interface AddPantryItemRequest {
   purchasedAt: string;
   expiresAt: IsoDate | null;
   purchasedPrice: MoneyDto | null;
+  /** Cadeia onde foi comprado; só cadeias `Active` (outra dá 404). */
+  chainId?: string | null;
 }
 
 /** Um item do pedido em lote: um produto ou, sem produto, um ingrediente (entra pelo produto genérico dele). */
@@ -139,6 +146,7 @@ export interface AddPantryItemsBatchItem {
   location: PantryLocation;
   expiresAt: IsoDate | null;
   purchasedPrice: MoneyDto | null;
+  chainId?: string | null;
 }
 
 const base = (householdId: string) => `/households/${householdId}/pantry-items`;

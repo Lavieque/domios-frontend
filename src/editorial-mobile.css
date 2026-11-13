@@ -1142,3 +1142,96 @@
     padding: 0 11px;
   }
 }
+
+/* ---------- Terceira passagem no telemóvel: as outras páginas ---------- */
+
+@media (max-width: 640px) {
+  /* Lista de compras: o número que falta ao lado do título, sem o vazio por cima. */
+  /* O número fica alinhado com o título, como uma capitular. */
+  .app.editorial .list-head {
+    align-items: flex-start;
+    gap: 14px;
+    margin: 0.5rem 0 1.25rem;
+  }
+
+  .app.editorial .list-head .list-tally-count {
+    flex: none;
+    font-size: 58px;
+    line-height: 0.85;
+  }
+
+  .app.editorial .list-head .list-title {
+    font-size: clamp(28px, 8vw, 34px);
+    line-height: 1.08;
+  }
+
+  /* Fim da lista: concluir e cancelar lado a lado, a toda a largura. */
+  .app.editorial .list-status-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .app.editorial .list-status-actions > * {
+    min-height: 46px;
+    margin: 0;
+    border-radius: 12px;
+  }
+
+  .app.editorial .list-status-actions > .button-secondary {
+    border-color: rgb(255 255 230 / 0.32);
+    background: rgb(16 45 35 / 0.5);
+    color: #fffdf3;
+  }
+
+  /* Cozinhar e Receitas: o destaque sem fotografia não guarda um bloco vazio. */
+  .app.editorial .feature-card-media:not(:has(img)) {
+    display: none;
+  }
+
+  /* Casa: "Remover" na mesma linha das ações do membro, discreto até ser preciso. */
+  .app.editorial .member-actions {
+    align-items: center;
+    gap: 4px 16px;
+  }
+
+  .app.editorial .member-actions .link-button {
+    min-height: 36px;
+    font-size: 14px;
+  }
+
+  .app.editorial .member-actions .button-danger {
+    min-height: 34px;
+    margin-left: auto;
+    padding: 0 12px;
+    border: 1px solid rgb(255 180 168 / 0.45);
+    border-radius: 8px;
+    background: none;
+    color: #ffc9bf;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Produto: a lista onde pôr o artigo ocupa a linha toda; o botão vem por baixo. */
+  .app.editorial .article-sheet .inline-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .app.editorial .article-sheet .inline-form > * {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    margin: 0;
+  }
+
+  .app.editorial .article-sheet .inline-form select {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

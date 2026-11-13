@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHousehold, type CallerHouseholdDto } from "../api/households";
 import { listPantryItems, type PantryItemDto } from "../api/pantry";
-import { getRecipe } from "../api/client";
 import { listPlannedMeals, MealType, mealTypeLabels, PlannedMealStatus, type PlannedMealDto } from "../api/planning";
 import { getCookableRecipes, type CookableRecipesDto } from "../api/savedRecipes";
 import { measurementUnitLabels } from "../api/types";
@@ -11,6 +10,7 @@ import { OpportunitiesPanel } from "../opportunities/OpportunitiesPanel";
 import { urgency } from "../pantry/urgency";
 import { useProducts } from "../pantry/useProducts";
 import { addDays, startOfWeek, today, weekdayTitle, type IsoDate } from "../plan/dates";
+import { useRecipeImages } from "../plan/recipeImages";
 import { useOpenLists } from "../shopping/useOpenLists";
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
@@ -86,7 +86,6 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
   const [cookable, setCookable] = useState<CookableRecipesDto | null>(null);
   const [pantry, setPantry] = useState<PantryItemDto[] | null>(null);
   const [memberName, setMemberName] = useState<string | null>(null);
-  const [images, setImages] = useState<Map<string, string | null>>(new Map());
   const { lists } = useOpenLists(householdId);
   const products = useProducts(pantry?.map((item) => item.productId) ?? []);
 
@@ -119,22 +118,9 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
     .slice(0, 3);
 
   // A foto de cada prato vem da receita (as que dá para fazer já a trazem).
-  const missingKey = upcoming
-    .map((m) => m.recipeId)
-    .filter((id): id is string => id !== null && !allCookable.some((r) => r.recipeId === id) && !images.has(id))
-    .join(",");
-  useEffect(() => {
-    if (!missingKey) return;
-    let cancelled = false;
-    for (const id of missingKey.split(",")) {
-      getRecipe(id)
-        .then((recipe) => !cancelled && setImages((prev) => new Map(prev).set(id, recipe.imageUrl)))
-        .catch(() => !cancelled && setImages((prev) => new Map(prev).set(id, null)));
-    }
-    return () => {
-      cancelled = true;
-    };
-  }, [missingKey]);
+  const images = useRecipeImages(
+    upcoming.map((m) => (m.recipeId && !allCookable.some((r) => r.recipeId === m.recipeId) ? m.recipeId : null)),
+  );
 
   const toBuy = lists ? lists.reduce((sum, list) => sum + (list.itemCount - list.purchasedItemCount), 0) : null;
   const useSoon = pantry ? pantry.filter((item) => urgency(item.expiresAt).level >= 2).length : null;
@@ -172,7 +158,10 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
                 const image = recipe?.imageUrl ?? (meal.recipeId ? (images.get(meal.recipeId) ?? null) : null);
                 const body = (
                   <>
-                    <span className="photo-card-media">{image && <img src={image} alt="" loading="lazy" />}</span>
+                    <span className="photo-card-media">
+                      {/* Sem foto, ou se não carregar, fica o desenho de fundo do cartão. */}
+                      {image && <img src={image} alt="" loading="lazy" onError={(e) => (e.currentTarget.hidden = true)} />}
+                    </span>
                     <span className="photo-card-body">
                       <span className="photo-card-title">{meal.title}</span>
                       <span className="photo-card-meta">

@@ -2,6 +2,8 @@
 // RFC 7807 Problem Details: o `type` (ex. "invalid-credentials") é o que
 // distingue os casos, nunca o texto do `title` (que vem em inglês).
 
+import { CATALOG_TTL_MS, HOUSEHOLD_TTL_MS, cachedText, clearApiCache } from "./cache";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 if (!BASE_URL) {
@@ -47,7 +49,42 @@ export function buildUrl(path: string, params: QueryParams = {}): URL {
 }
 
 export async function send<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const method = options.method ?? "GET";
+  if (method !== "GET") {
+    clearApiCache();
+  } else if (options.responseType !== "blob") {
+    // A chave não leva o token (roda a cada renovação); trocar de sessão limpa a cache.
+    const url = buildUrl(path, options.params);
+    const scope = options.accessToken ? "household" : "catalog";
+    const ttl = options.accessToken ? HOUSEHOLD_TTL_MS : CATALOG_TTL_MS;
+    const text = await cachedText(`${scope} ${url}`, ttl, () => fetchText(url, options));
+    return (text ? JSON.parse(text) : undefined) as T;
+  }
+
   const url = buildUrl(path, options.params);
+  let response: Response;
+  try {
+    response = await request(url, options);
+  } finally {
+    // De novo no fim: um GET que estava em voo durante a escrita pode ter guardado o valor antigo.
+    if (method !== "GET") clearApiCache();
+  }
+
+  if (options.responseType === "blob") {
+    return (await response.blob()) as T;
+  }
+
+  // 204 (logout, reset, verify) não tem corpo.
+  const text = await response.text();
+  return (text ? JSON.parse(text) : undefined) as T;
+}
+
+async function fetchText(url: URL, options: RequestOptions): Promise<string> {
+  return (await request(url, options)).text();
+}
+
+/** Faz o fetch; lança ApiError se a resposta não for 2xx. */
+async function request(url: URL, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = {};
   if (options.blob) headers["Content-Type"] = options.blob.type;
   else if (options.body !== undefined) headers["Content-Type"] = "application/json";
@@ -62,14 +99,7 @@ export async function send<T>(path: string, options: RequestOptions = {}): Promi
   if (!response.ok) {
     throw await toApiError(response, url);
   }
-
-  if (options.responseType === "blob") {
-    return (await response.blob()) as T;
-  }
-
-  // 204 (logout, reset, verify) não tem corpo.
-  const text = await response.text();
-  return (text ? JSON.parse(text) : undefined) as T;
+  return response;
 }
 
 async function toApiError(response: Response, url: URL): Promise<ApiError> {

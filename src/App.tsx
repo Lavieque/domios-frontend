@@ -1,40 +1,79 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { useSession } from "./auth/useSession";
 import { AppRail } from "./components/AppMenu";
 import { EditorialBar } from "./components/EditorialBar";
 import { EmailVerificationNotice } from "./components/EmailVerificationNotice";
-import { AccountPage } from "./pages/AccountPage";
-import { AddPantryItemPage } from "./pages/AddPantryItemPage";
-import { CookPage } from "./pages/CookPage";
-import { CookedRecipesPage } from "./pages/CookedRecipesPage";
-import { CreateHouseholdPage } from "./pages/CreateHouseholdPage";
-import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
-import { HouseholdHistoryPage } from "./pages/HouseholdHistoryPage";
-import { HouseholdPage } from "./pages/HouseholdPage";
+import { PageSkeleton } from "./components/PageSkeleton";
 import { LoginPage } from "./pages/LoginPage";
-import { MealPlanTemplateDetailPage } from "./pages/MealPlanTemplateDetailPage";
-import { MealPlanTemplatesPage } from "./pages/MealPlanTemplatesPage";
-import { PantryPage } from "./pages/PantryPage";
-import { PlanPage } from "./pages/PlanPage";
-import { NutritionPage } from "./pages/NutritionPage";
 import { OverviewPage } from "./pages/OverviewPage";
-import { ProductsPage } from "./pages/ProductsPage";
-import { ProductDetailPage } from "./pages/ProductDetailPage";
-import { PromotionsPage } from "./pages/PromotionsPage";
-import { RecipesPage } from "./pages/RecipesPage";
-import { RecipeDetailPage } from "./pages/RecipeDetailPage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { ShoppingListPage } from "./pages/ShoppingListPage";
-import { ShoppingListsPage } from "./pages/ShoppingListsPage";
-import { SpendingPage } from "./pages/SpendingPage";
-import { NearbyStoresPage } from "./pages/NearbyStoresPage";
-import { PantryWastePage } from "./pages/PantryWastePage";
-import { ResetPasswordPage } from "./pages/ResetPasswordPage";
-import { VerifyEmailPage } from "./pages/VerifyEmailPage";
 import { editorialScene, readRailCollapsed, writeRailCollapsed } from "./editorial";
 import { REQUEST_ACCESS_URL } from "./siteUrl";
+
+
+// Cada página é um ficheiro à parte, pedido só quando é precisa: o arranque
+// carrega só o essencial. Hoje e Entrar ficam no ficheiro principal (são a
+// primeira página de quase todas as visitas). Depois de a app abrir, as outras
+// são pedidas em segundo plano, para que mudar de página não espere pela rede.
+const pageLoaders = {
+  AccountPage: () => import("./pages/AccountPage").then((m) => ({ default: m.AccountPage })),
+  AddPantryItemPage: () => import("./pages/AddPantryItemPage").then((m) => ({ default: m.AddPantryItemPage })),
+  CookPage: () => import("./pages/CookPage").then((m) => ({ default: m.CookPage })),
+  CookedRecipesPage: () => import("./pages/CookedRecipesPage").then((m) => ({ default: m.CookedRecipesPage })),
+  CreateHouseholdPage: () => import("./pages/CreateHouseholdPage").then((m) => ({ default: m.CreateHouseholdPage })),
+  ForgotPasswordPage: () => import("./pages/ForgotPasswordPage").then((m) => ({ default: m.ForgotPasswordPage })),
+  HouseholdHistoryPage: () => import("./pages/HouseholdHistoryPage").then((m) => ({ default: m.HouseholdHistoryPage })),
+  HouseholdPage: () => import("./pages/HouseholdPage").then((m) => ({ default: m.HouseholdPage })),
+  MealPlanTemplateDetailPage: () => import("./pages/MealPlanTemplateDetailPage").then((m) => ({ default: m.MealPlanTemplateDetailPage })),
+  MealPlanTemplatesPage: () => import("./pages/MealPlanTemplatesPage").then((m) => ({ default: m.MealPlanTemplatesPage })),
+  PantryPage: () => import("./pages/PantryPage").then((m) => ({ default: m.PantryPage })),
+  PlanPage: () => import("./pages/PlanPage").then((m) => ({ default: m.PlanPage })),
+  NutritionPage: () => import("./pages/NutritionPage").then((m) => ({ default: m.NutritionPage })),
+  ProductsPage: () => import("./pages/ProductsPage").then((m) => ({ default: m.ProductsPage })),
+  ProductDetailPage: () => import("./pages/ProductDetailPage").then((m) => ({ default: m.ProductDetailPage })),
+  PromotionsPage: () => import("./pages/PromotionsPage").then((m) => ({ default: m.PromotionsPage })),
+  RecipesPage: () => import("./pages/RecipesPage").then((m) => ({ default: m.RecipesPage })),
+  RecipeDetailPage: () => import("./pages/RecipeDetailPage").then((m) => ({ default: m.RecipeDetailPage })),
+  RegisterPage: () => import("./pages/RegisterPage").then((m) => ({ default: m.RegisterPage })),
+  ShoppingListPage: () => import("./pages/ShoppingListPage").then((m) => ({ default: m.ShoppingListPage })),
+  ShoppingListsPage: () => import("./pages/ShoppingListsPage").then((m) => ({ default: m.ShoppingListsPage })),
+  SpendingPage: () => import("./pages/SpendingPage").then((m) => ({ default: m.SpendingPage })),
+  NearbyStoresPage: () => import("./pages/NearbyStoresPage").then((m) => ({ default: m.NearbyStoresPage })),
+  PantryWastePage: () => import("./pages/PantryWastePage").then((m) => ({ default: m.PantryWastePage })),
+  ResetPasswordPage: () => import("./pages/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })),
+  VerifyEmailPage: () => import("./pages/VerifyEmailPage").then((m) => ({ default: m.VerifyEmailPage })),
+};
+const AccountPage = lazy(pageLoaders.AccountPage);
+const AddPantryItemPage = lazy(pageLoaders.AddPantryItemPage);
+const CookPage = lazy(pageLoaders.CookPage);
+const CookedRecipesPage = lazy(pageLoaders.CookedRecipesPage);
+const CreateHouseholdPage = lazy(pageLoaders.CreateHouseholdPage);
+const ForgotPasswordPage = lazy(pageLoaders.ForgotPasswordPage);
+const HouseholdHistoryPage = lazy(pageLoaders.HouseholdHistoryPage);
+const HouseholdPage = lazy(pageLoaders.HouseholdPage);
+const MealPlanTemplateDetailPage = lazy(pageLoaders.MealPlanTemplateDetailPage);
+const MealPlanTemplatesPage = lazy(pageLoaders.MealPlanTemplatesPage);
+const PantryPage = lazy(pageLoaders.PantryPage);
+const PlanPage = lazy(pageLoaders.PlanPage);
+const NutritionPage = lazy(pageLoaders.NutritionPage);
+const ProductsPage = lazy(pageLoaders.ProductsPage);
+const ProductDetailPage = lazy(pageLoaders.ProductDetailPage);
+const PromotionsPage = lazy(pageLoaders.PromotionsPage);
+const RecipesPage = lazy(pageLoaders.RecipesPage);
+const RecipeDetailPage = lazy(pageLoaders.RecipeDetailPage);
+const RegisterPage = lazy(pageLoaders.RegisterPage);
+const ShoppingListPage = lazy(pageLoaders.ShoppingListPage);
+const ShoppingListsPage = lazy(pageLoaders.ShoppingListsPage);
+const SpendingPage = lazy(pageLoaders.SpendingPage);
+const NearbyStoresPage = lazy(pageLoaders.NearbyStoresPage);
+const PantryWastePage = lazy(pageLoaders.PantryWastePage);
+const ResetPasswordPage = lazy(pageLoaders.ResetPasswordPage);
+const VerifyEmailPage = lazy(pageLoaders.VerifyEmailPage);
+
+function preloadPages() {
+  for (const load of Object.values(pageLoaders)) void load().catch(() => undefined);
+}
 
 /** Onde o próprio ecrã já trata do email por confirmar. */
 const PATHS_WITHOUT_VERIFICATION_NOTICE = ["/conta", "/verify-email"];
@@ -50,6 +89,11 @@ function App() {
   // No telemóvel o mesmo botão abre o menu por cima da página; no ecrã largo recolhe-o.
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [pathname]);
+
+  useEffect(() => {
+    if ("requestIdleCallback" in window) window.requestIdleCallback(preloadPages);
+    else setTimeout(preloadPages, 1500);
+  }, []);
   function toggleRail() {
     if (window.matchMedia("(max-width: 899px)").matches) {
       setMenuOpen((open) => !open);
@@ -118,6 +162,7 @@ function App() {
       )}
 
       <main className="app-main">
+        <Suspense fallback={<PageSkeleton />}>
         <Routes>
           {/* Nada do DomiOS é visível sem sessão, catálogos incluídos. */}
           <Route element={<RequireAuth />}>
@@ -152,6 +197,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Routes>
+        </Suspense>
       </main>
 
       <footer className="app-footer">

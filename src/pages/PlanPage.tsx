@@ -23,9 +23,11 @@ import { measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
 import { addPlanToShoppingList } from "../api/shopping";
 import { AddToPlanForm } from "../components/AddToPlanForm";
+import { MealPhoto } from "../components/MealPhoto";
 import { PlanToPantryForm } from "../components/PlanToPantryForm";
 import { SendToListForm } from "../components/SendToListForm";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { useRecipeImages } from "../plan/recipeImages";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekDays, weekdayName, weekdayTitle } from "../plan/dates";
 
 export function PlanPage() {
@@ -52,6 +54,8 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   const reload = () => setVersion((v) => v + 1);
+  // A foto de cada prato vem da receita: o plano só traz o id.
+  const images = useRecipeImages(meals.map((meal) => meal.recipeId));
 
   const householdId = household.householdId;
   useEffect(() => {
@@ -152,8 +156,9 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                     {dayMeals.map((meal) => (
                       <li
                         key={meal.plannedMealId}
-                        className={meal.status === PlannedMealStatus.Skipped ? "week-meal is-skipped" : "week-meal"}
+                        className={meal.status === PlannedMealStatus.Skipped ? "week-meal has-photo is-skipped" : "week-meal has-photo"}
                       >
+                        <MealPhoto src={meal.recipeId ? images.get(meal.recipeId) : null} />
                         <span className="week-meal-slot">{mealTypeLabels[meal.mealType]}</span>
                         <span className="week-meal-body">
                           {meal.recipeId ? (

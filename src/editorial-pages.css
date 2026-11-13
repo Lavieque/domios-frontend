@@ -1459,6 +1459,12 @@
   opacity: 1;
 }
 
+/* Com a foto ao lado, as ações do plano passam à linha seguinte em vez de saírem do cartão. */
+.editorial .week-meal.has-photo .week-meal-actions {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .editorial .week-meal-photo img {
     transition: none;

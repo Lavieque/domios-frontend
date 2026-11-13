@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getProductStoreOffers } from "../api/client";
+import { getProductStoreOffers, getStoreOffersBatch, MAX_BATCH_PRODUCT_IDS } from "../api/client";
+import { ApiError } from "../api/http";
 import {
   measurementUnitLabels,
   type MeasurementUnit,
@@ -60,16 +61,69 @@ export function sortOffers(offers: ProductStoreOfferDto[]): ProductStoreOfferDto
 // entre a lista e o detalhe; GET /products não traz preços.
 const cache = new Map<string, Promise<ProductStoreOfferDto[] | null>>();
 
+// Os cartões de uma lista pedem as ofertas cada um no seu efeito, no mesmo tick:
+// juntam-se aqui e saem num só GET /products/batch/store-offers.
+type Waiter = (offers: ProductStoreOfferDto[] | null) => void;
+let queued = new Map<string, Waiter>();
+let flushScheduled = false;
+
+// Enquanto a Api em produção não tiver o pedido em lote, o 404 faz voltar aos
+// pedidos um a um, e não se tenta outra vez até recarregar a página.
+let batchUnavailable = false;
+
+async function loadBatch(productIds: string[]): Promise<Map<string, ProductStoreOfferDto[] | null>> {
+  const found = new Map<string, ProductStoreOfferDto[] | null>();
+  if (!batchUnavailable) {
+    try {
+      for (let i = 0; i < productIds.length; i += MAX_BATCH_PRODUCT_IDS) {
+        const result = await getStoreOffersBatch(productIds.slice(i, i + MAX_BATCH_PRODUCT_IDS));
+        for (const [productId, offers] of Object.entries(result)) found.set(productId, offers);
+      }
+      for (const id of productIds) if (!found.has(id)) found.set(id, []);
+      return found;
+    } catch (error) {
+      if (error instanceof ApiError && (error.status === 404 || error.status === 405)) batchUnavailable = true;
+      found.clear();
+    }
+  }
+  const loaded = await Promise.all(productIds.map((id) => getProductStoreOffers(id).catch(() => null)));
+  productIds.forEach((id, n) => found.set(id, loaded[n]));
+  return found;
+}
+
+function flush() {
+  flushScheduled = false;
+  const batch = queued;
+  queued = new Map();
+  void loadBatch([...batch.keys()]).then((found) => {
+    for (const [id, resolve] of batch) resolve(found.get(id) ?? null);
+  });
+}
+
 export function loadOffers(productId: string): Promise<ProductStoreOfferDto[] | null> {
   let pending = cache.get(productId);
   if (!pending) {
-    pending = getProductStoreOffers(productId).catch(() => {
-      cache.delete(productId);
-      return null;
+    pending = new Promise<ProductStoreOfferDto[] | null>((resolve) => queued.set(productId, resolve));
+    // Uma falha não fica em cache: o próximo pedido tenta de novo.
+    const current = pending;
+    void current.then((offers) => {
+      if (offers === null && cache.get(productId) === current) cache.delete(productId);
     });
     cache.set(productId, pending);
+    if (!flushScheduled) {
+      flushScheduled = true;
+      setTimeout(flush, 0);
+    }
   }
   return pending;
+}
+
+/** Só para testes. */
+export function resetOffersCache() {
+  cache.clear();
+  queued = new Map();
+  flushScheduled = false;
+  batchUnavailable = false;
 }
 
 /** undefined enquanto carrega; null se falhou. */

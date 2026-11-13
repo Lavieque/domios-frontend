@@ -1,15 +1,20 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAvatar } from "../auth/useAvatar";
 import { useSession } from "../auth/useSession";
 import { useHouseholds } from "../household/useHouseholds";
+import { useIsPhone } from "../usePageSize";
+import { AppTopMenu } from "./AppMenu";
 
 /** Cabeçalho da app: botão do menu, pesquisa, a casa escolhida e a conta. */
 export function EditorialBar({
+  brand,
   collapsed,
   menuOpen,
   onToggle,
 }: {
+  /** O logótipo: só aparece no telemóvel, onde não há menu lateral. */
+  brand: ReactNode;
   collapsed: boolean;
   menuOpen: boolean;
   onToggle: () => void;
@@ -19,6 +24,8 @@ export function EditorialBar({
   const avatar = useAvatar();
   const { current } = useHouseholds();
   const [query, setQuery] = useState("");
+  // No telemóvel a caixa é curta: o texto de ajuda também.
+  const phone = useIsPhone();
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -42,6 +49,8 @@ export function EditorialBar({
         </svg>
       </button>
 
+      <div className="bar-brand">{brand}</div>
+
       <form className="bar-search" role="search" onSubmit={submit}>
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="2" />
@@ -50,7 +59,7 @@ export function EditorialBar({
         <input
           type="search"
           aria-label="Pesquisar produtos"
-          placeholder="Pesquisar produtos…"
+          placeholder={phone ? "Pesquisar…" : "Pesquisar produtos…"}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -65,6 +74,11 @@ export function EditorialBar({
       <Link to="/conta" className={`bar-avatar${avatar ? " has-photo" : ""}`} aria-label="Conta">
         {avatar ? <img src={avatar} alt="" /> : (session?.email ?? "?").charAt(0).toUpperCase()}
       </Link>
+
+      {/* Só no telemóvel: o que não cabe na barra de baixo, depois da conta. */}
+      <div className="bar-menu">
+        <AppTopMenu />
+      </div>
     </header>
   );
 }

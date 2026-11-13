@@ -1,3 +1,4 @@
+import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState, type CSSProperties } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../api/client";
@@ -42,7 +43,7 @@ export function ProductDetailPage() {
   }, [id]);
 
   if (!id) return null;
-  if (!product) return <p className="muted loading">A carregar…</p>;
+  if (!product) return <PageSkeleton />;
 
   const sorted = offers ? sortOffers(offers) : [];
   const onSale = sorted.filter(isOnSale);

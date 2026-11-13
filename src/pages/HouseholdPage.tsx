@@ -1,3 +1,4 @@
+import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 import {
@@ -47,7 +48,7 @@ export function HouseholdPage() {
   }, [currentId]);
 
   if (loading) {
-    return <p className="muted loading">A carregar…</p>;
+    return <PageSkeleton />;
   }
   if (error) {
     return (

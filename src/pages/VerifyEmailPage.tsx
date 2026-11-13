@@ -46,7 +46,7 @@ export function VerifyEmailPage() {
 
   return (
     <AuthSheet title="Confirmar email">
-      {status === "verifying" && <p className="muted loading">A confirmar…</p>}
+      {status === "verifying" && <p className="muted loading loading-text">A confirmar…</p>}
       {status === "verified" && <p className="notice">Email confirmado. Obrigado!</p>}
       {status === "invalid" && (
         <p className="form-error" role="alert">

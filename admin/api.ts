@@ -306,7 +306,8 @@ function base(): string {
 
 async function raw(path: string, init: RequestInit): Promise<Response> {
   try {
-    return await fetch(`${base()}${path}`, init);
+    // O admin lê logo a seguir ao que edita: nunca da cache do browser (a Api marca o catálogo como público).
+    return await fetch(`${base()}${path}`, { ...init, cache: "no-store" });
   } catch {
     throw new ApiError(0, "network", "Sem ligação à Api.");
   }

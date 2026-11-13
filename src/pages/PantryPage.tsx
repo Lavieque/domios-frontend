@@ -30,8 +30,8 @@ import { urgency } from "../pantry/urgency";
 import { SearchField } from "../components/SearchField";
 import { useProducts } from "../pantry/useProducts";
 import { daysBetween, longDate, shortDate, today } from "../plan/dates";
+import { usePageSize } from "../usePageSize";
 
-const PAGE_SIZE = 50;
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
 
 /** "fifo" = o que há, pela ordem em que deve ser usado; os outros são estados. */
@@ -71,6 +71,7 @@ function withoutPage(params: URLSearchParams): URLSearchParams {
 }
 
 function Pantry({ household }: { household: CallerHouseholdDto }) {
+  const pageSize = usePageSize(50, 15);
   const householdId = household.householdId;
   const location = useLocation();
   const notice = (location.state as { notice?: string } | null)?.notice;
@@ -114,7 +115,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
       location: locationFilter,
       search: query === "" ? undefined : query,
       page,
-      pageSize: PAGE_SIZE,
+      pageSize: pageSize,
     })
       .then((result) => {
         if (cancelled) return;
@@ -127,7 +128,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     return () => {
       cancelled = true;
     };
-  }, [householdId, view, locationFilter, query, page, version]);
+  }, [householdId, view, locationFilter, query, page, pageSize, version]);
 
   function setFilter(next: { view?: View; location?: PantryLocation | null; page?: number }) {
     const params = new URLSearchParams();
@@ -236,7 +237,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
         )
       )}
 
-      <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={(nextPage) => setFilter({ page: nextPage })} />
+      <Pagination page={page} pageSize={pageSize} total={total} onPageChange={(nextPage) => setFilter({ page: nextPage })} />
     </div>
   );
 }

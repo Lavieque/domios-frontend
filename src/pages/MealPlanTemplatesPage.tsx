@@ -13,10 +13,12 @@ import { SearchField } from "../components/SearchField";
 import { RecipeRow } from "../components/RecipeRow";
 import { templateImage } from "../plan/templateImage";
 import { withoutNamePrefix } from "../plan/templates";
+import { usePageSize } from "../usePageSize";
 
 const count = new Intl.NumberFormat("pt-PT");
 
 export function MealPlanTemplatesPage() {
+  const pageSize = usePageSize(20, 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") ?? "";
   const page = Number(searchParams.get("page") ?? "1") || 1;
@@ -38,7 +40,7 @@ export function MealPlanTemplatesPage() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    searchMealPlanTemplates(search, page)
+    searchMealPlanTemplates(search, page, pageSize)
       .then((result) => {
         if (!active) return;
         setTemplates(result.items);
@@ -50,7 +52,7 @@ export function MealPlanTemplatesPage() {
     return () => {
       active = false;
     };
-  }, [search, page]);
+  }, [search, page, pageSize]);
 
   return (
     <div className="page templates-page">
@@ -99,7 +101,7 @@ export function MealPlanTemplatesPage() {
         )}
       </section>
 
-      {!error && <Pagination page={page} pageSize={20} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />}
+      {!error && <Pagination page={page} pageSize={pageSize} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />}
     </div>
   );
 }

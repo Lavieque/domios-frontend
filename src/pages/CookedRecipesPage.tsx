@@ -7,8 +7,7 @@ import { Pagination } from "../components/Pagination";
 import { RecipeRow } from "../components/RecipeRow";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { longDate, type IsoDate } from "../plan/dates";
-
-const PAGE_SIZE = 20;
+import { usePageSize } from "../usePageSize";
 
 export function CookedRecipesPage() {
   return <HouseholdGate>{(household) => <Cooked household={household} />}</HouseholdGate>;
@@ -23,6 +22,7 @@ function localDay(instant: string): IsoDate {
 
 /** As receitas que a casa já fez: quantas vezes e a última. */
 function Cooked({ household }: { household: CallerHouseholdDto }) {
+  const pageSize = usePageSize(20, 10);
   const householdId = household.householdId;
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get("page") ?? "1") || 1;
@@ -33,7 +33,7 @@ function Cooked({ household }: { household: CallerHouseholdDto }) {
   useEffect(() => {
     let active = true;
     setItems(null);
-    listCookedRecipes(householdId, page, PAGE_SIZE)
+    listCookedRecipes(householdId, page, pageSize)
       .then((result) => {
         if (!active) return;
         setItems(result.items);
@@ -43,7 +43,7 @@ function Cooked({ household }: { household: CallerHouseholdDto }) {
     return () => {
       active = false;
     };
-  }, [householdId, page]);
+  }, [householdId, page, pageSize]);
 
   async function save(recipeId: string) {
     setError(null);
@@ -116,7 +116,7 @@ function Cooked({ household }: { household: CallerHouseholdDto }) {
 
       <Pagination
         page={page}
-        pageSize={PAGE_SIZE}
+        pageSize={pageSize}
         total={total}
         onPageChange={(next) => setSearchParams(next > 1 ? { page: String(next) } : {}, { replace: true })}
       />

@@ -15,6 +15,7 @@ import { SearchField } from "../components/SearchField";
 import { describeError } from "../auth/errors";
 import { FeatureCard } from "../components/FeatureCard";
 import { RecipeRow } from "../components/RecipeRow";
+import { usePageSize } from "../usePageSize";
 
 const count = new Intl.NumberFormat("pt-PT");
 const dishTypes = Object.values(DishType) as DishType[];
@@ -28,6 +29,7 @@ function parseEnum<T extends number>(value: string | null, allowed: T[]): T | un
 }
 
 export function RecipesPage() {
+  const pageSize = usePageSize(20, 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") ?? "";
   const page = Number(searchParams.get("page") ?? "1") || 1;
@@ -67,7 +69,7 @@ export function RecipesPage() {
     let active = true;
     setLoading(true);
     setError(null);
-    searchRecipes(search, page, 20, { dishType, mainProtein, difficulty })
+    searchRecipes(search, page, pageSize, { dishType, mainProtein, difficulty })
       .then((result) => {
         if (!active) return;
         setRecipes(result.items);
@@ -78,7 +80,7 @@ export function RecipesPage() {
     return () => {
       active = false;
     };
-  }, [search, page, dishType, mainProtein, difficulty]);
+  }, [search, page, pageSize, dishType, mainProtein, difficulty]);
 
   // O total só se diz quando a Api o deu; com filtros é o que eles encontram, não o catálogo.
   const countLine = loading
@@ -208,7 +210,7 @@ export function RecipesPage() {
       )}
 
       {!error && (
-        <Pagination page={page} pageSize={20} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
+        <Pagination page={page} pageSize={pageSize} total={total} onPageChange={(nextPage) => applyFilters({ page: nextPage })} />
       )}
     </div>
   );

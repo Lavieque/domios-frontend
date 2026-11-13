@@ -1,3 +1,4 @@
+import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
@@ -82,7 +83,7 @@ export function RecipeDetailPage() {
         </p>
       </div>
     );
-  if (!recipe) return <p className="muted loading">A carregar…</p>;
+  if (!recipe) return <PageSkeleton />;
 
   const ingredients = recipe.ingredients.slice().sort((a, b) => a.sortOrder - b.sortOrder);
   const steps = recipe.steps.slice().sort((a, b) => a.stepNumber - b.stepNumber);

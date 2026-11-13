@@ -1,3 +1,4 @@
+import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
@@ -77,7 +78,7 @@ export function MealPlanTemplateDetailPage() {
       </div>
     );
   }
-  if (!template) return <p className="muted loading">A carregar…</p>;
+  if (!template) return <PageSkeleton />;
 
   const days = Array.from({ length: template.durationDays }, (_, i) => i + 1);
   // Só uma ementa da própria casa, ainda em rascunho, muda; as outras copiam-se primeiro.

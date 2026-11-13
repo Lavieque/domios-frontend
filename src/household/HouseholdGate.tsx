@@ -1,3 +1,4 @@
+import { PageSkeleton } from "../components/PageSkeleton";
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
@@ -14,7 +15,7 @@ export function HouseholdGate({
 }) {
   const { loading, error, current } = useHouseholds();
 
-  if (loading) return <p className="muted loading">A carregar…</p>;
+  if (loading) return <PageSkeleton />;
   if (error) {
     return (
       <p className="form-error" role="alert">

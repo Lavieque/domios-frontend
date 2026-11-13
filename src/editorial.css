@@ -583,6 +583,15 @@ body {
   color: #f0f1e5;
 }
 
+/* Sobre a fotografia, o esqueleto é um véu claro, como o texto que vem a seguir. */
+.editorial {
+  --skeleton: rgb(255 255 240 / 0.16);
+}
+
+.editorial p.loading:not(.loading-text) {
+  color: transparent;
+}
+
 .editorial .filter-option[aria-pressed="true"],
 .editorial .filter-option-all[aria-pressed="true"] {
   background: rgb(255 255 240 / 0.18);

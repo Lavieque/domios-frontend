@@ -414,7 +414,7 @@ function PantryRow({
             </p>
           )}
           {scan === null && <BarcodeScanner onScan={onScanned} />}
-          {scan === "searching" && <p className="muted loading">A procurar…</p>}
+          {scan === "searching" && <p className="muted loading loading-text">A procurar…</p>}
           {scan !== null && scan !== "searching" && (
             <div className="scan-result">
               {scan.result ? (

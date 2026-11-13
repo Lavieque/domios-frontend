@@ -7,11 +7,12 @@ const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR
 
 /**
  * "Comprado no Continente · 1,29 €", "Pago 1,29 € (prateleira)", "Comprado no Lidl" ou `null` sem preço nem loja.
- * A loja física só vem por id (a Api não manda o nome no item), por isso fica a cadeia.
- * Uma cadeia que já não está aberta (ou que ainda não chegou) fica de fora em vez de mostrar um id.
+ * Com a loja física: "Comprado no Pingo Doce Telheiras" quando o nome já traz a cadeia, senão
+ * "Comprado no Lidl (Lidl Benfica)". Uma cadeia que já não está aberta (ou que ainda não chegou) fica de fora
+ * em vez de mostrar um id; a loja física vale sozinha nesse caso.
  */
 export function describePurchase(
-  item: Pick<PantryItemDto, "purchasedPrice" | "purchasedChainId" | "purchasedPriceSource">,
+  item: Pick<PantryItemDto, "purchasedPrice" | "purchasedChainId" | "purchasedPriceSource" | "purchasedPhysicalStoreName">,
   chains: ChainDto[] | null,
 ): string | null {
   const chainName = item.purchasedChainId ? chains?.find((c) => c.chainId === item.purchasedChainId)?.name : undefined;
@@ -19,8 +20,19 @@ export function describePurchase(
     ? money.format(item.purchasedPrice.amount) +
       (item.purchasedPriceSource === ("Offer" satisfies PaidPriceSource) ? " (prateleira)" : "")
     : null;
-  if (chainName && price) return `Comprado no ${chainName} · ${price}`;
-  if (chainName) return `Comprado no ${chainName}`;
+  const store = storeLabel(chainName, item.purchasedPhysicalStoreName ?? undefined);
+  if (store && price) return `Comprado ${store} · ${price}`;
+  if (store) return `Comprado ${store}`;
   if (price) return `Pago ${price}`;
+  return null;
+}
+
+function storeLabel(chainName: string | undefined, physicalName: string | undefined): string | null {
+  const physical = physicalName?.trim();
+  if (physical && (!chainName || physical.toLocaleLowerCase("pt").includes(chainName.toLocaleLowerCase("pt")))) {
+    return `em ${physical}`;
+  }
+  if (chainName && physical) return `no ${chainName} (${physical})`;
+  if (chainName) return `no ${chainName}`;
   return null;
 }

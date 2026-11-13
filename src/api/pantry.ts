@@ -101,6 +101,8 @@ export interface PantryItemDto {
   /** Onde foi comprado e de onde vem o preço (adenda 2026-11-09 de DomiOS_API_Fase1.md). */
   purchasedChainId?: string | null;
   purchasedPhysicalStoreId?: string | null;
+  /** Nome da loja física (adenda 2026-11-13 (c)); a Api antiga não o manda. */
+  purchasedPhysicalStoreName?: string | null;
   purchasedPriceSource?: PaidPriceSource | null;
 }
 

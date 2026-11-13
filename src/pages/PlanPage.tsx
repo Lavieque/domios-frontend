@@ -36,6 +36,12 @@ export function PlanPage() {
 
 const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
 
+/** O que falta e as sugestões começam curtos; o resto abre-se com um botão. */
+const MISSING_SHOWN = 8;
+const SUGGESTIONS_SHOWN = 3;
+/** Pedem-se mais sugestões do que as que se mostram, para o "Ver mais". */
+const SUGGESTIONS_FETCHED = 9;
+
 const isSunday = (date: string) => new Date(`${date}T12:00:00`).getDay() === 0;
 
 function WeekPlan({ household }: { household: CallerHouseholdDto }) {
@@ -54,6 +60,13 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   const reload = () => setVersion((v) => v + 1);
+  const [allMissing, setAllMissing] = useState(false);
+  const [allSuggestions, setAllSuggestions] = useState(false);
+  // Outra semana começa outra vez com as listas curtas.
+  useEffect(() => {
+    setAllMissing(false);
+    setAllSuggestions(false);
+  }, [monday]);
   // A foto de cada prato vem da receita: o plano só traz o id.
   const images = useRecipeImages(meals.map((meal) => meal.recipeId));
 
@@ -65,7 +78,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
       listPlannedMeals(householdId, monday, sunday),
       getPlanAvailability(householdId, monday, sunday),
       // As sugestões são um extra: se falharem, o plano mostra-se na mesma.
-      getSuggestions(householdId, suggestionDate, 3).catch(() => null),
+      getSuggestions(householdId, suggestionDate, SUGGESTIONS_FETCHED).catch(() => null),
     ])
       .then(([plannedMeals, planAvailability, mealSuggestions]) => {
         if (cancelled) return;
@@ -226,7 +239,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
             )}
             {missingLines.length > 0 && (
               <ul className="missing-list">
-                {missingLines.map((line) => (
+                {(allMissing ? missingLines : missingLines.slice(0, MISSING_SHOWN)).map((line) => (
                   <li key={line.ingredientId}>
                     <span className="missing-name">{line.label}</span>
                     <span className="missing-qty">
@@ -240,6 +253,16 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                   </li>
                 ))}
               </ul>
+            )}
+            {missingLines.length > MISSING_SHOWN && (
+              <button
+                type="button"
+                className="link-button side-more"
+                aria-expanded={allMissing}
+                onClick={() => setAllMissing((open) => !open)}
+              >
+                {allMissing ? "Ver menos" : `Ver tudo o que falta (${missingLines.length})`}
+              </button>
             )}
             {missingLines.length > 0 && (
               <SendToListForm
@@ -266,7 +289,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
               </p>
             )}
             <ul className="suggestion-list">
-              {suggestions?.suggestions.map((suggestion) => (
+              {suggestions?.suggestions.slice(0, allSuggestions ? undefined : SUGGESTIONS_SHOWN).map((suggestion) => (
                 <li key={suggestion.recipeId}>
                   <Link to={`/receitas/${suggestion.recipeId}`} className="suggestion-dish">
                     {suggestion.title}
@@ -305,6 +328,16 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                 </li>
               ))}
             </ul>
+            {suggestions && suggestions.suggestions.length > SUGGESTIONS_SHOWN && (
+              <button
+                type="button"
+                className="link-button side-more"
+                aria-expanded={allSuggestions}
+                onClick={() => setAllSuggestions((open) => !open)}
+              >
+                {allSuggestions ? "Ver menos" : "Ver mais sugestões"}
+              </button>
+            )}
           </section>
         </aside>
       </div>

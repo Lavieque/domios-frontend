@@ -577,6 +577,14 @@
   box-shadow: var(--glass-shadow);
 }
 
+/* "Ver tudo" / "Ver mais" por baixo de uma lista curta do plano. */
+.editorial .week-side .side-more {
+  display: inline-block;
+  margin: 10px 0 14px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
 /* ---------- Despensa: cartões com a fotografia em cima ---------- */
 
 .editorial .pantry-page .pantry-list {

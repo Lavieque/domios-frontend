@@ -226,7 +226,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
           })}
         </ol>
 
-        <aside className="week-side">
+        <aside className={allMissing || allSuggestions ? "week-side is-expanded" : "week-side"}>
           <section className="side-block">
             <div className="side-head">
               <h2>O que falta</h2>

@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { useSession } from "./auth/useSession";
-import { AppRail } from "./components/AppMenu";
+import { AppRail, AppTabBar } from "./components/AppMenu";
 import { EditorialBar } from "./components/EditorialBar";
 import { EmailVerificationNotice } from "./components/EmailVerificationNotice";
 import { PageSkeleton } from "./components/PageSkeleton";
@@ -143,7 +143,7 @@ function App() {
       <div className="app-column">
       {session ? (
         <>
-          <EditorialBar collapsed={railCollapsed} menuOpen={menuOpen} onToggle={toggleRail} />
+          <EditorialBar brand={brand} collapsed={railCollapsed} menuOpen={menuOpen} onToggle={toggleRail} />
         </>
       ) : (
         <header className="guest-header">
@@ -205,6 +205,8 @@ function App() {
         <span>Preços observados nas lojas acompanhadas</span>
       </footer>
       </div>
+      {/* No telemóvel a navegação fica em baixo, ao alcance do polegar. */}
+      {session && <AppTabBar />}
     </div>
   );
 }

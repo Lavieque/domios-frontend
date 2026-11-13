@@ -9,9 +9,9 @@ import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { ProductThumb } from "../components/ProductThumb";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
+import { usePageSize } from "../usePageSize";
 
 const count = new Intl.NumberFormat("pt-PT");
-const PAGE_SIZE = 20;
 
 /** Grupos da barra de filtros, pela ordem em que aparecem. */
 const SCOPE_GROUPS: { scope: CategoryScope; label: string }[] = [
@@ -24,6 +24,7 @@ const SCOPE_GROUPS: { scope: CategoryScope; label: string }[] = [
 const GROUP_PREVIEW = 8;
 
 export function ProductsPage() {
+  const pageSize = usePageSize(20, 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") ?? "";
   const categoryId = searchParams.get("categoryId");
@@ -122,13 +123,13 @@ export function ProductsPage() {
 
   useEffect(() => {
     setLoading(true);
-    searchProducts(search, page, PAGE_SIZE, categoryId ?? undefined, groceryOnly)
+    searchProducts(search, page, pageSize, categoryId ?? undefined, groceryOnly)
       .then((result) => {
         setProducts(result.items);
         setTotal(result.total);
       })
       .finally(() => setLoading(false));
-  }, [search, page, categoryId, groceryOnly]);
+  }, [search, page, pageSize, categoryId, groceryOnly]);
 
   const selectedCategory = categoryId ? categoriesById.get(categoryId) : undefined;
   // Primeira carga sem nada para mostrar; depois a grelha anterior fica à
@@ -297,7 +298,7 @@ export function ProductsPage() {
 
           <Pagination
             page={page}
-            pageSize={PAGE_SIZE}
+            pageSize={pageSize}
             total={total}
             onPageChange={(nextPage) => applyFilters({ page: nextPage })}
           />

@@ -5,9 +5,9 @@ import { CategoryScope, ChainStatus, type CategoryDto, type ChainDto, type Curre
 import { GroceryOnlyToggle } from "../components/GroceryOnlyToggle";
 import { Pagination } from "../components/Pagination";
 import { PromotionOfferLabel } from "../components/PromotionOfferLabel";
+import { usePageSize } from "../usePageSize";
 
 const count = new Intl.NumberFormat("pt-PT");
-const PAGE_SIZE = 20;
 // Em produção há 4 cadeias abertas; acima disto os chips deixam de caber
 // numa linha e passa a ser uma lista.
 const MAX_CHAIN_CHIPS = 8;
@@ -26,6 +26,7 @@ function parseMinDiscount(value: string | null): number | undefined {
 }
 
 export function PromotionsPage() {
+  const pageSize = usePageSize(20, 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const chainId = searchParams.get("chainId");
   const categoryId = searchParams.get("categoryId");
@@ -103,7 +104,7 @@ export function PromotionsPage() {
     searchCurrentPromotions(
       chainId ?? undefined,
       page,
-      PAGE_SIZE,
+      pageSize,
       categoryId ?? undefined,
       groceryOnly,
       requiresCard,
@@ -114,7 +115,7 @@ export function PromotionsPage() {
         setTotal(result.total);
       })
       .finally(() => setLoading(false));
-  }, [chainId, categoryId, groceryOnly, requiresCard, minDiscount, page]);
+  }, [chainId, categoryId, groceryOnly, requiresCard, minDiscount, page, pageSize]);
 
   return (
     <div className="page">
@@ -270,7 +271,7 @@ export function PromotionsPage() {
 
       <Pagination
         page={page}
-        pageSize={PAGE_SIZE}
+        pageSize={pageSize}
         total={total ?? 0}
         onPageChange={(nextPage) => applyFilters({ page: nextPage })}
       />

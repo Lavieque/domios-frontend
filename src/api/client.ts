@@ -67,6 +67,15 @@ export function getProductStoreOffers(productId: string): Promise<ProductStoreOf
   return get<ProductStoreOfferDto[]>(`/products/${productId}/store-offers`);
 }
 
+/**
+ * As ofertas de vários produtos num pedido (`GET /products/batch/store-offers?ids=`):
+ * uma chave por produto pedido, `[]` para os que não têm ofertas. No máximo
+ * `MAX_BATCH_PRODUCT_IDS` ids.
+ */
+export function getStoreOffersBatch(productIds: string[]): Promise<Record<string, ProductStoreOfferDto[]>> {
+  return get<Record<string, ProductStoreOfferDto[]>>("/products/batch/store-offers", { ids: productIds.join(",") });
+}
+
 export function searchActivePromotions(page = 1, pageSize = 20): Promise<PagedResult<PromotionDto>> {
   return get<PagedResult<PromotionDto>>("/promotions", { activeNow: true, page, pageSize });
 }

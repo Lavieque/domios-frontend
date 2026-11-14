@@ -95,7 +95,7 @@ export function MealPlanTemplateDetailPage() {
     setCopying(true);
     try {
       const copy = await createHouseholdMealPlanTemplate(current.householdId, {
-        name: `${loaded.name} ${tr().templateDetail.copySuffix}`.slice(0, 120),
+        name: loaded.name,
         description: loaded.description,
         durationDays: loaded.durationDays,
         servingsBasis: loaded.servingsBasis,

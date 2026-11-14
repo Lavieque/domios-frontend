@@ -10,6 +10,7 @@ import {
 import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { tr } from "../i18n";
+import { shortDate, today } from "../plan/dates";
 
 const statuses = [ShoppingListStatus.Open, ShoppingListStatus.Completed, ShoppingListStatus.Cancelled];
 
@@ -48,7 +49,7 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
     event.preventDefault();
     setCreating(true);
     try {
-      const list = await createShoppingList(household.householdId, name.trim() || null);
+      const list = await createShoppingList(household.householdId, name.trim() || tr().lists.defaultName(shortDate(today())));
       navigate(`/listas/${list.shoppingListId}`);
     } catch (err) {
       setError(describeError(err));

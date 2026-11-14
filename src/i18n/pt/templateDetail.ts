@@ -4,7 +4,6 @@ export const templateDetail = {
   title: "Ementa",
   openFailed: "Não deu para abrir esta ementa.",
   back: "Voltar às ementas",
-  copySuffix: "(minha)",
   duplicate: "A mesma receita está duas vezes na mesma refeição deste dia.",
   forbiddenRecipe: "Essa receita não pode entrar nesta ementa.",
   crumb: "Ementas prontas",

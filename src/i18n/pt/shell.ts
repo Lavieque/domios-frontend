@@ -141,6 +141,7 @@ export const account = {
   languageHint:
     "A língua dos menus e dos textos da app. Os nomes dos produtos e das receitas ficam como estão nas lojas.",
   languageNames: { pt: "Português", en: "English" },
+  languageShort: { pt: "PT", en: "EN" },
   avatar: {
     tooLarge: "A imagem é demasiado grande. Escolhe outra.",
     invalid: "Essa imagem não deu. Escolhe uma fotografia JPEG, PNG ou WebP.",

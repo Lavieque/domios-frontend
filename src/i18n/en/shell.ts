@@ -142,6 +142,7 @@ export const account: Dict["account"] = {
   language: "Language",
   languageHint: "The language of the app's menus and text. Product and recipe names stay as they are in the stores.",
   languageNames: { pt: "Português", en: "English" },
+  languageShort: { pt: "PT", en: "EN" },
   avatar: {
     tooLarge: "The image is too large. Choose another one.",
     invalid: "That image didn't work. Choose a JPEG, PNG or WebP photo.",

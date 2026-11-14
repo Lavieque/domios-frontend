@@ -8,7 +8,7 @@ import { AuthSheet } from "../components/AuthSheet";
 import { inviteFromHash } from "../auth/links";
 import { useSession } from "../auth/useSession";
 import { REQUEST_ACCESS_URL } from "../siteUrl";
-import { useT } from "../i18n";
+import { getLanguage, useT } from "../i18n";
 
 
 export function RegisterPage() {
@@ -52,7 +52,7 @@ export function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await register(email.trim(), password, invite ?? undefined);
+      await register(email.trim(), password, invite ?? undefined, getLanguage());
       // O registo não faz login: entra-se a seguir com os mesmos dados.
       await signIn(email, password);
       navigate("/conta", {

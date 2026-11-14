@@ -125,7 +125,7 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
                     <ul className="waste-list">
                       {waste.byCategory.map((c) => (
                         <li key={c.categoryId ?? "none"}>
-                          <span>{c.name}</span>
+                          <span>{c.categoryId === null || c.name === null ? tr().waste.noCategory : c.name}</span>
                           <span className="muted">
                             {c.itemCount}
                             {c.estimatedValue && ` · ${money.format(c.estimatedValue.amount)}`}
@@ -143,7 +143,7 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
                   {waste.items.map((item) => (
                     <li key={item.pantryItemId}>
                       <span>
-                        <Link to={`/produtos/${item.productId}`}>{item.productName}</Link>{" "}
+                        <Link to={`/produtos/${item.productId}`}>{item.productName ?? tr().waste.unknownProduct}</Link>{" "}
                         <span className="muted">
                           {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]} ·{" "}
                           {item.reason === null ? tr().waste.noReasonInline : discardReasonLabels[item.reason].toLowerCase()}

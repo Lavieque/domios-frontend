@@ -210,7 +210,8 @@ export function eatLeftovers(householdId: string, pantryItemId: string, mealType
 export interface PantryWasteItemDto {
   pantryItemId: string;
   productId: string;
-  productName: string;
+  /** null: the product is no longer in the catalog. */
+  productName: string | null;
   /** O que restava quando foi deitado fora. */
   quantity: QuantityDto;
   reason: DiscardReason | null;
@@ -229,7 +230,7 @@ export interface PantryWasteDto {
   estimatedValue: MoneyDto | null;
   valuedItemCount: number;
   byReason: { reason: DiscardReason | null; itemCount: number; estimatedValue: MoneyDto | null }[];
-  byCategory: { categoryId: string | null; name: string; itemCount: number; estimatedValue: MoneyDto | null }[];
+  byCategory: { categoryId: string | null; /** null: no category. */ name: string | null; itemCount: number; estimatedValue: MoneyDto | null }[];
   items: PantryWasteItemDto[];
 }
 

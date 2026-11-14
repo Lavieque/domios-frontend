@@ -59,6 +59,8 @@ export const spending = {
 };
 
 export const waste = {
+  noCategory: "Sem categoria",
+  unknownProduct: "Produto desconhecido",
   back: "Despensa",
   title: "Desperdício",
   subtitle: (household: string) => `O que se deitou fora em ${household}`,

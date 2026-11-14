@@ -3,6 +3,7 @@
 
 import { authedRequest } from "../auth/sessionStore";
 import type { DomainEventLogEntryDto, PagedResult } from "./types";
+import { localized } from "../i18n";
 
 export const MemberRole = {
   Admin: 0,
@@ -12,12 +13,7 @@ export const MemberRole = {
 } as const;
 export type MemberRole = (typeof MemberRole)[keyof typeof MemberRole];
 
-export const memberRoleLabels: Record<MemberRole, string> = {
-  [MemberRole.Admin]: "Administrador",
-  [MemberRole.Adult]: "Adulto",
-  [MemberRole.Child]: "Criança",
-  [MemberRole.Guest]: "Convidado",
-};
+export const memberRoleLabels: Record<MemberRole, string> = localized((t) => t.enums.memberRole);
 
 /** Uma casa vista pelo utilizador: que membro é lá e com que papel. */
 export interface CallerHouseholdDto {

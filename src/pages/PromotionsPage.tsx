@@ -6,8 +6,10 @@ import { GroceryOnlyToggle } from "../components/GroceryOnlyToggle";
 import { Pagination } from "../components/Pagination";
 import { PromotionOfferLabel } from "../components/PromotionOfferLabel";
 import { usePageSize } from "../usePageSize";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const count = new Intl.NumberFormat("pt-PT");
+const count = numberFormat();
 // Em produção há 4 cadeias abertas; acima disto os chips deixam de caber
 // numa linha e passa a ser uma lista.
 const MAX_CHAIN_CHIPS = 8;
@@ -121,8 +123,8 @@ export function PromotionsPage() {
     <div className="page">
       <header className="page-head">
         <div>
-          <h1>Promoções</h1>
-          <p className="page-head-sub">Em promoção na última leitura de cada loja, dos últimos 3 dias.</p>
+          <h1>{tr().promotions.title}</h1>
+          <p className="page-head-sub">{tr().promotions.subtitle}</p>
         </div>
       </header>
 
@@ -134,7 +136,7 @@ export function PromotionsPage() {
           aria-controls="promotion-filters"
           onClick={() => setShowFilters((open) => !open)}
         >
-          {activeFilterCount > 0 ? `Filtros · ${activeFilterCount}` : "Filtros"}
+          {activeFilterCount > 0 ? tr().promotions.filtersCount(activeFilterCount) : tr().promotions.filters}
         </button>
         {activeFilterCount > 0 && (
           <button
@@ -150,7 +152,7 @@ export function PromotionsPage() {
               })
             }
           >
-            Limpar
+            {tr().promotions.clear}
           </button>
         )}
       </div>
@@ -159,11 +161,11 @@ export function PromotionsPage() {
         <div className="toolbar" id="promotion-filters">
           <select
             className="category-select"
-            aria-label="Categoria"
+            aria-label={tr().lists2.category}
             value={categoryId ?? ""}
             onChange={(e) => applyFilters({ categoryId: e.target.value || null, page: 1 })}
           >
-            <option value="">Todas as categorias</option>
+            <option value="">{tr().lists2.allCategories}</option>
             {topLevelCategories.map((category) => (
               <option key={category.categoryId} value={category.categoryId}>
                 {category.name}
@@ -172,7 +174,7 @@ export function PromotionsPage() {
           </select>
           <select
             className="category-select"
-            aria-label="Cartão"
+            aria-label={tr().promotions.card}
             value={requiresCard === undefined ? "" : requiresCard ? "1" : "0"}
             onChange={(e) =>
               applyFilters({
@@ -181,13 +183,13 @@ export function PromotionsPage() {
               })
             }
           >
-            <option value="">Com e sem cartão</option>
-            <option value="1">Só com cartão</option>
-            <option value="0">Só sem cartão</option>
+            <option value="">{tr().promotions.anyCard}</option>
+            <option value="1">{tr().promotions.cardOnly}</option>
+            <option value="0">{tr().promotions.noCard}</option>
           </select>
           <select
             className="category-select"
-            aria-label="Desconto mínimo"
+            aria-label={tr().promotions.minDiscount}
             value={minDiscount ?? ""}
             onChange={(e) =>
               applyFilters({
@@ -196,10 +198,10 @@ export function PromotionsPage() {
               })
             }
           >
-            <option value="">Qualquer desconto</option>
+            <option value="">{tr().promotions.anyDiscount}</option>
             {MIN_DISCOUNTS.map((value) => (
               <option key={value} value={value}>
-                {value}% ou mais
+                {tr().promotions.orMore(value)}
               </option>
             ))}
           </select>
@@ -207,11 +209,11 @@ export function PromotionsPage() {
           {openChains.length > MAX_CHAIN_CHIPS && (
             <select
               className="category-select"
-              aria-label="Cadeia"
+              aria-label={tr().stores.chain}
               value={chainId ?? ""}
               onChange={(e) => applyFilters({ chainId: e.target.value || null, page: 1 })}
             >
-              <option value="">Todas as cadeias</option>
+              <option value="">{tr().stores.allChains}</option>
               {openChains.map((chain) => (
                 <option key={chain.chainId} value={chain.chainId}>
                   {chain.name}
@@ -223,14 +225,14 @@ export function PromotionsPage() {
       )}
 
       {openChains.length > 1 && openChains.length <= MAX_CHAIN_CHIPS && (
-        <div className="chip-row" role="group" aria-label="Cadeia">
+        <div className="chip-row" role="group" aria-label={tr().stores.chain}>
           <button
             type="button"
             className="chip"
             aria-pressed={chainId === null}
             onClick={() => applyFilters({ chainId: null, page: 1 })}
           >
-            Todas
+            {tr().lists2.all}
           </button>
           {openChains.map((chain) => (
             <button
@@ -253,12 +255,12 @@ export function PromotionsPage() {
 
       <p className="results-count">
         {loading || total === null
-          ? "A procurar…"
-          : `${count.format(total)} ${total === 1 ? "produto" : "produtos"} em promoção`}
+          ? tr().lists2.searching
+          : tr().promotions.count(count.format(total), total)}
       </p>
 
       {!loading && offers.length === 0 ? (
-        <p className="empty-state">Sem promoções ativas neste momento.</p>
+        <p className="empty-state">{tr().promotions.none}</p>
       ) : (
         !loading && (
           <div className="price-rows">

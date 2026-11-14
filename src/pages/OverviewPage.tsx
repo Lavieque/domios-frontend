@@ -12,9 +12,11 @@ import { useProducts } from "../pantry/useProducts";
 import { addDays, startOfWeek, today, weekdayTitle, type IsoDate } from "../plan/dates";
 import { useRecipeImages } from "../plan/recipeImages";
 import { useOpenLists } from "../shopping/useOpenLists";
+import { dateTimeFormat, numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
-const longDate = new Intl.DateTimeFormat("pt-PT", {
+const quantityFormat = numberFormat({ maximumFractionDigits: 2 });
+const longDate = dateTimeFormat({
   weekday: "long",
   day: "numeric",
   month: "long",
@@ -40,15 +42,15 @@ export function OverviewPage() {
       <HouseholdGate
         withoutHousehold={
           <>
-            <TodayIntro title="Olá!" />
+            <TodayIntro title={tr().today.hello} />
             <section className="panel">
-              <h2>Ainda não tens casa</h2>
+              <h2>{tr().today.noHousehold}</h2>
               <p className="muted">
-                O dia, a semana, a despensa e as compras pertencem a uma casa. Cria a tua e começa pelo jantar de hoje.
+                {tr().today.noHouseholdText}
               </p>
               <div className="panel-actions">
                 <Link to="/casa/nova" className="button-primary">
-                  Criar a casa
+                  {tr().today.createHousehold}
                 </Link>
               </div>
             </section>
@@ -69,9 +71,9 @@ function TodayIntro({ title }: { title: string }) {
         <p className="eyebrow">{longDate.format(new Date(`${day}T12:00:00Z`))}</p>
         <h1>{title}</h1>
         <p className="page-head-sub">
-          Uma casa mais organizada,
+          {tr().today.taglineTop}
           <br />
-          uma vida mais simples.
+          {tr().today.taglineBottom}
         </p>
       </div>
     </header>
@@ -129,26 +131,26 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <>
-      <TodayIntro title={memberName ? `Olá, ${memberName}!` : "Olá!"} />
+      <TodayIntro title={memberName ? tr().today.helloName(memberName) : tr().today.hello} />
 
       <div className="stats">
-        <Stat to="/plano" value={meals?.length ?? null} label="refeições planeadas" icon="M3 5h18v16H3z M7 3v4 M17 3v4 M3 10h18" />
-        <Stat to="/listas" value={toBuy} label="artigos por comprar" icon="M2 3h3l3 12h11l2-8H6 M9 20h.01m9 0h.01" />
-        <Stat to="/despensa" value={useSoon} label="alimentos a usar" icon="M12 7v5l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0" />
+        <Stat to="/plano" value={meals?.length ?? null} label={tr().today.plannedMeals} icon="M3 5h18v16H3z M7 3v4 M17 3v4 M3 10h18" />
+        <Stat to="/listas" value={toBuy} label={tr().today.toBuy} icon="M2 3h3l3 12h11l2-8H6 M9 20h.01m9 0h.01" />
+        <Stat to="/despensa" value={useSoon} label={tr().today.toUse} icon="M12 7v5l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0" />
       </div>
 
       <div className="home-grid home-grid-top">
         <section className="panel edge-photo edge-soft edge-plan">
           <div className="section-head">
-            <h2>À mesa esta semana</h2>
+            <h2>{tr().today.thisWeek}</h2>
             <Link to="/plano" className="arrow-link">
-              Ver planeamento →
+              {tr().today.seePlanning}
             </Link>
           </div>
-          {meals === null && <p className="muted loading">A carregar…</p>}
+          {meals === null && <p className="muted loading">{tr().common.loading}</p>}
           {meals !== null && upcoming.length === 0 && (
             <p className="muted">
-              Escolhe a primeira refeição no <Link to="/plano">planeamento</Link>.
+              {tr().today.firstMeal.before} <Link to="/plano">{tr().today.firstMeal.link}</Link>{tr().today.firstMeal.after}
             </p>
           )}
           {upcoming.length > 0 && (
@@ -169,7 +171,7 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
                         {recipe && (
                           <>
                             <br />
-                            {recipe.availableCount} de {recipe.requiredCount} ingredientes em casa
+                            {tr().today.ingredientsAtHome(recipe.availableCount, recipe.requiredCount)}
                           </>
                         )}
                       </span>
@@ -192,12 +194,12 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
 
         <section className="panel edge-photo edge-soft edge-pantry use-first-panel">
           <div className="section-head">
-            <h2>Usar primeiro</h2>
+            <h2>{tr().today.useFirst}</h2>
           </div>
-          {pantry === null && <p className="muted loading">A carregar…</p>}
+          {pantry === null && <p className="muted loading">{tr().common.loading}</p>}
           {pantry !== null && pantry.length === 0 && (
             <p className="muted">
-              A despensa está vazia. <Link to="/despensa/adicionar">Guardar as compras</Link>
+              {tr().today.pantryEmpty} <Link to="/despensa/adicionar">{tr().today.storeShopping}</Link>
             </p>
           )}
           {pantry !== null &&
@@ -213,7 +215,7 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
                     <strong>{product?.name ?? "…"}</strong>
                     <span>
                       {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]}
-                      {item.openedAt !== null && " · aberto"}
+                      {item.openedAt !== null && tr().today.opened}
                     </span>
                   </span>
                   <span className={u.level >= 2 ? "badge badge-warn" : "badge"}>{u.label}</span>
@@ -221,7 +223,7 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
               );
             })}
           <Link to="/despensa" className="arrow-link">
-            Ver despensa →
+            {tr().today.seePantry}
           </Link>
         </section>
       </div>
@@ -229,30 +231,30 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
       <div className="home-grid home-grid-bottom">
         <section className="panel edge-photo edge-shopping shop-banner">
           <div>
-            <p className="eyebrow">Compras com intenção</p>
+            <p className="eyebrow">{tr().today.shoppingEyebrow}</p>
             <h2>
-              Comprar melhor
+              {tr().today.shoppingTop}
               <br />
-              começa aqui.
+              {tr().today.shoppingBottom}
             </h2>
             <p className="muted">
               {lists === null
-                ? "A carregar…"
+                ? tr().common.loading
                 : firstList
-                  ? `${firstLeft} ${firstLeft === 1 ? "artigo" : "artigos"} na lista «${firstList.name}».`
-                  : "Ainda não tens listas abertas."}
+                  ? tr().today.itemsOnList(firstLeft, firstList.name)
+                  : tr().today.noOpenLists}
             </p>
           </div>
           <Link to={firstList ? `/listas/${firstList.shoppingListId}` : "/listas"} className="button-sage">
-            {firstList ? "Abrir lista →" : "Criar lista →"}
+            {firstList ? tr().today.openList : tr().today.createList}
           </Link>
         </section>
 
         <section className="panel edge-photo edge-offers">
-          <h2>Oportunidades para ti</h2>
-          <p className="muted">Descobre os preços nas tuas lojas e compara os artigos de que precisas.</p>
+          <h2>{tr().today.offersTitle}</h2>
+          <p className="muted">{tr().today.offersText}</p>
           <Link to="/produtos" className="arrow-link">
-            Comparar preços →
+            {tr().today.comparePrices}
           </Link>
         </section>
       </div>

@@ -10,6 +10,7 @@ import { useCategories } from "../catalog/useCategories";
 import { useActiveChains } from "../catalog/useChains";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { isIsoDate } from "../plan/dates";
+import { tr } from "../i18n";
 
 const units = Object.values(MeasurementUnit) as MeasurementUnit[];
 
@@ -59,7 +60,7 @@ function fromIngredient(ingredient: IngredientDto, location: PantryLocation, cha
     kind: "ingredient",
     id: ingredient.ingredientId,
     name: ingredient.displayName ?? ingredient.name,
-    detail: "sem marca",
+    detail: tr().addPantry.noBrand,
     amount: "1",
     unit: ingredient.defaultUnit,
     location,
@@ -156,15 +157,15 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
       const amount = Number(draft.amount.replace(",", "."));
       const price = draft.price.trim() === "" ? null : Number(draft.price.replace(",", "."));
       if (!(amount > 0)) {
-        setError(`Indica a quantidade de ${draft.name}.`);
+        setError(tr().addPantry.missingQuantity(draft.name));
         return;
       }
       if (draft.expiresAt !== "" && !isIsoDate(draft.expiresAt)) {
-        setError(`A validade de ${draft.name} não é uma data válida.`);
+        setError(tr().addPantry.badExpiry(draft.name));
         return;
       }
       if (price !== null && !(price >= 0)) {
-        setError(`O preço de ${draft.name} não é válido.`);
+        setError(tr().addPantry.badPrice(draft.name));
         return;
       }
       items.push({
@@ -184,13 +185,13 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
       await addPantryItemsBatch(household.householdId, items);
       const notice =
         items.length === 1
-          ? `${drafts[0].name} adicionado à despensa.`
-          : `${items.length} itens adicionados à despensa.`;
+          ? tr().addPantry.addedOne(drafts[0].name)
+          : tr().addPantry.addedMany(items.length);
       navigate("/despensa", { state: { notice } });
     } catch (err) {
       setError(
         describeError(err, {
-          "invalid-argument": "Algum item não pode ser adicionado (um produto pode ter sido descontinuado).",
+          "invalid-argument": tr().addPantry.invalid,
         }),
       );
       setSubmitting(false);
@@ -202,20 +203,20 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <div className="page add-pantry-page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <Link to="/despensa" className="back-link">
-          Despensa
+          {tr().addPantry.pantry}
         </Link>
       </nav>
       <header className="page-head">
         <div>
-          <h1>Adicionar à despensa</h1>
+          <h1>{tr().addPantry.title}</h1>
           <p className="page-head-sub">{household.name}</p>
         </div>
       </header>
 
       <div className="add-layout">
-        <section className="add-picker" aria-label="Procurar">
+        <section className="add-picker" aria-label={tr().addPantry.search}>
           <div className="add-search">
             <div className="search-wrap">
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -224,8 +225,8 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
               </svg>
               <input
                 type="search"
-                aria-label="Produto ou ingrediente"
-                placeholder="Leite, cebola, arroz…"
+                aria-label={tr().addPantry.searchLabel}
+                placeholder={tr().addPantry.searchPlaceholder}
                 autoFocus
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -233,22 +234,22 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
               />
             </div>
             {searching && !hasResults && (
-              <p className="add-search-empty muted">Nada encontrado para “{search.trim()}”.</p>
+              <p className="add-search-empty muted">{tr().addPantry.nothingFound(search.trim())}</p>
             )}
             {hasResults && (
               <ul className="product-results">
-                {ingredients.length > 0 && <li className="result-group">Ingredientes sem marca</li>}
+                {ingredients.length > 0 && <li className="result-group">{tr().addPantry.ingredients}</li>}
                 {ingredients.map((ingredient) => (
                   <li key={ingredient.ingredientId}>
                     <button type="button" onClick={() => add(fromIngredient(ingredient, location, chainId))}>
                       <span className="result-text">
                         <strong>{ingredient.displayName ?? ingredient.name}</strong>
-                        <span className="muted">Basta o nome, sem marca</span>
+                        <span className="muted">{tr().addPantry.justName}</span>
                       </span>
                     </button>
                   </li>
                 ))}
-                {products.length > 0 && <li className="result-group">Produtos do catálogo</li>}
+                {products.length > 0 && <li className="result-group">{tr().addPantry.products}</li>}
                 {products.map((product) => (
                   <li key={product.productId} className={aisleFor(product.category, categories)}>
                     <button type="button" onClick={() => add(fromProduct(product, location, chainId))}>
@@ -268,7 +269,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
 
           <div className="add-where">
             <span className="add-where-label" id="add-where-label">
-              Guardar em
+              {tr().addPantry.storeIn}
             </span>
             <div className="chip-row" role="group" aria-labelledby="add-where-label">
               {pantryLocations.map((loc) => (
@@ -286,22 +287,21 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
           </div>
           {chains && chains.length > 0 && (
             <label className="add-where">
-              <span className="add-where-label">Comprado no</span>
-              <ChainSelect chains={chains} value={chainId} onChange={applyChainToAll} label="Onde compraste" />
+              <span className="add-where-label">{tr().addPantry.boughtAt}</span>
+              <ChainSelect chains={chains} value={chainId} onChange={applyChainToAll} label={tr().addPantry.whereBought} />
             </label>
           )}
           <p className="add-hint muted">
-            Para “2 cebolas” serve o ingrediente; para uma marca em concreto, o produto. Junta vários e guarda tudo de
-            uma vez.
+            {tr().addPantry.hint}
           </p>
         </section>
 
         <section className="add-basket" aria-labelledby="add-basket-title">
           <h2 id="add-basket-title">
-            Por guardar {drafts.length > 0 && <span className="muted">{drafts.length}</span>}
+            {tr().addPantry.toStore} {drafts.length > 0 && <span className="muted">{drafts.length}</span>}
           </h2>
           {drafts.length === 0 ? (
-            <p className="empty-state">Ainda nada. Pesquisa e escolhe o que trouxeste das compras.</p>
+            <p className="empty-state">{tr().addPantry.empty}</p>
           ) : (
             <form onSubmit={handleSubmit}>
               <ul className="draft-list">
@@ -324,14 +324,14 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
               )}
               <div className="add-submit">
                 <span className="muted">
-                  {drafts.length === 1 ? "1 item por guardar" : `${drafts.length} itens por guardar`}
+                  {tr().addPantry.pending(drafts.length)}
                 </span>
                 <button type="submit" className="button-primary" disabled={submitting}>
                   {submitting
-                    ? "A guardar…"
+                    ? tr().addPantry.saving
                     : drafts.length === 1
-                      ? "Guardar na despensa"
-                      : `Guardar ${drafts.length} itens`}
+                      ? tr().addPantry.saveOne
+                      : tr().addPantry.saveMany(drafts.length)}
                 </button>
               </div>
             </form>
@@ -370,13 +370,13 @@ function DraftRow({
             type="text"
             inputMode="decimal"
             required
-            aria-label={`Quantidade de ${draft.name}`}
+            aria-label={tr().addPantry.quantityOf(draft.name)}
             value={draft.amount}
             onChange={(e) => onChange({ amount: e.target.value })}
           />
           <select
             className="category-select"
-            aria-label="Unidade"
+            aria-label={tr().addPantry.unit}
             value={draft.unit}
             onChange={(e) => onChange({ unit: Number(e.target.value) as MeasurementUnit })}
           >
@@ -389,7 +389,7 @@ function DraftRow({
         </span>
         <select
           className="category-select"
-          aria-label={`Onde fica ${draft.name}`}
+          aria-label={tr().addPantry.whereIs(draft.name)}
           value={draft.location}
           onChange={(e) => onChange({ location: Number(e.target.value) as PantryLocation })}
         >
@@ -400,10 +400,10 @@ function DraftRow({
           ))}
         </select>
         <button type="button" className="row-action" aria-expanded={more} onClick={() => setMore(!more)}>
-          Validade, preço e loja
+          {tr().addPantry.more}
         </button>
       </div>
-      <button type="button" className="icon-danger" aria-label={`Tirar ${draft.name}`} title="Tirar" onClick={onRemove}>
+      <button type="button" className="icon-danger" aria-label={tr().addPantry.removeItem(draft.name)} title={tr().addPantry.remove} onClick={onRemove}>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 7l10 10M17 7 7 17" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
@@ -411,27 +411,27 @@ function DraftRow({
       {more && (
         <div className="draft-more">
           <label className="form-field">
-            <span>Validade</span>
+            <span>{tr().addPantry.expiry}</span>
             <input type="date" value={draft.expiresAt} onChange={(e) => onChange({ expiresAt: e.target.value })} />
           </label>
           <label className="form-field">
-            <span>Preço pago (€)</span>
+            <span>{tr().addPantry.pricePaid}</span>
             <input
               type="text"
               inputMode="decimal"
-              placeholder="Opcional"
+              placeholder={tr().addPantry.optional}
               value={draft.price}
               onChange={(e) => onChange({ price: e.target.value })}
             />
           </label>
           {chains && chains.length > 0 && (
             <label className="form-field">
-              <span>Comprado no</span>
+              <span>{tr().addPantry.boughtAt}</span>
               <ChainSelect
                 chains={chains}
                 value={draft.chainId}
                 onChange={(next) => onChange({ chainId: next })}
-                label={`Onde compraste ${draft.name}`}
+                label={tr().addPantry.whereBoughtItem(draft.name)}
               />
             </label>
           )}
@@ -454,7 +454,7 @@ function ChainSelect({
 }) {
   return (
     <select className="category-select" aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
-      <option value="">Sem loja</option>
+      <option value="">{tr().addPantry.noStore}</option>
       {chains.map((chain) => (
         <option key={chain.chainId} value={chain.chainId}>
           {chain.name}

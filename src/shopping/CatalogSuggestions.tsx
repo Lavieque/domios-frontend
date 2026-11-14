@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { searchIngredients, searchProducts, type IngredientDto } from "../api/client";
 import { measurementUnitLabels, type ProductDto } from "../api/types";
+import { tr } from "../i18n";
 
 export type CatalogPick =
   | { kind: "ingredient"; id: string; name: string; ingredient: IngredientDto }
@@ -66,7 +67,7 @@ export function SuggestionList({ suggestions, onPick }: { suggestions: Suggestio
   if (ingredients.length === 0 && products.length === 0) return null;
   return (
     <ul className="product-results suggestion-list">
-      {ingredients.length > 0 && <li className="result-group">Qualquer marca</li>}
+      {ingredients.length > 0 && <li className="result-group">{tr().ui.catalog.anyBrand}</li>}
       {ingredients.map((ingredient) => (
         <li key={ingredient.ingredientId}>
           <button
@@ -75,12 +76,12 @@ export function SuggestionList({ suggestions, onPick }: { suggestions: Suggestio
           >
             <span className="result-text">
               <strong>{ingredient.displayName ?? ingredient.name}</strong>
-              <span className="muted">Compara todas as marcas</span>
+              <span className="muted">{tr().ui.catalog.compareBrands}</span>
             </span>
           </button>
         </li>
       ))}
-      {products.length > 0 && <li className="result-group">Produto em concreto</li>}
+      {products.length > 0 && <li className="result-group">{tr().ui.catalog.specificProduct}</li>}
       {products.map((product) => (
         <li key={product.productId}>
           <button type="button" onClick={() => onPick({ kind: "product", id: product.productId, name: product.name, product })}>
@@ -104,12 +105,12 @@ export function LinkPicker({ label, onPick, onCancel }: { label: string; onPick:
   const empty = !suggestions.loading && suggestions.ingredients.length === 0 && suggestions.products.length === 0;
   return (
     <div className="link-picker">
-      {suggestions.loading && <p className="muted">A procurar…</p>}
-      {empty && <p className="muted">Nada no catálogo parecido com “{label}”.</p>}
+      {suggestions.loading && <p className="muted">{tr().ui.picker.searching}</p>}
+      {empty && <p className="muted">{tr().ui.catalog.nothingLike(label)}</p>}
       <SuggestionList suggestions={suggestions} onPick={onPick} />
       {onCancel && (
         <button type="button" className="link-button" onClick={onCancel}>
-          Fechar
+          {tr().common.close}
         </button>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { tr } from "../i18n";
 
 interface PaginationProps {
   page: number;
@@ -49,13 +50,13 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
   return (
     <div className="pagination" ref={ref}>
       <button type="button" disabled={page <= 1} onClick={() => go(page - 1)}>
-        Anterior
+        {tr().ui.pagination.previous}
       </button>
       <span>
-        Página {page} de {totalPages} ({total} resultados)
+        {tr().ui.pagination.page(page, totalPages, total)}
       </span>
       <button type="button" disabled={page >= totalPages} onClick={() => go(page + 1)}>
-        Seguinte
+        {tr().ui.pagination.next}
       </button>
     </div>
   );

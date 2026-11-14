@@ -11,3 +11,16 @@ export function logoutAll(): Promise<void> {
 export function requestEmailVerification(): Promise<void> {
   return authedRequest<void>("/auth/email/verification-requests", { method: "POST" });
 }
+
+export interface AccountPreferences {
+  language: "pt" | "en";
+}
+
+/** Preferências da conta (DomiOS_API_Fase3.md, adenda 2026-11-13): por agora só a língua da app. */
+export function getPreferences(): Promise<AccountPreferences> {
+  return authedRequest<AccountPreferences>("/account/preferences");
+}
+
+export function updatePreferences(preferences: AccountPreferences): Promise<AccountPreferences> {
+  return authedRequest<AccountPreferences>("/account/preferences", { method: "PUT", body: preferences });
+}

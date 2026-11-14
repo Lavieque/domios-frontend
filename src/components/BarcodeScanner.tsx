@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { isBarcode } from "../api/barcodes";
+import { tr } from "../i18n";
 
 interface Props {
   /** Chamado uma vez com os dígitos lidos (ou escritos). */
@@ -47,7 +48,7 @@ export function BarcodeScanner({ onScan }: Props) {
     async function start() {
       const video = videoRef.current;
       if (!video || !navigator.mediaDevices?.getUserMedia) {
-        setCameraError("Este browser não deixa usar a câmara. Escreve o código.");
+        setCameraError(tr().ui.barcode.noCamera);
         return;
       }
       try {
@@ -81,7 +82,7 @@ export function BarcodeScanner({ onScan }: Props) {
         stopZxing = () => controls.stop();
         if (stopped) controls.stop();
       } catch {
-        setCameraError("Não consegui abrir a câmara. Dá-lhe permissão ou escreve o código.");
+        setCameraError(tr().ui.barcode.cameraFailed);
       }
     }
 
@@ -100,7 +101,7 @@ export function BarcodeScanner({ onScan }: Props) {
       {cameraError ? (
         <p className="muted">{cameraError}</p>
       ) : (
-        <video ref={videoRef} className="barcode-video" muted playsInline aria-label="Câmara a ler o código de barras" />
+        <video ref={videoRef} className="barcode-video" muted playsInline aria-label={tr().ui.barcode.camera} />
       )}
       <form
         className="inline-form"
@@ -112,13 +113,13 @@ export function BarcodeScanner({ onScan }: Props) {
         <input
           type="text"
           inputMode="numeric"
-          aria-label="Código de barras"
-          placeholder="Ou escreve o código"
+          aria-label={tr().ui.barcode.code}
+          placeholder={tr().ui.barcode.typeCode}
           value={typed}
           onChange={(e) => setTyped(e.target.value)}
         />
         <button type="submit" className="button-secondary" disabled={!isBarcode(digits)}>
-          Procurar
+          {tr().ui.barcode.search}
         </button>
       </form>
     </div>

@@ -4,6 +4,7 @@ import { createHousehold } from "../api/households";
 import { describeError } from "../auth/errors";
 import { useSession } from "../auth/useSession";
 import { storeHouseholdId } from "../household/currentHousehold";
+import { tr } from "../i18n";
 
 // Todas as casas reais são em Portugal; a Api guarda o fuso para datas e
 // refeições, a moeda para os preços.
@@ -34,7 +35,7 @@ export function CreateHouseholdPage() {
     } catch (err) {
       setError(
         describeError(err, {
-          "invalid-argument": "Preenche o nome da casa e o teu nome.",
+          "invalid-argument": tr().createHousehold.invalid,
         }),
       );
       setSubmitting(false);
@@ -43,26 +44,23 @@ export function CreateHouseholdPage() {
 
   return (
     <div className="page settings-page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <Link to="/casa" className="back-link">
-          Casa
+          {tr().shell.links.household.label}
         </Link>
       </nav>
       <header className="page-head">
-        <h1>Criar casa</h1>
+        <h1>{tr().createHousehold.title}</h1>
       </header>
-      <p className="page-lede">
-        A casa junta a despensa, as listas de compras e o plano de refeições. Ficas como administrador e podes
-        acrescentar o resto da família depois.
-      </p>
+      <p className="page-lede">{tr().createHousehold.lede}</p>
 
       <form className="auth-form create-household-form" onSubmit={handleSubmit}>
         <label className="form-field">
-          <span>Nome da casa</span>
+          <span>{tr().createHousehold.name}</span>
           <input type="text" required maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
         </label>
         <label className="form-field">
-          <span>O teu nome</span>
+          <span>{tr().createHousehold.yourName}</span>
           <input
             type="text"
             autoComplete="given-name"
@@ -78,7 +76,7 @@ export function CreateHouseholdPage() {
           </p>
         )}
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? "A criar…" : "Criar casa"}
+          {submitting ? tr().common.creating : tr().createHousehold.title}
         </button>
       </form>
     </div>

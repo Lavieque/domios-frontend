@@ -8,12 +8,13 @@ import { AuthSheet } from "../components/AuthSheet";
 import { inviteFromHash } from "../auth/links";
 import { useSession } from "../auth/useSession";
 import { REQUEST_ACCESS_URL } from "../siteUrl";
+import { useT } from "../i18n";
 
-const WEAK_PASSWORD = `A password tem de ter entre ${PASSWORD_MIN_LENGTH} e ${PASSWORD_MAX_LENGTH} caracteres.`;
-const INVALID_INVITE =
-  "Este convite não é válido: expirou, já foi usado ou é de outro email. Pede acesso de novo ou usa o email para onde o convite foi enviado.";
 
 export function RegisterPage() {
+  const t = useT();
+  const WEAK_PASSWORD = t.auth.weakPassword(PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH);
+  const INVALID_INVITE = t.auth.invalidInvite;
   const session = useSession();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,7 +46,7 @@ export function RegisterPage() {
       return;
     }
     if (password !== confirmation) {
-      setError("As duas passwords não são iguais.");
+      setError(t.auth.passwordsDiffer);
       return;
     }
 
@@ -57,7 +58,7 @@ export function RegisterPage() {
       navigate("/conta", {
         replace: true,
         state: {
-          notice: "Conta criada. Enviámos-te um email com um link para confirmares o endereço.",
+          notice: t.auth.accountCreated,
         },
       });
     } catch (err) {
@@ -78,34 +79,31 @@ export function RegisterPage() {
 
   if (!invite) {
     return (
-      <AuthSheet title="Criar conta">
-        <p>
-          O DomiOS está aberto só a quem tem convite. Pede acesso e, quando for aprovado, recebes um email com o link
-          para criares a conta.
-        </p>
+      <AuthSheet title={t.auth.createAccount}>
+        <p>{t.auth.inviteOnly}</p>
         <p>
           <a className="button-primary" href={REQUEST_ACCESS_URL}>
-            Pedir acesso
+            {t.common.requestAccess}
           </a>
         </p>
         <p className="form-links">
-          Já tens conta? <Link to="/entrar">Entrar</Link>
+          {t.auth.haveAccount} <Link to="/entrar">{t.common.signIn}</Link>
         </p>
       </AuthSheet>
     );
   }
 
   return (
-    <AuthSheet title="Criar conta">
-      <p className="muted">Acesso aprovado. Usa o email para onde enviámos o convite.</p>
+    <AuthSheet title={t.auth.createAccount}>
+      <p className="muted">{t.auth.inviteApproved}</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label className="form-field">
-          <span>Email</span>
+          <span>{t.common.email}</span>
           <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label className="form-field">
-          <span>Password</span>
+          <span>{t.common.password}</span>
           <input
             type="password"
             autoComplete="new-password"
@@ -113,12 +111,10 @@ export function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <small className="muted">
-            Entre {PASSWORD_MIN_LENGTH} e {PASSWORD_MAX_LENGTH} caracteres.
-          </small>
+          <small className="muted">{t.auth.passwordLength(PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH)}</small>
         </label>
         <label className="form-field">
-          <span>Repetir password</span>
+          <span>{t.auth.repeatPassword}</span>
           <input
             type="password"
             autoComplete="new-password"
@@ -134,17 +130,17 @@ export function RegisterPage() {
         )}
         {duplicateEmail && (
           <p className="form-error" role="alert">
-            Já existe uma conta com este email. <Link to="/entrar">Entrar</Link> ou{" "}
-            <Link to="/esqueci-password">recuperar a password</Link>.
+            {t.auth.duplicateEmail} <Link to="/entrar">{t.common.signIn}</Link> {t.auth.or}{" "}
+            <Link to="/esqueci-password">{t.auth.recoverPassword}</Link>.
           </p>
         )}
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? "A criar conta…" : "Criar conta"}
+          {submitting ? t.auth.creatingAccount : t.auth.createAccount}
         </button>
       </form>
 
       <p className="form-links">
-        Já tens conta? <Link to="/entrar">Entrar</Link>
+        {t.auth.haveAccount} <Link to="/entrar">{t.common.signIn}</Link>
       </p>
     </AuthSheet>
   );

@@ -6,6 +6,7 @@ import { describeError } from "../auth/errors";
 import { FeatureCard } from "../components/FeatureCard";
 import { CookableRecipeList } from "../components/CookableRecipeList";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { tr } from "../i18n";
 
 export function CookPage() {
   return <HouseholdGate>{(household) => <Cook household={household} />}</HouseholdGate>;
@@ -46,11 +47,11 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
     <div className="page cook-page">
       <header className="page-head">
         <div>
-          <h1>O que posso cozinhar</h1>
-          <p className="page-head-sub">Com o que tens na despensa de {household.name}</p>
+          <h1>{tr().cook.title}</h1>
+          <p className="page-head-sub">{tr().cook.subtitle(household.name)}</p>
         </div>
         <Link to="/cozinhar/feitas" className="button-secondary">
-          Receitas já feitas
+          {tr().cook.cooked}
         </Link>
       </header>
 
@@ -59,13 +60,13 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
           {error}
         </p>
       )}
-      {!result && !error && <p className="muted loading">A carregar…</p>}
+      {!result && !error && <p className="muted loading">{tr().common.loading}</p>}
 
       {result && suggestion && (
         <FeatureCard
-          eyebrow="Sugestão para hoje"
+          eyebrow={tr().cook.suggestion}
           title={suggestion.title}
-          meta={`${suggestion.servings} ${suggestion.servings === 1 ? "pessoa" : "pessoas"} · ${suggestion.availableCount} de ${suggestion.requiredCount} ingredientes em casa`}
+          meta={tr().cook.meta(suggestion.servings, suggestion.availableCount, suggestion.requiredCount)}
           imageUrl={suggestion.imageUrl}
           to={`/receitas/${suggestion.recipeId}`}
         />
@@ -74,11 +75,10 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
       {result && (
         <div className="cook-sections">
           <section className="panel cook-section">
-            <h2>As tuas receitas</h2>
+            <h2>{tr().cook.yours}</h2>
             {result.saved.length === 0 ? (
               <p className="muted">
-                Ainda não guardaste receitas. Abre uma <Link to="/receitas">receita</Link> e carrega em “Guardar
-                receita”; as que pões na lista de compras ficam guardadas sozinhas.
+                {tr().cook.noSaved.before} <Link to="/receitas">{tr().cook.noSaved.link}</Link> {tr().cook.noSaved.after}
               </p>
             ) : (
               <CookableRecipeList recipes={result.saved} onRemove={remove} />
@@ -86,10 +86,10 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
           </section>
 
           <section className="panel cook-section">
-            <h2>Também dá para fazer</h2>
+            <h2>{tr().cook.alsoPossible}</h2>
             {result.others.length === 0 ? (
               <p className="muted">
-                Nada mais com o que está na despensa. <Link to="/despensa">Ver a despensa</Link>
+                {tr().cook.nothingElse} <Link to="/despensa">{tr().cook.seePantry}</Link>
               </p>
             ) : (
               <CookableRecipeList recipes={result.others} />

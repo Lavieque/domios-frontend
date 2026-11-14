@@ -4,14 +4,15 @@ import { ApiError } from "../api/http";
 import {
   measurementUnitLabels,
   type MeasurementUnit,
-  MeasurementUnit as Unit,
   type ProductStoreOfferDto,
   StoreOfferAvailability,
 } from "../api/types";
+import { localized } from "../i18n";
+import { numberFormat } from "../i18n/format";
 
-export const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
-const plain = new Intl.NumberFormat("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const percent = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 0 });
+export const money = numberFormat({ style: "currency", currency: "EUR" });
+const plain = numberFormat({ minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const percent = numberFormat({ maximumFractionDigits: 0 });
 
 /** "0,89" — o símbolo vai à parte na etiqueta. */
 export function priceDigits(amount: number): string {
@@ -23,13 +24,7 @@ export function formatPercent(value: number): string {
 }
 
 /** Unidade de referência do preço unitário: €/kg, €/L, €/un. */
-const perLabels: Record<MeasurementUnit, string> = {
-  [Unit.Unit]: "un",
-  [Unit.Gram]: "g",
-  [Unit.Kilogram]: "kg",
-  [Unit.Milliliter]: "ml",
-  [Unit.Liter]: "L",
-};
+const perLabels: Record<MeasurementUnit, string> = localized((t) => t.enums.perUnit);
 
 export function unitPriceLabel(offer: Pick<ProductStoreOfferDto, "unitPrice">): string | null {
   if (!offer.unitPrice) return null;

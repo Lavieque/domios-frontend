@@ -1,6 +1,8 @@
 import { MeasurementUnit, measurementUnitLabels } from "../api/types";
+import { localized } from "../i18n";
+import { numberFormat } from "../i18n/format";
 
-const quantity = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
+const quantity = numberFormat({ maximumFractionDigits: 2 });
 
 /**
  * A embalagem como se lê na prateleira: "92 g" em vez de "0.092 kg", "1,5 l" em vez de "1.5 l".
@@ -17,30 +19,7 @@ export function formatPackage(amount: number, unit: MeasurementUnit): string {
 }
 
 // A Api devolve os alergénios como as lojas os publicam, muitas vezes em inglês.
-const allergenNames: Record<string, string> = {
-  gluten: "Glúten",
-  milk: "Leite",
-  eggs: "Ovos",
-  egg: "Ovos",
-  fish: "Peixe",
-  crustaceans: "Crustáceos",
-  molluscs: "Moluscos",
-  peanuts: "Amendoins",
-  nuts: "Frutos de casca rija",
-  "tree nuts": "Frutos de casca rija",
-  soy: "Soja",
-  soybeans: "Soja",
-  soya: "Soja",
-  celery: "Aipo",
-  mustard: "Mostarda",
-  sesame: "Sésamo",
-  "sesame seeds": "Sésamo",
-  sulphites: "Sulfitos",
-  sulfites: "Sulfitos",
-  "sulphur dioxide": "Sulfitos",
-  lupin: "Tremoço",
-  lactose: "Lactose",
-};
+const allergenNames: Record<string, string> = localized((t) => t.enums.allergens);
 
 /** O alergénio em português quando é um dos conhecidos; caso contrário, como veio. */
 export function allergenLabel(allergen: string): string {

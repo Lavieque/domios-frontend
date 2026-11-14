@@ -13,13 +13,15 @@ import {
 } from "../api/memberPreferences";
 import { describeError } from "../auth/errors";
 import { GOAL_FIELDS, goalValuesFrom, parseGoalValues, type GoalValues } from "../household/goalsForm";
+import { localeOf } from "../i18n/format";
+import { localized, tr } from "../i18n";
 
-const PREFERENCE_ERRORS = {
-  "forbidden-household-role": "Só o próprio membro ou um administrador da casa pode mudar isto.",
-  "invalid-argument": "Algum valor não é válido. Confirma o que escreveste.",
-  "invariant-violation": "Já há 200 alimentos nesta lista.",
-  "not-found": "Esse alimento já não existe.",
-};
+const PREFERENCE_ERRORS = localized((t) => ({
+  "forbidden-household-role": t.prefs.errors.forbidden,
+  "invalid-argument": t.prefs.errors.invalid,
+  "invariant-violation": t.prefs.errors.full,
+  "not-found": t.prefs.errors.notFound,
+}));
 
 interface PanelProps {
   householdId: string;
@@ -29,10 +31,7 @@ interface PanelProps {
   onClose: () => void;
 }
 
-const severityLabels: Record<AvoidSeverity, string> = {
-  Avoid: "Evitar",
-  Limit: "Pouco",
-};
+const severityLabels = localized<Record<AvoidSeverity, string>>((t) => t.prefs.severity);
 
 /** A lista de alimentos que o membro escolheu evitar ou limitar. É dele: não é um conselho médico. */
 export function AvoidedIngredientsPanel({ householdId, member, canEdit, onClose }: PanelProps) {
@@ -66,18 +65,18 @@ export function AvoidedIngredientsPanel({ householdId, member, canEdit, onClose 
   function handleSaved(saved: AvoidedIngredientDto) {
     setItems((current) => {
       const rest = (current ?? []).filter((i) => i.ingredientId !== saved.ingredientId);
-      return [...rest, saved].sort((a, b) => a.name.localeCompare(b.name, "pt-PT"));
+      return [...rest, saved].sort((a, b) => a.name.localeCompare(b.name, localeOf()));
     });
   }
 
   return (
-    <section className="member-panel preference-panel" aria-label={`Alimentos a evitar de ${member.name}`}>
+    <section className="member-panel preference-panel" aria-label={tr().prefs.avoidedOf(member.name)}>
       <p className="muted preference-note">
-        A lista é de {member.name}: o DomiOS só a repete nas receitas, não diz o que se deve comer.
+        {tr().prefs.avoidedNote(member.name)}
       </p>
 
-      {items === null && !error && <p className="muted loading">A carregar…</p>}
-      {items !== null && items.length === 0 && <p className="muted">Ainda não há alimentos nesta lista.</p>}
+      {items === null && !error && <p className="muted loading">{tr().common.loading}</p>}
+      {items !== null && items.length === 0 && <p className="muted">{tr().prefs.emptyList}</p>}
 
       {items !== null && items.length > 0 && (
         <ul className="avoided-list">
@@ -95,7 +94,7 @@ export function AvoidedIngredientsPanel({ householdId, member, canEdit, onClose 
                   disabled={busyId === item.ingredientId}
                   onClick={() => handleRemove(item)}
                 >
-                  Tirar
+                  {tr().prefs.remove}
                 </button>
               )}
             </li>
@@ -119,7 +118,7 @@ export function AvoidedIngredientsPanel({ householdId, member, canEdit, onClose 
       )}
       <div className="button-row">
         <button type="button" className="button-secondary" onClick={onClose}>
-          Fechar
+          {tr().common.close}
         </button>
       </div>
     </section>
@@ -180,10 +179,10 @@ function AddAvoidedForm({ householdId, memberId, onSaved, onError }: AddAvoidedF
   return (
     <form className="member-form avoided-form" onSubmit={handleSubmit}>
       <label className="form-field member-form-wide">
-        <span>Acrescentar alimento</span>
+        <span>{tr().prefs.addFood}</span>
         <input
           type="search"
-          placeholder="Ex.: tomate, café, cebola"
+          placeholder={tr().prefs.addPlaceholder}
           autoComplete="off"
           value={chosen ? (chosen.displayName ?? chosen.name) : search}
           onChange={(e) => {
@@ -194,7 +193,7 @@ function AddAvoidedForm({ householdId, memberId, onSaved, onError }: AddAvoidedF
       </label>
 
       {results.length > 0 && (
-        <div className="chip-row member-form-wide" role="group" aria-label="Resultados">
+        <div className="chip-row member-form-wide" role="group" aria-label={tr().prefs.results}>
           {results.map((ingredient) => (
             <button
               key={ingredient.ingredientId}
@@ -211,26 +210,26 @@ function AddAvoidedForm({ householdId, memberId, onSaved, onError }: AddAvoidedF
       {chosen && (
         <>
           <label className="form-field">
-            <span>Quanto</span>
+            <span>{tr().prefs.howMuch}</span>
             <select value={severity} onChange={(e) => setSeverity(e.target.value as AvoidSeverity)}>
-              <option value="Avoid">Evitar</option>
-              <option value="Limit">Só um pouco</option>
+              <option value="Avoid">{tr().prefs.avoid}</option>
+              <option value="Limit">{tr().prefs.limit}</option>
             </select>
           </label>
           <label className="form-field">
-            <span>Nota</span>
+            <span>{tr().prefs.note}</span>
             <input
               type="text"
               maxLength={200}
-              placeholder="Ex.: só cru, à noite"
+              placeholder={tr().prefs.notePlaceholder}
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
-            <small>Opcional.</small>
+            <small>{tr().prefs.optional}</small>
           </label>
           <div className="button-row member-form-wide">
             <button type="submit" className="button-primary" disabled={busy}>
-              {busy ? "A guardar…" : "Acrescentar"}
+              {busy ? tr().common.saving : tr().prefs.add}
             </button>
           </div>
         </>
@@ -302,13 +301,12 @@ export function NutritionGoalsPanel({ householdId, member, canEdit, onClose }: P
   }
 
   return (
-    <section className="member-panel preference-panel" aria-label={`Objetivos nutricionais de ${member.name}`}>
+    <section className="member-panel preference-panel" aria-label={tr().prefs.goalsOf(member.name)}>
       <p className="muted preference-note">
-        Os valores são de {member.name}. Servem para comparar o que se come com o que a pessoa quer; o que ficar em
-        branco usa a dose de referência europeia.
+        {tr().prefs.goalsNote(member.name)}
       </p>
 
-      {!values && !error && <p className="muted loading">A carregar…</p>}
+      {!values && !error && <p className="muted loading">{tr().common.loading}</p>}
 
       {values && (
         <form className="member-form" onSubmit={handleSubmit}>
@@ -335,22 +333,22 @@ export function NutritionGoalsPanel({ householdId, member, canEdit, onClose }: P
           )}
           {saved && (
             <p className="muted member-form-wide" role="status">
-              Guardado.
+              {tr().prefs.saved}
             </p>
           )}
           <div className="button-row member-form-wide">
             {canEdit && (
               <button type="submit" className="button-primary" disabled={busy}>
-                {busy ? "A guardar…" : "Guardar"}
+                {busy ? tr().common.saving : tr().common.save}
               </button>
             )}
             {canEdit && isSet && (
               <button type="button" className="button-danger" onClick={handleClear} disabled={busy}>
-                Apagar objetivos
+                {tr().prefs.clearGoals}
               </button>
             )}
             <button type="button" className="button-secondary" onClick={onClose} disabled={busy}>
-              Fechar
+              {tr().common.close}
             </button>
           </div>
         </form>
@@ -363,7 +361,7 @@ export function NutritionGoalsPanel({ householdId, member, canEdit, onClose }: P
           </p>
           <div className="button-row">
             <button type="button" className="button-secondary" onClick={onClose}>
-              Fechar
+              {tr().common.close}
             </button>
           </div>
         </>

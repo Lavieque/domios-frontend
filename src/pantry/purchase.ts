@@ -2,8 +2,10 @@ import type { PantryItemDto } from "../api/pantry";
 // Só tipos: o módulo shopping arrasta a sessão (window.localStorage) e não corre nos testes.
 import type { PaidPriceSource } from "../api/shopping";
 import type { ChainDto } from "../api/types";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
+const money = numberFormat({ style: "currency", currency: "EUR" });
 
 /**
  * "Comprado no Continente · 1,29 €", "Pago 1,29 € (prateleira)", "Comprado no Lidl" ou `null` sem preço nem loja.
@@ -18,21 +20,22 @@ export function describePurchase(
   const chainName = item.purchasedChainId ? chains?.find((c) => c.chainId === item.purchasedChainId)?.name : undefined;
   const price = item.purchasedPrice
     ? money.format(item.purchasedPrice.amount) +
-      (item.purchasedPriceSource === ("Offer" satisfies PaidPriceSource) ? " (prateleira)" : "")
+      (item.purchasedPriceSource === ("Offer" satisfies PaidPriceSource) ? tr().ui.purchase.shelf : "")
     : null;
   const store = storeLabel(chainName, item.purchasedPhysicalStoreName ?? undefined);
-  if (store && price) return `Comprado ${store} · ${price}`;
-  if (store) return `Comprado ${store}`;
-  if (price) return `Pago ${price}`;
+  const t = tr().ui.purchase;
+  if (store && price) return `${t.bought(store)} · ${price}`;
+  if (store) return t.bought(store);
+  if (price) return t.paid(price);
   return null;
 }
 
 function storeLabel(chainName: string | undefined, physicalName: string | undefined): string | null {
   const physical = physicalName?.trim();
   if (physical && (!chainName || physical.toLocaleLowerCase("pt").includes(chainName.toLocaleLowerCase("pt")))) {
-    return `em ${physical}`;
+    return tr().ui.purchase.atStore(physical);
   }
-  if (chainName && physical) return `no ${chainName} (${physical})`;
-  if (chainName) return `no ${chainName}`;
+  if (chainName && physical) return `${tr().ui.purchase.atChain(chainName)} (${physical})`;
+  if (chainName) return tr().ui.purchase.atChain(chainName);
   return null;
 }

@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { forgotPassword } from "../api/auth";
 import { describeError } from "../auth/errors";
 import { AuthSheet } from "../components/AuthSheet";
+import { useT } from "../i18n";
 
 export function ForgotPasswordPage() {
+  const t = useT();
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -18,25 +20,25 @@ export function ForgotPasswordPage() {
       await forgotPassword(email.trim());
       setSentTo(email.trim());
     } catch (err) {
-      setError(describeError(err, { "invalid-argument": "Indica um email válido." }));
+      setError(describeError(err, { "invalid-argument": t.auth.invalidEmail }));
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <AuthSheet title="Recuperar password">
+    <AuthSheet title={t.auth.recoverTitle}>
       {sentTo ? (
         // A Api responde igual exista ou não a conta: a mensagem também.
         <p className="notice">
-          Se existir uma conta com <strong>{sentTo}</strong>, vais receber um email com um link para definires uma
-          password nova. O link é válido durante 30 minutos.
+          {t.auth.resetSentBefore} <strong>{sentTo}</strong>
+          {t.auth.resetSentAfter}
         </p>
       ) : (
         <form className="auth-form" onSubmit={handleSubmit}>
-          <p className="muted">Indica o email da tua conta e enviamos-te um link para definires uma password nova.</p>
+          <p className="muted">{t.auth.recoverIntro}</p>
           <label className="form-field">
-            <span>Email</span>
+            <span>{t.common.email}</span>
             <input
               type="email"
               autoComplete="email"
@@ -51,13 +53,13 @@ export function ForgotPasswordPage() {
             </p>
           )}
           <button type="submit" className="button-primary" disabled={submitting}>
-            {submitting ? "A enviar…" : "Enviar link"}
+            {submitting ? t.common.sending : t.auth.sendLink}
           </button>
         </form>
       )}
 
       <p className="form-links">
-        <Link to="/entrar">Voltar a entrar</Link>
+        <Link to="/entrar">{t.auth.backToSignIn}</Link>
       </p>
     </AuthSheet>
   );

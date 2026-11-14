@@ -14,8 +14,10 @@ import { RecipeRow } from "../components/RecipeRow";
 import { templateImage } from "../plan/templateImage";
 import { withoutNamePrefix } from "../plan/templates";
 import { usePageSize } from "../usePageSize";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const count = new Intl.NumberFormat("pt-PT");
+const count = numberFormat();
 
 export function MealPlanTemplatesPage() {
   const pageSize = usePageSize(20, 10);
@@ -58,8 +60,8 @@ export function MealPlanTemplatesPage() {
     <div className="page templates-page">
       <header className="page-head">
         <div>
-          <h1>Ementas prontas</h1>
-          <p className="page-head-sub">Planos de uma semana, quinzena ou mês para aplicar ao teu plano a partir de um dia</p>
+          <h1>{tr().templates.title}</h1>
+          <p className="page-head-sub">{tr().templates.subtitle}</p>
         </div>
       </header>
 
@@ -67,17 +69,17 @@ export function MealPlanTemplatesPage() {
 
       <section className="panel" aria-labelledby="templates-all">
         <div className="side-head">
-          <h2 id="templates-all">Todas as ementas</h2>
+          <h2 id="templates-all">{tr().templates.all}</h2>
           {!loading && !error && (
             <span className="side-head-count">
-              {count.format(total)} {search ? (total === 1 ? "encontrada" : "encontradas") : total === 1 ? "ementa" : "ementas"}
+              {tr().templates.count(count.format(total), total, Boolean(search))}
             </span>
           )}
         </div>
         <div className="toolbar">
           <SearchField
-            label="Pesquisar ementas"
-            placeholder="Pesquisar ementas…"
+            label={tr().templates.search}
+            placeholder={tr().templates.searchPlaceholder}
             value={search}
             onChange={(value) => applyFilters({ search: value, page: 1 })}
           />
@@ -88,9 +90,9 @@ export function MealPlanTemplatesPage() {
             {error}
           </p>
         )}
-        {loading && <p className="muted loading">A procurar…</p>}
+        {loading && <p className="muted loading">{tr().lists2.searching}</p>}
         {!loading && !error && templates.length === 0 && (
-          <p className="empty-state">{search ? "Nenhuma ementa com essa pesquisa." : "Ainda não há ementas publicadas."}</p>
+          <p className="empty-state">{search ? tr().templates.noneFound : tr().templates.nonePublished}</p>
         )}
         {!loading && !error && templates.length > 0 && (
           <ul className="recipe-rows">
@@ -117,14 +119,14 @@ function TemplateRow({ template, note }: { template: MealPlanTemplateSummaryDto;
       lead={
         <>
           <span className="list-tally-count">{template.durationDays}</span>
-          <span className="recipe-row-lead-label">{template.durationDays === 1 ? "dia" : "dias"}</span>
+          <span className="recipe-row-lead-label">{tr().templates.days(template.durationDays)}</span>
         </>
       }
     >
       <span className="recipe-row-meta">
         {[
-          `${template.entryCount} ${template.entryCount === 1 ? "refeição" : "refeições"}`,
-          `${template.servingsBasis} ${template.servingsBasis === 1 ? "dose" : "doses"}`,
+          tr().templates.meals(template.entryCount),
+          tr().templates.servings(template.servingsBasis),
           note ?? null,
         ]
           .filter(Boolean)
@@ -134,7 +136,7 @@ function TemplateRow({ template, note }: { template: MealPlanTemplateSummaryDto;
       {template.tags.length > 0 && (
         <span className="recipe-row-tags">
           {template.tags.slice(0, 4).join(", ")}
-          {template.tags.length > 4 && ` e mais ${template.tags.length - 4}`}
+          {template.tags.length > 4 && tr().lists2.andMore(template.tags.length - 4)}
         </span>
       )}
     </RecipeRow>
@@ -161,13 +163,13 @@ function MyTemplates() {
 
   return (
     <section className="panel" aria-labelledby="templates-mine">
-      <h2 id="templates-mine">As minhas ementas</h2>
+      <h2 id="templates-mine">{tr().templates.mine}</h2>
       <ul className="recipe-rows">
         {mine.map((template) => (
           <TemplateRow
             key={template.mealPlanTemplateId}
             template={template}
-            note={template.status === RecipeStatus.Draft ? "Dá para editar" : undefined}
+            note={template.status === RecipeStatus.Draft ? tr().templates.editable : undefined}
           />
         ))}
       </ul>

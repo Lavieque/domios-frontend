@@ -7,10 +7,14 @@ import { useSession } from "../auth/useSession";
 import { AvatarPicker } from "../components/AvatarPicker";
 import { EmailVerificationNotice } from "../components/EmailVerificationNotice";
 import { useHouseholds } from "../household/useHouseholds";
+import { LANGS, useLanguage, useT, type Lang } from "../i18n";
+import { saveAccountLanguage } from "../i18n/accountLanguage";
 
 export function AccountPage() {
   // Rota dentro de <RequireAuth>: há sempre sessão ao renderizar.
   const session = useSession()!;
+  const t = useT();
+  const language = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const notice = (location.state as { notice?: string } | null)?.notice;
@@ -18,12 +22,27 @@ export function AccountPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [languageBusy, setLanguageBusy] = useState(false);
+  const [languageError, setLanguageError] = useState<string | null>(null);
+
+  async function handleLanguage(lang: Lang) {
+    if (lang === language) return;
+    setLanguageError(null);
+    setLanguageBusy(true);
+    try {
+      // Grava na conta; a app remonta na língua nova quando a gravação acaba.
+      await saveAccountLanguage(lang);
+    } catch (err) {
+      setLanguageError(describeError(err));
+      setLanguageBusy(false);
+    }
+  }
 
   async function handleSignOut() {
     await signOut();
     navigate("/entrar", {
       replace: true,
-      state: { notice: "Saíste da conta." },
+      state: { notice: t.shell.signedOut },
     });
   }
 
@@ -34,7 +53,7 @@ export function AccountPage() {
       await signOutEverywhere();
       navigate("/entrar", {
         replace: true,
-        state: { notice: "Saíste da conta em todos os dispositivos." },
+        state: { notice: t.account.signedOutEverywhere },
       });
     } catch (err) {
       setError(describeError(err));
@@ -46,8 +65,8 @@ export function AccountPage() {
     <div className="page settings-page">
       <header className="page-head">
         <div>
-          <h1>A tua conta</h1>
-          <p className="page-head-sub">O teu acesso ao DomiOS e as casas de que fazes parte.</p>
+          <h1>{t.account.title}</h1>
+          <p className="page-head-sub">{t.account.subtitle}</p>
         </div>
       </header>
       {notice && <p className="notice">{notice}</p>}
@@ -59,34 +78,34 @@ export function AccountPage() {
           <p className="muted">
             {households.current
               ? `${households.current.name} · ${memberRoleLabels[households.current.role]}`
-              : "Ainda sem casa"}
+              : t.account.noHouseholdYet}
           </p>
         </div>
         <Link to="/casa" className="button-primary">
-          Gerir a minha casa
+          {t.account.manageMyHousehold}
         </Link>
       </section>
 
       <section className="panel" aria-labelledby="account-access">
-        <h2 id="account-access">Acesso</h2>
+        <h2 id="account-access">{t.account.access}</h2>
         <dl className="settings-list">
           <div className="settings-row">
-            <dt>Email</dt>
+            <dt>{t.common.email}</dt>
             <dd>
               <span className="settings-value">{session.email}</span>
               {session.emailVerified ? (
-                <span className="settings-flag">Confirmado</span>
+                <span className="settings-flag">{t.account.confirmed}</span>
               ) : (
-                <span className="settings-flag is-pending">Por confirmar</span>
+                <span className="settings-flag is-pending">{t.account.pendingConfirmation}</span>
               )}
             </dd>
           </div>
           <div className="settings-row">
-            <dt>Password</dt>
+            <dt>{t.common.password}</dt>
             <dd>
-              <span className="muted">Para mudar, enviamos-te um link para o email.</span>
+              <span className="muted">{t.account.passwordHint}</span>
               <Link to="/esqueci-password" className="settings-action">
-                Pedir link
+                {t.account.requestLink}
               </Link>
             </dd>
           </div>
@@ -94,20 +113,45 @@ export function AccountPage() {
         {!session.emailVerified && <EmailVerificationNotice />}
       </section>
 
+      <section className="panel" aria-labelledby="account-language">
+        <h2 id="account-language">{t.account.language}</h2>
+        <p className="muted">{t.account.languageHint}</p>
+        <div className="chip-row" role="group" aria-labelledby="account-language">
+          {LANGS.map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              className="chip"
+              lang={lang}
+              aria-pressed={lang === language}
+              disabled={languageBusy}
+              onClick={() => handleLanguage(lang)}
+            >
+              {t.account.languageNames[lang]}
+            </button>
+          ))}
+        </div>
+        {languageError && (
+          <p className="form-error" role="alert">
+            {languageError}
+          </p>
+        )}
+      </section>
+
       <section className="panel" aria-labelledby="account-households">
         <div className="side-head">
-          <h2 id="account-households">As tuas casas</h2>
-          <Link to="/casa/nova">Criar casa</Link>
+          <h2 id="account-households">{t.account.yourHouseholds}</h2>
+          <Link to="/casa/nova">{t.account.createHousehold}</Link>
         </div>
         {households.loading ? (
-          <p className="muted loading">A carregar…</p>
+          <p className="muted loading">{t.common.loading}</p>
         ) : households.error ? (
           <p className="form-error" role="alert">
             {households.error}
           </p>
         ) : households.households.length === 0 ? (
           <p className="empty-state">
-            Ainda não fazes parte de nenhuma casa. <Link to="/casa/nova">Cria a tua</Link>.
+            {t.account.noHouseholdsBefore} <Link to="/casa/nova">{t.account.createYours}</Link>.
           </p>
         ) : (
           <ul className="settings-list">
@@ -117,13 +161,13 @@ export function AccountPage() {
                 <li key={h.householdId} className="settings-row">
                   <span className="settings-row-title">
                     {h.name}
-                    {isCurrent && <span className="settings-flag">Neste browser</span>}
+                    {isCurrent && <span className="settings-flag">{t.account.inThisBrowser}</span>}
                   </span>
                   <span className="settings-row-end">
                     <span className="muted">{memberRoleLabels[h.role]}</span>
                     {isCurrent ? (
                       <Link to="/casa" className="settings-action">
-                        Gerir
+                        {t.common.manage}
                       </Link>
                     ) : (
                       <button
@@ -134,7 +178,7 @@ export function AccountPage() {
                           navigate("/casa");
                         }}
                       >
-                        Usar esta casa
+                        {t.account.useThisHousehold}
                       </button>
                     )}
                   </span>
@@ -146,7 +190,7 @@ export function AccountPage() {
       </section>
 
       <section className="panel" aria-labelledby="account-session">
-        <h2 id="account-session">Sessão</h2>
+        <h2 id="account-session">{t.account.session}</h2>
         {error && (
           <p className="form-error" role="alert">
             {error}
@@ -155,20 +199,20 @@ export function AccountPage() {
         <ul className="settings-list">
           <li className="settings-row">
             <span className="settings-row-title">
-              Este browser
-              <small className="muted">Sais aqui; os outros dispositivos continuam com sessão.</small>
+              {t.account.thisBrowser}
+              <small className="muted">{t.account.thisBrowserHint}</small>
             </span>
             <button type="button" className="button-secondary" onClick={handleSignOut} disabled={busy}>
-              Sair
+              {t.shell.signOut}
             </button>
           </li>
           <li className="settings-row">
             <span className="settings-row-title">
-              Todos os dispositivos
-              <small className="muted">Termina todas as sessões, incluindo esta. Útil se perdeste um telemóvel.</small>
+              {t.account.allDevices}
+              <small className="muted">{t.account.allDevicesHint}</small>
             </span>
             <button type="button" className="button-danger" onClick={handleSignOutEverywhere} disabled={busy}>
-              {busy ? "A sair…" : "Sair em todos"}
+              {busy ? t.account.signingOut : t.account.signOutEverywhere}
             </button>
           </li>
         </ul>

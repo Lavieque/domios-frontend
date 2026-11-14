@@ -10,6 +10,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { editorialScene, readRailCollapsed, writeRailCollapsed } from "./editorial";
 import { REQUEST_ACCESS_URL } from "./siteUrl";
+import { useT } from "./i18n";
 
 
 // Cada página é um ficheiro à parte, pedido só quando é precisa: o arranque
@@ -79,6 +80,7 @@ function preloadPages() {
 const PATHS_WITHOUT_VERIFICATION_NOTICE = ["/conta", "/verify-email"];
 
 function App() {
+  const t = useT();
   const session = useSession();
   const { pathname } = useLocation();
   const showVerificationNotice =
@@ -106,7 +108,7 @@ function App() {
   }
 
   const brand = (
-    <NavLink to="/" className="brand" aria-label="DomiOS, Hoje">
+    <NavLink to="/" className="brand" aria-label={t.shell.brandLabel}>
       <svg className="brand-mark" viewBox="0 0 120 120" aria-hidden="true">
         <polyline
           points="30,72 30,46 60,20 90,46 90,72"
@@ -138,7 +140,7 @@ function App() {
     >
       <div className="editorial-scene" style={{ backgroundImage: `url(${scene.image})` }} aria-hidden="true" />
       {session && <AppRail brand={brand} />}
-      {menuOpen && <button type="button" className="menu-backdrop" aria-label="Fechar menu" onClick={() => setMenuOpen(false)} />}
+      {menuOpen && <button type="button" className="menu-backdrop" aria-label={t.shell.closeMenu} onClick={() => setMenuOpen(false)} />}
 
       <div className="app-column">
       {session ? (
@@ -148,9 +150,9 @@ function App() {
       ) : (
         <header className="guest-header">
           {brand}
-          <nav className="guest-nav" aria-label="Conta">
-            <a href={REQUEST_ACCESS_URL}>Pedir acesso</a>
-            <NavLink to="/entrar">Entrar</NavLink>
+          <nav className="guest-nav" aria-label={t.shell.guestNav}>
+            <a href={REQUEST_ACCESS_URL}>{t.common.requestAccess}</a>
+            <NavLink to="/entrar">{t.common.signIn}</NavLink>
           </nav>
         </header>
       )}
@@ -201,8 +203,8 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <span>DomiOS · A casa, em harmonia</span>
-        <span>Preços observados nas lojas acompanhadas</span>
+        <span>{t.shell.footerTagline}</span>
+        <span>{t.shell.footerPrices}</span>
       </footer>
       </div>
       {/* No telemóvel a navegação fica em baixo, ao alcance do polegar. */}

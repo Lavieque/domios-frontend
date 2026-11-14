@@ -4,14 +4,14 @@ import { signOut } from "../auth/actions";
 import { useAvatar } from "../auth/useAvatar";
 import { useSession } from "../auth/useSession";
 import { useHouseholds } from "../household/useHouseholds";
+import { useT, type Dict } from "../i18n";
+
+type LinkId = keyof Dict["shell"]["links"];
 
 interface MenuLink {
   to: string;
-  label: string;
-  /** Uma linha a dizer para que serve a página (na gaveta "Mais"). */
-  hint: string;
-  /** Nome mais curto para a barra de baixo, quando o do menu não cabe. */
-  tabLabel?: string;
+  /** O nome, a dica e (às vezes) o nome curto para a barra de baixo, em `t.shell.links`. */
+  id: LinkId;
   /** Caminho do ícone de linha do rail (viewBox 24). */
   icon: string;
   end?: boolean;
@@ -19,29 +19,29 @@ interface MenuLink {
 
 /** O dia a dia da casa: os quatro destinos que contam. */
 const mainLinks: MenuLink[] = [
-  { to: "/", label: "Hoje", hint: "O que se come hoje", icon: "M12 7v5l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0", end: true },
-  { to: "/plano", label: "Planeamento", tabLabel: "Plano", hint: "Refeições da semana", icon: "M3 5h18v16H3z M7 3v4 M17 3v4 M3 10h18 M8 14h2m4 0h2m-8 3h2" },
-  { to: "/despensa", label: "Despensa", hint: "O que há em casa", icon: "M4 3h16v18H4z M4 12h16 M10 8h4m-4 8h4" },
-  { to: "/listas", label: "Compras", hint: "Listas por fazer", icon: "M2 3h3l3 12h11l2-8H6 M9 20h.01m9 0h.01" },
+  { to: "/", id: "today", icon: "M12 7v5l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0", end: true },
+  { to: "/plano", id: "plan", icon: "M3 5h18v16H3z M7 3v4 M17 3v4 M3 10h18 M8 14h2m4 0h2m-8 3h2" },
+  { to: "/despensa", id: "pantry", icon: "M4 3h16v18H4z M4 12h16 M10 8h4m-4 8h4" },
+  { to: "/listas", id: "lists", icon: "M2 3h3l3 12h11l2-8H6 M9 20h.01m9 0h.01" },
 ];
 
 const kitchenLinks: MenuLink[] = [
-  { to: "/cozinhar", label: "Cozinhar", hint: "Com o que tens", icon: "M5 10h14v9H5z M3 12h2m14 0h2 M4 8h16 M10 5h4" },
-  { to: "/receitas", label: "Receitas", hint: "Para escolher", icon: "M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v14" },
-  { to: "/ementas", label: "Ementas", hint: "Semanas prontas", icon: "M6 3h12v18H6z M9 8h6m-6 4h6m-6 4h4" },
-  { to: "/nutricao", label: "Nutrição", hint: "O que se come", icon: "M12 20 4 12a5 5 0 0 1 8-6 5 5 0 0 1 8 6z M8 12h2l2-3 2 5 2-2" },
+  { to: "/cozinhar", id: "cook", icon: "M5 10h14v9H5z M3 12h2m14 0h2 M4 8h16 M10 5h4" },
+  { to: "/receitas", id: "recipes", icon: "M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v14" },
+  { to: "/ementas", id: "templates", icon: "M6 3h12v18H6z M9 8h6m-6 4h6m-6 4h4" },
+  { to: "/nutricao", id: "nutrition", icon: "M12 20 4 12a5 5 0 0 1 8-6 5 5 0 0 1 8 6z M8 12h2l2-3 2 5 2-2" },
 ];
 
 const priceLinks: MenuLink[] = [
-  { to: "/produtos", label: "Produtos", hint: "Produtos nas lojas", icon: "M3 7 12 3l9 4v10l-9 4-9-4z M3 7l9 4 9-4m-9 4v10" },
-  { to: "/promocoes", label: "Promoções", hint: "Descontos em vigor", icon: "M3 4h8l10 10-7 7L3 10z M7 8h.01" },
-  { to: "/lojas", label: "Lojas perto", hint: "E quanto custa ir", icon: "M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" },
-  { to: "/gastos", label: "Gastos", hint: "Quanto se gastou", icon: "M4 20V10m6 10V4m6 16v-7m4 7H2" },
+  { to: "/produtos", id: "products", icon: "M3 7 12 3l9 4v10l-9 4-9-4z M3 7l9 4 9-4m-9 4v10" },
+  { to: "/promocoes", id: "promotions", icon: "M3 4h8l10 10-7 7L3 10z M7 8h.01" },
+  { to: "/lojas", id: "stores", icon: "M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" },
+  { to: "/gastos", id: "spending", icon: "M4 20V10m6 10V4m6 16v-7m4 7H2" },
 ];
 
 const accountLinks: MenuLink[] = [
-  { to: "/casa", label: "Casa", hint: "Membros da casa", icon: "M3 11l9-8 9 8 M5 10v11h14V10 M10 21v-6h4v6" },
-  { to: "/conta", label: "Definições", hint: "Email e password", icon: "M4 6h16 M4 12h16 M4 18h16 M8 4v4 M16 10v4 M10 16v4" },
+  { to: "/casa", id: "household", icon: "M3 11l9-8 9 8 M5 10v11h14V10 M10 21v-6h4v6" },
+  { to: "/conta", id: "settings", icon: "M4 6h16 M4 12h16 M4 18h16 M8 4v4 M16 10v4 M10 16v4" },
 ];
 
 const tabIcons: Record<string, ReactNode> = {
@@ -74,6 +74,7 @@ const tabIcons: Record<string, ReactNode> = {
 };
 
 function RailGroup({ links }: { links: MenuLink[] }) {
+  const t = useT();
   return (
     <div className="rail-group">
       {links.map((link) => (
@@ -81,7 +82,7 @@ function RailGroup({ links }: { links: MenuLink[] }) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d={link.icon} />
           </svg>
-          {link.label}
+          {t.shell.links[link.id].label}
         </NavLink>
       ))}
     </div>
@@ -90,12 +91,13 @@ function RailGroup({ links }: { links: MenuLink[] }) {
 
 /** Menu lateral: o logótipo, as duas famílias de destinos e a pessoa com sessão. */
 export function AppRail({ brand }: { brand: ReactNode }) {
+  const t = useT();
   const session = useSession();
   return (
     <aside className="app-rail" id="app-rail">
       {brand}
-      <p className="rail-tagline">A casa, em harmonia</p>
-      <nav className="rail-nav" aria-label="Principal">
+      <p className="rail-tagline">{t.common.tagline}</p>
+      <nav className="rail-nav" aria-label={t.shell.mainNav}>
         <RailGroup links={[...mainLinks, ...kitchenLinks.slice(0, 3)]} />
         <RailGroup links={[kitchenLinks[3], ...priceLinks, ...accountLinks]} />
       </nav>
@@ -113,10 +115,15 @@ export function AppRail({ brand }: { brand: ReactNode }) {
 const tabLinks: MenuLink[] = [...mainLinks, kitchenLinks[0]];
 
 /** Tudo o resto, no menu do topo do telemóvel. A casa e a conta vão no cimo da folha. */
-const topMenuGroups: { title: string; links: MenuLink[] }[] = [
-  { title: "Cozinha", links: kitchenLinks.slice(1) },
-  { title: "Preços", links: priceLinks },
+const topMenuGroups: { title: keyof Dict["shell"]["groups"]; links: MenuLink[] }[] = [
+  { title: "kitchen", links: kitchenLinks.slice(1) },
+  { title: "prices", links: priceLinks },
 ];
+
+/** Nome curto para a barra de baixo, quando o do menu não cabe. */
+function tabLabel(link: { label: string; tab?: string }): string {
+  return link.tab ?? link.label;
+}
 
 /** O avatar de quem usa, ou a inicial do email quando não há fotografia. */
 function Avatar({ className }: { className: string }) {
@@ -131,8 +138,9 @@ function Avatar({ className }: { className: string }) {
 
 /** Barra de baixo no telemóvel: os cinco destinos de todos os dias, ao alcance do polegar. */
 export function AppTabBar() {
+  const t = useT();
   return (
-    <nav className="tabbar" aria-label="Principal">
+    <nav className="tabbar" aria-label={t.shell.mainNav}>
       {tabLinks.map((link) => (
         <NavLink key={link.to} to={link.to} end={link.end} className="tab">
           {tabIcons[link.to] ?? (
@@ -140,7 +148,7 @@ export function AppTabBar() {
               <path d={link.icon} />
             </svg>
           )}
-          {link.tabLabel ?? link.label}
+          {tabLabel(t.shell.links[link.id])}
         </NavLink>
       ))}
     </nav>
@@ -152,6 +160,7 @@ export function AppTabBar() {
  * que desce de cima, com a conta e a casa no cimo e, por baixo, o que não cabe na barra de baixo.
  */
 export function AppTopMenu() {
+  const t = useT();
   const sheet = useRef<HTMLDialogElement>(null);
   const { pathname } = useLocation();
   const session = useSession();
@@ -161,7 +170,7 @@ export function AppTopMenu() {
   async function handleSignOut() {
     sheet.current?.close();
     await signOut();
-    navigate("/entrar", { replace: true, state: { notice: "Saíste da conta." } });
+    navigate("/entrar", { replace: true, state: { notice: t.shell.signedOut } });
   }
 
   // Ao mudar de página fecha logo, sem animação: a página nova já está a aparecer.
@@ -195,7 +204,7 @@ export function AppTopMenu() {
         type="button"
         className={active ? "top-menu-button active" : "top-menu-button"}
         aria-haspopup="dialog"
-        aria-label="Menu"
+        aria-label={t.shell.menu}
         onClick={() => sheet.current?.showModal()}
       >
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -207,7 +216,7 @@ export function AppTopMenu() {
       <dialog
         ref={sheet}
         className="top-menu"
-        aria-label="Menu"
+        aria-label={t.shell.menu}
         onClick={(e) => e.target === e.currentTarget && close()}
         onCancel={(e) => {
           e.preventDefault();
@@ -220,10 +229,10 @@ export function AppTopMenu() {
               <Avatar className="top-menu-person-avatar" />
               <span className="top-menu-text">
                 <span className="top-menu-email">{session?.email}</span>
-                <span className="top-menu-hint">Conta e definições</span>
+                <span className="top-menu-hint">{t.shell.accountAndSettings}</span>
               </span>
             </Link>
-            <button type="button" className="top-menu-close" aria-label="Fechar menu" onClick={close}>
+            <button type="button" className="top-menu-close" aria-label={t.shell.closeMenu} onClick={close}>
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path d="m5 5 10 10M15 5 5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
@@ -235,27 +244,27 @@ export function AppTopMenu() {
               <path d={accountLinks[0].icon} />
             </svg>
             <span className="top-menu-text">
-              <span className="top-menu-house-name">{current?.name ?? "A minha casa"}</span>
+              <span className="top-menu-house-name">{current?.name ?? t.common.myHousehold}</span>
               <span className="top-menu-hint">
-                {households.length > 1 ? `Uma de ${households.length} casas` : "A tua casa"}
+                {households.length > 1 ? t.shell.oneOfHouseholds(households.length) : t.shell.yourHousehold}
               </span>
             </span>
             <span className="top-menu-house-actions">
               {households.length > 1 && (
                 <Link to="/conta" className="top-menu-pill">
-                  Trocar
+                  {t.shell.switchHousehold}
                 </Link>
               )}
               <Link to="/casa" className="top-menu-pill">
-                Gerir
+                {t.common.manage}
               </Link>
             </span>
           </div>
 
-          <nav aria-label="Menu">
+          <nav aria-label={t.shell.menu}>
             {topMenuGroups.map((group) => (
               <section key={group.title} className="top-menu-group">
-                <h2 className="top-menu-group-title">{group.title}</h2>
+                <h2 className="top-menu-group-title">{t.shell.groups[group.title]}</h2>
                 <div className="top-menu-links">
                   {group.links.map((link) => (
                     <NavLink key={link.to} to={link.to} className="top-menu-link">
@@ -263,8 +272,8 @@ export function AppTopMenu() {
                         <path d={link.icon} />
                       </svg>
                       <span className="top-menu-text">
-                        {link.label}
-                        <span className="top-menu-hint">{link.hint}</span>
+                        {t.shell.links[link.id].label}
+                        <span className="top-menu-hint">{t.shell.links[link.id].hint}</span>
                       </span>
                     </NavLink>
                   ))}
@@ -273,22 +282,22 @@ export function AppTopMenu() {
             ))}
 
             <section className="top-menu-group">
-              <h2 className="top-menu-group-title">Conta</h2>
+              <h2 className="top-menu-group-title">{t.shell.account}</h2>
               <div className="top-menu-links">
                 <NavLink to="/conta" className="top-menu-link">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21a8 8 0 0 1 16 0" />
                   </svg>
                   <span className="top-menu-text">
-                    A minha conta
-                    <span className="top-menu-hint">Email, password e foto</span>
+                    {t.shell.myAccount}
+                    <span className="top-menu-hint">{t.shell.myAccountHint}</span>
                   </span>
                 </NavLink>
                 <button type="button" className="top-menu-link top-menu-signout" onClick={handleSignOut}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M15 4h4v16h-4 M10 8l-4 4 4 4 M6 12h10" />
                   </svg>
-                  <span className="top-menu-text">Sair</span>
+                  <span className="top-menu-text">{t.shell.signOut}</span>
                 </button>
               </div>
             </section>

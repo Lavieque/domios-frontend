@@ -59,6 +59,8 @@ export const spending: Dict["spending"] = {
 };
 
 export const waste: Dict["waste"] = {
+  noCategory: "No category",
+  unknownProduct: "Unknown product",
   back: "Pantry",
   title: "Food waste",
   subtitle: (household) => `What was thrown away at ${household}`,

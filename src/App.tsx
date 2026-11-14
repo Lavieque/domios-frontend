@@ -11,6 +11,7 @@ import { OverviewPage } from "./pages/OverviewPage";
 import { editorialScene, readRailCollapsed, writeRailCollapsed } from "./editorial";
 import { REQUEST_ACCESS_URL } from "./siteUrl";
 import { useT } from "./i18n";
+import { GuestLanguageSwitch } from "./components/GuestLanguageSwitch";
 
 
 // Cada página é um ficheiro à parte, pedido só quando é precisa: o arranque
@@ -153,6 +154,7 @@ function App() {
           <nav className="guest-nav" aria-label={t.shell.guestNav}>
             <a href={REQUEST_ACCESS_URL}>{t.common.requestAccess}</a>
             <NavLink to="/entrar">{t.common.signIn}</NavLink>
+            <GuestLanguageSwitch />
           </nav>
         </header>
       )}

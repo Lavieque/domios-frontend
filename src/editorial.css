@@ -786,6 +786,57 @@ body {
   color: #fffdf3;
 }
 
+/* Sem sessão: PT · EN, ao lado de "Entrar". Fica neste browser e vai no registo. */
+.editorial .guest-nav {
+  align-items: center;
+}
+
+.editorial .guest-language {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid rgba(255, 253, 243, 0.35);
+  border-radius: 999px;
+}
+
+.editorial .guest-language button {
+  min-width: 2.5rem;
+  min-height: 2rem;
+  padding: 0 0.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #fffdf3;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.editorial .guest-language button[aria-pressed="true"] {
+  background: #fffdf3;
+  color: #16241f;
+}
+
+.editorial .guest-language button:focus-visible {
+  outline: 2px solid #fffdf3;
+  outline-offset: 2px;
+}
+
+/* Num telemóvel a marca, os dois links e PT · EN não cabem numa linha: os links descem. */
+@media (max-width: 520px) {
+  .editorial .guest-header {
+    flex-wrap: wrap;
+    row-gap: 0.75rem;
+  }
+
+  .editorial .guest-nav {
+    flex: 1 0 100%;
+    justify-content: flex-end;
+    white-space: nowrap;
+  }
+}
+
 .editorial .auth-page {
   max-width: 34rem;
   margin: clamp(1.5rem, 6vw, 4.5rem) auto 0;

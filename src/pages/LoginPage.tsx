@@ -6,8 +6,10 @@ import { AuthSheet } from "../components/AuthSheet";
 import { safeNextPath } from "../auth/links";
 import { useSession } from "../auth/useSession";
 import { REQUEST_ACCESS_URL } from "../siteUrl";
+import { useT } from "../i18n";
 
 export function LoginPage() {
+  const t = useT();
   const session = useSession();
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,7 +36,7 @@ export function LoginPage() {
     } catch (err) {
       setError(
         describeError(err, {
-          "invalid-credentials": "Email ou password errados.",
+          "invalid-credentials": t.auth.invalidCredentials,
         }),
       );
       setSubmitting(false);
@@ -42,16 +44,16 @@ export function LoginPage() {
   }
 
   return (
-    <AuthSheet title="Entrar">
+    <AuthSheet title={t.common.signIn}>
       {notice && <p className="notice">{notice}</p>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label className="form-field">
-          <span>Email</span>
+          <span>{t.common.email}</span>
           <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label className="form-field">
-          <span>Password</span>
+          <span>{t.common.password}</span>
           <input
             type="password"
             autoComplete="current-password"
@@ -66,18 +68,18 @@ export function LoginPage() {
           </p>
         )}
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? "A entrar…" : "Entrar"}
+          {submitting ? t.auth.signingIn : t.common.signIn}
         </button>
       </form>
 
       <p className="form-links">
-        <Link to="/esqueci-password">Esqueci-me da password</Link>
+        <Link to="/esqueci-password">{t.auth.forgotPassword}</Link>
       </p>
 
       <div className="request-access">
-        <p className="muted">Ainda não tens conta?</p>
+        <p className="muted">{t.auth.noAccountYet}</p>
         <a className="button-secondary" href={REQUEST_ACCESS_URL}>
-          Pedir acesso
+          {t.common.requestAccess}
         </a>
       </div>
     </AuthSheet>

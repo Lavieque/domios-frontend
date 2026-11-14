@@ -3,17 +3,15 @@ import { ApiError } from "../api/http";
 import { AVATAR_MAX_BYTES, prepareAvatar } from "../auth/avatarImage";
 import { describeError } from "../auth/errors";
 import { removeAvatar, saveAvatar, useAvatar } from "../auth/useAvatar";
-
-const avatarErrors = {
-  "avatar-too-large": "A imagem é demasiado grande. Escolhe outra.",
-  "invalid-image": "Essa imagem não deu. Escolhe uma fotografia JPEG, PNG ou WebP.",
-};
+import { useT } from "../i18n";
 
 /**
  * O avatar da página da conta: a fotografia (ou a inicial) e os botões para a
  * mudar ou tirar. A imagem é cortada ao quadrado e reduzida no browser antes de ir.
  */
 export function AvatarPicker({ userId, email }: { userId: string; email: string }) {
+  const t = useT();
+  const avatarErrors = { "avatar-too-large": t.account.avatar.tooLarge, "invalid-image": t.account.avatar.invalid };
   const avatar = useAvatar();
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -31,7 +29,7 @@ export function AvatarPicker({ userId, email }: { userId: string; email: string 
       try {
         image = await prepareAvatar(file);
       } catch {
-        setError("Não foi possível abrir essa imagem. Escolhe uma fotografia.");
+        setError(t.account.avatar.cannotOpen);
         return;
       }
       if (image.size > AVATAR_MAX_BYTES) {
@@ -43,7 +41,7 @@ export function AvatarPicker({ userId, email }: { userId: string; email: string 
       // 404 sem tipo: a Api deste ambiente ainda não tem a rota do avatar.
       setError(
         err instanceof ApiError && err.status === 404 && !err.type
-          ? "As fotografias ainda não estão disponíveis. Tenta mais tarde."
+          ? t.account.avatar.unavailable
           : describeError(err, avatarErrors),
       );
     } finally {
@@ -70,7 +68,7 @@ export function AvatarPicker({ userId, email }: { userId: string; email: string 
         className={`profile-avatar${avatar ? " has-photo" : ""}`}
         onClick={() => input.current?.click()}
         disabled={busy}
-        aria-label={avatar ? "Mudar a fotografia" : "Pôr uma fotografia"}
+        aria-label={avatar ? t.account.avatar.change : t.account.avatar.set}
       >
         {avatar ? <img src={avatar} alt="" /> : email.charAt(0).toUpperCase()}
         <span className="avatar-picker-badge" aria-hidden="true">
@@ -88,11 +86,11 @@ export function AvatarPicker({ userId, email }: { userId: string; email: string 
       <input ref={input} type="file" accept="image/*" hidden onChange={choose} />
       <div className="avatar-picker-actions">
         <button type="button" className="link-button" onClick={() => input.current?.click()} disabled={busy}>
-          {busy ? "A guardar…" : avatar ? "Mudar fotografia" : "Pôr fotografia"}
+          {busy ? t.common.saving : avatar ? t.account.avatar.changeShort : t.account.avatar.setShort}
         </button>
         {avatar && !busy && (
           <button type="button" className="link-button" onClick={remove}>
-            Remover
+            {t.common.remove}
           </button>
         )}
       </div>

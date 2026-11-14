@@ -48,10 +48,12 @@ import { moveItem, withPendingOrder } from "../shopping/order";
 import { rankStores } from "../shopping/storeRanking";
 import { planForStore, planFromSplit, toPlanRequest, type StorePlan } from "../shopping/storePlan";
 import { LinkPicker, SuggestionList, useCatalogSuggestions, type CatalogPick } from "../shopping/CatalogSuggestions";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
-const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
-const kmFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
+const quantityFormat = numberFormat({ maximumFractionDigits: 2 });
+const money = numberFormat({ style: "currency", currency: "EUR" });
+const kmFormat = numberFormat({ maximumFractionDigits: 1 });
 const units = Object.values(MeasurementUnit) as MeasurementUnit[];
 
 export function ShoppingListPage() {
@@ -86,7 +88,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     let cancelled = false;
     getShoppingList(householdId, listId)
       .then((result) => !cancelled && setList(result))
-      .catch((err: unknown) => !cancelled && setError(describeError(err, { "not-found": "Esta lista não existe nesta casa." })));
+      .catch((err: unknown) => !cancelled && setError(describeError(err, { "not-found": tr().shoppingList.notFound })));
     return () => {
       cancelled = true;
     };
@@ -110,7 +112,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
       setComparison(null); // os totais mudam com os itens
       setVersion((v) => v + 1);
     } catch (err) {
-      setError(describeError(err, { "invalid-state-transition": "A lista está fechada: reabre-a para a alterar." }));
+      setError(describeError(err, { "invalid-state-transition": tr().shoppingList.closed }));
     }
   }
 
@@ -151,7 +153,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
       setComparison(await getStoreComparison(householdId, listId, origin));
     } catch (err) {
       if (err instanceof PositionError) setWithTravel(false);
-      setError(err instanceof PositionError ? err.message : describeError(err, { "invalid-argument": "As lojas físicas só existem em Portugal." }));
+      setError(err instanceof PositionError ? err.message : describeError(err, { "invalid-argument": tr().shoppingList.portugalOnly }));
     } finally {
       setComparing(false);
     }
@@ -176,7 +178,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
         {error}
       </p>
     ) : (
-      <p className="muted loading">A carregar…</p>
+      <p className="muted loading">{tr().common.loading}</p>
     );
   }
 
@@ -201,7 +203,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   // Onde se compra: "Lidl", ou "Lidl · Lidl Matosinhos" com a loja física.
   const storeLabel = (chainId: string | null | undefined, physicalStoreName: string | null | undefined) => {
     if (!chainId || !chains) return null;
-    const name = chains.find((c) => c.chainId === chainId)?.name ?? "Loja fechada";
+    const name = chains.find((c) => c.chainId === chainId)?.name ?? tr().shoppingList.closedStore;
     return physicalStoreName ? `${name} · ${physicalStoreName}` : name;
   };
   // Por comprar com exceção: a loja da linha, diferente da da lista.
@@ -214,7 +216,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   return (
     <div className="page list-page">
       <Link to="/listas" className="back-link">
-        Listas de compras
+        {tr().shoppingList.back}
       </Link>
       <header className="list-head">
         <span className="list-tally-count" aria-hidden="true">
@@ -226,7 +228,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
             {list.status !== ShoppingListStatus.Open && (
               <span className={`status-tag status-${list.status}`}>{shoppingListStatusLabels[list.status]}</span>
             )}{" "}
-            {pending.length} por comprar de {list.items.length} · {household.name}
+            {tr().shoppingList.pendingOf(pending.length, list.items.length)} · {household.name}
           </p>
           {list.status !== ShoppingListStatus.Cancelled && (
             <ListStore
@@ -265,20 +267,21 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
 
           {list.items.length === 0 ? (
             <p className="empty-state">
-              Lista vazia. Acrescenta itens aqui, a partir de uma receita, ou com o que falta no <Link to="/plano">plano da semana</Link>.
+              {tr().shoppingList.empty.before} <Link to="/plano">{tr().shoppingList.empty.link}</Link>
+              {tr().shoppingList.empty.after}
             </p>
           ) : (
             <>
               <div className="section-head pending-head">
-                <h2>Por comprar ({pending.length})</h2>
+                <h2>{tr().shoppingList.toBuy(pending.length)}</h2>
                 {open && pending.length > 1 && !draftOrder && (
                   <button type="button" className="link-button" onClick={() => setDraftOrder(pending.map((item) => item.shoppingListItemId))}>
-                    Ordenar
+                    {tr().shoppingList.sort}
                   </button>
                 )}
               </div>
               {pending.length === 0 ? (
-                <p className="muted">Tudo comprado.</p>
+                <p className="muted">{tr().shoppingList.allBought}</p>
               ) : draftOrder ? (
                 <OrderItems
                   items={draftOrder.flatMap((itemId) => pending.filter((item) => item.shoppingListItemId === itemId))}
@@ -310,7 +313,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
               )}
               {purchased.length > 0 && (
                 <>
-                  <h2>Comprados ({purchased.length})</h2>
+                  <h2>{tr().shoppingList.bought(purchased.length)}</h2>
                   <PurchasedTotal items={purchased} />
                   {list.plan && <PlanSummary plan={list.plan} />}
                   <ItemList
@@ -364,15 +367,15 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
             {open ? (
               <>
                 <button type="button" className="button-primary" onClick={() => act(() => completeShoppingList(householdId, listId))}>
-                  Concluir lista
+                  {tr().shoppingList.complete}
                 </button>
                 <button type="button" className="button-secondary" onClick={() => act(() => cancelShoppingList(householdId, listId))}>
-                  Cancelar lista
+                  {tr().shoppingList.cancel}
                 </button>
               </>
             ) : (
               <button type="button" className="button-secondary" onClick={() => act(() => reopenShoppingList(householdId, listId))}>
-                Reabrir lista
+                {tr().shoppingList.reopen}
               </button>
             )}
           </div>
@@ -382,21 +385,21 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
           <aside className="list-side">
             <section className="side-block comparison-panel">
               <div className="side-head">
-                <h2>Onde fica mais barato</h2>
+                <h2>{tr().shoppingList.cheapest}</h2>
               </div>
               {checkingLinks && unlinked.length > 0 && (
                 <UnlinkedWarning items={unlinked} onLink={link} onCompareAnyway={() => void compare()} onCancel={() => setCheckingLinks(false)} />
               )}
               <label className="travel-toggle">
                 <input type="checkbox" checked={withTravel} disabled={comparing} onChange={(e) => toggleTravel(e.target.checked)} />
-                Contar deslocação <span className="muted">(usa a tua localização, que não fica guardada)</span>
+                {tr().shoppingList.countTravel} <span className="muted">{tr().shoppingList.travelHint}</span>
               </label>
               {!comparison ? (
                 !checkingLinks && (
                   <>
-                    <p className="side-empty">Os preços das lojas dos últimos 3 dias, item a item.</p>
+                    <p className="side-empty">{tr().shoppingList.compareHint}</p>
                     <button type="button" className="button-secondary" onClick={() => void startCompare()} disabled={comparing}>
-                      {comparing ? "A comparar…" : "Comparar lojas"}
+                      {comparing ? tr().shoppingList.comparing : tr().shoppingList.compare}
                     </button>
                   </>
                 )
@@ -448,13 +451,12 @@ function StoreInPantryPanel({ count, onStore }: { count: number; onStore: (locat
 
   return (
     <section className="panel store-in-pantry">
-      <h2>Pôr na despensa</h2>
+      <h2>{tr().shoppingList.toPantry}</h2>
       <p className="muted">
-        {count === 1 ? "1 item comprado ainda não está" : `${count} itens comprados ainda não estão`} na despensa. Entram com a quantidade da lista; a
-        validade podes acertar depois, na despensa.
+        {tr().shoppingList.notInPantry(count)}
       </p>
       <form className="inline-form" onSubmit={handleSubmit}>
-        <select className="category-select" aria-label="Onde ficam" value={location} onChange={(e) => setLocation(Number(e.target.value) as PantryLocation)}>
+        <select className="category-select" aria-label={tr().shoppingList.whereStored} value={location} onChange={(e) => setLocation(Number(e.target.value) as PantryLocation)}>
           {pantryLocations.map((loc) => (
             <option key={loc} value={loc}>
               {pantryLocationLabels[loc]}
@@ -462,7 +464,7 @@ function StoreInPantryPanel({ count, onStore }: { count: number; onStore: (locat
           ))}
         </select>
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? "A guardar…" : "Pôr na despensa"}
+          {submitting ? tr().common.saving : tr().shoppingList.toPantry}
         </button>
       </form>
       {error && (
@@ -472,9 +474,9 @@ function StoreInPantryPanel({ count, onStore }: { count: number; onStore: (locat
       )}
       {result && (
         <p className="notice inline-notice">
-          {result.storedCount === 1 ? "1 item entrou" : `${result.storedCount} itens entraram`} na <Link to="/despensa">despensa</Link>.
+          {tr().shoppingList.stored(result.storedCount)} <Link to="/despensa">{tr().shoppingList.pantryLink}</Link>.
           {result.skipped.length > 0 &&
-            ` Ficaram de fora, por não terem produto nem ingrediente: ${result.skipped.map((s) => s.label).join(", ")}. Acrescenta-os à mão na despensa.`}
+            tr().shoppingList.skipped(result.skipped.map((s) => s.label).join(", "))}
         </p>
       )}
     </section>
@@ -498,7 +500,7 @@ function ListName({ list, onRename }: { list: ShoppingListDto; onRename: (name: 
               setEditing(true);
             }}
           >
-            Mudar nome
+            {tr().shoppingList.rename}
           </button>
         )}
       </h1>
@@ -514,12 +516,12 @@ function ListName({ list, onRename }: { list: ShoppingListDto; onRename: (name: 
         setEditing(false);
       }}
     >
-      <input type="text" aria-label="Nome da lista" required maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
+      <input type="text" aria-label={tr().shoppingList.listName} required maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
       <button type="submit" className="button-primary">
-        Guardar
+        {tr().common.save}
       </button>
       <button type="button" className="link-button" onClick={() => setEditing(false)}>
-        Cancelar
+        {tr().common.cancel}
       </button>
     </form>
   );
@@ -540,8 +542,7 @@ function UnlinkedWarning({
   return (
     <div className="notice unlinked-warning" role="status">
       <p>
-        {items.length === 1 ? "1 item não está ligado" : `${items.length} itens não estão ligados`} a um produto do catálogo e por isso não entra
-        {items.length === 1 ? "" : "m"} na comparação. Confirma o que é cada um:
+        {tr().shoppingList.unlinked(items.length)}
       </p>
       <ul className="unlinked-list">
         {items.map((item) => (
@@ -553,10 +554,10 @@ function UnlinkedWarning({
       </ul>
       <div className="button-row">
         <button type="button" className="button-secondary" onClick={onCompareAnyway}>
-          Comparar mesmo assim
+          {tr().shoppingList.compareAnyway}
         </button>
         <button type="button" className="link-button" onClick={onCancel}>
-          Cancelar
+          {tr().common.cancel}
         </button>
       </div>
     </div>
@@ -593,8 +594,8 @@ function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: M
       <div className="add-item-field">
         <input
           type="text"
-          aria-label="Item"
-          placeholder="Acrescentar item…"
+          aria-label={tr().shoppingList.item}
+          placeholder={tr().shoppingList.addItem}
           required
           maxLength={200}
           value={label}
@@ -604,13 +605,13 @@ function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: M
           }}
         />
         {pick ? (
-          <p className="muted add-item-linked">Ligado a {pick.kind === "product" ? "produto" : "ingrediente"}: {pick.name}</p>
+          <p className="muted add-item-linked">{tr().shoppingList.linkedTo(pick.kind, pick.name)}</p>
         ) : (
           <SuggestionList suggestions={suggestions} onPick={handlePick} />
         )}
       </div>
-      <input type="text" inputMode="decimal" aria-label="Quantidade" className="amount-input" value={amount} onChange={(e) => setAmount(e.target.value)} />
-      <select className="category-select" aria-label="Unidade" value={unit} onChange={(e) => setUnit(Number(e.target.value) as MeasurementUnit)}>
+      <input type="text" inputMode="decimal" aria-label={tr().shoppingList.quantity} className="amount-input" value={amount} onChange={(e) => setAmount(e.target.value)} />
+      <select className="category-select" aria-label={tr().shoppingList.unit} value={unit} onChange={(e) => setUnit(Number(e.target.value) as MeasurementUnit)}>
         {units.map((u) => (
           <option key={u} value={u}>
             {measurementUnitLabels[u]}
@@ -618,7 +619,7 @@ function AddItemForm({ onAdd }: { onAdd: (label: string, amount: number, unit: M
         ))}
       </select>
       <button type="submit" className="button-primary">
-        Acrescentar
+        {tr().shoppingList.add}
       </button>
     </form>
   );
@@ -638,19 +639,19 @@ function OrderItems({
 }) {
   return (
     <>
-      <p className="muted">Põe os itens pela ordem em que os vais buscar. Fora deste modo a lista volta a aparecer por corredor.</p>
+      <p className="muted">{tr().shoppingList.orderHint}</p>
       <ol className="pantry-list order-list">
         {items.map((item, index) => (
           <li key={item.shoppingListItemId} className="list-row">
             <span className="meal-title">{item.label}</span>
             <span className="order-buttons">
-              <button type="button" className="icon-button" aria-label={`Subir ${item.label}`} disabled={index === 0} onClick={() => onMove(index, -1)}>
+              <button type="button" className="icon-button" aria-label={tr().shoppingList.moveUp(item.label)} disabled={index === 0} onClick={() => onMove(index, -1)}>
                 ↑
               </button>
               <button
                 type="button"
                 className="icon-button"
-                aria-label={`Descer ${item.label}`}
+                aria-label={tr().shoppingList.moveDown(item.label)}
                 disabled={index === items.length - 1}
                 onClick={() => onMove(index, 1)}
               >
@@ -662,10 +663,10 @@ function OrderItems({
       </ol>
       <div className="button-row">
         <button type="button" className="button-primary" onClick={onDone}>
-          Guardar ordem
+          {tr().shoppingList.saveOrder}
         </button>
         <button type="button" className="button-secondary" onClick={onCancel}>
-          Cancelar
+          {tr().common.cancel}
         </button>
       </div>
     </>
@@ -698,7 +699,7 @@ function PendingItems({
         <section key={group.name} className={`item-group ${aisleClass(group.name === OTHERS_GROUP ? null : aisleOf(group.name))}`}>
           <h3>
             <span className="aisle-dot" aria-hidden="true" />
-            {group.name} <span className="muted">({group.items.length})</span>
+            {group.name === OTHERS_GROUP ? tr().shoppingList.others : group.name} <span className="muted">({group.items.length})</span>
           </h3>
           <ItemList items={group.items} {...rest} />
         </section>
@@ -768,19 +769,21 @@ function ItemList({
           </span>
           {packaging?.get(item.shoppingListItemId) && (
             <span className="pill pill-accent2" title={packaging.get(item.shoppingListItemId)!.productName}>
-              comprar {packaging.get(item.shoppingListItemId)!.packageCount} ×{" "}
-              {formatQuantity(packaging.get(item.shoppingListItemId)!.packageQuantity, packaging.get(item.shoppingListItemId)!.packageUnit)}
+              {tr().shoppingList.buyPackages(
+                packaging.get(item.shoppingListItemId)!.packageCount,
+                formatQuantity(packaging.get(item.shoppingListItemId)!.packageQuantity, packaging.get(item.shoppingListItemId)!.packageUnit),
+              )}
             </span>
           )}
-          {item.storedInPantryAt && <span className="pill pill-muted">Na despensa</span>}
+          {item.storedInPantryAt && <span className="pill pill-muted">{tr().shoppingList.inPantry}</span>}
           {!item.isPurchased && planned?.get(item.shoppingListItemId) && (
-            <span className="pill pill-muted" title="Planeado comprar nesta loja, não na da lista">
-              no {planned.get(item.shoppingListItemId)}
+            <span className="pill pill-muted" title={tr().shoppingList.plannedHereHint}>
+              {tr().shoppingList.at(planned.get(item.shoppingListItemId)!)}
             </span>
           )}
           {item.isPurchased && item.followedPlan === false && (
-            <span className="pill pill-muted" title="Comprado noutra loja que não a do plano">
-              planeado no {chains?.find((c) => c.chainId === item.plannedChainId)?.name ?? "outra loja"}
+            <span className="pill pill-muted" title={tr().shoppingList.boughtElsewhereHint}>
+              {tr().shoppingList.plannedAt(chains?.find((c) => c.chainId === item.plannedChainId)?.name ?? tr().shoppingList.otherStore)}
             </span>
           )}
           {open && !item.isPurchased && item.plannedChainId && onBuyElsewhere && chains && (
@@ -791,10 +794,10 @@ function ItemList({
             <button
               type="button"
               className="link-button list-row-link"
-              title="Sem produto ligado: não entra na comparação de lojas"
+              title={tr().shoppingList.noProductHint}
               onClick={() => setLinking(linking === item.shoppingListItemId ? null : item.shoppingListItemId)}
             >
-              Ligar a produto
+              {tr().shoppingList.linkProduct}
             </button>
           )}
           {linking === item.shoppingListItemId && onLink && (
@@ -814,7 +817,7 @@ function ItemList({
             </span>
           )}
           {open && (
-            <button type="button" className="icon-danger" aria-label={`Remover ${item.label}`} title="Remover" onClick={() => onDelete(item)}>
+            <button type="button" className="icon-danger" aria-label={tr().shoppingList.removeItem(item.label)} title={tr().shoppingList.remove} onClick={() => onDelete(item)}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 7h14M10 7V5h4v2M7 7l1 12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -852,19 +855,19 @@ function ListStore({
   if (!chains) return null;
   return (
     <label className="list-store">
-      <span className="muted">Compras no</span>
+      <span className="muted">{tr().shoppingList.shoppingAt}</span>
       <select className="category-select" value={chainId ?? ""} onChange={(e) => onChange(e.target.value || null)}>
-        <option value="">Loja por escolher</option>
+        <option value="">{tr().shoppingList.storeTbd}</option>
         {chains.map((chain) => (
           <option key={chain.chainId} value={chain.chainId}>
             {chain.name}
           </option>
         ))}
         {/* A cadeia guardada pode ter fechado entretanto: mostra-se na mesma. */}
-        {chainId && !chains.some((c) => c.chainId === chainId) && <option value={chainId}>Loja fechada</option>}
+        {chainId && !chains.some((c) => c.chainId === chainId) && <option value={chainId}>{tr().shoppingList.closedStore}</option>}
       </select>
       {place && <span className="muted">{place}</span>}
-      {elsewhere > 0 && <span className="muted">· {elsewhere === 1 ? "1 item noutra loja" : `${elsewhere} itens noutra loja`}</span>}
+      {elsewhere > 0 && <span className="muted">{tr().shoppingList.elsewhere(elsewhere)}</span>}
     </label>
   );
 }
@@ -875,14 +878,14 @@ function BuyElsewhere({ item, chains, onPick }: { item: ShoppingListItemDto; cha
   if (!picking) {
     return (
       <button type="button" className="link-button list-row-link" onClick={() => setPicking(true)}>
-        Comprei noutro sítio
+        {tr().shoppingList.boughtElsewhere}
       </button>
     );
   }
   return (
     <select
       className="category-select"
-      aria-label={`Onde compraste ${item.label}`}
+      aria-label={tr().shoppingList.whereBoughtItem(item.label)}
       autoFocus
       value=""
       onBlur={() => setPicking(false)}
@@ -891,7 +894,7 @@ function BuyElsewhere({ item, chains, onPick }: { item: ShoppingListItemDto; cha
         if (e.target.value) onPick(e.target.value);
       }}
     >
-      <option value="">Onde compraste?</option>
+      <option value="">{tr().shoppingList.whereBought}</option>
       {chains
         .filter((chain) => chain.chainId !== item.effectiveChainId)
         .map((chain) => (
@@ -910,14 +913,14 @@ function PlanSummary({ plan }: { plan: ShoppingPlanDto }) {
   const place = [plan.chainName, plan.physicalStoreName].filter(Boolean).join(" · ");
   return (
     <p className="muted purchased-total">
-      Plano{place && ` (${place})`}
+      {tr().shoppingList.plan}{place && ` (${place})`}
       {plan.plannedTotal > 0 && (
         <>
-          : planeado {money.format(plan.plannedTotal)}, pago <strong className="price-tag">{money.format(plan.paidTotal)}</strong>
+          {tr().shoppingList.plannedPaid.planned} {money.format(plan.plannedTotal)}{tr().shoppingList.plannedPaid.paid} <strong className="price-tag">{money.format(plan.paidTotal)}</strong>
         </>
       )}
-      {plan.boughtElsewhere > 0 && ` · ${plan.boughtElsewhere === 1 ? "1 item comprado noutra loja" : `${plan.boughtElsewhere} itens comprados noutra loja`}`}
-      {plan.outsidePlan > 0 && ` · ${plan.outsidePlan === 1 ? "1 item fora do plano" : `${plan.outsidePlan} itens fora do plano`}`}
+      {plan.boughtElsewhere > 0 && tr().shoppingList.planElsewhere(plan.boughtElsewhere)}
+      {plan.outsidePlan > 0 && tr().shoppingList.outsidePlan(plan.outsidePlan)}
     </p>
   );
 }
@@ -933,9 +936,9 @@ function PurchasedTotal({ items }: { items: ShoppingListItemDto[] }) {
   const missing = items.length - priced.length;
   return (
     <p className="muted purchased-total">
-      Pago: <strong className="price-tag">{money.format(total)}</strong>
-      {estimated > 0 && ` · ${money.format(estimated)} pelo preço da prateleira`}
-      {missing > 0 && ` · ${missing === 1 ? "1 item sem preço" : `${missing} itens sem preço`}`}
+      {tr().shoppingList.paid} <strong className="price-tag">{money.format(total)}</strong>
+      {estimated > 0 && tr().shoppingList.shelfPart(money.format(estimated))}
+      {missing > 0 && ` · ${tr().shoppingList.unpriced(missing)}`}
     </p>
   );
 }
@@ -967,9 +970,9 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
     } catch (err) {
       setError(
         describeError(err, {
-          "invalid-state-transition": "A lista foi cancelada: já não aceita preços.",
-          "invalid-argument": "Escreve um valor entre 0 e 10 000 €.",
-          "not-found": "Esta loja já não existe.",
+          "invalid-state-transition": tr().shoppingList.priceErrors.cancelled,
+          "invalid-argument": tr().shoppingList.priceErrors.range,
+          "not-found": tr().shoppingList.priceErrors.noStore,
         }),
       );
     } finally {
@@ -987,7 +990,7 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
     }
     const value = Number(text.replace(",", "."));
     if (!Number.isFinite(value) || value < 0 || value > 10000) {
-      setError("Escreve um valor entre 0 e 10 000 €.");
+      setError(tr().shoppingList.priceErrors.range);
       return;
     }
     void save(Math.round(value * 100) / 100);
@@ -998,16 +1001,16 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
       <button
         type="button"
         className="link-button paid-price"
-        title={typed ? "Preço escrito por ti" : item.paidPrice ? "Preço da prateleira no dia da compra" : "Escrever quanto pagaste"}
+        title={typed ? tr().shoppingList.typedHint : item.paidPrice ? tr().shoppingList.shelfHint : tr().shoppingList.writeHint}
         onClick={start}
       >
         {item.paidPrice ? (
           <>
             <span className="price-tag">{money.format(item.paidPrice.amount)}</span>
-            {!typed && <span className="muted"> prateleira</span>}
+            {!typed && <span className="muted">{tr().shoppingList.shelf}</span>}
           </>
         ) : (
-          "Quanto pagaste?"
+          tr().shoppingList.howMuchPaid
         )}
         {ownChain && <span className="muted"> · {ownChain}</span>}
       </button>
@@ -1018,13 +1021,13 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
   return (
     <form className="inline-form paid-price-form" onSubmit={submit}>
       <label>
-        <span className="muted">Pago (total da linha)</span>{" "}
+        <span className="muted">{tr().shoppingList.paidLine}</span>{" "}
         <input
           type="text"
           inputMode="decimal"
           className="amount-input"
           placeholder={item.paidPrice && !typed ? String(item.paidPrice.amount).replace(".", ",") : "0,00"}
-          aria-label={`Quanto pagaste por ${item.label}, em euros`}
+          aria-label={tr().shoppingList.paidFor(item.label)}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           autoFocus
@@ -1032,8 +1035,8 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
         €
       </label>
       {chains && (
-        <select className="category-select" aria-label="Loja desta linha" value={chainId} onChange={(e) => setChainId(e.target.value)}>
-          <option value="">{listChain ? `Como a lista (${listChain})` : "Como a lista"}</option>
+        <select className="category-select" aria-label={tr().shoppingList.lineStore} value={chainId} onChange={(e) => setChainId(e.target.value)}>
+          <option value="">{tr().shoppingList.likeList(listChain)}</option>
           {chains.map((chain) => (
             <option key={chain.chainId} value={chain.chainId}>
               {chain.name}
@@ -1042,15 +1045,15 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
         </select>
       )}
       <button type="submit" className="button-primary" disabled={saving}>
-        {saving ? "A guardar…" : "Guardar"}
+        {saving ? tr().common.saving : tr().common.save}
       </button>
       {typed && (
-        <button type="button" className="link-button" disabled={saving} onClick={() => void save(null)} title="Apaga o valor escrito">
-          Usar preço da prateleira
+        <button type="button" className="link-button" disabled={saving} onClick={() => void save(null)} title={tr().shoppingList.clearTyped}>
+          {tr().shoppingList.useShelf}
         </button>
       )}
       <button type="button" className="link-button" onClick={() => setEditing(false)}>
-        Cancelar
+        {tr().common.cancel}
       </button>
       {error && (
         <span className="form-error" role="alert">
@@ -1098,7 +1101,7 @@ function Comparison({
   const splitPlan = choice ? planFromSplit(comparison, choice.pendingIds) : null;
   const followSplit = splitPlan && choice && (
     <button type="button" className="button-secondary" onClick={() => choice.onChoose(splitPlan)}>
-      Seguir esta divisão
+      {tr().shoppingList.followSplit}
     </button>
   );
 
@@ -1114,7 +1117,7 @@ function Comparison({
     <div>
       {!anyPrice && (
         <p className="muted">
-          Nenhuma loja tem preço recente para {comparison.itemCount === 1 ? "este item" : `estes ${comparison.itemCount} itens`}.
+          {tr().shoppingList.noRecentPrice(comparison.itemCount)}
         </p>
       )}
       {anyPrice && (
@@ -1128,26 +1131,26 @@ function Comparison({
                 <div className="store-card-text">
                   <strong>{store.chainName}</strong>
                   <span>
-                    {store.coveredItemCount} de {comparison.itemCount} itens com preço
+                    {tr().shoppingList.covered(store.coveredItemCount, comparison.itemCount)}
                   </span>
                 </div>
                 <div className="store-card-price">
                   <span className="price-tag">{money.format(store.totalWithTravel ?? store.total)}</span>
                   {store.totalWithTravel != null && store.travelCost != null && store.nearestStore ? (
                     <span>
-                      Artigos {money.format(store.total)} + deslocação {money.format(store.travelCost)} ({kmFormat.format(store.nearestStore.roundTripKm)} km)
+                      {tr().shoppingList.itemsPlusTravel(money.format(store.total), money.format(store.travelCost), kmFormat.format(store.nearestStore.roundTripKm))}
                     </span>
                   ) : (
-                    store.cardTotal < store.total && <span>{money.format(store.cardTotal)} com cartão</span>
+                    store.cardTotal < store.total && <span>{tr().shoppingList.withCard(money.format(store.cardTotal))}</span>
                   )}
                 </div>
                 {store.nearestStore && <span className="store-card-near muted">{store.nearestStore.name}</span>}
                 <span className={isBest ? "badge" : complete ? "badge badge-soft" : "badge badge-warn"}>
-                  {isBest ? "Mais barato" : complete ? "Tem tudo" : `Falta ${comparison.itemCount - store.coveredItemCount}`}
+                  {isBest ? tr().shoppingList.cheapestBadge : complete ? tr().shoppingList.hasAll : tr().shoppingList.missing(comparison.itemCount - store.coveredItemCount)}
                 </span>
                 {choice &&
                   (choice.listChainId === store.chainId && !choice.hasExceptions ? (
-                    <span className="store-card-choose muted">É onde vais comprar</span>
+                    <span className="store-card-choose muted">{tr().shoppingList.buyingHere}</span>
                   ) : (
                     <button
                       type="button"
@@ -1157,7 +1160,7 @@ function Comparison({
                         if (plan) choice.onChoose(plan);
                       }}
                     >
-                      Vou comprar aqui
+                      {tr().shoppingList.buyHere}
                     </button>
                   ))}
               </div>
@@ -1172,22 +1175,30 @@ function Comparison({
 
       {comparison.travel?.status === "NoStoresInRange" && (
         <p className="muted">
-          Nenhuma loja destas cadeias a menos de {kmFormat.format(comparison.travel.radiusKm)} km: os totais não contam a deslocação. O raio muda-se
-          em <Link to="/casa">Casa</Link>.
+          {tr().shoppingList.noStoresInRange(kmFormat.format(comparison.travel.radiusKm))} <Link to="/casa">{tr().shoppingList.household}</Link>.
         </p>
       )}
       {comparison.splitWithTravel && comparison.splitWithTravel.storeCount > 1 && (
         <div className="notice">
-          Contando a deslocação, dividir por {comparison.splitWithTravel.storeCount} lojas dá {money.format(comparison.splitWithTravel.totalWithTravel)}:
-          artigos {money.format(comparison.splitWithTravel.total)} + deslocação {money.format(comparison.splitWithTravel.travelCost)} (
-          {kmFormat.format(comparison.splitWithTravel.routeKm)} km).
+          {tr().shoppingList.splitWithTravel(
+            comparison.splitWithTravel.storeCount,
+            money.format(comparison.splitWithTravel.totalWithTravel),
+            money.format(comparison.splitWithTravel.total),
+            money.format(comparison.splitWithTravel.travelCost),
+            kmFormat.format(comparison.splitWithTravel.routeKm),
+          )}
           {comparison.travel?.status === "Included" && <div>{followSplit}</div>}
         </div>
       )}
       {split.storeCount > 1 && split.savingVsBestStore > 0 && comparison.travel?.status !== "Included" && (
         <div className="notice">
-          Dividindo a compra por {split.storeCount} lojas: {money.format(split.total)} ({money.format(split.cardTotal)} com cartão),
-          menos {money.format(split.savingVsBestStore)} do que tudo no {splitBest?.chainName}.
+          {tr().shoppingList.split(
+            split.storeCount,
+            money.format(split.total),
+            money.format(split.cardTotal),
+            money.format(split.savingVsBestStore),
+            splitBest?.chainName ?? "",
+          )}
           <ul className="split-list">
             {splitByStore.map((group) => (
               <li key={group.chainName}>
@@ -1203,27 +1214,25 @@ function Comparison({
       {comparison.unpricedItems.length > 0 && (
         <details className="comparison-details">
           <summary>
-            {comparison.unpricedItems.length === 1 ? "1 item sem preço" : `${comparison.unpricedItems.length} itens sem preço`}
+            {tr().shoppingList.unpriced(comparison.unpricedItems.length)}
           </summary>
           <ul className="unpriced-list">
             {comparison.unpricedItems.map((item) => (
               <li key={item.itemId}>
                 {item.label}{" "}
                 <span className="muted">
-                  {item.reason === UnpricedItemReason.NoProduct ? "sem produto ligado" : "nenhuma loja vende"}
+                  {item.reason === UnpricedItemReason.NoProduct ? tr().shoppingList.noProduct : tr().shoppingList.noStoreSells}
                 </span>
               </li>
             ))}
           </ul>
-          <p className="muted">Itens escritos à mão só têm preço quando ligados a um produto ou ingrediente.</p>
+          <p className="muted">{tr().shoppingList.handTyped}</p>
         </details>
       )}
       {anyPrice && (
         <p className="muted comparison-note">
-          Os preços são das embalagens inteiras que tens de comprar, não da parte que a receita usa: 20 g de arroz contam como um pacote de 1 kg.
-          Itens iguais de várias receitas contam juntos. Preços dos últimos 3 dias nas lojas online.
-          {comparison.travel?.status === "Included" &&
-            ` Deslocação: ida e volta à loja mais perto de cada cadeia, a ${money.format(comparison.travel.costPerKm)}/km. Lojas © OpenStreetMap contributors.`}
+          {tr().shoppingList.priceNote}
+          {comparison.travel?.status === "Included" && tr().shoppingList.travelNote(money.format(comparison.travel.costPerKm))}
         </p>
       )}
     </div>
@@ -1252,7 +1261,7 @@ function ConversionAsk({
     event.preventDefault();
     const value = Number(grams.replace(",", "."));
     if (!Number.isFinite(value) || value <= 0) {
-      setError("Escreve um número maior que zero.");
+      setError(tr().shoppingList.positive);
       return;
     }
 
@@ -1275,21 +1284,21 @@ function ConversionAsk({
   return (
     <form className="conversion-ask" onSubmit={submit}>
       <label>
-        Conta 1 embalagem. {isDensity ? "1 l" : "1 un"} ≈{" "}
+        {tr().shoppingList.countsOne} {isDensity ? "1 l" : tr().shoppingList.oneUnit} ≈{" "}
         <input
           type="text"
           inputMode="decimal"
           size={5}
           value={grams}
           onChange={(e) => setGrams(e.target.value)}
-          aria-label={isDensity ? "Gramas num litro" : "Gramas numa unidade"}
+          aria-label={isDensity ? tr().shoppingList.gramsLitre : tr().shoppingList.gramsUnit}
         />{" "}
         g
       </label>{" "}
       <button type="submit" className="link-button" disabled={saving || grams.trim() === ""}>
-        {saving ? "A guardar…" : "Guardar"}
+        {saving ? tr().common.saving : tr().common.save}
       </button>
-      <div className="muted">Fica para todas as casas.</div>
+      <div className="muted">{tr().shoppingList.forAll}</div>
       {error && (
         <div className="form-error" role="alert">
           {error}
@@ -1315,17 +1324,17 @@ function StoreBreakdown({
     <details className="store-breakdown">
       <summary>
         <ChainLogo chainName={store.chainName} size="sm" />
-        <span className="store-breakdown-name">O que comprar no {store.chainName}</span>
+        <span className="store-breakdown-name">{tr().shoppingList.whatToBuyAt(store.chainName)}</span>
         <span className="store-breakdown-total">{money.format(store.total)}</span>
       </summary>
       <div className="table-wrap">
       <table className="comparison-table breakdown-table">
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Precisas</th>
-            <th>Compras</th>
-            <th className="num">Preço</th>
+            <th>{tr().shoppingList.item}</th>
+            <th>{tr().shoppingList.need}</th>
+            <th>{tr().shoppingList.buy}</th>
+            <th className="num">{tr().shoppingList.price}</th>
           </tr>
         </thead>
         <tbody>
@@ -1338,10 +1347,10 @@ function StoreBreakdown({
               <td>
                 {line.productName}
                 <div className="muted">
-                  {line.packageCount} × {line.packageQuantity > 0 ? formatQuantity(line.packageQuantity, line.packageUnit) : "embalagem"} a{" "}
+                  {line.packageCount} × {line.packageQuantity > 0 ? formatQuantity(line.packageQuantity, line.packageUnit) : tr().shoppingList.pack} {tr().shoppingList.packAt}{" "}
                   {money.format(line.packagePrice)}
-                  {!line.quantityComparable && !line.missingConversion && " · quantidade não comparável, conta 1 embalagem"}
-                  {line.quantityConverted && " · quantidade aproximada"}
+                  {!line.quantityComparable && !line.missingConversion && tr().shoppingList.notComparable}
+                  {line.quantityConverted && tr().shoppingList.approx}
                 </div>
                 {line.missingConversion && (
                   <ConversionAsk householdId={householdId} missing={line.missingConversion} onSaved={onRecompare} />
@@ -1349,7 +1358,7 @@ function StoreBreakdown({
               </td>
               <td className="num">
                 {money.format(line.lineTotal)}
-                {line.cardLineTotal < line.lineTotal && <div className="muted">{money.format(line.cardLineTotal)} com cartão</div>}
+                {line.cardLineTotal < line.lineTotal && <div className="muted">{tr().shoppingList.withCard(money.format(line.cardLineTotal))}</div>}
               </td>
             </tr>
           ))}
@@ -1358,9 +1367,9 @@ function StoreBreakdown({
       </div>
       {store.missingItemIds.length > 0 && (
         <p className="muted">
-          Sem preço no {store.chainName}:{" "}
+          {tr().shoppingList.noPriceAt(store.chainName)}{" "}
           {store.missingItemIds.length > 3
-            ? `${store.missingItemIds.length} itens`
+            ? tr().shoppingList.nItems(store.missingItemIds.length)
             : store.missingItemIds.map(labelOf).join(", ")}
           .
         </p>

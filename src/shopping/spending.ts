@@ -1,6 +1,7 @@
+import { dateTimeFormat } from "../i18n/format";
 // Datas da página de gastos.
 
-const monthFormat = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" });
+const monthFormat = dateTimeFormat({ month: "long", year: "numeric" });
 
 function isoDay(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");

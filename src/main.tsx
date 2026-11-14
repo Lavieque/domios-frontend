@@ -9,11 +9,24 @@ import './editorial.css'
 import './editorial-pages.css'
 import './editorial-mobile.css'
 import App from './App.tsx'
+import { useLanguage } from './i18n'
+import { startAccountLanguageSync } from './i18n/accountLanguage'
+
+startAccountLanguageSync()
+
+/**
+ * Quando a língua muda, a app remonta: os textos lidos fora dos componentes
+ * (rótulos, formatadores) voltam a ser lidos na língua nova.
+ */
+function LanguageRoot() {
+  const lang = useLanguage()
+  return <App key={lang} />
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <LanguageRoot />
     </BrowserRouter>
   </StrictMode>,
 )

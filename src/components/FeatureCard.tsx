@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { tr } from "../i18n";
 
 /** O destaque editorial: fotografia à esquerda, a receita à direita num cartão de vidro. */
 export function FeatureCard({
@@ -7,7 +8,7 @@ export function FeatureCard({
   meta,
   imageUrl,
   to,
-  action = "Ver receita →",
+  action,
 }: {
   eyebrow: string;
   title: string;
@@ -24,7 +25,7 @@ export function FeatureCard({
         <h2>{title}</h2>
         {meta && <p className="feature-card-meta">{meta}</p>}
         <Link to={to} className="button-primary">
-          {action}
+          {action ?? tr().ui.seeRecipe}
         </Link>
       </div>
     </section>

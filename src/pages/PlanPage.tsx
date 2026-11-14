@@ -29,12 +29,14 @@ import { SendToListForm } from "../components/SendToListForm";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useRecipeImages } from "../plan/recipeImages";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekDays, weekdayName, weekdayTitle } from "../plan/dates";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
 export function PlanPage() {
   return <HouseholdGate>{(household) => <WeekPlan household={household} />}</HouseholdGate>;
 }
 
-const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
+const quantityFormat = numberFormat({ maximumFractionDigits: 1 });
 
 /** O que falta e as sugestões começam curtos; o resto abre-se com um botão. */
 const MISSING_SHOWN = 8;
@@ -103,7 +105,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
       await action();
       reload();
     } catch (err) {
-      setError(describeError(err, { "invalid-state-transition": "Esta refeição já não pode ser alterada." }));
+      setError(describeError(err, { "invalid-state-transition": tr().plan.locked }));
     }
   }
 
@@ -113,26 +115,26 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
   return (
     <div className="page week-page">
       <header className="week-head">
-        <h1>Plano da semana</h1>
+        <h1>{tr().plan.title}</h1>
         <p className="week-head-sub">{household.name}</p>
-        <nav className="week-nav" aria-label="Semanas">
+        <nav className="week-nav" aria-label={tr().plan.weeks}>
           <button type="button" className="week-step" onClick={() => goToWeek(addDays(monday, -7))}>
             <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            Anterior
+            {tr().plan.previous}
           </button>
           <span className="week-range">
             {shortDate(monday)} – {longDate(sunday)}
           </span>
           <button type="button" className="week-step" onClick={() => goToWeek(addDays(monday, 7))}>
-            Seguinte
+            {tr().plan.next}
             <svg className="week-step-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <Link to="/ementas" className="week-nav-link">
-            Aplicar uma ementa pronta
+            {tr().plan.applyTemplate}
           </Link>
         </nav>
       </header>
@@ -142,11 +144,11 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
           {error}
         </p>
       )}
-      {loading && <p className="muted loading">A carregar…</p>}
+      {loading && <p className="muted loading">{tr().common.loading}</p>}
 
       <div className="week-layout">
         {/* Os dias em linhas, por ordem; o número fica sempre na mesma coluna. */}
-        <ol className="week-days" aria-label="Dias da semana">
+        <ol className="week-days" aria-label={tr().plan.days}>
           {days.map((day) => {
             const dayMeals = meals.filter((meal) => meal.date === day);
             const isToday = day === now;
@@ -159,11 +161,11 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                   </span>
                   <span className="week-day-weekday">
                     {weekdayTitle(day).replace("-feira", "")}
-                    {isToday && <span className="week-day-today">Hoje</span>}
+                    {isToday && <span className="week-day-today">{tr().plan.today}</span>}
                   </span>
                 </div>
                 {dayMeals.length === 0 ? (
-                  <p className="week-day-empty">Nada planeado.</p>
+                  <p className="week-day-empty">{tr().plan.nothingPlanned}</p>
                 ) : (
                   <ul className="week-day-meals">
                     {dayMeals.map((meal) => (
@@ -182,7 +184,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                             <span className="week-meal-dish">{meal.title}</span>
                           )}
                           <span className="week-meal-meta">
-                            {meal.servings} {meal.servings === 1 ? "dose" : "doses"}
+                            {tr().plan.servings(meal.servings)}
                             {meal.status !== PlannedMealStatus.Planned && ` · ${plannedMealStatusLabels[meal.status]}`}
                           </span>
                         </span>
@@ -197,7 +199,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                                 className="link-button"
                                 onClick={() => act(() => skipPlannedMeal(householdId, meal.plannedMealId))}
                               >
-                                Saltar
+                                {tr().plan.skip}
                               </button>
                             ) : (
                               <button
@@ -205,7 +207,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                                 className="link-button"
                                 onClick={() => act(() => unskipPlannedMeal(householdId, meal.plannedMealId))}
                               >
-                                Repor
+                                {tr().plan.restore}
                               </button>
                             )}
                             <button
@@ -213,7 +215,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                               className="link-button"
                               onClick={() => act(() => deletePlannedMeal(householdId, meal.plannedMealId))}
                             >
-                              Remover
+                              {tr().common.remove}
                             </button>
                           </span>
                         )}
@@ -229,13 +231,13 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
         <aside className={allMissing || allSuggestions ? "week-side is-expanded" : "week-side"}>
           <section className="side-block">
             <div className="side-head">
-              <h2>O que falta</h2>
+              <h2>{tr().plan.missingTitle}</h2>
             </div>
             {availability && availability.plannedMealCount === 0 && (
-              <p className="side-empty">Sem refeições com receita nesta semana.</p>
+              <p className="side-empty">{tr().plan.noRecipeMeals}</p>
             )}
             {availability && availability.plannedMealCount > 0 && missingLines.length === 0 && (
-              <p className="side-ok">Tens tudo o que as receitas desta semana pedem.</p>
+              <p className="side-ok">{tr().plan.haveAll}</p>
             )}
             {missingLines.length > 0 && (
               <ul className="missing-list">
@@ -244,10 +246,10 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                     <span className="missing-name">{line.label}</span>
                     <span className="missing-qty">
                       {line.nominalQuantity
-                        ? "q.b."
-                        : `faltam ${quantityFormat.format(line.missing)} ${measurementUnitLabels[line.unit]}` +
+                        ? tr().plan.toTaste
+                        : tr().plan.missing(`${quantityFormat.format(line.missing)} ${measurementUnitLabels[line.unit]}`) +
                           (line.status === AvailabilityLineStatus.Partial
-                            ? ` (tens ${quantityFormat.format(line.available)})`
+                            ? tr().plan.youHave(quantityFormat.format(line.available))
                             : "")}
                     </span>
                   </li>
@@ -261,14 +263,14 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                 aria-expanded={allMissing}
                 onClick={() => setAllMissing((open) => !open)}
               >
-                {allMissing ? "Ver menos" : `Ver tudo o que falta (${missingLines.length})`}
+                {allMissing ? tr().plan.seeLess : tr().plan.seeAllMissing(missingLines.length)}
               </button>
             )}
             {missingLines.length > 0 && (
               <SendToListForm
                 householdId={householdId}
-                newListName={`Compras da semana de ${shortDate(monday)}`}
-                submitLabel="Pôr o que falta na lista"
+                newListName={tr().plan.weekListName(shortDate(monday))}
+                submitLabel={tr().ui.opportunities.putMissingOnList}
                 send={async (listId) => {
                   const result = await addPlanToShoppingList(householdId, listId, monday, sunday);
                   return { list: result.shoppingList, added: result.addedItemCount, covered: result.coveredByListCount };
@@ -280,12 +282,11 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
 
           <section className="side-block">
             <div className="side-head">
-              <h2>Sugestões para {weekdayName(suggestionDate)}</h2>
+              <h2>{tr().plan.suggestionsFor(weekdayName(suggestionDate))}</h2>
             </div>
             {suggestions && suggestions.suggestions.length === 0 && (
               <p className="side-empty">
-                Sem sugestões: as sugestões partem do que tens na despensa, e não há nada lá (ou nada que entre numa
-                receita).
+                {tr().plan.noSuggestions}
               </p>
             )}
             <ul className="suggestion-list">
@@ -296,8 +297,8 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                   </Link>
                   <p className={suggestion.missingIngredients.length === 0 ? "suggestion-meta is-ready" : "suggestion-meta"}>
                     {suggestion.missingIngredients.length === 0
-                      ? "Tens tudo"
-                      : `${suggestion.availableCount} de ${suggestion.ingredientCount} ingredientes em casa`}
+                      ? tr().plan.haveAllShort
+                      : tr().plan.ingredientsAtHome(suggestion.availableCount, suggestion.ingredientCount)}
                     {suggestion.reasons.length > 0 && (
                       <span className="suggestion-reasons">
                         {" · "}
@@ -307,17 +308,17 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                   </p>
                   {suggestion.missingIngredients.length > 0 && (
                     <p className="suggestion-note is-missing">
-                      Falta: {suggestion.missingIngredients.map((i) => i.name).join(", ")}
+                      {tr().plan.missingList(suggestion.missingIngredients.map((i) => i.name).join(", "))}
                     </p>
                   )}
                   {suggestion.avoided && suggestion.avoided.avoidedBy.length > 0 && (
                     <p className="suggestion-note">
-                      {suggestion.avoided.avoidedBy.some((a) => a.severity === "Avoid") ? "Evitam" : "Limitam"}:{" "}
+                      {suggestion.avoided.avoidedBy.some((a) => a.severity === "Avoid") ? tr().plan.avoid : tr().plan.limit}:{" "}
                       {suggestion.avoided.avoidedBy.map((a) => a.name).join(", ")}
                     </p>
                   )}
                   {suggestion.restrictions === RestrictionResult.Unverifiable && (
-                    <p className="suggestion-note">Não deu para confirmar as restrições alimentares de todos os membros.</p>
+                    <p className="suggestion-note">{tr().plan.unverifiable}</p>
                   )}
                   <AddToPlanForm
                     householdId={householdId}
@@ -335,7 +336,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                 aria-expanded={allSuggestions}
                 onClick={() => setAllSuggestions((open) => !open)}
               >
-                {allSuggestions ? "Ver menos" : "Ver mais sugestões"}
+                {allSuggestions ? tr().plan.seeLess : tr().plan.moreSuggestions}
               </button>
             )}
           </section>
@@ -354,7 +355,7 @@ function CookButton({ meal, onCook }: { meal: PlannedMealDto; onCook: (leftoverS
   if (!open) {
     return (
       <button type="button" className="link-button" onClick={() => setOpen(true)}>
-        Cozinhei
+        {tr().plan.cooked}
       </button>
     );
   }
@@ -372,21 +373,21 @@ function CookButton({ meal, onCook }: { meal: PlannedMealDto; onCook: (leftoverS
     >
       {meal.servings > 1 && (
         <label>
-          <span className="muted">Sobraram</span>{" "}
+          <span className="muted">{tr().plan.leftovers}</span>{" "}
           <select className="category-select" value={leftovers} onChange={(e) => setLeftovers(Number(e.target.value))}>
             {Array.from({ length: meal.servings }, (_, n) => (
               <option key={n} value={n}>
-                {n === 0 ? "nada" : n === 1 ? "1 dose" : `${n} doses`}
+                {tr().plan.leftoverOption(n)}
               </option>
             ))}
           </select>
         </label>
       )}
       <button type="submit" className="button-primary" disabled={busy}>
-        {busy ? "A registar…" : "Registar"}
+        {busy ? tr().plan.logging : tr().plan.log}
       </button>
       <button type="button" className="link-button" onClick={() => setOpen(false)}>
-        Cancelar
+        {tr().common.cancel}
       </button>
     </form>
   );

@@ -16,8 +16,10 @@ import { describeError } from "../auth/errors";
 import { FeatureCard } from "../components/FeatureCard";
 import { RecipeRow } from "../components/RecipeRow";
 import { usePageSize } from "../usePageSize";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const count = new Intl.NumberFormat("pt-PT");
+const count = numberFormat();
 const dishTypes = Object.values(DishType) as DishType[];
 const proteins = Object.values(MainProtein) as MainProtein[];
 const difficulties = Object.values(RecipeDifficulty) as RecipeDifficulty[];
@@ -84,18 +86,18 @@ export function RecipesPage() {
 
   // O total só se diz quando a Api o deu; com filtros é o que eles encontram, não o catálogo.
   const countLine = loading
-    ? "A procurar…"
+    ? tr().lists2.searching
     : error
-      ? "Para cozinhar, planear ou pôr na lista"
+      ? tr().recipes.forCooking
       : filtered
-        ? `${count.format(total)} ${total === 1 ? "receita" : "receitas"} com estes filtros`
-        : `${count.format(total)} receitas publicadas, para cozinhar, planear ou pôr na lista`;
+        ? tr().recipes.withFilters(count.format(total), total)
+        : tr().recipes.published(count.format(total));
 
   return (
     <div className="page recipes-page">
       <header className="page-head">
         <div>
-          <h1>Receitas</h1>
+          <h1>{tr().recipes.title}</h1>
           <p className="page-head-sub" aria-live="polite">
             {countLine}
           </p>
@@ -104,7 +106,7 @@ export function RecipesPage() {
 
       {!filtered && page === 1 && !loading && recipes[0] && (
         <FeatureCard
-          eyebrow="Da nossa seleção"
+          eyebrow={tr().recipes.ourPick}
           title={recipes[0].title}
           meta={[
             recipes[0].dishType !== null ? dishTypeLabels[recipes[0].dishType] : null,
@@ -118,23 +120,23 @@ export function RecipesPage() {
       )}
 
       <div className="section-head section-head-loose">
-        <h2>Explorar receitas</h2>
+        <h2>{tr().recipes.explore}</h2>
       </div>
 
       <div className="toolbar">
         <SearchField
-          label="Pesquisar receitas"
-          placeholder="Pesquisar receitas…"
+          label={tr().recipes.search}
+          placeholder={tr().recipes.searchPlaceholder}
           value={search}
           onChange={(value) => applyFilters({ search: value, page: 1 })}
         />
         <select
           className="category-select"
-          aria-label="Tipo de prato"
+          aria-label={tr().ui.picker.dishType}
           value={dishType ?? ""}
           onChange={(e) => applyFilters({ dishType: e.target.value === "" ? null : (Number(e.target.value) as DishType), page: 1 })}
         >
-          <option value="">Todos os pratos</option>
+          <option value="">{tr().ui.picker.allDishes}</option>
           {dishTypes.map((type) => (
             <option key={type} value={type}>
               {dishTypeLabels[type]}
@@ -143,13 +145,13 @@ export function RecipesPage() {
         </select>
         <select
           className="category-select"
-          aria-label="Dificuldade"
+          aria-label={tr().recipes.difficulty}
           value={difficulty ?? ""}
           onChange={(e) =>
             applyFilters({ difficulty: e.target.value === "" ? null : (Number(e.target.value) as RecipeDifficulty), page: 1 })
           }
         >
-          <option value="">Qualquer dificuldade</option>
+          <option value="">{tr().recipes.anyDifficulty}</option>
           {difficulties.map((level) => (
             <option key={level} value={level}>
               {recipeDifficultyLabels[level]}
@@ -158,9 +160,9 @@ export function RecipesPage() {
         </select>
       </div>
 
-      <div className="chip-row" role="group" aria-label="Proteína principal">
+      <div className="chip-row" role="group" aria-label={tr().recipes.mainProtein}>
         <button type="button" className="chip" aria-pressed={mainProtein === undefined} onClick={() => applyFilters({ mainProtein: null, page: 1 })}>
-          Todas
+          {tr().lists2.all}
         </button>
         {proteins.map((protein) => (
           <button
@@ -182,7 +184,7 @@ export function RecipesPage() {
       )}
 
       {error ? null : !loading && recipes.length === 0 ? (
-        <p className="empty-state">Sem receitas com estes filtros.</p>
+        <p className="empty-state">{tr().recipes.none}</p>
       ) : (
         !loading && (
           <ul className="recipe-rows">
@@ -200,7 +202,7 @@ export function RecipesPage() {
                 {recipe.tags.length > 0 && (
                   <span className="recipe-row-tags">
                     {recipe.tags.slice(0, 4).join(", ")}
-                    {recipe.tags.length > 4 && ` e mais ${recipe.tags.length - 4}`}
+                    {recipe.tags.length > 4 && tr().lists2.andMore(recipe.tags.length - 4)}
                   </span>
                 )}
               </RecipeRow>

@@ -3,6 +3,7 @@
 // porque a lista é do membro e a receita pode ter o que ele ainda não marcou.
 
 import type { AvoidedMatchDto, RecipeRestrictionsDto } from "../api/memberPreferences";
+import { localized, tr } from "../i18n";
 
 export interface MemberAvoidedSummary {
   memberId: string;
@@ -25,13 +26,7 @@ export function summarizeAvoided(restrictions: RecipeRestrictionsDto): MemberAvo
 }
 
 /** Dietas que a Api verifica (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.1), pelo nome da restrição. */
-export const dietLabels: Record<string, string> = {
-  Vegetarian: "vegetariana",
-  Pescatarian: "pescetariana",
-  Vegan: "vegana",
-};
-
-const mainProteinLabels = ["carne", "peixe", "marisco", "vegetariana"];
+export const dietLabels: Record<string, string> = localized((t) => t.enums.diet);
 
 export interface MemberDietConflict {
   memberId: string;
@@ -51,9 +46,16 @@ export function summarizeDietConflicts(restrictions: RecipeRestrictionsDto): Mem
         name: member.name,
         diet: dietLabels[r.restriction],
         reasons: [
-          ...(r.conflictingMainProtein != null ? [`proteína principal: ${mainProteinLabels[r.conflictingMainProtein] ?? "outra"}`] : []),
+          ...(r.conflictingMainProtein != null
+            ? [tr().enums.mainProteinReason(mainProteinInline(r.conflictingMainProtein))]
+            : []),
           ...r.conflictingIngredients.map((i) => (i.source === "Name" ? i.name : `${i.name} (${i.allergen})`)),
         ],
       })),
   );
+}
+
+function mainProteinInline(protein: number): string {
+  const names: Record<number, string> = tr().enums.mainProteinInline;
+  return names[protein] ?? tr().enums.otherProteinInline;
 }

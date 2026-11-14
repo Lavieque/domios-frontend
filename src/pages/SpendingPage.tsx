@@ -6,15 +6,13 @@ import { describeError } from "../auth/errors";
 import { ChainLogo } from "../components/ChainLogo";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { monthLabel, periodFor } from "../shopping/spending";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
+const money = numberFormat({ style: "currency", currency: "EUR" });
 
 /** Períodos que a página oferece; a Api aceita até 24 meses. */
-const periods = [
-  { months: 3, label: "3 meses" },
-  { months: 6, label: "6 meses" },
-  { months: 12, label: "12 meses" },
-] as const;
+const periods = [3, 6, 12] as const;
 
 export function SpendingPage() {
   return <HouseholdGate>{(household) => <Spending household={household} />}</HouseholdGate>;
@@ -45,20 +43,20 @@ function Spending({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <div className="page spending-page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <Link to="/listas" className="back-link">
-          Listas de compras
+          {tr().spending.back}
         </Link>
       </nav>
       <header className="page-head">
         <div>
-          <h1>Gastos</h1>
-          <p className="page-head-sub">O que se comprou em {household.name}, por mês e por loja</p>
+          <h1>{tr().spending.title}</h1>
+          <p className="page-head-sub">{tr().spending.subtitle(household.name)}</p>
         </div>
-        <select className="category-select" aria-label="Período" value={months} onChange={(e) => setMonths(Number(e.target.value))}>
+        <select className="category-select" aria-label={tr().spending.period} value={months} onChange={(e) => setMonths(Number(e.target.value))}>
           {periods.map((p) => (
-            <option key={p.months} value={p.months}>
-              Últimos {p.label}
+            <option key={p} value={p}>
+              {tr().spending.lastMonths(p)}
             </option>
           ))}
         </select>
@@ -69,32 +67,30 @@ function Spending({ household }: { household: CallerHouseholdDto }) {
           {error}
         </p>
       )}
-      {!spending && !error && <p className="muted loading">A carregar…</p>}
+      {!spending && !error && <p className="muted loading">{tr().common.loading}</p>}
 
       {spending && (
         <>
           <section className="panel spending-summary">
             <div>
-              <span className="muted">Total</span>
+              <span className="muted">{tr().spending.total}</span>
               <div className="price-tag">{money.format(spending.total)}</div>
             </div>
             {spending.estimated > 0 && (
               <p className="muted">
-                {money.format(spending.estimated)} pelo preço da prateleira no dia da compra; {money.format(spending.typed)} escrito por vocês.
+                {tr().spending.estimated(money.format(spending.estimated), money.format(spending.typed))}
               </p>
             )}
             {spending.purchasesWithoutPrice > 0 && (
               <p className="muted">
-                {spending.purchasesWithoutPrice === 1 ? "1 compra sem preço" : `${spending.purchasesWithoutPrice} compras sem preço`} fora do total:
-                escolhe a loja da lista ou escreve quanto pagaste.
+                {tr().spending.withoutPrice(spending.purchasesWithoutPrice)}
               </p>
             )}
           </section>
 
           {shown.length === 0 ? (
             <p className="empty-state">
-              Ainda não há compras neste período. Marca os itens de uma <Link to="/listas">lista</Link> como comprados e escolhe a loja: o preço
-              entra aqui.
+              {tr().spending.empty.before} <Link to="/listas">{tr().spending.empty.link}</Link> {tr().spending.empty.after}
             </p>
           ) : (
             shown.map((month) => <Month key={month.month} month={month} />)
@@ -114,18 +110,18 @@ function Month({ month }: { month: SpendingMonthDto }) {
         <span className="price-tag">{money.format(month.total)}</span>
       </h2>
       {month.purchasesWithoutPrice > 0 && (
-        <p className="muted">{month.purchasesWithoutPrice === 1 ? "Mais 1 compra sem preço." : `Mais ${month.purchasesWithoutPrice} compras sem preço.`}</p>
+        <p className="muted">{tr().spending.moreWithoutPrice(month.purchasesWithoutPrice)}</p>
       )}
       <ul className="spending-chains">
         {month.chains.map((chain) => (
           <li key={chain.chainId ?? "none"}>
             {chain.chainName ? <ChainLogo chainName={chain.chainName} size="sm" /> : <span aria-hidden="true" />}
             <span>
-              {chain.chainName ?? "Sem loja"}{" "}
+              {chain.chainName ?? tr().spending.noStore}{" "}
               <span className="muted">
-                · {chain.purchases === 1 ? "1 compra" : `${chain.purchases} compras`}
-                {chain.estimated > 0 && chain.typed > 0 && `, ${money.format(chain.estimated)} estimado`}
-                {chain.estimated > 0 && chain.typed === 0 && ", estimado"}
+                · {tr().spending.purchases(chain.purchases)}
+                {chain.estimated > 0 && chain.typed > 0 && tr().spending.estimatedPart(money.format(chain.estimated))}
+                {chain.estimated > 0 && chain.typed === 0 && tr().spending.estimatedOnly}
               </span>
             </span>
             <strong>{money.format(chain.total)}</strong>

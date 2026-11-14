@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { searchRecipes } from "../api/client";
 import { dishTypeLabels, DishType, type RecipeSummaryDto } from "../api/types";
 import { SearchField } from "./SearchField";
+import { tr } from "../i18n";
 
 const PAGE_SIZE = 8;
 const dishTypes = Object.values(DishType) as DishType[];
@@ -45,14 +46,14 @@ export function RecipePicker({ label, defaultDishType, onPick, onCancel }: Props
     <div className="recipe-picker" role="group" aria-label={label} ref={root}>
       <p className="recipe-picker-label">{label}</p>
       <div className="filter-row">
-        <SearchField value={search} label="Procurar receita" placeholder="Procurar receita…" onChange={setSearch} />
+        <SearchField value={search} label={tr().ui.picker.search} placeholder={tr().ui.picker.searchPlaceholder} onChange={setSearch} />
         <select
           className="category-select"
-          aria-label="Tipo de prato"
+          aria-label={tr().ui.picker.dishType}
           value={dishType === null ? "" : String(dishType)}
           onChange={(e) => setDishType(e.target.value === "" ? null : (Number(e.target.value) as DishType))}
         >
-          <option value="">Todos os pratos</option>
+          <option value="">{tr().ui.picker.allDishes}</option>
           {dishTypes.map((type) => (
             <option key={type} value={type}>
               {dishTypeLabels[type]}
@@ -60,11 +61,11 @@ export function RecipePicker({ label, defaultDishType, onPick, onCancel }: Props
           ))}
         </select>
         <button type="button" className="link-button" onClick={onCancel}>
-          Fechar procura
+          {tr().ui.picker.closeSearch}
         </button>
       </div>
-      {results === null && <p className="muted loading">A procurar…</p>}
-      {results !== null && results.length === 0 && <p className="muted">Nenhuma receita encontrada.</p>}
+      {results === null && <p className="muted loading">{tr().ui.picker.searching}</p>}
+      {results !== null && results.length === 0 && <p className="muted">{tr().ui.picker.noRecipes}</p>}
       {results !== null && results.length > 0 && (
         <ul className="recipe-picker-list">
           {results.map((recipe) => (

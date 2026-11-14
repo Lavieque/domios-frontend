@@ -1,0 +1,19 @@
+import * as enums from "./enums";
+import * as pages1 from "./pages1";
+import * as pages2 from "./pages2";
+import * as pages3 from "./pages3";
+import * as products from "./products";
+import * as plan from "./plan";
+import * as recipe from "./recipe";
+import * as pantry from "./pantry";
+import * as addPantry from "./addPantry";
+import * as templateDetail from "./templateDetail";
+import * as nutrition from "./nutrition";
+import * as prefs from "./prefs";
+import * as householdPage from "./householdPage";
+import * as shoppingList from "./shoppingList";
+import * as shell from "./shell";
+import * as today from "./today";
+import * as ui from "./ui";
+
+export const pt = { ...shell, ...enums, ...ui, ...shoppingList, ...householdPage, ...prefs, ...nutrition, ...templateDetail, ...addPantry, ...pantry, ...recipe, ...plan, ...today, ...products, ...pages3, ...pages1, ...pages2 };

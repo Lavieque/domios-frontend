@@ -5,11 +5,11 @@ import {
   createShoppingList,
   listShoppingLists,
   ShoppingListStatus,
-  shoppingListStatusLabels,
   type ShoppingListSummaryDto,
 } from "../api/shopping";
 import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { tr } from "../i18n";
 
 const statuses = [ShoppingListStatus.Open, ShoppingListStatus.Completed, ShoppingListStatus.Cancelled];
 
@@ -60,13 +60,13 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
     <div className="page lists-page">
       <header className="page-head">
         <div>
-          <h1>Listas de compras</h1>
+          <h1>{tr().lists.title}</h1>
           <p className="page-head-sub">{household.name}</p>
         </div>
       </header>
 
       <div className="lists-toolbar">
-        <div className="chip-row" role="group" aria-label="Estado">
+        <div className="chip-row" role="group" aria-label={tr().lists.status}>
           {statuses.map((s) => (
             <button
               key={s}
@@ -75,14 +75,14 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
               aria-pressed={status === s}
               onClick={() => setSearchParams(s === ShoppingListStatus.Open ? {} : { estado: String(s) }, { replace: true })}
             >
-              {s === ShoppingListStatus.Open ? "Abertas" : s === ShoppingListStatus.Completed ? "Concluídas" : "Canceladas"}
+              {s === ShoppingListStatus.Open ? tr().lists.open : s === ShoppingListStatus.Completed ? tr().lists.completed : tr().lists.cancelled}
             </button>
           ))}
         </div>
         <form className="inline-form new-list-form" onSubmit={handleCreate}>
-          <input type="text" aria-label="Nome da lista" placeholder="Nome da nova lista (opcional)" maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
+          <input type="text" aria-label={tr().lists.listName} placeholder={tr().lists.newListPlaceholder} maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
           <button type="submit" className="button-primary" disabled={creating}>
-            {creating ? "A criar…" : "Nova lista"}
+            {creating ? tr().common.creating : tr().lists.newList}
           </button>
         </form>
       </div>
@@ -92,10 +92,10 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
           {error}
         </p>
       )}
-      {loading && <p className="muted loading">A carregar…</p>}
+      {loading && <p className="muted loading">{tr().common.loading}</p>}
 
       {!loading && lists.length === 0 ? (
-        <p className="empty-state">Sem listas {shoppingListStatusLabels[status].toLowerCase().replace(/a$/, "as")}.</p>
+        <p className="empty-state">{tr().lists.none[status]}</p>
       ) : (
         !loading && (
           <ul className="pantry-list">
@@ -109,8 +109,8 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
                     <span className="lists-row-name">{list.name}</span>
                     <span className="lists-row-meta">
                       {list.itemCount === 0
-                        ? "Vazia"
-                        : `${list.itemCount - list.purchasedItemCount} por comprar · ${list.purchasedItemCount} de ${list.itemCount} comprados`}
+                        ? tr().lists.empty
+                        : tr().lists.progress(list.itemCount - list.purchasedItemCount, list.purchasedItemCount, list.itemCount)}
                     </span>
                   </span>
                 </Link>

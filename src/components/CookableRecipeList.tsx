@@ -2,6 +2,7 @@ import { RecipeVerdict, SavedRecipeOrigin, type CookableRecipeDto } from "../api
 import { urgency, type UrgencyLevel } from "../pantry/urgency";
 import { shortDate } from "../plan/dates";
 import { RecipeRow } from "./RecipeRow";
+import { tr } from "../i18n";
 
 interface Props {
   recipes: CookableRecipeDto[];
@@ -11,13 +12,14 @@ interface Props {
 
 /** A linha de prontidão, com o ponto de Hoje: verde tens tudo, vermelho falta, tinta fraca quando não se sabe. */
 function Readiness({ recipe }: { recipe: CookableRecipeDto }) {
-  const counts = `${recipe.availableCount} de ${recipe.requiredCount} ingredientes em casa`;
+  const t = tr().ui.cookable;
+  const counts = t.counts(recipe.availableCount, recipe.requiredCount);
   if (recipe.verdict === RecipeVerdict.CanCook) {
     return (
       <span className="readiness readiness-compact readiness-ready">
         <span className="readiness-dot" aria-hidden="true" />
         <span>
-          <strong>Tens tudo</strong> · {counts}
+          <strong>{t.haveAll}</strong> · {counts}
         </span>
       </span>
     );
@@ -27,7 +29,7 @@ function Readiness({ recipe }: { recipe: CookableRecipeDto }) {
       <span className="readiness readiness-compact readiness-unknown">
         <span className="readiness-dot" aria-hidden="true" />
         <span>
-          <strong>Deve dar</strong> · {counts}
+          <strong>{t.shouldWork}</strong> · {counts}
         </span>
       </span>
     );
@@ -38,7 +40,7 @@ function Readiness({ recipe }: { recipe: CookableRecipeDto }) {
     <span className="readiness readiness-compact">
       <span className="readiness-dot" aria-hidden="true" />
       <span>
-        <strong>{missing > 0 ? `Falta ${missing}` : "Falta algo"}</strong> · {counts}
+        <strong>{missing > 0 ? t.missing(missing) : t.missingSomething}</strong> · {counts}
       </span>
       {/* A lista inteira fica no título; no cartão corta ao fim de poucas linhas. */}
       {missing > 0 && (
@@ -57,7 +59,7 @@ function Expiring({ items }: { items: CookableRecipeDto["expiringIngredients"] }
   return (
     <span className={`recipe-row-expiring urgency-${level}`}>
       <span className="urgency-dot" aria-hidden="true" />
-      <span>Usar primeiro: {graded.map((i) => `${i.name} (${i.label.toLowerCase()})`).join(", ")}</span>
+      <span>{tr().ui.cookable.useFirst} {graded.map((i) => `${i.name} (${i.label.toLowerCase()})`).join(", ")}</span>
     </span>
   );
 }
@@ -68,8 +70,8 @@ export function CookableRecipeList({ recipes, onRemove }: Props) {
     <ul className="recipe-rows">
       {recipes.map((recipe) => {
         const notes = [
-          recipe.plannedOn.length > 0 ? `No plano: ${recipe.plannedOn.map(shortDate).join(", ")}` : null,
-          recipe.savedOrigin === SavedRecipeOrigin.ShoppingList ? "Compraste para esta" : null,
+          recipe.plannedOn.length > 0 ? tr().ui.cookable.inPlan(recipe.plannedOn.map(shortDate).join(", ")) : null,
+          recipe.savedOrigin === SavedRecipeOrigin.ShoppingList ? tr().ui.cookable.boughtFor : null,
         ].filter(Boolean);
         return (
           <RecipeRow
@@ -80,7 +82,7 @@ export function CookableRecipeList({ recipes, onRemove }: Props) {
             action={
               onRemove && recipe.savedOrigin !== null ? (
                 <button type="button" className="link-button" onClick={() => onRemove(recipe.recipeId)}>
-                  Remover das guardadas
+                  {tr().ui.cookable.removeSaved}
                 </button>
               ) : undefined
             }

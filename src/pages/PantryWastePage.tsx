@@ -6,16 +6,18 @@ import { measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { periodFor } from "../shopping/spending";
+import { dateTimeFormat, localeOf, numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const money = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
-const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
-const dateFormat = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short" });
+const money = numberFormat({ style: "currency", currency: "EUR" });
+const quantityFormat = numberFormat({ maximumFractionDigits: 2 });
+const dateFormat = dateTimeFormat({ day: "numeric", month: "short" });
 
 /** A Api aceita até 366 dias. */
 const periods = [
-  { months: 1, label: "Este mês" },
-  { months: 3, label: "Últimos 3 meses" },
-  { months: 12, label: "Últimos 12 meses" },
+  { months: 1, label: "thisMonth" },
+  { months: 3, label: "last3" },
+  { months: 12, label: "last12" },
 ] as const;
 
 export function PantryWastePage() {
@@ -44,20 +46,20 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
 
   return (
     <div className="page waste-page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <Link to="/despensa" className="back-link">
-          Despensa
+          {tr().waste.back}
         </Link>
       </nav>
       <header className="page-head">
         <div>
-          <h1>Desperdício</h1>
-          <p className="page-head-sub">O que se deitou fora em {household.name}</p>
+          <h1>{tr().waste.title}</h1>
+          <p className="page-head-sub">{tr().waste.subtitle(household.name)}</p>
         </div>
-        <select className="category-select" aria-label="Período" value={months} onChange={(e) => setMonths(Number(e.target.value))}>
+        <select className="category-select" aria-label={tr().spending.period} value={months} onChange={(e) => setMonths(Number(e.target.value))}>
           {periods.map((p) => (
             <option key={p.months} value={p.months}>
-              {p.label}
+              {tr().waste[p.label]}
             </option>
           ))}
         </select>
@@ -68,47 +70,47 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
           {error}
         </p>
       )}
-      {!waste && !error && <p className="muted loading">A carregar…</p>}
+      {!waste && !error && <p className="muted loading">{tr().common.loading}</p>}
 
       {waste && (
         <>
           <section className="panel spending-summary">
             <div>
-              <span className="muted">Deitado fora</span>
+              <span className="muted">{tr().waste.thrownAway}</span>
               <div className="price-tag">
-                {waste.discardedItemCount === 1 ? "1 artigo" : `${waste.discardedItemCount} artigos`}
+                {tr().waste.items(waste.discardedItemCount)}
               </div>
             </div>
             {waste.wastePercent !== null && (
               <div>
-                <span className="muted">Do que se acabou</span>
-                <div className="price-tag">{waste.wastePercent.toLocaleString("pt-PT")} %</div>
+                <span className="muted">{tr().waste.ofFinished}</span>
+                <div className="price-tag">{waste.wastePercent.toLocaleString(localeOf())} %</div>
               </div>
             )}
             {waste.estimatedValue && (
               <div>
-                <span className="muted">Valia cerca de</span>
+                <span className="muted">{tr().waste.worth}</span>
                 <div className="price-tag">{money.format(waste.estimatedValue.amount)}</div>
               </div>
             )}
             {waste.estimatedValue && waste.valuedItemCount < waste.discardedItemCount && (
               <p className="muted">
-                Valor de {waste.valuedItemCount} de {waste.discardedItemCount}: os outros não têm preço de compra.
+                {tr().waste.valued(waste.valuedItemCount, waste.discardedItemCount)}
               </p>
             )}
           </section>
 
           {waste.items.length === 0 ? (
-            <p className="empty-state">Nada deitado fora neste período.</p>
+            <p className="empty-state">{tr().waste.none}</p>
           ) : (
             <>
               <div className="waste-groups">
                 <section className="panel">
-                  <h2>Porquê</h2>
+                  <h2>{tr().waste.why}</h2>
                   <ul className="waste-list">
                     {waste.byReason.map((r) => (
                       <li key={String(r.reason)}>
-                        <span>{r.reason === null ? "Sem motivo" : discardReasonLabels[r.reason]}</span>
+                        <span>{r.reason === null ? tr().waste.noReason : discardReasonLabels[r.reason]}</span>
                         <span className="muted">
                           {r.itemCount}
                           {r.estimatedValue && ` · ${money.format(r.estimatedValue.amount)}`}
@@ -119,7 +121,7 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
                 </section>
                 {waste.byCategory.length > 0 && (
                   <section className="panel">
-                    <h2>O quê</h2>
+                    <h2>{tr().waste.what}</h2>
                     <ul className="waste-list">
                       {waste.byCategory.map((c) => (
                         <li key={c.categoryId ?? "none"}>
@@ -136,7 +138,7 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
               </div>
 
               <section className="panel">
-                <h2>Artigos</h2>
+                <h2>{tr().waste.articles}</h2>
                 <ul className="waste-list">
                   {waste.items.map((item) => (
                     <li key={item.pantryItemId}>
@@ -144,7 +146,7 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
                         <Link to={`/produtos/${item.productId}`}>{item.productName}</Link>{" "}
                         <span className="muted">
                           {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]} ·{" "}
-                          {item.reason === null ? "sem motivo" : discardReasonLabels[item.reason].toLowerCase()}
+                          {item.reason === null ? tr().waste.noReasonInline : discardReasonLabels[item.reason].toLowerCase()}
                         </span>
                       </span>
                       <span className="muted">
@@ -154,7 +156,7 @@ function Waste({ household }: { household: CallerHouseholdDto }) {
                     </li>
                   ))}
                 </ul>
-                <p className="muted">"Registado por engano" não conta no total nem na percentagem.</p>
+                <p className="muted">{tr().waste.mistakeNote}</p>
               </section>
             </>
           )}

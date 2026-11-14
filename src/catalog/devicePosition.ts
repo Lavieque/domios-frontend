@@ -1,4 +1,5 @@
 import type { GeoPoint } from "../api/nearbyStores";
+import { tr } from "../i18n";
 
 // A posição do dispositivo, pedida só quando o utilizador a quer usar. Fica em memória enquanto a
 // página está aberta; nunca vai para o armazenamento do browser nem é guardada pela Api.
@@ -9,9 +10,9 @@ export class PositionError extends Error {}
 
 /** Mensagem para o utilizador a partir do código da Geolocation API. */
 export function positionErrorMessage(code: number): string {
-  if (code === 1) return "Sem acesso à localização. Autoriza-a no browser para ver as lojas perto.";
-  if (code === 3) return "A localização demorou demasiado. Tenta outra vez.";
-  return "Não foi possível saber onde estás.";
+  if (code === 1) return tr().ui.position.denied;
+  if (code === 3) return tr().ui.position.timeout;
+  return tr().ui.position.unknown;
 }
 
 /** A última posição conhecida desta página, se ainda for recente. */
@@ -23,7 +24,7 @@ export function getDevicePosition(): Promise<GeoPoint> {
   const known = lastDevicePosition();
   if (known) return Promise.resolve(known);
   if (typeof navigator === "undefined" || !navigator.geolocation) {
-    return Promise.reject(new PositionError("Este browser não dá a localização."));
+    return Promise.reject(new PositionError(tr().ui.position.unsupported));
   }
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(

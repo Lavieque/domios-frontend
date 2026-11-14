@@ -16,15 +16,17 @@ import {
 import { describeError } from "../auth/errors";
 import { AvoidedIngredientsPanel, NutritionGoalsPanel } from "../components/MemberPreferencesPanels";
 import { useHouseholds } from "../household/useHouseholds";
+import { localeOf, numberFormat } from "../i18n/format";
+import { localized, tr } from "../i18n";
 
 const ROLES = [MemberRole.Admin, MemberRole.Adult, MemberRole.Child, MemberRole.Guest];
 
 /** Erros da Api que estes formulários esperam (ProblemDetailsExceptionHandler). */
-const MEMBER_ERRORS = {
-  "invalid-argument": "Falta o nome do membro.",
-  "invariant-violation": "A casa precisa de ficar com pelo menos um administrador.",
-  "forbidden-household-role": "Só um administrador da casa pode fazer isto.",
-};
+const MEMBER_ERRORS = localized((t) => ({
+  "invalid-argument": t.householdPage.errors.noName,
+  "invariant-violation": t.householdPage.errors.lastAdmin,
+  "forbidden-household-role": t.householdPage.errors.adminOnly,
+}));
 
 export function HouseholdPage() {
   const { loading, error, households, current, select, reload } = useHouseholds();
@@ -76,11 +78,11 @@ export function HouseholdPage() {
           )}
           {current && (
             <p className="page-head-sub">
-              És {memberRoleLabels[current.role].toLowerCase()} desta casa.
+              {tr().householdPage.youAre(memberRoleLabels[current.role])}
               {household && (
                 <>
                   {" "}
-                  {members.length} {members.length === 1 ? "membro" : "membros"}, {linkedCount} com conta.
+                  {tr().householdPage.memberCount(members.length, linkedCount)}
                 </>
               )}
             </p>
@@ -89,7 +91,7 @@ export function HouseholdPage() {
       </header>
 
       {households.length > 1 && (
-        <div className="chip-row household-switch" role="group" aria-label="As tuas casas">
+        <div className="chip-row household-switch" role="group" aria-label={tr().householdPage.yourHouseholds}>
           {households.map((h) => (
             <button
               key={h.householdId}
@@ -109,16 +111,16 @@ export function HouseholdPage() {
           {detailError}
         </p>
       )}
-      {!household && !detailError && <p className="muted loading">A carregar membros…</p>}
+      {!household && !detailError && <p className="muted loading">{tr().householdPage.loadingMembers}</p>}
 
       {household && (
         <>
           <section className="panel" aria-labelledby="household-members">
             <div className="side-head">
-              <h2 id="household-members">Membros</h2>
+              <h2 id="household-members">{tr().householdPage.members}</h2>
               {isAdmin && !adding && (
                 <button type="button" className="link-button" onClick={() => setAdding(true)}>
-                  Acrescentar membro
+                  {tr().householdPage.addMember}
                 </button>
               )}
             </div>
@@ -157,37 +159,37 @@ export function HouseholdPage() {
               )}
             </ul>
             {!isAdmin && (
-              <p className="settings-note muted">Só um administrador acrescenta membros, muda papéis ou liga contas.</p>
+              <p className="settings-note muted">{tr().householdPage.adminNote}</p>
             )}
           </section>
 
           <section className="panel" aria-labelledby="household-settings">
-            <h2 id="household-settings">Casa</h2>
+            <h2 id="household-settings">{tr().householdPage.household}</h2>
             <dl className="settings-list">
               <div className="settings-row">
-                <dt>Fuso horário</dt>
+                <dt>{tr().householdPage.timeZone}</dt>
                 <dd>{household.timeZone}</dd>
               </div>
               <div className="settings-row">
-                <dt>Moeda</dt>
+                <dt>{tr().householdPage.currency}</dt>
                 <dd>{household.currency}</dd>
               </div>
               <TravelSettings household={household} isAdmin={isAdmin} onSaved={setHousehold} />
               <div className="settings-row">
-                <dt>Histórico</dt>
+                <dt>{tr().householdPage.history}</dt>
                 <dd>
-                  <span className="muted">O que mudou na despensa, nas listas e no plano.</span>
+                  <span className="muted">{tr().householdPage.historyHint}</span>
                   <Link to="/casa/historico" className="settings-action">
-                    Ver histórico
+                    {tr().householdPage.seeHistory}
                   </Link>
                 </dd>
               </div>
               <div className="settings-row">
-                <dt>Outra casa</dt>
+                <dt>{tr().householdPage.otherHousehold}</dt>
                 <dd>
-                  <span className="muted">Cada casa tem a sua despensa, listas e plano.</span>
+                  <span className="muted">{tr().householdPage.otherHint}</span>
                   <Link to="/casa/nova" className="settings-action">
-                    Criar casa
+                    {tr().householdPage.createHousehold}
                   </Link>
                 </dd>
               </div>
@@ -205,7 +207,7 @@ function sortMembers(members: MemberDto[], myMemberId: string | undefined): Memb
     (a, b) =>
       Number(b.memberId === myMemberId) - Number(a.memberId === myMemberId) ||
       a.role - b.role ||
-      a.name.localeCompare(b.name, "pt-PT"),
+      a.name.localeCompare(b.name, localeOf()),
   );
 }
 
@@ -250,7 +252,7 @@ function HouseholdName({ household, onSaved }: { household: HouseholdDto; onSave
     } catch (err) {
       setError(
         describeError(err, {
-          "invalid-argument": "A casa precisa de um nome.",
+          "invalid-argument": tr().householdPage.errors.householdName,
         }),
       );
     } finally {
@@ -270,7 +272,7 @@ function HouseholdName({ household, onSaved }: { household: HouseholdDto; onSave
             setEditing(true);
           }}
         >
-          Mudar nome
+          {tr().householdPage.rename}
         </button>
       </div>
     );
@@ -280,15 +282,15 @@ function HouseholdName({ household, onSaved }: { household: HouseholdDto; onSave
     <form className="title-form" onSubmit={handleSubmit}>
       <h1 className="visually-hidden">{household.name}</h1>
       <label className="form-field">
-        <span>Nome da casa</span>
+        <span>{tr().householdPage.householdName}</span>
         <input type="text" required maxLength={200} autoFocus value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       <div className="button-row">
         <button type="submit" className="button-primary" disabled={busy}>
-          {busy ? "A guardar…" : "Guardar"}
+          {busy ? tr().common.saving : tr().common.save}
         </button>
         <button type="button" className="button-secondary" onClick={() => setEditing(false)} disabled={busy}>
-          Cancelar
+          {tr().common.cancel}
         </button>
       </div>
       {error && (
@@ -345,7 +347,7 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
         {age !== null ? (
           <>
             <span className="member-lead-number">{age}</span>
-            <span className="recipe-row-lead-label">{age === 1 ? "ano" : "anos"}</span>
+            <span className="recipe-row-lead-label">{tr().householdPage.years(age)}</span>
           </>
         ) : (
           <span className="member-lead-number is-initials">{initials(member.name)}</span>
@@ -354,20 +356,20 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
       <div className="member-main">
         <span className="member-name">
           {member.name}
-          {isMe && <span className="muted"> (tu)</span>}
+          {isMe && <span className="muted">{tr().householdPage.you}</span>}
         </span>
         <span className="member-meta">
           <span className={member.role === MemberRole.Admin ? "member-role is-admin" : "member-role"}>
             {memberRoleLabels[member.role]}
           </span>
-          {age !== null && <span className="visually-hidden">, {age === 1 ? "1 ano" : `${age} anos`}</span>}
-          <span>{member.userId ? " · Com conta" : " · Sem conta"}</span>
+          {age !== null && <span className="visually-hidden">, {tr().householdPage.age(age)}</span>}
+          <span>{member.userId ? tr().householdPage.withAccount : tr().householdPage.withoutAccount}</span>
           {member.defaultPortion !== undefined && member.defaultPortion !== 1 && (
-            <span> · porção {member.defaultPortion.toLocaleString("pt-PT")}</span>
+            <span>{tr().householdPage.portion(member.defaultPortion.toLocaleString(localeOf()))}</span>
           )}
         </span>
         {member.dietaryRestrictions.length > 0 && (
-          <span className="member-restrictions" aria-label="Restrições alimentares">
+          <span className="member-restrictions" aria-label={tr().householdPage.restrictions}>
             {member.dietaryRestrictions.map((r) => (
               <span key={r} className="tag member-restriction">
                 {r}
@@ -380,24 +382,24 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
       {mode === "view" && (
         <div className="member-actions">
           <button type="button" className="link-button" onClick={() => open("avoid")}>
-            Evitar
+            {tr().householdPage.avoid}
           </button>
           <button type="button" className="link-button" onClick={() => open("goals")}>
-            Objetivos
+            {tr().householdPage.goals}
           </button>
           {canEdit && (
             <button type="button" className="link-button" onClick={() => open("edit")}>
-              Editar
+              {tr().householdPage.edit}
             </button>
           )}
           {isAdmin && !member.userId && (
             <button type="button" className="link-button" onClick={() => open("link")}>
-              Ligar conta
+              {tr().householdPage.linkAccount}
             </button>
           )}
           {canRemove && (
             <button type="button" className="button-danger" onClick={() => open("remove")}>
-              {isMe ? "Sair da casa" : "Remover"}
+              {isMe ? tr().householdPage.leave : tr().householdPage.remove}
             </button>
           )}
         </div>
@@ -447,18 +449,18 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
       )}
 
       {mode === "remove" && (
-        <div className="member-panel member-confirm" role="group" aria-label={isMe ? "Sair da casa" : "Remover membro"}>
+        <div className="member-panel member-confirm" role="group" aria-label={isMe ? tr().householdPage.leave : tr().householdPage.removeMember}>
           <p>
             {isMe
-              ? "Deixas de ver a despensa, as listas e o plano desta casa. Para voltares, um administrador tem de te acrescentar outra vez."
-              : `${member.name} deixa de fazer parte desta casa.`}
+              ? tr().householdPage.leaveWarning
+              : tr().householdPage.removeWarning(member.name)}
           </p>
           <div className="button-row">
             <button type="button" className="button-danger is-confirm" onClick={handleRemove} disabled={busy}>
-              {busy ? "A remover…" : isMe ? "Sair da casa" : `Remover ${member.name}`}
+              {busy ? tr().householdPage.removing : isMe ? tr().householdPage.leave : tr().householdPage.removeName(member.name)}
             </button>
             <button type="button" className="button-secondary" onClick={() => setMode("view")} disabled={busy}>
-              Cancelar
+              {tr().common.cancel}
             </button>
           </div>
         </div>
@@ -493,7 +495,7 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
     event.preventDefault();
     const portionValue = Number(portion.replace(",", "."));
     if (!(portionValue >= 0.25 && portionValue <= 3)) {
-      setError("A porção vai de 0,25 a 3 (1 é uma dose normal).");
+      setError(tr().householdPage.errors.portion);
       return;
     }
     setError(null);
@@ -517,12 +519,12 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
   return (
     <form className="member-panel member-form" onSubmit={handleSubmit}>
       <label className="form-field">
-        <span>Nome</span>
+        <span>{tr().householdPage.name}</span>
         <input type="text" required maxLength={200} autoFocus value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       {canChangeRole && (
         <label className="form-field">
-          <span>Papel</span>
+          <span>{tr().householdPage.role}</span>
           <select value={role} onChange={(e) => setRole(Number(e.target.value) as MemberRole)}>
             {ROLES.map((r) => (
               <option key={r} value={r}>
@@ -533,19 +535,19 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
         </label>
       )}
       <label className="form-field member-form-wide">
-        <span>Restrições alimentares</span>
+        <span>{tr().householdPage.restrictions}</span>
         <input
           type="text"
-          placeholder="Ex.: sem glúten, vegetariano"
+          placeholder={tr().householdPage.restrictionsPlaceholder}
           value={restrictions}
           onChange={(e) => setRestrictions(e.target.value)}
         />
-        <small>Separa por vírgulas.</small>
+        <small>{tr().householdPage.commaSeparated}</small>
       </label>
       <label className="form-field">
-        <span>Porção habitual</span>
+        <span>{tr().householdPage.usualPortion}</span>
         <input type="text" inputMode="decimal" value={portion} onChange={(e) => setPortion(e.target.value)} />
-        <small>1 é uma dose; 0,5 come metade, 1,5 come uma vez e meia. Divide a nutrição das refeições.</small>
+        <small>{tr().householdPage.portionHint}</small>
       </label>
       {error && (
         <p className="form-error member-form-wide" role="alert">
@@ -554,10 +556,10 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
       )}
       <div className="button-row member-form-wide">
         <button type="submit" className="button-primary" disabled={busy}>
-          {busy ? "A guardar…" : "Guardar"}
+          {busy ? tr().common.saving : tr().common.save}
         </button>
         <button type="button" className="button-secondary" onClick={onCancel} disabled={busy}>
-          Cancelar
+          {tr().common.cancel}
         </button>
       </div>
     </form>
@@ -586,8 +588,8 @@ function LinkAccountForm({ householdId, member, onLinked, onCancel }: LinkAccoun
     } catch (err) {
       setError(
         describeError(err, {
-          "not-found": "Não há nenhuma conta DomiOS com esse email. A pessoa tem de se registar primeiro.",
-          "member-already-linked": "Essa conta já está ligada a outro membro desta casa.",
+          "not-found": tr().householdPage.errors.noAccount,
+          "member-already-linked": tr().householdPage.errors.alreadyLinked,
           "forbidden-household-role": MEMBER_ERRORS["forbidden-household-role"],
         }),
       );
@@ -598,7 +600,7 @@ function LinkAccountForm({ householdId, member, onLinked, onCancel }: LinkAccoun
   return (
     <form className="member-panel member-form" onSubmit={handleSubmit}>
       <label className="form-field member-form-wide">
-        <span>Email da conta de {member.name}</span>
+        <span>{tr().householdPage.accountEmail(member.name)}</span>
         <input
           type="email"
           required
@@ -607,7 +609,7 @@ function LinkAccountForm({ householdId, member, onLinked, onCancel }: LinkAccoun
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <small>A pessoa passa a ver e a mudar tudo nesta casa: despensa, listas e plano.</small>
+        <small>{tr().householdPage.linkHint}</small>
       </label>
       {error && (
         <p className="form-error member-form-wide" role="alert">
@@ -616,10 +618,10 @@ function LinkAccountForm({ householdId, member, onLinked, onCancel }: LinkAccoun
       )}
       <div className="button-row member-form-wide">
         <button type="submit" className="button-primary" disabled={busy}>
-          {busy ? "A ligar…" : "Ligar conta"}
+          {busy ? tr().householdPage.linking : tr().householdPage.linkAccount}
         </button>
         <button type="button" className="button-secondary" onClick={onCancel} disabled={busy}>
-          Cancelar
+          {tr().common.cancel}
         </button>
       </div>
     </form>
@@ -661,13 +663,13 @@ function AddMemberForm({ householdId, onSaved, onCancel }: AddMemberFormProps) {
 
   return (
     <form className="member-form" onSubmit={handleSubmit}>
-      <h3 className="member-form-wide">Membro novo</h3>
+      <h3 className="member-form-wide">{tr().householdPage.newMember}</h3>
       <label className="form-field">
-        <span>Nome</span>
+        <span>{tr().householdPage.name}</span>
         <input type="text" required maxLength={200} autoFocus value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       <label className="form-field">
-        <span>Papel</span>
+        <span>{tr().householdPage.role}</span>
         <select value={role} onChange={(e) => setRole(Number(e.target.value) as MemberRole)}>
           {ROLES.map((r) => (
             <option key={r} value={r}>
@@ -677,22 +679,22 @@ function AddMemberForm({ householdId, onSaved, onCancel }: AddMemberFormProps) {
         </select>
       </label>
       <label className="form-field">
-        <span>Data de nascimento</span>
+        <span>{tr().householdPage.birthDate}</span>
         <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
-        <small>Opcional.</small>
+        <small>{tr().householdPage.optional}</small>
       </label>
       <label className="form-field">
-        <span>Restrições alimentares</span>
+        <span>{tr().householdPage.restrictions}</span>
         <input
           type="text"
-          placeholder="Ex.: sem glúten, vegetariano"
+          placeholder={tr().householdPage.restrictionsPlaceholder}
           value={restrictions}
           onChange={(e) => setRestrictions(e.target.value)}
         />
-        <small>Separa por vírgulas.</small>
+        <small>{tr().householdPage.commaSeparated}</small>
       </label>
       <p className="muted member-form-wide">
-        Um membro sem conta faz parte da casa mas não entra no DomiOS. Para entrar, liga-o depois à conta dele.
+        {tr().householdPage.noAccountNote}
       </p>
       {error && (
         <p className="form-error member-form-wide" role="alert">
@@ -701,18 +703,18 @@ function AddMemberForm({ householdId, onSaved, onCancel }: AddMemberFormProps) {
       )}
       <div className="button-row member-form-wide">
         <button type="submit" className="button-primary" disabled={busy}>
-          {busy ? "A acrescentar…" : "Acrescentar"}
+          {busy ? tr().householdPage.adding : tr().householdPage.add}
         </button>
         <button type="button" className="button-secondary" onClick={onCancel} disabled={busy}>
-          Cancelar
+          {tr().common.cancel}
         </button>
       </div>
     </form>
   );
 }
 
-const kmFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
-const perKmFormat = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", maximumFractionDigits: 3 });
+const kmFormat = numberFormat({ maximumFractionDigits: 1 });
+const perKmFormat = numberFormat({ style: "currency", currency: "EUR", maximumFractionDigits: 3 });
 
 /** Custo por km e distância máxima das lojas (adenda 2026-11-09 de DomiOS_API_Fase5.md, E.2). Só Admin muda. */
 function TravelSettings({ household, isAdmin, onSaved }: { household: HouseholdDto; isAdmin: boolean; onSaved: (h: HouseholdDto) => void }) {
@@ -739,7 +741,7 @@ function TravelSettings({ household, isAdmin, onSaved }: { household: HouseholdD
       onSaved(await updateHousehold(household.householdId, request));
       setEditing(false);
     } catch (err) {
-      setError(describeError(err, { "invalid-argument": "Custo entre 0 e 2 € por km; distância entre 1 e 50 km." }));
+      setError(describeError(err, { "invalid-argument": tr().householdPage.errors.travel }));
     } finally {
       setBusy(false);
     }
@@ -750,7 +752,7 @@ function TravelSettings({ household, isAdmin, onSaved }: { household: HouseholdD
     const costValue = Number(cost.replace(",", "."));
     const distanceValue = Number(distance.replace(",", "."));
     if (!(costValue >= 0 && costValue <= 2) || !(distanceValue >= 1 && distanceValue <= 50)) {
-      setError("Custo entre 0 e 2 € por km; distância entre 1 e 50 km.");
+      setError(tr().householdPage.errors.travel);
       return;
     }
     void save({ travelCostPerKm: Math.round(costValue * 1000) / 1000, maxStoreDistanceKm: Math.round(distanceValue * 10) / 10 });
@@ -758,37 +760,37 @@ function TravelSettings({ household, isAdmin, onSaved }: { household: HouseholdD
 
   return (
     <div className="settings-row">
-      <dt>Deslocação</dt>
+      <dt>{tr().householdPage.travel}</dt>
       <dd>
         {!editing ? (
           <>
             <span className="muted">
-              {perKmFormat.format(costPerKm)}/km · lojas até {kmFormat.format(maxKm)} km
+              {perKmFormat.format(costPerKm)}/km{tr().householdPage.storesUpTo(kmFormat.format(maxKm))}
             </span>
             {isAdmin && (
               <button type="button" className="link-button settings-action" onClick={start}>
-                Mudar
+                {tr().householdPage.change}
               </button>
             )}
           </>
         ) : (
           <form className="inline-form" onSubmit={handleSubmit}>
             <label>
-              <span className="muted">€ por km</span>{" "}
+              <span className="muted">{tr().householdPage.perKm}</span>{" "}
               <input type="text" inputMode="decimal" className="amount-input" value={cost} onChange={(e) => setCost(e.target.value)} />
             </label>
             <label>
-              <span className="muted">Até (km)</span>{" "}
+              <span className="muted">{tr().householdPage.upToKm}</span>{" "}
               <input type="text" inputMode="decimal" className="amount-input" value={distance} onChange={(e) => setDistance(e.target.value)} />
             </label>
             <button type="submit" className="button-primary" disabled={busy}>
-              Guardar
+              {tr().common.save}
             </button>
             <button type="button" className="link-button" disabled={busy} onClick={() => void save({ travelCostPerKm: null, maxStoreDistanceKm: null })}>
-              Valores por omissão
+              {tr().householdPage.defaults}
             </button>
             <button type="button" className="link-button" onClick={() => setEditing(false)}>
-              Cancelar
+              {tr().common.cancel}
             </button>
             {error && (
               <span className="form-error" role="alert">

@@ -4,6 +4,7 @@ import { formatPercent, money, unitPriceLabel } from "../catalog/offers";
 import { daysLeft, daysLeftLabel } from "../catalog/promotions";
 import { ProductThumb } from "./ProductThumb";
 import { LabelPrice, ShelfLabel, VerdictBand } from "./ShelfLabel";
+import { tr } from "../i18n";
 
 /**
  * Uma oferta em promoção numa linha, como os produtos: o desconto ao lado do preço,
@@ -18,7 +19,7 @@ export function PromotionOfferLabel({ offer }: { offer: CurrentPromotionDto; ind
   const discount =
     (promotion.discountPercent !== null
       ? `−${formatPercent(promotion.discountPercent)}`
-      : promotion.description || promotionTypeLabels[promotion.type]) + (promotion.requiresCard ? " com cartão" : "");
+      : promotion.description || promotionTypeLabels[promotion.type]) + (promotion.requiresCard ? ` ${tr().ui.price.withCard}` : "");
   // Sem percentagem a descrição já é o desconto ("Leve 3, pague 2"); com cartão diz qual cartão.
   const descriptionInFoot = !percentOnly && promotion.discountPercent !== null;
 
@@ -40,13 +41,13 @@ export function PromotionOfferLabel({ offer }: { offer: CurrentPromotionDto; ind
           {unit && <strong>{unit}</strong>}
           {unit && " · "}
           {offer.storeName}
-          {offer.cardPrice && ` · ${money.format(offer.cardPrice.amount)} com cartão`}
+          {offer.cardPrice && ` · ${money.format(offer.cardPrice.amount)} ${tr().ui.price.withCard}`}
         </span>
       </div>
       {(descriptionInFoot || (promotion.minQuantity !== null && promotion.minQuantity > 1)) && (
         <div className="label-foot">
           {descriptionInFoot && <span className="label-foot-line">{promotion.description}</span>}
-          {promotion.minQuantity !== null && promotion.minQuantity > 1 && <span>Mín. {promotion.minQuantity} un</span>}
+          {promotion.minQuantity !== null && promotion.minQuantity > 1 && <span>{tr().ui.price.minQuantity(promotion.minQuantity)}</span>}
         </div>
       )}
     </ShelfLabel>

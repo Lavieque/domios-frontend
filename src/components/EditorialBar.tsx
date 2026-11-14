@@ -5,6 +5,7 @@ import { useSession } from "../auth/useSession";
 import { useHouseholds } from "../household/useHouseholds";
 import { useIsPhone } from "../usePageSize";
 import { AppTopMenu } from "./AppMenu";
+import { useT } from "../i18n";
 
 /** Cabeçalho da app: botão do menu, pesquisa, a casa escolhida e a conta. */
 export function EditorialBar({
@@ -19,6 +20,7 @@ export function EditorialBar({
   menuOpen: boolean;
   onToggle: () => void;
 }) {
+  const t = useT();
   const navigate = useNavigate();
   const session = useSession();
   const avatar = useAvatar();
@@ -39,7 +41,7 @@ export function EditorialBar({
         type="button"
         className="rail-toggle"
         aria-controls="app-rail"
-        aria-label={collapsed && !menuOpen ? "Mostrar menu lateral" : "Menu lateral"}
+        aria-label={collapsed && !menuOpen ? t.shell.showRail : t.shell.rail}
         data-collapsed={collapsed}
         data-open={menuOpen}
         onClick={onToggle}
@@ -58,8 +60,8 @@ export function EditorialBar({
         </svg>
         <input
           type="search"
-          aria-label="Pesquisar produtos"
-          placeholder={phone ? "Pesquisar…" : "Pesquisar produtos…"}
+          aria-label={t.shell.searchProducts}
+          placeholder={phone ? t.shell.searchShort : t.shell.searchLong}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -69,9 +71,9 @@ export function EditorialBar({
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M3 11l9-8 9 8M5 10v11h14V10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        {current?.name ?? "A minha casa"}
+        {current?.name ?? t.common.myHousehold}
       </Link>
-      <Link to="/conta" className={`bar-avatar${avatar ? " has-photo" : ""}`} aria-label="Conta">
+      <Link to="/conta" className={`bar-avatar${avatar ? " has-photo" : ""}`} aria-label={t.shell.account}>
         {avatar ? <img src={avatar} alt="" /> : (session?.email ?? "?").charAt(0).toUpperCase()}
       </Link>
 

@@ -6,6 +6,7 @@ import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
 import type { PaidPriceSource } from "./shopping";
 import type { MeasurementUnit, MoneyDto, PagedResult } from "./types";
+import { localized } from "../i18n";
 
 export const PantryLocation = {
   Pantry: 0,
@@ -15,12 +16,7 @@ export const PantryLocation = {
 } as const;
 export type PantryLocation = (typeof PantryLocation)[keyof typeof PantryLocation];
 
-export const pantryLocationLabels: Record<PantryLocation, string> = {
-  [PantryLocation.Pantry]: "Despensa",
-  [PantryLocation.Fridge]: "Frigorífico",
-  [PantryLocation.Freezer]: "Congelador",
-  [PantryLocation.Cabinet]: "Armário",
-};
+export const pantryLocationLabels: Record<PantryLocation, string> = localized((t) => t.enums.pantryLocation);
 
 export const pantryLocations: PantryLocation[] = [
   PantryLocation.Pantry,
@@ -38,13 +34,7 @@ export const PantryState = {
 } as const;
 export type PantryState = (typeof PantryState)[keyof typeof PantryState];
 
-export const pantryStateLabels: Record<PantryState, string> = {
-  [PantryState.Sealed]: "Fechado",
-  [PantryState.Open]: "Aberto",
-  [PantryState.Frozen]: "Congelado",
-  [PantryState.Consumed]: "Consumido",
-  [PantryState.Discarded]: "Deitado fora",
-};
+export const pantryStateLabels: Record<PantryState, string> = localized((t) => t.enums.pantryState);
 
 /** Os nomes que a query string aceita (`state=`, `location=`). */
 const stateNames: Record<PantryState, string> = {
@@ -69,12 +59,7 @@ export const DiscardReason = {
 } as const;
 export type DiscardReason = (typeof DiscardReason)[keyof typeof DiscardReason];
 
-export const discardReasonLabels: Record<DiscardReason, string> = {
-  [DiscardReason.Expired]: "Passou da validade",
-  [DiscardReason.Spoiled]: "Estragou-se",
-  [DiscardReason.Mistake]: "Registado por engano",
-  [DiscardReason.Other]: "Outro motivo",
-};
+export const discardReasonLabels: Record<DiscardReason, string> = localized((t) => t.enums.discardReason);
 
 export interface QuantityDto {
   amount: number;

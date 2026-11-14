@@ -6,6 +6,7 @@ import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
 import type { PantryLocation, QuantityDto } from "./pantry";
 import type { MeasurementUnit, PagedResult } from "./types";
+import { localized } from "../i18n";
 
 export const ShoppingListStatus = {
   Open: 0,
@@ -14,11 +15,7 @@ export const ShoppingListStatus = {
 } as const;
 export type ShoppingListStatus = (typeof ShoppingListStatus)[keyof typeof ShoppingListStatus];
 
-export const shoppingListStatusLabels: Record<ShoppingListStatus, string> = {
-  [ShoppingListStatus.Open]: "Aberta",
-  [ShoppingListStatus.Completed]: "Concluída",
-  [ShoppingListStatus.Cancelled]: "Cancelada",
-};
+export const shoppingListStatusLabels: Record<ShoppingListStatus, string> = localized((t) => t.enums.shoppingListStatus);
 
 const statusNames: Record<ShoppingListStatus, string> = {
   [ShoppingListStatus.Open]: "Open",

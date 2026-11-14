@@ -14,8 +14,10 @@ import { SendToListForm } from "../components/SendToListForm";
 import { shortDate } from "../plan/dates";
 import { opportunityAction } from "./actions";
 import { useOpportunities } from "./useOpportunities";
+import { dateTimeFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const paidDate = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short" });
+const paidDate = dateTimeFormat({ day: "numeric", month: "short" });
 
 /**
  * Sugestões da casa (DomiOS_API_Fase8.md): só as que o orçamento de atenção
@@ -28,7 +30,7 @@ export function OpportunitiesPanel({ householdId }: { householdId: string }) {
 
   return (
     <section className="panel opportunities-panel">
-      <h2>Sugestões</h2>
+      <h2>{tr().ui.opportunities.title}</h2>
       {headline && <p className="opportunity-headline">{headline}</p>}
       <ul className="opportunity-list">
         {opportunities.items.map((opportunity) => (
@@ -42,9 +44,7 @@ export function OpportunitiesPanel({ householdId }: { householdId: string }) {
       </ul>
       {opportunities.heldBackCount > 0 && (
         <p className="muted">
-          {opportunities.heldBackCount === 1
-            ? "Mais 1 sugestão à espera."
-            : `Mais ${opportunities.heldBackCount} sugestões à espera.`}
+          {tr().ui.opportunities.heldBack(opportunities.heldBackCount)}
         </p>
       )}
     </section>
@@ -86,15 +86,15 @@ function OpportunityCard({
       <div className="opportunity-head">
         <strong>{opportunity.title}</strong>
         {opportunity.expectedBenefit !== null && opportunity.expectedBenefit > 0 && (
-          <span className="pill pill-accent2">poupa ~{money.format(opportunity.expectedBenefit)}</span>
+          <span className="pill pill-accent2">{tr().ui.opportunities.saves(money.format(opportunity.expectedBenefit))}</span>
         )}
       </div>
       <p className="muted">{opportunity.explanation}</p>
       {opportunity.type === OpportunityType.BelowLastPaid && (
         <p className="opportunity-detail">
-          Agora {money.format(opportunity.payload.current)}; pagaste {money.format(opportunity.payload.lastPaid)} a{" "}
+          {tr().ui.opportunities.nowVsPaid(money.format(opportunity.payload.current), money.format(opportunity.payload.lastPaid))}{" "}
           {paidDate.format(new Date(opportunity.payload.lastPaidAt))}
-          {opportunity.payload.priceSource === "Offer" && " (preço da prateleira)"}.
+          {opportunity.payload.priceSource === "Offer" && tr().ui.opportunities.shelfPrice}.
         </p>
       )}
 
@@ -102,8 +102,8 @@ function OpportunityCard({
       {opportunity.type === OpportunityType.PlannedMealMissingItems && (
         <SendToListForm
           householdId={householdId}
-          newListName={`Compras de ${shortDate(opportunity.payload.date)}`}
-          submitLabel="Pôr o que falta na lista"
+          newListName={tr().ui.opportunities.listName(shortDate(opportunity.payload.date))}
+          submitLabel={tr().ui.opportunities.putMissingOnList}
           send={async (listId) => {
             const date = opportunity.payload.date;
             const result = await addPlanToShoppingList(householdId, listId, date, date);
@@ -129,7 +129,7 @@ function OpportunityCard({
             disabled={busy}
             onClick={() => close(() => actOnOpportunity(householdId, opportunity.opportunityId))}
           >
-            {action?.doneLabel ?? "Feito"}
+            {action?.doneLabel ?? tr().ui.opportunities.done}
           </button>
           <button
             type="button"
@@ -137,7 +137,7 @@ function OpportunityCard({
             disabled={busy}
             onClick={() => close(() => dismissOpportunity(householdId, opportunity.opportunityId))}
           >
-            Dispensar
+            {tr().ui.opportunities.dismiss}
           </button>
         </div>
       )}

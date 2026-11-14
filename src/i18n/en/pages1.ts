@@ -37,6 +37,7 @@ export const lists: Dict["lists"] = {
   cancelled: "Cancelled",
   listName: "List name",
   newListPlaceholder: "New list name (optional)",
+  defaultName: (date) => `List of ${date}`,
   creating: "Creating…",
   newList: "New list",
   none: { 0: "No open lists.", 1: "No completed lists.", 2: "No cancelled lists." },

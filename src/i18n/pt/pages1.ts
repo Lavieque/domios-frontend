@@ -37,6 +37,7 @@ export const lists = {
   cancelled: "Canceladas",
   listName: "Nome da lista",
   newListPlaceholder: "Nome da nova lista (opcional)",
+  defaultName: (date: string): string => `Lista de ${date}`,
   creating: "A criar…",
   newList: "Nova lista",
   none: { 0: "Sem listas abertas.", 1: "Sem listas concluídas.", 2: "Sem listas canceladas." },

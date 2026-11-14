@@ -4,7 +4,6 @@ export const templateDetail: Dict["templateDetail"] = {
   title: "Meal plan",
   openFailed: "Couldn't open this meal plan.",
   back: "Back to meal plans",
-  copySuffix: "(mine)",
   duplicate: "The same recipe appears twice in the same meal of this day.",
   forbiddenRecipe: "That recipe can't be part of this meal plan.",
   crumb: "Ready-made meal plans",

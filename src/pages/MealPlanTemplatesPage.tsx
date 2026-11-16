@@ -115,7 +115,7 @@ function TemplateRow({ template, note }: { template: MealPlanTemplateSummaryDto;
     <RecipeRow
       title={template.name}
       to={`/ementas/${template.mealPlanTemplateId}`}
-      imageUrl={templateImage(template.tags)}
+      imageUrl={template.imageUrl ?? templateImage(template.tags)}
       lead={
         <>
           <span className="list-tally-count">{template.durationDays}</span>

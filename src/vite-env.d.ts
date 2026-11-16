@@ -6,6 +6,8 @@ interface ImportMetaEnv {
   readonly VITE_SITE_URL?: string;
   /** Opcional (só o site). Onde vive a app; por omissão https://app.domios.pt. */
   readonly VITE_APP_URL?: string;
+  /** "true" só no build de demonstração (npm run dev:demo / build:demo): Api falsa no browser. */
+  readonly VITE_DEMO?: string;
 }
 
 interface ImportMeta {

@@ -2,30 +2,30 @@ import type { FeatureKey } from "./i18n";
 
 /**
  * Where each note sits on the desktop capture (1440 × 900), in percent of its width and
- * height, in the same order as `shotNotes.notes` in the dictionaries. Re-check these when
- * the captures are retaken.
+ * height, in the same order as `shotNotes.notes` in the dictionaries. The captures are taken
+ * on a Thursday (site/scripts/capture-shots.mjs), so "today" is always the fourth column of
+ * the plan. Re-check these when the captures are retaken.
  */
 export const HOTSPOTS: Partial<Record<FeatureKey, [x: number, y: number][]>> = {
   today: [
-    [59, 39],
-    [42, 74.5],
-    [94.6, 58.5],
+    [72.5, 34],
+    [50, 74.7],
+    [96.6, 58.6],
   ],
   plan: [
-    [68.9, 34],
-    [66, 85.7],
-    [92, 25.2],
+    [60.5, 34],
+    [59.5, 62.8],
+    [85, 25.3],
   ],
   pantry: [
-    [20.8, 70.3],
-    [45, 64.8],
-    [51.4, 74.8],
-    [81, 24],
+    [34.5, 70.3],
+    [55.3, 64.7],
+    [76, 74.8],
+    [76, 24],
   ],
   promotions: [
-    [34.7, 37.9],
-    [23, 82.7],
-    [47.6, 78.6],
-    [67.7, 78.6],
+    [47.5, 38],
+    [30, 82.7],
+    [53.3, 76.3],
   ],
 };

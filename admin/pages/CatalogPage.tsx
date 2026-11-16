@@ -1,43 +1,67 @@
 import { useState, type FormEvent } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { admin, type CatalogCategory, type CatalogProduct, type CatalogPromotion, type CatalogStore } from "../api";
-import { ConfirmAction, PageHead, Pager, State } from "../components";
+import { Avatar, ConfirmAction, PageHead, Pager, State, Thumb } from "../components";
 import { dateOnly, useLoad } from "../hooks";
 import { IngredientsSection } from "./IngredientsSection";
 import { ProductForm } from "./ProductForm";
 import { RecipesSection } from "./RecipesSection";
 
-const TABS = [
-  { value: "products", label: "Produtos" },
-  { value: "recipes", label: "Receitas" },
-  { value: "ingredients", label: "Ingredientes" },
-  { value: "stores", label: "Lojas" },
-  { value: "promotions", label: "Promoções" },
-] as const;
+/** O endereço antigo guardava a secção em ?secao=; leva para a página própria dessa secção. */
+const LEGACY_SECTIONS: Record<string, string> = {
+  products: "produtos",
+  recipes: "receitas",
+  ingredients: "ingredientes",
+  stores: "lojas",
+  promotions: "promocoes",
+};
 
-type Tab = (typeof TABS)[number]["value"];
+export function CatalogRedirect() {
+  const [params] = useSearchParams();
+  return <Navigate to={`/catalogo/${LEGACY_SECTIONS[params.get("secao") ?? ""] ?? "produtos"}`} replace />;
+}
 
-export function CatalogPage() {
-  // The section lives in the address (?secao=receitas), so refresh and back keep it.
-  const [params, setParams] = useSearchParams();
-  const requested = params.get("secao");
-  const tab: Tab = TABS.some((t) => t.value === requested) ? (requested as Tab) : "products";
-  const setTab = (value: Tab) => setParams(value === "products" ? {} : { secao: value }, { replace: true });
+export function ProductsPage() {
   return (
     <>
-      <PageHead title="Catálogo" sub="Produtos, receitas, ingredientes, lojas e promoções. Cada alteração fica na auditoria; a recolha de preços continua a escrever à parte." />
-      <div className="chip-row" role="tablist" aria-label="Secção">
-        {TABS.map((t) => (
-          <button key={t.value} type="button" role="tab" className="chip" aria-selected={tab === t.value} onClick={() => setTab(t.value)}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-      {tab === "products" && <ProductsSection />}
-      {tab === "recipes" && <RecipesSection />}
-      {tab === "ingredients" && <IngredientsSection />}
-      {tab === "stores" && <StoresSection />}
-      {tab === "promotions" && <PromotionsSection />}
+      <PageHead title="Produtos" sub="O catálogo global. Cada alteração fica na auditoria; a recolha de preços continua a escrever à parte." />
+      <ProductsSection />
+    </>
+  );
+}
+
+export function RecipesPage() {
+  return (
+    <>
+      <PageHead title="Receitas" sub="Rascunhos, publicadas e arquivadas. Só as publicadas aparecem às casas." />
+      <RecipesSection />
+    </>
+  );
+}
+
+export function IngredientsPage() {
+  return (
+    <>
+      <PageHead title="Ingredientes" sub="A lista que as receitas usam. Arquivar tira o ingrediente das receitas novas." />
+      <IngredientsSection />
+    </>
+  );
+}
+
+export function StoresPage() {
+  return (
+    <>
+      <PageHead title="Lojas" sub="Cadeias e lojas de onde vêm os preços. Fechar uma loja tira-a das comparações." />
+      <StoresSection />
+    </>
+  );
+}
+
+export function PromotionsPage() {
+  return (
+    <>
+      <PageHead title="Promoções" sub="As promoções recolhidas. Cancelar uma esconde-a das casas." />
+      <PromotionsSection />
     </>
   );
 }
@@ -125,6 +149,7 @@ function ProductRow({ product: p, categories, onChanged }: { product: CatalogPro
 
   return (
     <li className="row">
+      <Thumb src={p.imageUrl} name={p.name} />
       <div className="row-main">
         <div className="row-title">
           <strong>{p.name}</strong>
@@ -226,6 +251,7 @@ function OpenRow({
 }) {
   return (
     <li className="row">
+      <Avatar name={title} />
       <div className="row-main">
         <div className="row-title">
           <strong>{title}</strong>

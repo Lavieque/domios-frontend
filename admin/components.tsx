@@ -92,3 +92,19 @@ export function State({ loading, error, empty, emptyText }: { loading: boolean; 
   if (empty) return <p className="muted empty">{emptyText}</p>;
   return null;
 }
+
+/** Iniciais num círculo: a cara de uma conta, de uma casa ou de uma loja quando não há foto. */
+export function Avatar({ name }: { name: string }) {
+  const words = name.replace(/@.*/, "").split(/[\s._-]+/).filter(Boolean);
+  const initials = ((words[0]?.[0] ?? "?") + (words.length > 1 ? (words[words.length - 1][0] ?? "") : "")).toUpperCase();
+  return (
+    <span className="avatar" aria-hidden="true">
+      {initials}
+    </span>
+  );
+}
+
+/** Miniatura quadrada da foto de um produto ou receita; sem foto, as iniciais. */
+export function Thumb({ src, name }: { src: string | null; name: string }) {
+  return src ? <img className="avatar-photo" src={src} alt="" loading="lazy" /> : <Avatar name={name} />;
+}

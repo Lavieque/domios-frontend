@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { DEMO_URL } from "../config";
 import { useSite } from "../context";
 import { PHOTO } from "../photos";
 import { ArrowIcon } from "./Icons";
@@ -17,6 +18,9 @@ export function RequestCta({ title, text }: { title: string; text: string }) {
             {t.nav.request}
             <ArrowIcon />
           </Link>
+          <a className="button button-outline button-lg" href={DEMO_URL}>
+            {t.nav.tryDemo}
+          </a>
           <Link className="text-link" to={to({ kind: "guide" })}>
             {t.home.guideCta}
           </Link>

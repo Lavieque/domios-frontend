@@ -495,8 +495,15 @@ button {
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 2.1rem;
+}
+
+/* "Ver como funciona": um passo mais baixo que os dois botões, sobre a fotografia. */
+.hero-more {
+  padding-inline: 0.5rem;
+  color: var(--on-dark);
 }
 
 /* One day in the app, set on glass over the photograph, as the app sets its own panels. */

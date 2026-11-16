@@ -7,6 +7,8 @@ export const pt: Dict = {
     features: "A app",
     guide: "Guia",
     request: "Pedir acesso",
+    demo: "Demo",
+    tryDemo: "Experimentar o demo",
     enter: "Entrar",
     menuOpen: "Menu",
     menuClose: "Fechar",
@@ -114,7 +116,7 @@ export const pt: Dict = {
       today: ["O dia num relance: refeições, compras e o que usar.", "Cada refeição diz quantos ingredientes já tens.", "O que convém usar primeiro, com o prazo."],
       plan: ["Hoje fica marcado na semana.", "Marcas como cozinhada, saltas ou removes.", "Aplica uma ementa pronta à semana."],
       pantry: ["O que está aberto ou expira primeiro vem primeiro.", "A loja e o preço de cada compra.", "Abrir e usar com um toque.", "Quanto se deitou fora, e quanto valia."],
-      promotions: ["Filtra por cadeia.", "Quando acaba cada promoção.", "Descontos com cartão aparecem à parte.", "Também promoções por quantidade."],
+      promotions: ["Filtra por cadeia.", "Quando acaba cada promoção.", "Descontos com cartão aparecem à parte."],
     },
   },
   features: {

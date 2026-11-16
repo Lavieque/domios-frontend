@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { APP_LOGIN_URL } from "./config";
+import { APP_LOGIN_URL, DEMO_URL } from "./config";
 import { ArrowIcon, MenuIcon } from "./components/Icons";
 import { makeContext, SiteProvider, useSite } from "./context";
 import { dicts, LANGS, pathFor, parseRoute, switchLanguage, type Lang, type Route } from "./i18n";
@@ -182,6 +182,7 @@ function Header({ pathname }: { pathname: string }) {
           <nav className="site-nav" aria-label={t.nav.main}>
             <Link to={to({ kind: "features" })}>{t.nav.features}</Link>
             <Link to={to({ kind: "guide" })}>{t.nav.guide}</Link>
+            <a href={DEMO_URL}>{t.nav.demo}</a>
             <a href={APP_LOGIN_URL}>{t.nav.enter}</a>
           </nav>
           <nav className="lang-switch" aria-label={t.nav.language}>
@@ -223,6 +224,7 @@ function Footer() {
           <h2>{t.footer.product}</h2>
           <Link to={to({ kind: "features" })}>{t.nav.features}</Link>
           <Link to={to({ kind: "guide" })}>{t.nav.guide}</Link>
+          <a href={DEMO_URL}>{t.nav.tryDemo}</a>
         </nav>
         <nav aria-label={t.footer.help}>
           <h2>{t.footer.help}</h2>

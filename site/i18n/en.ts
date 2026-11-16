@@ -7,6 +7,8 @@ export const en: Dict = {
     features: "The app",
     guide: "Guide",
     request: "Request access",
+    demo: "Demo",
+    tryDemo: "Try the demo",
     enter: "Log in",
     menuOpen: "Menu",
     menuClose: "Close",
@@ -114,7 +116,7 @@ export const en: Dict = {
       today: ["The day at a glance: meals, shopping, what to use.", "Each meal says how many ingredients you already have.", "What to use first, with its deadline."],
       plan: ["Today is marked in the week.", "Mark a meal cooked, skip it or remove it.", "Apply a ready-made menu to the week."],
       pantry: ["Whatever is open or expires first comes first.", "The store and price of each purchase.", "Open and use in one tap.", "How much was thrown away, and what it was worth."],
-      promotions: ["Filter by chain.", "When each promotion ends.", "Card-only discounts are shown apart.", "Multi-buy offers too."],
+      promotions: ["Filter by chain.", "When each promotion ends.", "Card-only discounts are shown apart."],
     },
   },
   features: {

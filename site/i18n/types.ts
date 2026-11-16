@@ -39,6 +39,10 @@ export interface Dict {
     features: string;
     guide: string;
     request: string;
+    /** Menu e rodapé: o link curto para o demo. */
+    demo: string;
+    /** Botões: abre o demo com dados de exemplo. */
+    tryDemo: string;
     enter: string;
     menuOpen: string;
     menuClose: string;

@@ -5,6 +5,7 @@ import { RequestCta } from "../components/RequestCta";
 import { ShelfDemo } from "../components/ShelfDemo";
 import { Shot } from "../components/Shot";
 import { Tour } from "../components/Tour";
+import { DEMO_URL } from "../config";
 import { useSite } from "../context";
 import { PHOTO, SCENE } from "../photos";
 
@@ -46,7 +47,11 @@ export function HomePage() {
               {h.primary}
               <ArrowIcon />
             </Link>
-            <a className="button button-ghost button-lg" href="#como-funciona">
+            <a className="button button-ghost button-lg" href={DEMO_URL}>
+              {t.nav.tryDemo}
+              <ArrowIcon />
+            </a>
+            <a className="text-link hero-more" href="#como-funciona">
               {h.secondary}
               <ArrowIcon down />
             </a>

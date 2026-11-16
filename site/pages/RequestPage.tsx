@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { APP_LOGIN_URL } from "../config";
 import { AccessRequestError, submitAccessRequest } from "../api";
+import { PageHead } from "../components/PageHead";
 import { useSite } from "../context";
+import { PHOTO } from "../photos";
 
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "sent" } | { kind: "error"; message: string };
 
@@ -36,18 +38,16 @@ export function RequestPage() {
   }
 
   return (
-    <div className="request-layout">
+    <>
+      <PageHead title={r.title} lede={r.lede} photo={PHOTO.request} />
+      <div className="page-body request-layout">
       <div>
-        <header className="page-head">
-          <h1>{r.title}</h1>
-          <p className="lede">{r.lede}</p>
-        </header>
 
         {status.kind === "sent" ? (
           <section className="notice request-done" role="status">
             <h2>{r.successTitle}</h2>
             <p>{r.successText}</p>
-            <button type="button" className="button-secondary" onClick={reset}>
+            <button type="button" className="button button-outline" onClick={reset}>
               {r.again}
             </button>
           </section>
@@ -104,7 +104,7 @@ export function RequestPage() {
                 {status.message}
               </p>
             )}
-            <button type="submit" className="button-primary" disabled={status.kind === "sending"}>
+            <button type="submit" className="button button-dark button-lg" disabled={status.kind === "sending"}>
               {status.kind === "sending" ? r.sending : r.submit}
             </button>
           </form>
@@ -123,6 +123,7 @@ export function RequestPage() {
           ))}
         </ol>
       </aside>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
 import { searchIngredients, searchProducts, type IngredientDto } from "../api/client";
 import { measurementUnitLabels, type ProductDto } from "../api/types";
@@ -105,7 +106,7 @@ export function LinkPicker({ label, onPick, onCancel }: { label: string; onPick:
   const empty = !suggestions.loading && suggestions.ingredients.length === 0 && suggestions.products.length === 0;
   return (
     <div className="link-picker">
-      {suggestions.loading && <p className="muted">{tr().ui.picker.searching}</p>}
+      {suggestions.loading && <p className="muted"><Busy>{tr().ui.picker.searching}</Busy></p>}
       {empty && <p className="muted">{tr().ui.catalog.nothingLike(label)}</p>}
       <SuggestionList suggestions={suggestions} onPick={onPick} />
       {onCancel && (

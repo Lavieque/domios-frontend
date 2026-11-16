@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
@@ -287,7 +288,7 @@ function HouseholdName({ household, onSaved }: { household: HouseholdDto; onSave
       </label>
       <div className="button-row">
         <button type="submit" className="button-primary" disabled={busy}>
-          {busy ? tr().common.saving : tr().common.save}
+          {busy ? <Busy>{tr().common.saving}</Busy> : tr().common.save}
         </button>
         <button type="button" className="button-secondary" onClick={() => setEditing(false)} disabled={busy}>
           {tr().common.cancel}
@@ -457,7 +458,7 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
           </p>
           <div className="button-row">
             <button type="button" className="button-danger is-confirm" onClick={handleRemove} disabled={busy}>
-              {busy ? tr().householdPage.removing : isMe ? tr().householdPage.leave : tr().householdPage.removeName(member.name)}
+              {busy ? <Busy>{tr().householdPage.removing}</Busy> : isMe ? tr().householdPage.leave : tr().householdPage.removeName(member.name)}
             </button>
             <button type="button" className="button-secondary" onClick={() => setMode("view")} disabled={busy}>
               {tr().common.cancel}
@@ -556,7 +557,7 @@ function EditMemberForm({ householdId, member, canChangeRole, onSaved, onCancel 
       )}
       <div className="button-row member-form-wide">
         <button type="submit" className="button-primary" disabled={busy}>
-          {busy ? tr().common.saving : tr().common.save}
+          {busy ? <Busy>{tr().common.saving}</Busy> : tr().common.save}
         </button>
         <button type="button" className="button-secondary" onClick={onCancel} disabled={busy}>
           {tr().common.cancel}
@@ -618,7 +619,7 @@ function LinkAccountForm({ householdId, member, onLinked, onCancel }: LinkAccoun
       )}
       <div className="button-row member-form-wide">
         <button type="submit" className="button-primary" disabled={busy}>
-          {busy ? tr().householdPage.linking : tr().householdPage.linkAccount}
+          {busy ? <Busy>{tr().householdPage.linking}</Busy> : tr().householdPage.linkAccount}
         </button>
         <button type="button" className="button-secondary" onClick={onCancel} disabled={busy}>
           {tr().common.cancel}

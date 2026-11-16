@@ -1,3 +1,4 @@
+import { Busy } from "./Busy";
 import { useEffect, useRef, useState } from "react";
 import type { MealPlanTemplateEntryDto } from "../api/mealPlanTemplates";
 import { MealType, mealTypeLabels, mealTypes } from "../api/planning";
@@ -169,7 +170,7 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
       )}
       <div className="button-row">
         <button type="button" className="button-primary" disabled={saving || picking !== null} onClick={() => onSave(rows)}>
-          {saving ? tr().common.saving : tr().ui.dayEditor.saveDay}
+          {saving ? <Busy>{tr().common.saving}</Busy> : tr().ui.dayEditor.saveDay}
         </button>
         <button type="button" className="button-secondary" disabled={saving} onClick={onCancel}>
           {tr().common.cancel}

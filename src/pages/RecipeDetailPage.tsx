@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -209,7 +210,7 @@ export function RecipeDetailPage() {
             </button>
             {current ? (
               <button type="button" className="button-secondary button-lg" onClick={sendMissingToList} disabled={listBusy}>
-                {listBusy ? tr().recipe.sending : tr().recipe.sendToList}
+                {listBusy ? <Busy>{tr().recipe.sending}</Busy> : tr().recipe.sendToList}
               </button>
             ) : (
               <Link to="/casa/nova" className="button-secondary button-lg">

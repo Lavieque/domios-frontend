@@ -592,6 +592,30 @@ body {
   color: transparent;
 }
 
+/* Cartões vazios com o mesmo vidro e o mesmo papel da fotografia que os cartões reais. */
+.editorial .skeleton-card {
+  background: rgb(16 44 35 / 0.72);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-shadow);
+  animation-name: skeleton-breathe;
+}
+
+.editorial .skeleton-card-media {
+  background: rgb(250 247 240 / 0.3);
+}
+
+@keyframes skeleton-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .editorial .filter-option[aria-pressed="true"],
 .editorial .filter-option-all[aria-pressed="true"] {
   background: rgb(255 255 240 / 0.18);

@@ -1,3 +1,4 @@
+import { Busy } from "./Busy";
 import { useState } from "react";
 import { requestEmailVerification } from "../api/account";
 import { describeError } from "../auth/errors";
@@ -29,7 +30,7 @@ export function EmailVerificationNotice() {
         <>
           <span>{t.auth.emailNotConfirmed}</span>
           <button type="button" className="link-button" onClick={resend} disabled={state === "sending"}>
-            {state === "sending" ? t.common.sending : t.auth.resendConfirmation}
+            {state === "sending" ? <Busy>{t.common.sending}</Busy> : t.auth.resendConfirmation}
           </button>
         </>
       )}

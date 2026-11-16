@@ -1,5 +1,7 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { CardsSkeleton } from "../components/CardsSkeleton";
 import { getCategories, searchProducts } from "../api/client";
 import { CategoryScope, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
 import { topCategory } from "../catalog/aisles";
@@ -254,7 +256,7 @@ export function ProductsPage() {
         <div className="catalog-results" aria-busy={loading}>
           <div className="results-head">
             <p className="results-count">
-              {firstLoad ? tr().lists2.searching : tr().products.count(count.format(total), total)}
+              {firstLoad ? <Busy>{tr().lists2.searching}</Busy> : tr().products.count(count.format(total), total)}
             </p>
             {selectedCategory && (
               <button
@@ -279,6 +281,7 @@ export function ProductsPage() {
             )}
           </div>
 
+          {firstLoad && <CardsSkeleton />}
           {!loading && products.length === 0 ? (
             <p className="empty-state">
               {search || categoryId ? tr().products.noneForFilters : tr().products.noneInCatalog}
@@ -320,7 +323,7 @@ function ProductLabel({ product, top }: { product: ProductDto; index: number; to
 
   let band;
   if (product.status === ProductStatus.Discontinued) band = <VerdictBand tone="none">{tr().products.discontinued}</VerdictBand>;
-  else if (offers === undefined) band = <VerdictBand tone="none">{tr().products.readingHistory}</VerdictBand>;
+  else if (offers === undefined) band = <VerdictBand tone="none"><Busy>{tr().products.readingHistory}</Busy></VerdictBand>;
   else if (cheapest) band = <VerdictBand insight={cheapest.priceInsight} />;
   else band = <VerdictBand tone="none">{tr().ui.price.noPrice}</VerdictBand>;
 

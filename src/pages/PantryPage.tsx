@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
@@ -426,7 +427,7 @@ function PantryRow({
             </p>
           )}
           {scan === null && <BarcodeScanner onScan={onScanned} />}
-          {scan === "searching" && <p className="muted loading loading-text">{tr().lists2.searching}</p>}
+          {scan === "searching" && <p className="muted loading loading-text"><Busy>{tr().lists2.searching}</Busy></p>}
           {scan !== null && scan !== "searching" && (
             <div className="scan-result">
               {scan.result ? (

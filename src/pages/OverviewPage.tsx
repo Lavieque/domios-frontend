@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHousehold, type CallerHouseholdDto } from "../api/households";
@@ -239,7 +240,7 @@ function HouseholdToday({ household }: { household: CallerHouseholdDto }) {
             </h2>
             <p className="muted">
               {lists === null
-                ? tr().common.loading
+                ? <Busy>{tr().common.loading}</Busy>
                 : firstList
                   ? tr().today.itemsOnList(firstLeft, firstList.name)
                   : tr().today.noOpenLists}

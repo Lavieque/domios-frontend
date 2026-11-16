@@ -1,5 +1,7 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { CardsSkeleton } from "../components/CardsSkeleton";
 import { searchRecipes } from "../api/client";
 import {
   DishType,
@@ -89,7 +91,7 @@ export function RecipesPage() {
 
   // O total só se diz quando a Api o deu; com filtros é o que eles encontram, não o catálogo.
   const countLine = loading
-    ? tr().lists2.searching
+    ? <Busy>{tr().lists2.searching}</Busy>
     : error
       ? tr().recipes.forCooking
       : filtered
@@ -186,6 +188,7 @@ export function RecipesPage() {
         </p>
       )}
 
+      {!error && loading && <CardsSkeleton />}
       {error ? null : !loading && recipes.length === 0 ? (
         <p className="empty-state">{tr().recipes.none}</p>
       ) : (

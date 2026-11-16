@@ -1,3 +1,4 @@
+import { Busy } from "./Busy";
 import { useRef, useState, type ChangeEvent } from "react";
 import { ApiError } from "../api/http";
 import { AVATAR_MAX_BYTES, prepareAvatar } from "../auth/avatarImage";
@@ -86,7 +87,7 @@ export function AvatarPicker({ userId, email }: { userId: string; email: string 
       <input ref={input} type="file" accept="image/*" hidden onChange={choose} />
       <div className="avatar-picker-actions">
         <button type="button" className="link-button" onClick={() => input.current?.click()} disabled={busy}>
-          {busy ? t.common.saving : avatar ? t.account.avatar.changeShort : t.account.avatar.setShort}
+          {busy ? <Busy>{t.common.saving}</Busy> : avatar ? t.account.avatar.changeShort : t.account.avatar.setShort}
         </button>
         {avatar && !busy && (
           <button type="button" className="link-button" onClick={remove}>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { listSavedRecipes, removeSavedRecipe, saveRecipe } from "../api/savedRecipes";
 import { describeError } from "../auth/errors";
+import { tr } from "../i18n";
 
 interface Props {
   householdId: string;
@@ -18,7 +19,7 @@ export function SaveRecipeButton({ householdId, recipeId }: Props) {
     setSaved(null);
     listSavedRecipes(householdId)
       .then((list) => active && setSaved(list.some((s) => s.recipeId === recipeId)))
-      .catch(() => active && setError("Não deu para ver se está guardada."));
+      .catch(() => active && setError(tr().ui.saveRecipe.checkFailed));
     return () => {
       active = false;
     };
@@ -36,7 +37,7 @@ export function SaveRecipeButton({ householdId, recipeId }: Props) {
         setSaved(true);
       }
     } catch (err) {
-      setError(describeError(err, { "saved-recipes-limit": "Já tens 500 receitas guardadas. Remove algumas primeiro." }));
+      setError(describeError(err, { "saved-recipes-limit": tr().ui.saveRecipe.limit }));
     } finally {
       setBusy(false);
     }
@@ -56,7 +57,7 @@ export function SaveRecipeButton({ householdId, recipeId }: Props) {
             <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
-        {saved ? "Guardada" : "Guardar receita"}
+        {saved ? tr().ui.saveRecipe.saved : tr().ui.saveRecipe.save}
       </button>
       {error && (
         <p className="form-error" role="alert">

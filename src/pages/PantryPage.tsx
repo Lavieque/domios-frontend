@@ -1,8 +1,10 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import {
   consumePantryItem,
+  eatLeftovers,
   DiscardReason,
   discardPantryItem,
   discardReasonLabels,
@@ -19,26 +21,29 @@ import {
 } from "../api/pantry";
 import { lookupBarcode, type BarcodeLookupResult } from "../api/barcodes";
 import { ApiError } from "../api/http";
-import { measurementUnitLabels, type ProductDto } from "../api/types";
+import { measurementUnitLabels, type ChainDto, type ProductDto } from "../api/types";
 import { describeError } from "../auth/errors";
 import { BarcodeScanner } from "../components/BarcodeScanner";
-import { CookableTeaser } from "../components/CookableTeaser";
 import { Pagination } from "../components/Pagination";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { AisleSign } from "../components/AisleSign";
+import { useActiveChains } from "../catalog/useChains";
+import { describePurchase } from "../pantry/purchase";
 import { urgency } from "../pantry/urgency";
 import { SearchField } from "../components/SearchField";
 import { useProducts } from "../pantry/useProducts";
 import { daysBetween, longDate, shortDate, today } from "../plan/dates";
+import { usePageSize } from "../usePageSize";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const PAGE_SIZE = 50;
-const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
+const quantityFormat = numberFormat({ maximumFractionDigits: 2 });
 
 /** "fifo" = o que há, pela ordem em que deve ser usado; os outros são estados. */
 type View = "fifo" | PantryState;
 
-const viewLabels: [View, string][] = [
-  ["fifo", "O que há (usar primeiro)"],
+const viewLabels = (): [View, string][] => [
+  ["fifo", tr().pantry.fifo],
   [PantryState.Sealed, pantryStateLabels[PantryState.Sealed]],
   [PantryState.Open, pantryStateLabels[PantryState.Open]],
   [PantryState.Frozen, pantryStateLabels[PantryState.Frozen]],
@@ -55,13 +60,14 @@ function isLive(item: PantryItemDto) {
 }
 
 function ExpiryLabel({ expiresAt }: { expiresAt: string | null }) {
-  if (!expiresAt) return <span className="pantry-when">Sem validade</span>;
+  const t = tr().pantry;
+  if (!expiresAt) return <span className="pantry-when">{t.noExpiry}</span>;
   const days = daysBetween(today(), expiresAt);
-  if (days < 0) return <span className="pantry-when">Expirou a {longDate(expiresAt)}</span>;
-  if (days === 0) return <span className="pantry-when">Expira hoje</span>;
-  if (days === 1) return <span className="pantry-when">Expira amanhã</span>;
-  if (days <= 7) return <span className="pantry-when">Expira em {days} dias</span>;
-  return <span className="pantry-when">Até {shortDate(expiresAt)}</span>;
+  if (days < 0) return <span className="pantry-when">{t.expiredOn(longDate(expiresAt))}</span>;
+  if (days === 0) return <span className="pantry-when">{t.expiresToday}</span>;
+  if (days === 1) return <span className="pantry-when">{t.expiresTomorrow}</span>;
+  if (days <= 7) return <span className="pantry-when">{t.expiresInDays(days)}</span>;
+  return <span className="pantry-when">{t.until(shortDate(expiresAt))}</span>;
 }
 
 function withoutPage(params: URLSearchParams): URLSearchParams {
@@ -71,6 +77,7 @@ function withoutPage(params: URLSearchParams): URLSearchParams {
 }
 
 function Pantry({ household }: { household: CallerHouseholdDto }) {
+  const pageSize = usePageSize(50, 15);
   const householdId = household.householdId;
   const location = useLocation();
   const notice = (location.state as { notice?: string } | null)?.notice;
@@ -91,6 +98,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const products = useProducts(items.map((item) => item.productId));
+  const chains = useActiveChains();
 
   useEffect(() => {
     const next = search.trim();
@@ -114,7 +122,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
       location: locationFilter,
       search: query === "" ? undefined : query,
       page,
-      pageSize: PAGE_SIZE,
+      pageSize: pageSize,
     })
       .then((result) => {
         if (cancelled) return;
@@ -127,7 +135,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     return () => {
       cancelled = true;
     };
-  }, [householdId, view, locationFilter, query, page, version]);
+  }, [householdId, view, locationFilter, query, page, pageSize, version]);
 
   function setFilter(next: { view?: View; location?: PantryLocation | null; page?: number }) {
     const params = new URLSearchParams();
@@ -147,7 +155,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
       await action();
       setVersion((v) => v + 1);
     } catch (err) {
-      setError(describeError(err, { "invalid-state-transition": "Este item já não permite essa ação." }));
+      setError(describeError(err, { "invalid-state-transition": tr().pantry.actionNotAllowed }));
     }
   }
 
@@ -155,29 +163,32 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     <div className="page pantry-page">
       <header className="page-head">
         <div>
-          <h1>Despensa</h1>
+          <h1>{tr().pantry.title}</h1>
           <p className="page-head-sub">
             {household.name}
-            {!loading && total > 0 && ` · ${total} ${total === 1 ? "artigo" : "artigos"}`}
+            {!loading && total > 0 && tr().pantry.items(total)}
           </p>
         </div>
-        <Link to="/despensa/adicionar" className="button-primary button-lg">
-          Adicionar à despensa
-        </Link>
+        <div className="button-row">
+          <Link to="/despensa/desperdicio" className="button-secondary">
+            {tr().pantry.waste}
+          </Link>
+          <Link to="/despensa/adicionar" className="button-primary button-lg">
+            {tr().pantry.add}
+          </Link>
+        </div>
       </header>
       {notice && <p className="notice">{notice}</p>}
 
-      <CookableTeaser householdId={household.householdId} version={version} />
-
       <div className="filter-row">
-        <SearchField value={search} label="Pesquisar na despensa" placeholder="Pesquisar artigo…" onChange={setSearch} />
+        <SearchField value={search} label={tr().pantry.search} placeholder={tr().pantry.searchPlaceholder} onChange={setSearch} />
         <select
           className="category-select"
-          aria-label="Ver"
+          aria-label={tr().pantry.view}
           value={String(view)}
           onChange={(e) => setFilter({ view: e.target.value === "fifo" ? "fifo" : (Number(e.target.value) as PantryState) })}
         >
-          {viewLabels.map(([value, label]) => (
+          {viewLabels().map(([value, label]) => (
             <option key={String(value)} value={String(value)}>
               {label}
             </option>
@@ -185,11 +196,11 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
         </select>
         <select
           className="category-select"
-          aria-label="Local"
+          aria-label={tr().pantry.location}
           value={locationFilter === undefined ? "" : String(locationFilter)}
           onChange={(e) => setFilter({ location: e.target.value === "" ? null : (Number(e.target.value) as PantryLocation) })}
         >
-          <option value="">Todos os locais</option>
+          <option value="">{tr().pantry.allLocations}</option>
           {pantryLocations.map((loc) => (
             <option key={loc} value={loc}>
               {pantryLocationLabels[loc]}
@@ -203,19 +214,19 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
           {error}
         </p>
       )}
-      {loading && <p className="muted loading">A carregar…</p>}
+      {loading && <p className="muted loading">{tr().common.loading}</p>}
 
       {!loading && items.length === 0 && searching ? (
         <p className="empty-state">
-          Nenhum artigo corresponde a “{query}”.{" "}
+          {tr().pantry.noMatch(query)}{" "}
           <button type="button" className="link-button" onClick={() => setSearch("")}>
-            Limpar pesquisa
+            {tr().pantry.clearSearch}
           </button>
         </p>
       ) : !loading && items.length === 0 ? (
         <p className="empty-state">
-          {view === "fifo" ? "A despensa está vazia." : "Nada neste estado."}{" "}
-          {view === "fifo" && <Link to="/despensa/adicionar">Adicionar o primeiro produto</Link>}
+          {view === "fifo" ? tr().pantry.empty : tr().pantry.nothingInState}{" "}
+          {view === "fifo" && <Link to="/despensa/adicionar">{tr().pantry.addFirst}</Link>}
         </p>
       ) : (
         !loading && (
@@ -225,6 +236,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
                 key={item.pantryItemId}
                 item={item}
                 product={products.get(item.productId)}
+                chains={chains}
                 onAct={act}
                 householdId={householdId}
               />
@@ -233,7 +245,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
         )
       )}
 
-      <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={(nextPage) => setFilter({ page: nextPage })} />
+      <Pagination page={page} pageSize={pageSize} total={total} onPageChange={(nextPage) => setFilter({ page: nextPage })} />
     </div>
   );
 }
@@ -241,11 +253,13 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
 function PantryRow({
   item,
   product,
+  chains,
   householdId,
   onAct,
 }: {
   item: PantryItemDto;
   product: ProductDto | undefined;
+  chains: ChainDto[] | null;
   householdId: string;
   onAct: (action: () => Promise<unknown>) => void;
 }) {
@@ -259,6 +273,7 @@ function PantryRow({
   // O que a casa leu na embalagem que comprou ganha ao produto da cadeia.
   const thumb = item.scanned?.imageUrl ?? product?.imageUrl;
   const title = item.scanned?.name ?? product?.name ?? "…";
+  const purchase = describePurchase(item, chains);
 
   async function onScanned(barcode: string) {
     setScan("searching");
@@ -318,6 +333,7 @@ function PantryRow({
             {quantityFormat.format(item.quantity.amount)} {unit} · {pantryStateLabels[item.state]}
             {!live && ` · ${pantryLocationLabels[item.location]}`}
           </span>
+          {purchase && <span className="meal-meta muted">{purchase}</span>}
         </div>
       </div>
       <div className="pantry-expiry">{live && <ExpiryLabel expiresAt={item.expiresAt} />}</div>
@@ -325,7 +341,7 @@ function PantryRow({
         <div className="pantry-actions">
           <select
             className="category-select"
-            aria-label="Local"
+            aria-label={tr().pantry.location}
             value={item.location}
             onChange={(e) => onAct(() => movePantryItem(householdId, item.pantryItemId, Number(e.target.value) as PantryLocation))}
           >
@@ -335,9 +351,19 @@ function PantryRow({
               </option>
             ))}
           </select>
-          {item.state === PantryState.Sealed && (
+          {item.sourceMealId && item.quantity.amount >= 1 && (
+            <button
+              type="button"
+              className="row-action"
+              title={tr().pantry.eatLeftoversHint}
+              onClick={() => onAct(() => eatLeftovers(householdId, item.pantryItemId, mealTypeNow(), 1))}
+            >
+              {tr().pantry.eatLeftovers}
+            </button>
+          )}
+          {item.state === PantryState.Sealed && !item.sourceMealId && (
             <button type="button" className="row-action" onClick={() => onAct(() => openPantryItem(householdId, item.pantryItemId))}>
-              Abrir
+              {tr().pantry.open}
             </button>
           )}
           <button
@@ -346,7 +372,7 @@ function PantryRow({
             aria-expanded={mode === "consume"}
             onClick={() => setMode(mode === "consume" ? null : "consume")}
           >
-            Usar
+            {tr().pantry.use}
           </button>
           <button
             type="button"
@@ -354,7 +380,7 @@ function PantryRow({
             aria-expanded={mode === "scan"}
             onClick={() => (mode === "scan" ? closeScan() : setMode("scan"))}
           >
-            {item.scanned ? "Voltar a ler" : "Ler código"}
+            {item.scanned ? tr().pantry.rescan : tr().pantry.scan}
           </button>
           <button
             type="button"
@@ -362,7 +388,7 @@ function PantryRow({
             aria-expanded={mode === "discard"}
             onClick={() => setMode(mode === "discard" ? null : "discard")}
           >
-            Deitar fora
+            {tr().pantry.throwAway}
           </button>
         </div>
       )}
@@ -372,13 +398,13 @@ function PantryRow({
           <input
             type="text"
             inputMode="decimal"
-            aria-label={`Quantidade usada (${unit})`}
-            placeholder={`Quanto (${unit})`}
+            aria-label={tr().pantry.usedQuantity(unit)}
+            placeholder={tr().pantry.howMuch(unit)}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
           <button type="button" className="button-secondary" onClick={consumePart} disabled={!(Number(amount.replace(",", ".")) > 0)}>
-            Usar esta quantidade
+            {tr().pantry.useThis}
           </button>
           <button
             type="button"
@@ -388,7 +414,7 @@ function PantryRow({
               setMode(null);
             }}
           >
-            Usar tudo
+            {tr().pantry.useAll}
           </button>
         </div>
       )}
@@ -401,7 +427,7 @@ function PantryRow({
             </p>
           )}
           {scan === null && <BarcodeScanner onScan={onScanned} />}
-          {scan === "searching" && <p className="muted loading">A procurar…</p>}
+          {scan === "searching" && <p className="muted loading loading-text"><Busy>{tr().lists2.searching}</Busy></p>}
           {scan !== null && scan !== "searching" && (
             <div className="scan-result">
               {scan.result ? (
@@ -413,13 +439,13 @@ function PantryRow({
                   </div>
                 </>
               ) : (
-                <p className="muted">Não conheço o código {scan.barcode}. Guardo só o código?</p>
+                <p className="muted">{tr().pantry.unknownCode(scan.barcode)}</p>
               )}
               <button type="button" className="button-primary" onClick={() => saveScan(scan)}>
-                Guardar
+                {tr().common.save}
               </button>
               <button type="button" className="button-secondary" onClick={() => setScan(null)}>
-                Ler outro
+                {tr().pantry.scanAnother}
               </button>
             </div>
           )}
@@ -430,7 +456,7 @@ function PantryRow({
         <div className="inline-form pantry-inline">
           <select
             className="category-select"
-            aria-label="Motivo"
+            aria-label={tr().pantry.reason}
             value={reason}
             onChange={(e) => setReason(Number(e.target.value) as DiscardReason)}
           >
@@ -448,10 +474,19 @@ function PantryRow({
               setMode(null);
             }}
           >
-            Deitar fora
+            {tr().pantry.throwAway}
           </button>
         </div>
       )}
     </li>
   );
+}
+
+/** A refeição pela hora local: pequeno-almoço até às 11h, almoço até às 16h, lanche até às 19h, depois jantar. */
+function mealTypeNow(now = new Date()): number {
+  const hour = now.getHours();
+  if (hour < 11) return 0;
+  if (hour < 16) return 1;
+  if (hour < 19) return 3;
+  return 2;
 }

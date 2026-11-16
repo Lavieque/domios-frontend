@@ -3,6 +3,7 @@
 
 import { authedRequest } from "../auth/sessionStore";
 import type { DomainEventLogEntryDto, PagedResult } from "./types";
+import { localized } from "../i18n";
 
 export const MemberRole = {
   Admin: 0,
@@ -12,12 +13,7 @@ export const MemberRole = {
 } as const;
 export type MemberRole = (typeof MemberRole)[keyof typeof MemberRole];
 
-export const memberRoleLabels: Record<MemberRole, string> = {
-  [MemberRole.Admin]: "Administrador",
-  [MemberRole.Adult]: "Adulto",
-  [MemberRole.Child]: "Criança",
-  [MemberRole.Guest]: "Convidado",
-};
+export const memberRoleLabels: Record<MemberRole, string> = localized((t) => t.enums.memberRole);
 
 /** Uma casa vista pelo utilizador: que membro é lá e com que papel. */
 export interface CallerHouseholdDto {
@@ -34,6 +30,8 @@ export interface MemberDto {
   dateOfBirth: string | null;
   dietaryRestrictions: string[];
   userId: string | null;
+  /** Porção habitual: 0,25 a 3,00 (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.2). */
+  defaultPortion?: number;
 }
 
 export interface HouseholdDto {
@@ -43,6 +41,9 @@ export interface HouseholdDto {
   currency: string;
   locale: string;
   members: MemberDto[];
+  /** Valores efetivos, com os por omissão (adenda 2026-11-09 de DomiOS_API_Fase5.md, E.2). */
+  travelCostPerKm?: number;
+  maxStoreDistanceKm?: number;
 }
 
 export interface CreateHouseholdRequest {
@@ -88,6 +89,10 @@ export interface UpdateHouseholdRequest {
   timeZone?: string;
   currency?: string;
   locale?: string;
+  /** 0 a 2 €/km; `null` volta ao valor por omissão. */
+  travelCostPerKm?: number | null;
+  /** 1 a 50 km; `null` volta ao valor por omissão. */
+  maxStoreDistanceKm?: number | null;
 }
 
 export interface AddMemberRequest {
@@ -102,6 +107,8 @@ export interface UpdateMemberRequest {
   name?: string;
   role?: MemberRole;
   dietaryRestrictions?: string[];
+  /** 0,25 a 3,00, até 2 casas decimais. */
+  defaultPortion?: number;
 }
 
 /** Só Admin. Devolve a casa atualizada. */

@@ -1,3 +1,4 @@
+import { dateTimeFormat } from "../i18n/format";
 // Datas do plano como a Api as quer: "YYYY-MM-DD", sem hora nem fuso. As
 // contas fazem-se em UTC para nunca saltar um dia com a mudança de hora.
 
@@ -43,9 +44,9 @@ export function isIsoDate(value: string | null): value is IsoDate {
   return value !== null && /^\d{4}-\d{2}-\d{2}$/.test(value) && format(parse(value)) === value;
 }
 
-const weekdayFormat = new Intl.DateTimeFormat("pt-PT", { weekday: "long", timeZone: "UTC" });
-const shortFormat = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short", timeZone: "UTC" });
-const longFormat = new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const weekdayFormat = dateTimeFormat({ weekday: "long", timeZone: "UTC" });
+const shortFormat = dateTimeFormat({ day: "numeric", month: "short", timeZone: "UTC" });
+const longFormat = dateTimeFormat({ day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
 /** "segunda-feira" */
 export function weekdayName(date: IsoDate): string {

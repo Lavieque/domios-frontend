@@ -3,6 +3,7 @@
 // 2026-11-06, A.1) e só protegem de erros de escrita: nada aqui recomenda um valor.
 
 import type { MemberNutritionGoalsDto, SetNutritionGoalsRequest } from "../api/memberPreferences";
+import { tr } from "../i18n";
 
 export type GoalKey = keyof SetNutritionGoalsRequest;
 
@@ -14,16 +15,32 @@ export interface GoalField {
   max: number;
 }
 
+/** O rótulo e a unidade leem-se na língua atual sempre que são pedidos. */
+function goalField(key: GoalKey, unit: string, per: "day" | "meal", min: number, max: number): GoalField {
+  return {
+    key,
+    min,
+    max,
+    get label() {
+      return tr().ui.goals[key];
+    },
+    get unit() {
+      const goals = tr().ui.goals;
+      return per === "day" ? goals.perDay(unit) : goals.perMeal(unit);
+    },
+  };
+}
+
 export const GOAL_FIELDS: GoalField[] = [
-  { key: "energyKcal", label: "Energia", unit: "kcal por dia", min: 500, max: 10000 },
-  { key: "proteinG", label: "Proteína", unit: "g por dia", min: 1, max: 2000 },
-  { key: "carbsG", label: "Hidratos de carbono", unit: "g por dia", min: 1, max: 2000 },
-  { key: "fatG", label: "Gordura", unit: "g por dia", min: 1, max: 2000 },
-  { key: "fiberG", label: "Fibra", unit: "g por dia", min: 1, max: 2000 },
-  { key: "sugarG", label: "Açúcares (máximo)", unit: "g por dia", min: 1, max: 2000 },
-  { key: "saturatesG", label: "Saturados (máximo)", unit: "g por dia", min: 1, max: 2000 },
-  { key: "saltG", label: "Sal (máximo)", unit: "g por dia", min: 0.1, max: 100 },
-  { key: "maxFatPerMealG", label: "Gordura por refeição (máximo)", unit: "g por refeição", min: 1, max: 500 },
+  goalField("energyKcal", "kcal", "day", 500, 10000),
+  goalField("proteinG", "g", "day", 1, 2000),
+  goalField("carbsG", "g", "day", 1, 2000),
+  goalField("fatG", "g", "day", 1, 2000),
+  goalField("fiberG", "g", "day", 1, 2000),
+  goalField("sugarG", "g", "day", 1, 2000),
+  goalField("saturatesG", "g", "day", 1, 2000),
+  goalField("saltG", "g", "day", 0.1, 100),
+  goalField("maxFatPerMealG", "g", "meal", 1, 500),
 ];
 
 export type GoalValues = Record<GoalKey, string>;
@@ -53,10 +70,10 @@ export function parseGoalValues(values: GoalValues): ParsedGoals {
 
     const number = Number(text);
     if (!Number.isFinite(number)) {
-      return { ok: false, error: `${field.label}: escreve um número.` };
+      return { ok: false, error: tr().ui.goals.notANumber(field.label) };
     }
     if (number < field.min || number > field.max) {
-      return { ok: false, error: `${field.label}: tem de estar entre ${field.min} e ${field.max}.` };
+      return { ok: false, error: tr().ui.goals.outOfRange(field.label, field.min, field.max) };
     }
 
     request[field.key] = Math.round(number * 10) / 10;
@@ -64,7 +81,7 @@ export function parseGoalValues(values: GoalValues): ParsedGoals {
   }
 
   if (filled === 0) {
-    return { ok: false, error: "Preenche pelo menos um valor, ou apaga os objetivos." };
+    return { ok: false, error: tr().ui.goals.fillOne };
   }
   return { ok: true, request };
 }

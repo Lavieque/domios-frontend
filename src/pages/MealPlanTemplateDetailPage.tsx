@@ -1,3 +1,5 @@
+import { Busy } from "../components/Busy";
+import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
@@ -18,11 +20,13 @@ import {
 } from "../api/planning";
 import { dishTypeLabels, mainProteinLabels, RecipeStatus } from "../api/types";
 import { describeError } from "../auth/errors";
+import { MealPhoto } from "../components/MealPhoto";
 import { TemplateDayEditor, type DayRow } from "../components/TemplateDayEditor";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useHouseholds } from "../household/useHouseholds";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekdayName } from "../plan/dates";
 import { withoutNamePrefix } from "../plan/templates";
+import { localized, tr } from "../i18n";
 
 export function MealPlanTemplateDetailPage() {
   const { id } = useParams();
@@ -66,18 +70,18 @@ export function MealPlanTemplateDetailPage() {
     return (
       <div className="page template-page">
         <header className="page-head">
-          <h1>Ementa</h1>
+          <h1>{tr().templateDetail.title}</h1>
         </header>
         <p className="form-error" role="alert">
-          Não deu para abrir esta ementa. {error}
+          {tr().templateDetail.openFailed} {error}
         </p>
         <p className="empty-state">
-          <Link to="/ementas">Voltar às ementas</Link>
+          <Link to="/ementas">{tr().templateDetail.back}</Link>
         </p>
       </div>
     );
   }
-  if (!template) return <p className="muted loading">A carregar…</p>;
+  if (!template) return <PageSkeleton />;
 
   const days = Array.from({ length: template.durationDays }, (_, i) => i + 1);
   // Só uma ementa da própria casa, ainda em rascunho, muda; as outras copiam-se primeiro.
@@ -92,7 +96,7 @@ export function MealPlanTemplateDetailPage() {
     setCopying(true);
     try {
       const copy = await createHouseholdMealPlanTemplate(current.householdId, {
-        name: `${loaded.name} (minha)`.slice(0, 120),
+        name: loaded.name,
         description: loaded.description,
         durationDays: loaded.durationDays,
         servingsBasis: loaded.servingsBasis,
@@ -130,8 +134,8 @@ export function MealPlanTemplateDetailPage() {
     } catch (err) {
       setDayError(
         describeError(err, {
-          "invalid-argument": "A mesma receita está duas vezes na mesma refeição deste dia.",
-          "forbidden-recipe-scope": "Essa receita não pode entrar nesta ementa.",
+          "invalid-argument": tr().templateDetail.duplicate,
+          "forbidden-recipe-scope": tr().templateDetail.forbiddenRecipe,
         }),
       );
     } finally {
@@ -143,38 +147,34 @@ export function MealPlanTemplateDetailPage() {
 
   return (
     <div className="page template-page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <Link to="/ementas" className="back-link">
-          Ementas prontas
+          {tr().templateDetail.crumb}
         </Link>
       </nav>
       <header className="page-head">
         <div>
           <h1>{template.name}</h1>
           <p className="page-head-sub">
-            {template.durationDays} {template.durationDays === 1 ? "dia" : "dias"} · {template.entries.length}{" "}
-            {template.entries.length === 1 ? "refeição" : "refeições"} · {template.servingsBasis}{" "}
-            {template.servingsBasis === 1 ? "dose" : "doses"} por refeição
+            {tr().templateDetail.summary(template.durationDays, template.entries.length, template.servingsBasis)}
           </p>
         </div>
         <a href="#template-apply" className="button-primary button-lg template-jump">
-          Aplicar ao plano
+          {tr().templateDetail.apply}
         </a>
       </header>
       {description && <p className="page-lede template-lede">{description}</p>}
 
       {editable && skippedOnCopy > 0 && (
         <p className="notice">
-          {skippedOnCopy === 1
-            ? "1 receita da ementa original já não está disponível e ficou de fora da cópia."
-            : `${skippedOnCopy} receitas da ementa original já não estão disponíveis e ficaram de fora da cópia.`}
+          {tr().templateDetail.skippedOnCopy(skippedOnCopy)}
         </p>
       )}
 
       <div className="week-layout template-layout">
         {/* Os dias da ementa em linhas, como no plano: o número fica sempre na mesma coluna. */}
         <h2 id="template-days" className="visually-hidden">
-          Dias
+          {tr().templateDetail.days}
         </h2>
         <ol className="week-days" aria-labelledby="template-days">
           {days.map((dayIndex) => {
@@ -183,13 +183,13 @@ export function MealPlanTemplateDetailPage() {
             return (
               <li key={dayIndex} className={isEditing ? "week-day is-editing" : "week-day"}>
                 <div className="week-day-date">
-                  <span className="week-day-weekday template-day-label">Dia</span>
+                  <span className="week-day-weekday template-day-label">{tr().templateDetail.day}</span>
                   <span className="week-day-number">{dayIndex}</span>
                   {editable && !isEditing && (
                     <button
                       type="button"
                       className="link-button template-day-edit"
-                      aria-label={`Editar dia ${dayIndex}`}
+                      aria-label={tr().templateDetail.editDay(dayIndex)}
                       data-edit-day={dayIndex}
                       disabled={editingDay !== null}
                       onClick={() => {
@@ -197,7 +197,7 @@ export function MealPlanTemplateDetailPage() {
                         setEditingDay(dayIndex);
                       }}
                     >
-                      Editar
+                      {tr().templateDetail.edit}
                     </button>
                   )}
                 </div>
@@ -215,11 +215,12 @@ export function MealPlanTemplateDetailPage() {
                     }}
                   />
                 ) : entries.length === 0 ? (
-                  <p className="week-day-empty">Sem refeições.</p>
+                  <p className="week-day-empty">{tr().templateDetail.noMeals}</p>
                 ) : (
                   <ul className="week-day-meals">
                     {entries.map((entry) => (
-                      <li key={entry.mealPlanTemplateEntryId} className="week-meal">
+                      <li key={entry.mealPlanTemplateEntryId} className="week-meal has-photo">
+                        <MealPhoto src={entry.recipeImageUrl} />
                         <span className="week-meal-slot">{mealTypeLabels[entry.mealType]}</span>
                         <span className="week-meal-body">
                           {entry.recipeStatus === RecipeStatus.Published ? (
@@ -234,9 +235,9 @@ export function MealPlanTemplateDetailPage() {
                               entry.dishType !== null ? dishTypeLabels[entry.dishType] : null,
                               entry.mainProtein !== null ? mainProteinLabels[entry.mainProtein] : null,
                               entry.servings !== template.servingsBasis
-                                ? `${entry.servings} ${entry.servings === 1 ? "dose" : "doses"}`
+                                ? tr().templateDetail.servings(entry.servings)
                                 : null,
-                              entry.recipeStatus !== RecipeStatus.Published ? "Já não está disponível" : null,
+                              entry.recipeStatus !== RecipeStatus.Published ? tr().templateDetail.unavailable : null,
                             ]
                               .filter(Boolean)
                               .join(" · ")}
@@ -254,7 +255,7 @@ export function MealPlanTemplateDetailPage() {
         <aside className="week-side template-side">
           <section className="side-block" aria-labelledby="template-apply">
             <div className="side-head">
-              <h2 id="template-apply">Aplicar ao plano</h2>
+              <h2 id="template-apply">{tr().templateDetail.apply}</h2>
             </div>
             <HouseholdGate>{(household) => <ApplyTemplateForm household={household} template={template} />}</HouseholdGate>
           </section>
@@ -262,15 +263,15 @@ export function MealPlanTemplateDetailPage() {
           {current && !editable && (
             <section className="side-block" aria-labelledby="template-copy">
               <div className="side-head">
-                <h2 id="template-copy">Personalizar</h2>
+                <h2 id="template-copy">{tr().templateDetail.customize}</h2>
               </div>
               <p className="side-empty">
                 {template.ownerHouseholdId === current.householdId
-                  ? "Esta ementa já foi publicada e não muda. Faz uma cópia para a editar."
-                  : "Queres trocar receitas? Faz uma cópia desta ementa para a tua casa e edita os dias."}
+                  ? tr().templateDetail.publishedOwn
+                  : tr().templateDetail.copyHint}
               </p>
               <button type="button" className="button-secondary" disabled={copying} onClick={copyToHousehold}>
-                {copying ? "A copiar…" : "Fazer uma cópia para editar"}
+                {copying ? tr().templateDetail.copying : tr().templateDetail.copy}
               </button>
               {copyError && (
                 <p className="form-error" role="alert">
@@ -283,10 +284,10 @@ export function MealPlanTemplateDetailPage() {
           {editable && (
             <section className="side-block" aria-labelledby="template-edit">
               <div className="side-head">
-                <h2 id="template-edit">Editar</h2>
+                <h2 id="template-edit">{tr().templateDetail.edit}</h2>
               </div>
               <p className="side-empty">
-                Esta ementa é da tua casa: carrega em “Editar” num dia para trocar, acrescentar ou tirar receitas.
+                {tr().templateDetail.editHint}
               </p>
             </section>
           )}
@@ -296,11 +297,11 @@ export function MealPlanTemplateDetailPage() {
   );
 }
 
-const policyLabels: Record<ConflictPolicy, string> = {
-  [ConflictPolicy.Skip]: "Manter o que já está planeado",
-  [ConflictPolicy.Replace]: "Substituir o que já está planeado (nunca o que já foi cozinhado)",
-  [ConflictPolicy.Fail]: "Não aplicar se houver refeições ocupadas",
-};
+const policyLabels = localized<Record<ConflictPolicy, string>>((t) => ({
+  [ConflictPolicy.Skip]: t.templateDetail.policySkip,
+  [ConflictPolicy.Replace]: t.templateDetail.policyReplace,
+  [ConflictPolicy.Fail]: t.templateDetail.policyFail,
+}));
 
 function ApplyTemplateForm({ household, template }: { household: CallerHouseholdDto; template: MealPlanTemplateDto }) {
   const navigate = useNavigate();
@@ -317,11 +318,11 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
     event.preventDefault();
     const servingsNumber = Number(servings);
     if (!isIsoDate(startDate)) {
-      setError("Escolhe o primeiro dia.");
+      setError(tr().templateDetail.pickFirstDay);
       return;
     }
     if (!Number.isInteger(servingsNumber) || servingsNumber < 1 || servingsNumber > 50) {
-      setError("As doses têm de ser entre 1 e 50.");
+      setError(tr().templateDetail.servingsRange);
       return;
     }
     setError(null);
@@ -338,7 +339,7 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
       );
     } catch (err) {
       if (err instanceof ApiError && err.type === "plan-conflict") {
-        setError("Já há refeições planeadas nesses dias. Escolhe manter ou substituir.");
+        setError(tr().templateDetail.conflict);
       } else {
         setError(describeError(err));
       }
@@ -352,20 +353,18 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
       <div>
         <p className="notice">
           {result.createdCount === 0
-            ? "Nada foi acrescentado ao plano."
-            : `${result.createdCount} ${result.createdCount === 1 ? "refeição acrescentada" : "refeições acrescentadas"} de ${longDate(result.from)} a ${longDate(result.to)}.`}
+            ? tr().templateDetail.nothingAdded
+            : tr().templateDetail.created(result.createdCount, longDate(result.from), longDate(result.to))}
           {result.removedCount > 0 &&
-            ` ${result.removedCount} ${result.removedCount === 1 ? "refeição substituída" : "refeições substituídas"}.`}
+            tr().templateDetail.removed(result.removedCount)}
           {result.skippedMeals.length > 0 &&
-            ` ${result.skippedMeals.length} ${result.skippedMeals.length === 1 ? "refeição do plano já estava ocupada e ficou" : "refeições do plano já estavam ocupadas e ficaram"} como estava${result.skippedMeals.length === 1 ? "" : "m"}.`}
+            tr().templateDetail.skippedMeals(result.skippedMeals.length)}
           {result.skippedEntries.length > 0 &&
-            (result.skippedEntries.length === 1
-              ? " 1 receita da ementa já não está disponível e foi saltada."
-              : ` ${result.skippedEntries.length} receitas da ementa já não estão disponíveis e foram saltadas.`)}
+            tr().templateDetail.skippedEntries(result.skippedEntries.length)}
         </p>
         {result.restrictionWarnings.length > 0 && (
           <div className="notice notice-warning">
-            <span>Atenção às restrições alimentares:</span>
+            <span>{tr().templateDetail.restrictions}</span>
             <ul className="ingredient-list">
               {result.restrictionWarnings.map((warning) => (
                 <li key={warning.recipeId}>
@@ -382,10 +381,10 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
             className="button-primary"
             onClick={() => navigate(`/plano?semana=${startOfWeek(result.from)}`)}
           >
-            Ver o plano
+            {tr().templateDetail.seePlan}
           </button>
           <button type="button" className="button-secondary" onClick={() => setResult(null)}>
-            Aplicar outra vez
+            {tr().templateDetail.applyAgain}
           </button>
         </div>
       </div>
@@ -395,20 +394,20 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
   return (
     <form className="auth-form apply-form" onSubmit={handleSubmit}>
       <label className="form-field">
-        <span>Primeiro dia</span>
+        <span>{tr().templateDetail.firstDay}</span>
         <input type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         {endDate && (
           <small className="muted">
-            De {weekdayName(startDate)}, {longDate(startDate)}, a {weekdayName(endDate)}, {longDate(endDate)}.
+            {tr().templateDetail.range(weekdayName(startDate), longDate(startDate), weekdayName(endDate), longDate(endDate))}
           </small>
         )}
       </label>
       <label className="form-field">
-        <span>Doses por refeição</span>
+        <span>{tr().templateDetail.servingsPerMeal}</span>
         <input type="number" min={1} max={50} required value={servings} onChange={(e) => setServings(e.target.value)} />
       </label>
       <label className="form-field">
-        <span>Se já houver refeições nesses dias</span>
+        <span>{tr().templateDetail.ifTaken}</span>
         <select
           className="category-select"
           value={policy}
@@ -427,7 +426,7 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
         </p>
       )}
       <button type="submit" className="button-primary" disabled={submitting}>
-        {submitting ? "A aplicar…" : "Aplicar ao plano"}
+        {submitting ? <Busy>{tr().templateDetail.applying}</Busy> : tr().templateDetail.apply}
       </button>
     </form>
   );

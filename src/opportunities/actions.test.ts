@@ -29,8 +29,8 @@ describe("ação de uma oportunidade", () => {
       payload: { shoppingListId: "l1", storeCount: 2, bestStoreId: "s1", savingVsBestStore: 4.2 },
     };
 
-    expect(opportunityAction(goodPrice).to).toBe("/produtos/p1");
-    expect(opportunityAction(split).to).toBe("/listas/l1");
+    expect(opportunityAction(goodPrice)?.to).toBe("/produtos/p1");
+    expect(opportunityAction(split)?.to).toBe("/listas/l1");
   });
 
   it("leva à despensa e ao plano nos tipos sem ecrã próprio", () => {
@@ -45,7 +45,32 @@ describe("ação de uma oportunidade", () => {
       payload: { plannedMealId: "pm1", recipeId: "r1", date: "2026-10-30", missing: [] },
     };
 
-    expect(opportunityAction(expiring).to).toBe("/despensa");
-    expect(opportunityAction(missing).to).toBe("/plano");
+    expect(opportunityAction(expiring)?.to).toBe("/despensa");
+    expect(opportunityAction(missing)?.to).toBe("/plano");
+  });
+
+  it("leva ao produto quando está mais barato do que a casa pagou", () => {
+    const belowLastPaid: OpportunityDto = {
+      ...base,
+      type: OpportunityType.BelowLastPaid,
+      payload: {
+        productId: "p2",
+        storeOfferId: "so2",
+        storeId: "s2",
+        current: 0.99,
+        lastPaid: 1.29,
+        lastPaidAt: "2026-11-02T18:40:00Z",
+        lastPaidChainId: "c1",
+        priceSource: "Typed",
+      },
+    };
+
+    expect(opportunityAction(belowLastPaid)).toEqual({ to: "/produtos/p2", linkLabel: "Ver o produto", doneLabel: "Comprei" });
+  });
+
+  it("não rebenta com um tipo que ainda não conhece", () => {
+    const unknown = { ...base, type: 99, payload: {} } as unknown as OpportunityDto;
+
+    expect(opportunityAction(unknown)).toBeNull();
   });
 });

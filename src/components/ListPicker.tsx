@@ -1,4 +1,5 @@
 import type { ShoppingListSummaryDto } from "../api/shopping";
+import { tr } from "../i18n";
 
 /** "" = criar uma lista nova. */
 export const NEW_LIST = "";
@@ -13,13 +14,13 @@ export function ListPicker({
   onChange: (listId: string) => void;
 }) {
   return (
-    <select className="category-select" aria-label="Lista de compras" value={value} onChange={(e) => onChange(e.target.value)}>
+    <select className="category-select" aria-label={tr().ui.sendToList.listLabel} value={value} onChange={(e) => onChange(e.target.value)}>
       {lists.map((list) => (
         <option key={list.shoppingListId} value={list.shoppingListId}>
-          {list.name} ({list.itemCount - list.purchasedItemCount} por comprar)
+          {tr().ui.sendToList.withPending(list.name, list.itemCount - list.purchasedItemCount)}
         </option>
       ))}
-      <option value={NEW_LIST}>Nova lista</option>
+      <option value={NEW_LIST}>{tr().ui.sendToList.newList}</option>
     </select>
   );
 }

@@ -1,6 +1,8 @@
 import {
   dishTypeNames,
   mainProteinNames,
+  recipeDifficultyNames,
+  type RecipeDifficulty,
   type CategoryDto,
   type ChainDto,
   type CurrentPromotionDto,
@@ -53,8 +55,25 @@ export function getProduct(productId: string): Promise<ProductDto> {
   return get<ProductDto>(`/products/${productId}`);
 }
 
+/** No máximo `MAX_BATCH_PRODUCT_IDS` ids por pedido; os desconhecidos ficam de fora da resposta. */
+export const MAX_BATCH_PRODUCT_IDS = 100;
+
+/** Vários produtos num só pedido (`GET /products/batch?ids=`), pela ordem pedida. */
+export function getProductsBatch(productIds: string[]): Promise<ProductDto[]> {
+  return get<ProductDto[]>("/products/batch", { ids: productIds.join(",") });
+}
+
 export function getProductStoreOffers(productId: string): Promise<ProductStoreOfferDto[]> {
   return get<ProductStoreOfferDto[]>(`/products/${productId}/store-offers`);
+}
+
+/**
+ * As ofertas de vários produtos num pedido (`GET /products/batch/store-offers?ids=`):
+ * uma chave por produto pedido, `[]` para os que não têm ofertas. No máximo
+ * `MAX_BATCH_PRODUCT_IDS` ids.
+ */
+export function getStoreOffersBatch(productIds: string[]): Promise<Record<string, ProductStoreOfferDto[]>> {
+  return get<Record<string, ProductStoreOfferDto[]>>("/products/batch/store-offers", { ids: productIds.join(",") });
 }
 
 export function searchActivePromotions(page = 1, pageSize = 20): Promise<PagedResult<PromotionDto>> {
@@ -64,6 +83,7 @@ export function searchActivePromotions(page = 1, pageSize = 20): Promise<PagedRe
 export interface RecipeFilters {
   dishType?: DishType;
   mainProtein?: MainProtein;
+  difficulty?: RecipeDifficulty;
 }
 
 export function searchRecipes(
@@ -78,6 +98,7 @@ export function searchRecipes(
     pageSize,
     dishType: filters.dishType === undefined ? undefined : dishTypeNames[filters.dishType],
     mainProtein: filters.mainProtein === undefined ? undefined : mainProteinNames[filters.mainProtein],
+    difficulty: filters.difficulty === undefined ? undefined : recipeDifficultyNames[filters.difficulty],
   });
 }
 

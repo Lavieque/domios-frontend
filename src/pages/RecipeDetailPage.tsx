@@ -1,38 +1,48 @@
+import { Busy } from "../components/Busy";
+import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
 import type { PlannedMealDto } from "../api/planning";
-import { addItemsFromRecipe, getShoppingList } from "../api/shopping";
+import {
+  addItemsFromRecipe,
+  createShoppingList,
+  getShoppingList,
+  listShoppingLists,
+  ShoppingListStatus,
+} from "../api/shopping";
 import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
 import { RecipeAvoidedNotice } from "../components/RecipeAvoidedNotice";
 import { SaveRecipeButton } from "../components/SaveRecipeButton";
-import { SendToListForm } from "../components/SendToListForm";
 import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { useHouseholds } from "../household/useHouseholds";
 import { longDate, startOfWeek, today } from "../plan/dates";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
+const quantityFormat = numberFormat({ maximumFractionDigits: 2 });
 
 function sourceHost(url: string): string {
   try {
     return new URL(url).hostname.replace(/^www./, "");
   } catch {
-    return "site de origem";
+    return tr().recipe.sourceSite;
   }
 }
 
 /** "45 min", "1 h", "1 h 20 min". */
 function duration(minutes: number): string {
-  if (minutes < 60) return `${minutes} min`;
+  const t = tr().recipe;
+  if (minutes < 60) return t.minutes(minutes);
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
-  return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
+  return rest === 0 ? t.hours(hours) : t.hoursMinutes(hours, rest);
 }
 
 /** O que se abre por baixo do cabeçalho: um formulário de cada vez. */
-type Task = "plan" | "list" | null;
+type Task = "plan" | null;
 
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +50,10 @@ export function RecipeDetailPage() {
   const { current } = useHouseholds();
   const [recipe, setRecipe] = useState<RecipeDto | null>(null);
   const [added, setAdded] = useState<PlannedMealDto | null>(null);
-  const [onlyMissing, setOnlyMissing] = useState(true);
+  // "Pôr na lista de compras": um clique, o que falta na despensa vai para a lista aberta.
+  const [listResult, setListResult] = useState<{ listId: string; name: string; added: number } | null>(null);
+  const [listBusy, setListBusy] = useState(false);
+  const [listError, setListError] = useState<string | null>(null);
   const [task, setTask] = useState<Task>(null);
   // Riscar ingredientes enquanto se cozinha; não sai deste ecrã.
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
@@ -52,6 +65,8 @@ export function RecipeDetailPage() {
     setRecipe(null);
     setError(null);
     setChecked(new Set());
+    setListResult(null);
+    setListError(null);
     getRecipe(id)
       .then((data) => active && setRecipe(data))
       .catch((err: unknown) => active && setError(describeError(err)));
@@ -65,14 +80,14 @@ export function RecipeDetailPage() {
     return (
       <div className="page recipe-page">
         <p className="form-error" role="alert">
-          Não deu para abrir esta receita. {error}
+          {tr().recipe.openFailed} {error}
         </p>
         <p className="empty-state">
-          <Link to="/receitas">Voltar às receitas</Link>
+          <Link to="/receitas">{tr().recipe.backToRecipes}</Link>
         </p>
       </div>
     );
-  if (!recipe) return <p className="muted loading">A carregar…</p>;
+  if (!recipe) return <PageSkeleton />;
 
   const ingredients = recipe.ingredients.slice().sort((a, b) => a.sortOrder - b.sortOrder);
   const steps = recipe.steps.slice().sort((a, b) => a.stepNumber - b.stepNumber);
@@ -89,6 +104,30 @@ export function RecipeDetailPage() {
     setTask((current) => (current === next ? null : next));
   }
 
+  /**
+   * Acrescenta logo à primeira lista aberta os ingredientes que a despensa não cobre;
+   * sem lista aberta, cria uma. Sem formulário pelo meio.
+   */
+  async function sendMissingToList() {
+    if (!current || !recipe) return;
+    setListBusy(true);
+    setListError(null);
+    setListResult(null);
+    try {
+      const householdId = current.householdId;
+      const open = await listShoppingLists(householdId, ShoppingListStatus.Open, 1, 1);
+      const target = open.items[0] ?? null;
+      const listId = target ? target.shoppingListId : (await createShoppingList(householdId, tr().recipe.defaultListName)).shoppingListId;
+      const before = target ? (await getShoppingList(householdId, listId)).items.length : 0;
+      const list = await addItemsFromRecipe(householdId, listId, recipe.recipeId, true);
+      setListResult({ listId, name: list.name, added: list.items.length - before });
+    } catch (err) {
+      setListError(describeError(err, { "invalid-state-transition": tr().ui.sendToList.listClosed }));
+    } finally {
+      setListBusy(false);
+    }
+  }
+
   function toggleIngredient(ingredientId: string) {
     setChecked((current) => {
       const next = new Set(current);
@@ -100,12 +139,12 @@ export function RecipeDetailPage() {
 
   return (
     <div className="page recipe-page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <button type="button" className="back-link" onClick={() => navigate(-1)}>
-          Voltar
+          {tr().recipe.back}
         </button>
         <span aria-hidden="true">·</span>
-        <Link to="/receitas">Receitas</Link>
+        <Link to="/receitas">{tr().recipe.recipes}</Link>
         {recipe.dishType !== null && (
           <>
             <span aria-hidden="true">/</span>
@@ -119,28 +158,29 @@ export function RecipeDetailPage() {
         <dl className="recipe-facts">
           {totalTime !== null && (
             <div>
-              <dt>Tempo</dt>
+              <dt>{tr().recipe.time}</dt>
               <dd>{duration(totalTime)}</dd>
             </div>
           )}
-          {recipe.prepTimeMinutes !== null && totalTime !== recipe.prepTimeMinutes && (
+          {/* A Api manda 0 quando a fonte não separa os tempos: "0 min" não diz nada. */}
+          {recipe.prepTimeMinutes !== null && recipe.prepTimeMinutes > 0 && totalTime !== recipe.prepTimeMinutes && (
             <div>
-              <dt>Preparação</dt>
+              <dt>{tr().recipe.prep}</dt>
               <dd>{duration(recipe.prepTimeMinutes)}</dd>
             </div>
           )}
-          {recipe.cookTimeMinutes !== null && totalTime !== recipe.cookTimeMinutes && (
+          {recipe.cookTimeMinutes !== null && recipe.cookTimeMinutes > 0 && totalTime !== recipe.cookTimeMinutes && (
             <div>
-              <dt>Cozedura</dt>
+              <dt>{tr().recipe.cook}</dt>
               <dd>{duration(recipe.cookTimeMinutes)}</dd>
             </div>
           )}
           <div>
-            <dt>Porções</dt>
+            <dt>{tr().recipe.servings}</dt>
             <dd>{recipe.servings}</dd>
           </div>
           <div>
-            <dt>Dificuldade</dt>
+            <dt>{tr().recipe.difficulty}</dt>
             <dd>{recipeDifficultyLabels[recipe.difficulty]}</dd>
           </div>
         </dl>
@@ -166,27 +206,41 @@ export function RecipeDetailPage() {
               aria-controls="recipe-task"
               onClick={() => toggleTask("plan")}
             >
-              Adicionar ao plano
+              {tr().recipe.addToPlan}
             </button>
-            <button
-              type="button"
-              className="button-secondary button-lg"
-              aria-expanded={task === "list"}
-              aria-controls="recipe-task"
-              onClick={() => toggleTask("list")}
-            >
-              Pôr na lista de compras
-            </button>
+            {current ? (
+              <button type="button" className="button-secondary button-lg" onClick={sendMissingToList} disabled={listBusy}>
+                {listBusy ? <Busy>{tr().recipe.sending}</Busy> : tr().recipe.sendToList}
+              </button>
+            ) : (
+              <Link to="/casa/nova" className="button-secondary button-lg">
+                {tr().recipe.sendToList}
+              </Link>
+            )}
             {/* Sem casa não há onde guardar: o botão simplesmente não aparece. */}
             {current && <SaveRecipeButton householdId={current.householdId} recipeId={recipe.recipeId} />}
           </div>
+
+          {listResult && (
+            <p className="notice inline-notice" role="status">
+              {listResult.added === 0
+                ? tr().recipe.nothingToAdd(listResult.name)
+                : tr().recipe.added(listResult.added, listResult.name)}{" "}
+              <Link to={`/listas/${listResult.listId}`}>{tr().ui.sendToList.seeList}</Link>
+            </p>
+          )}
+          {listError && (
+            <p className="form-error" role="alert">
+              {listError}
+            </p>
+          )}
 
           {(recipe.tags.length > 0 || recipe.sourceUrl) && (
             <p className="recipe-source">
               {recipe.tags.length > 0 && <span className="recipe-tags">{recipe.tags.join(", ")}</span>}
               {recipe.sourceUrl && (
                 <a href={recipe.sourceUrl} target="_blank" rel="noreferrer">
-                  Receita original em {sourceHost(recipe.sourceUrl)}
+                  {tr().recipe.original(sourceHost(recipe.sourceUrl))}
                 </a>
               )}
             </p>
@@ -201,11 +255,12 @@ export function RecipeDetailPage() {
         <section id="recipe-task" className="panel recipe-task">
           {task === "plan" ? (
             <>
-              <h2>Adicionar ao plano</h2>
+              <h2>{tr().recipe.addToPlan}</h2>
               <HouseholdGate
                 withoutHousehold={
                   <p className="muted">
-                    Para planear refeições, <Link to="/casa/nova">cria primeiro a tua casa</Link>.
+                    {tr().recipe.needHousehold.before} <Link to="/casa/nova">{tr().recipe.needHousehold.link}</Link>
+                    {tr().recipe.needHousehold.after}
                   </p>
                 }
               >
@@ -219,57 +274,28 @@ export function RecipeDetailPage() {
                     />
                     {added && (
                       <p className="notice">
-                        Adicionada a {longDate(added.date)}.{" "}
-                        <Link to={`/plano?semana=${startOfWeek(added.date)}`}>Ver o plano dessa semana</Link>
+                        {tr().recipe.addedOn(longDate(added.date))}{" "}
+                        <Link to={`/plano?semana=${startOfWeek(added.date)}`}>{tr().recipe.seeWeek}</Link>
                       </p>
                     )}
                   </>
                 )}
               </HouseholdGate>
             </>
-          ) : (
-            <>
-              <h2>Pôr na lista de compras</h2>
-              <HouseholdGate
-                withoutHousehold={
-                  <p className="muted">
-                    Para ter listas de compras, <Link to="/casa/nova">cria primeiro a tua casa</Link>.
-                  </p>
-                }
-              >
-                {(household) => (
-                  <SendToListForm
-                    householdId={household.householdId}
-                    newListName={recipe.title}
-                    submitLabel="Acrescentar ingredientes"
-                    send={async (listId) => {
-                      const before = await getShoppingList(household.householdId, listId);
-                      const list = await addItemsFromRecipe(household.householdId, listId, recipe.recipeId, onlyMissing);
-                      return { list, added: list.items.length - before.items.length };
-                    }}
-                  >
-                    <label className="checkbox-field">
-                      <input type="checkbox" checked={onlyMissing} onChange={(e) => setOnlyMissing(e.target.checked)} />
-                      Só o que não há na despensa
-                    </label>
-                  </SendToListForm>
-                )}
-              </HouseholdGate>
-            </>
-          )}
+          ) : null}
         </section>
       )}
 
       <div className="recipe-body">
         <section className="panel recipe-ingredients" aria-labelledby="recipe-ingredients-title">
           <div className="recipe-section-head">
-            <h2 id="recipe-ingredients-title">Ingredientes</h2>
+            <h2 id="recipe-ingredients-title">{tr().recipe.ingredients}</h2>
             <span className="muted">
-              {recipe.servings === 1 ? "1 porção" : `${recipe.servings} porções`}
+              {tr().recipe.portions(recipe.servings)}
             </span>
           </div>
           {ingredients.length === 0 ? (
-            <p className="muted">Sem ingredientes registados.</p>
+            <p className="muted">{tr().recipe.noIngredients}</p>
           ) : (
             <ul className="ingredient-checklist">
               {ingredients.map((ingredient) => {
@@ -281,7 +307,7 @@ export function RecipeDetailPage() {
                       {/* notes é a linha original da receita, quando a Api a guardou: substitui o resto. */}
                       <span className="ingredient-name">
                         {ingredient.notes ?? ingredient.ingredientName}
-                        {ingredient.isOptional && <span className="muted"> (opcional)</span>}
+                        {ingredient.isOptional && <span className="muted">{tr().recipe.optional}</span>}
                       </span>
                       {!ingredient.notes && (
                         <span className="qty">
@@ -296,18 +322,18 @@ export function RecipeDetailPage() {
           )}
           {checked.size > 0 && (
             <button type="button" className="link-button" onClick={() => setChecked(new Set())}>
-              Desmarcar todos
+              {tr().recipe.uncheckAll}
             </button>
           )}
         </section>
 
         <section className="panel recipe-method" aria-labelledby="recipe-method-title">
           <div className="recipe-section-head">
-            <h2 id="recipe-method-title">Preparação</h2>
-            {steps.length > 0 && <span className="muted">{steps.length === 1 ? "1 passo" : `${steps.length} passos`}</span>}
+            <h2 id="recipe-method-title">{tr().recipe.method}</h2>
+            {steps.length > 0 && <span className="muted">{tr().recipe.steps(steps.length)}</span>}
           </div>
           {steps.length === 0 ? (
-            <p className="muted">Sem passos registados.</p>
+            <p className="muted">{tr().recipe.noSteps}</p>
           ) : (
             <ol className="step-list">
               {steps.map((step) => (

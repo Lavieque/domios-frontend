@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { admin, type AdminUser } from "../api";
-import { ConfirmAction, PageHead, Pager, State } from "../components";
+import { Avatar, ConfirmAction, PageHead, Pager, State } from "../components";
 import { dateTime, useLoad } from "../hooks";
 
 export function UsersPage({ selfId }: { selfId: string }) {
@@ -52,6 +52,7 @@ function UserRow({ user: u, isSelf, onChanged }: { user: AdminUser; isSelf: bool
   };
   return (
     <li className="row">
+      <Avatar name={u.email} />
       <div className="row-main">
         <div className="row-title">
           <strong>{u.email}</strong>

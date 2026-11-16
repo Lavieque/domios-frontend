@@ -4,7 +4,9 @@
 
 import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
+import type { PaidPriceSource } from "./shopping";
 import type { MeasurementUnit, MoneyDto, PagedResult } from "./types";
+import { localized } from "../i18n";
 
 export const PantryLocation = {
   Pantry: 0,
@@ -14,12 +16,7 @@ export const PantryLocation = {
 } as const;
 export type PantryLocation = (typeof PantryLocation)[keyof typeof PantryLocation];
 
-export const pantryLocationLabels: Record<PantryLocation, string> = {
-  [PantryLocation.Pantry]: "Despensa",
-  [PantryLocation.Fridge]: "Frigorífico",
-  [PantryLocation.Freezer]: "Congelador",
-  [PantryLocation.Cabinet]: "Armário",
-};
+export const pantryLocationLabels: Record<PantryLocation, string> = localized((t) => t.enums.pantryLocation);
 
 export const pantryLocations: PantryLocation[] = [
   PantryLocation.Pantry,
@@ -37,13 +34,7 @@ export const PantryState = {
 } as const;
 export type PantryState = (typeof PantryState)[keyof typeof PantryState];
 
-export const pantryStateLabels: Record<PantryState, string> = {
-  [PantryState.Sealed]: "Fechado",
-  [PantryState.Open]: "Aberto",
-  [PantryState.Frozen]: "Congelado",
-  [PantryState.Consumed]: "Consumido",
-  [PantryState.Discarded]: "Deitado fora",
-};
+export const pantryStateLabels: Record<PantryState, string> = localized((t) => t.enums.pantryState);
 
 /** Os nomes que a query string aceita (`state=`, `location=`). */
 const stateNames: Record<PantryState, string> = {
@@ -68,12 +59,7 @@ export const DiscardReason = {
 } as const;
 export type DiscardReason = (typeof DiscardReason)[keyof typeof DiscardReason];
 
-export const discardReasonLabels: Record<DiscardReason, string> = {
-  [DiscardReason.Expired]: "Passou da validade",
-  [DiscardReason.Spoiled]: "Estragou-se",
-  [DiscardReason.Mistake]: "Registado por engano",
-  [DiscardReason.Other]: "Outro motivo",
-};
+export const discardReasonLabels: Record<DiscardReason, string> = localized((t) => t.enums.discardReason);
 
 export interface QuantityDto {
   amount: number;
@@ -95,6 +81,14 @@ export interface PantryItemDto {
   confidence: number;
   /** O que a casa leu na embalagem que comprou; independente do produto de qualquer cadeia. */
   scanned: ScannedProductDto | null;
+  /** Sobras de uma refeição (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.3). */
+  sourceMealId?: string | null;
+  /** Onde foi comprado e de onde vem o preço (adenda 2026-11-09 de DomiOS_API_Fase1.md). */
+  purchasedChainId?: string | null;
+  purchasedPhysicalStoreId?: string | null;
+  /** Nome da loja física (adenda 2026-11-13 (c)); a Api antiga não o manda. */
+  purchasedPhysicalStoreName?: string | null;
+  purchasedPriceSource?: PaidPriceSource | null;
 }
 
 export interface ScannedProductDto {
@@ -127,6 +121,8 @@ export interface AddPantryItemRequest {
   purchasedAt: string;
   expiresAt: IsoDate | null;
   purchasedPrice: MoneyDto | null;
+  /** Cadeia onde foi comprado; só cadeias `Active` (outra dá 404). */
+  chainId?: string | null;
 }
 
 /** Um item do pedido em lote: um produto ou, sem produto, um ingrediente (entra pelo produto genérico dele). */
@@ -137,6 +133,7 @@ export interface AddPantryItemsBatchItem {
   location: PantryLocation;
   expiresAt: IsoDate | null;
   purchasedPrice: MoneyDto | null;
+  chainId?: string | null;
 }
 
 const base = (householdId: string) => `/households/${householdId}/pantry-items`;
@@ -198,4 +195,46 @@ export function scanPantryItem(
     method: "PATCH",
     body: { location: null, quantity: null, scanned, expiresAt: expiresAt ?? null },
   });
+}
+
+// --- Sobras e desperdício (DomiOS_API_Fase4.md, adenda 2026-11-09, D.3 e D.5) ---
+
+/** Come `servings` doses de um item de sobras: regista a refeição com a nutrição da de origem. */
+export function eatLeftovers(householdId: string, pantryItemId: string, mealType: number, servings = 1): Promise<unknown> {
+  return authedRequest<unknown>(`/households/${householdId}/meals/from-leftovers`, {
+    method: "POST",
+    body: { pantryItemId, mealType, servings, eatenAt: null, participantMemberIds: [], notes: null },
+  });
+}
+
+export interface PantryWasteItemDto {
+  pantryItemId: string;
+  productId: string;
+  /** null: the product is no longer in the catalog. */
+  productName: string | null;
+  /** O que restava quando foi deitado fora. */
+  quantity: QuantityDto;
+  reason: DiscardReason | null;
+  discardedAt: string;
+  estimatedValue: MoneyDto | null;
+}
+
+/** `Mistake` fica fora das contas e do valor; aparece em `byReason` e `items`. */
+export interface PantryWasteDto {
+  from: string;
+  to: string;
+  discardedItemCount: number;
+  consumedItemCount: number;
+  /** null sem consumidos nem descartados. */
+  wastePercent: number | null;
+  estimatedValue: MoneyDto | null;
+  valuedItemCount: number;
+  byReason: { reason: DiscardReason | null; itemCount: number; estimatedValue: MoneyDto | null }[];
+  byCategory: { categoryId: string | null; /** null: no category. */ name: string | null; itemCount: number; estimatedValue: MoneyDto | null }[];
+  items: PantryWasteItemDto[];
+}
+
+/** `from`/`to` yyyy-MM-dd no fuso da casa, ambos incluídos, até 366 dias. */
+export function getPantryWaste(householdId: string, from: string, to: string): Promise<PantryWasteDto> {
+  return authedRequest<PantryWasteDto>(`/households/${householdId}/pantry/waste`, { params: { from, to } });
 }

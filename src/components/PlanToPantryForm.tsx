@@ -1,11 +1,14 @@
+import { Busy } from "./Busy";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { addPantryItemsBatch, PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
 import type { PlanAvailabilityLineDto } from "../api/planning";
 import { measurementUnitLabels } from "../api/types";
 import { describeError } from "../auth/errors";
+import { numberFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
-const quantityFormat = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 });
+const quantityFormat = numberFormat({ maximumFractionDigits: 1 });
 
 interface Props {
   householdId: string;
@@ -66,9 +69,9 @@ export function PlanToPantryForm({ householdId, lines, onDone }: Props) {
 
   return (
     <details className="have-it-already">
-      <summary>Já tenho alguns destes</summary>
+      <summary>{tr().ui.planToPantry.summary}</summary>
       <form onSubmit={handleSubmit}>
-        <p className="muted">Marca o que já está em casa. Entra na despensa com a quantidade que falta, e deixa de aparecer aqui.</p>
+        <p className="muted">{tr().ui.planToPantry.intro}</p>
         <ul className="ingredient-list">
           {usable.map((line) => (
             <li key={line.ingredientId}>
@@ -85,7 +88,7 @@ export function PlanToPantryForm({ householdId, lines, onDone }: Props) {
           ))}
         </ul>
         <div className="inline-form">
-          <select className="category-select" aria-label="Onde ficam" value={location} onChange={(e) => setLocation(Number(e.target.value) as PantryLocation)}>
+          <select className="category-select" aria-label={tr().ui.planToPantry.where} value={location} onChange={(e) => setLocation(Number(e.target.value) as PantryLocation)}>
             {pantryLocations.map((loc) => (
               <option key={loc} value={loc}>
                 {pantryLocationLabels[loc]}
@@ -93,7 +96,7 @@ export function PlanToPantryForm({ householdId, lines, onDone }: Props) {
             ))}
           </select>
           <button type="submit" className="button-secondary" disabled={submitting || chosen.length === 0}>
-            {submitting ? "A guardar…" : `Pôr ${chosen.length} na despensa`}
+            {submitting ? <Busy>{tr().common.saving}</Busy> : tr().ui.planToPantry.put(chosen.length)}
           </button>
         </div>
         {error && (
@@ -103,7 +106,7 @@ export function PlanToPantryForm({ householdId, lines, onDone }: Props) {
         )}
         {done !== null && (
           <p className="notice inline-notice">
-            {done === 1 ? "1 item entrou" : `${done} itens entraram`} na <Link to="/despensa">despensa</Link>.
+            {tr().ui.planToPantry.entered(done)} {tr().ui.planToPantry.inThe} <Link to="/despensa">{tr().ui.planToPantry.pantry}</Link>.
           </p>
         )}
       </form>

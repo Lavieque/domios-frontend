@@ -6,6 +6,7 @@ import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
 import type { PantryLocation, QuantityDto } from "./pantry";
 import type { MeasurementUnit, PagedResult } from "./types";
+import { localized } from "../i18n";
 
 export const ShoppingListStatus = {
   Open: 0,
@@ -14,11 +15,7 @@ export const ShoppingListStatus = {
 } as const;
 export type ShoppingListStatus = (typeof ShoppingListStatus)[keyof typeof ShoppingListStatus];
 
-export const shoppingListStatusLabels: Record<ShoppingListStatus, string> = {
-  [ShoppingListStatus.Open]: "Aberta",
-  [ShoppingListStatus.Completed]: "Concluída",
-  [ShoppingListStatus.Cancelled]: "Cancelada",
-};
+export const shoppingListStatusLabels: Record<ShoppingListStatus, string> = localized((t) => t.enums.shoppingListStatus);
 
 const statusNames: Record<ShoppingListStatus, string> = {
   [ShoppingListStatus.Open]: "Open",
@@ -45,7 +42,39 @@ export interface ShoppingListItemDto {
   purchasedAt: string | null;
   /** Quando foi para a despensa; null se ainda não foi. */
   storedInPantryAt: string | null;
+  /** Exceção da linha; null segue a loja da lista (adenda 2026-11-09). */
+  chainId?: string | null;
+  physicalStoreId?: string | null;
+  /** A da linha, senão a da lista. */
+  effectiveChainId?: string | null;
+  effectivePhysicalStoreId?: string | null;
+  /** Total da linha; só nas compradas. */
+  paidPrice?: MoneyDto | null;
+  paidPriceSource?: PaidPriceSource | null;
+  /** Nome da loja física efetiva (adenda 2026-11-12). */
+  physicalStoreName?: string | null;
+  /** O plano da linha, fixo desde a escolha; null sem plano. */
+  plannedChainId?: string | null;
+  plannedPhysicalStoreId?: string | null;
+  plannedPhysicalStoreName?: string | null;
+  plannedPrice?: MoneyDto | null;
+  /** Comprada na cadeia planeada; null por comprar ou sem plano. */
+  followedPlan?: boolean | null;
+  /** Pago menos planeado. */
+  priceDifference?: MoneyDto | null;
 }
+
+export interface MoneyDto {
+  amount: number;
+  currency: string;
+}
+
+/** Escrito pelo membro, ou o preço da prateleira na data da compra. */
+export const PaidPriceSource = {
+  Typed: "Typed",
+  Offer: "Offer",
+} as const;
+export type PaidPriceSource = (typeof PaidPriceSource)[keyof typeof PaidPriceSource];
 
 export interface ShoppingListDto {
   shoppingListId: string;
@@ -57,6 +86,35 @@ export interface ShoppingListDto {
   completedAt: string | null;
   /** Por ordem de criação. */
   items: ShoppingListItemDto[];
+  /** Onde se compra a lista (adenda 2026-11-09). */
+  chainId?: string | null;
+  physicalStoreId?: string | null;
+  physicalStoreName?: string | null;
+  /** O plano e como correu (adenda 2026-11-12); null sem plano. */
+  plan?: ShoppingPlanDto | null;
+}
+
+/** Os totais somam só as compradas com plano e os dois preços. */
+export interface ShoppingPlanDto {
+  plannedAt: string;
+  chainId: string;
+  chainName: string | null;
+  physicalStoreId: string | null;
+  physicalStoreName: string | null;
+  travelCost: MoneyDto | null;
+  plannedTotal: number;
+  paidTotal: number;
+  boughtAsPlanned: number;
+  boughtElsewhere: number;
+  notBought: number;
+  outsidePlan: number;
+}
+
+export interface SetShoppingPlanRequest {
+  list: { chainId: string; physicalStoreId: string | null };
+  /** Só as linhas por comprar noutra loja que não a da lista. */
+  items: { itemId: string; chainId: string; physicalStoreId: string | null }[];
+  travelCost: number | null;
 }
 
 export interface AddItemRequest {
@@ -125,9 +183,17 @@ export function deleteShoppingListItem(householdId: string, listId: string, item
   return authedRequest<void>(`${listPath(householdId, listId)}/items/${itemId}`, { method: "DELETE" });
 }
 
-export function setItemPurchased(householdId: string, listId: string, itemId: string, purchased: boolean): Promise<void> {
+/** `boughtAt`: "comprei noutro sítio" — a compra da linha vai para essa cadeia; o plano fica. */
+export function setItemPurchased(
+  householdId: string,
+  listId: string,
+  itemId: string,
+  purchased: boolean,
+  boughtAt?: { chainId: string; physicalStoreId: string | null },
+): Promise<void> {
   return authedRequest<void>(`${listPath(householdId, listId)}/items/${itemId}/${purchased ? "purchase" : "unpurchase"}`, {
     method: "POST",
+    ...(purchased && boughtAt ? { body: boughtAt } : {}),
   });
 }
 
@@ -142,6 +208,48 @@ export function cancelShoppingList(householdId: string, listId: string): Promise
 /** Ordem à mão: todos os itens da lista, pela ordem nova. */
 export function reorderShoppingListItems(householdId: string, listId: string, itemIds: string[]): Promise<void> {
   return authedRequest<void>(`${listPath(householdId, listId)}/items/order`, { method: "PUT", body: { itemIds } });
+}
+
+// --- Loja e preço da compra (DomiOS_API_Fase1.md, adenda 2026-11-09) ---
+
+/** `chainId: null` limpa. Recalcula os preços da prateleira das linhas compradas. A loja física tem de ser da cadeia. */
+export function setShoppingListStore(householdId: string, listId: string, chainId: string | null, physicalStoreId: string | null = null): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/store`, {
+    method: "PUT",
+    body: { chainId, physicalStoreId },
+  });
+}
+
+/** Grava o plano escolhido na comparação; a Api calcula o preço planeado de cada linha (adenda 2026-11-12). */
+export function setShoppingPlan(householdId: string, listId: string, plan: SetShoppingPlanRequest): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/plan`, { method: "PUT", body: plan });
+}
+
+/** Apaga o plano das linhas por comprar; a compra fica como está. */
+export function clearShoppingPlan(householdId: string, listId: string): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/plan`, { method: "DELETE" });
+}
+
+/** Exceção de uma linha; `null` volta à loja da lista. */
+export function setShoppingListItemStore(
+  householdId: string,
+  listId: string,
+  itemId: string,
+  chainId: string | null,
+  physicalStoreId: string | null = null,
+): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/items/${itemId}/store`, {
+    method: "PUT",
+    body: { chainId, physicalStoreId },
+  });
+}
+
+/** Total pago pela linha, em EUR; `null` apaga o escrito e volta ao preço da prateleira. */
+export function setShoppingListItemPaidPrice(householdId: string, listId: string, itemId: string, amount: number | null): Promise<ShoppingListDto> {
+  return authedRequest<ShoppingListDto>(`${listPath(householdId, listId)}/items/${itemId}/paid-price`, {
+    method: "PUT",
+    body: { amount },
+  });
 }
 
 export function reopenShoppingList(householdId: string, listId: string): Promise<void> {
@@ -254,6 +362,47 @@ export interface StoreComparisonStoreDto {
   cardTotal: number;
   missingItemIds: string[];
   items: StoreComparisonItemDto[];
+  /** Só com a deslocação pedida (adenda 2026-11-09, E.4); `null` sem loja física da cadeia no raio. */
+  nearestStore?: NearestStoreDto | null;
+  /** Ida e volta, em EUR; os totais sem deslocação continuam em `total`/`cardTotal`. */
+  travelCost?: number | null;
+  totalWithTravel?: number | null;
+  cardTotalWithTravel?: number | null;
+}
+
+export interface NearestStoreDto {
+  physicalStoreId: string;
+  name: string;
+  address: string | null;
+  roadKm: number;
+  roundTripKm: number;
+  openingHours: string | null;
+}
+
+/** A divisão escolhida com a deslocação contada: pode ter menos lojas do que `split`. */
+export interface SplitWithTravelDto {
+  coveredItemCount: number;
+  storeCount: number;
+  total: number;
+  cardTotal: number;
+  bestStoreId: string | null;
+  savingVsBestStore: number;
+  cardSavingVsBestStore: number;
+  items: { itemId: string; itemIds: string[]; storeId: string; productId: string; lineTotal: number }[];
+  /** Lojas físicas pela ordem do percurso. */
+  route: string[];
+  routeKm: number;
+  travelCost: number;
+  totalWithTravel: number;
+  cardTotalWithTravel: number;
+}
+
+export interface TravelInfoDto {
+  status: "Included" | "NoStoresInRange";
+  origin: { latitude: number; longitude: number };
+  costPerKm: number;
+  roadFactor: number;
+  radiusKm: number;
 }
 
 export interface StoreComparisonDto {
@@ -274,6 +423,9 @@ export interface StoreComparisonDto {
     cardSavingVsBestStore: number;
     items: { itemId: string; itemIds: string[]; storeId: string; productId: string; lineTotal: number }[];
   };
+  /** Só com a deslocação pedida; `null` sem nenhuma loja no raio com artigos. */
+  splitWithTravel?: SplitWithTravelDto | null;
+  travel?: TravelInfoDto;
 }
 
 export interface MissingConversionDto {
@@ -302,6 +454,13 @@ export function fillIngredientConversion(
   });
 }
 
-export function getStoreComparison(householdId: string, listId: string): Promise<StoreComparisonDto> {
-  return authedRequest<StoreComparisonDto>(`${listPath(householdId, listId)}/store-comparison`);
+/** Com `origin` (posição do dispositivo, não guardada), conta a ida às lojas físicas mais perto. */
+export function getStoreComparison(
+  householdId: string,
+  listId: string,
+  origin?: { latitude: number; longitude: number },
+): Promise<StoreComparisonDto> {
+  return authedRequest<StoreComparisonDto>(`${listPath(householdId, listId)}/store-comparison`, {
+    params: origin ? { lat: origin.latitude, lng: origin.longitude, includeTravel: true } : {},
+  });
 }

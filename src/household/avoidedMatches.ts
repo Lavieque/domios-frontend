@@ -3,6 +3,7 @@
 // porque a lista é do membro e a receita pode ter o que ele ainda não marcou.
 
 import type { AvoidedMatchDto, RecipeRestrictionsDto } from "../api/memberPreferences";
+import { localized, tr } from "../i18n";
 
 export interface MemberAvoidedSummary {
   memberId: string;
@@ -22,4 +23,39 @@ export function summarizeAvoided(restrictions: RecipeRestrictionsDto): MemberAvo
       optional: member.avoided?.optionalMatches ?? [],
     }))
     .filter((member) => member.required.length > 0 || member.optional.length > 0);
+}
+
+/** Dietas que a Api verifica (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.1), pelo nome da restrição. */
+export const dietLabels: Record<string, string> = localized((t) => t.enums.diet);
+
+export interface MemberDietConflict {
+  memberId: string;
+  name: string;
+  diet: string;
+  /** O que quebra a dieta: "Frango (Carne e Aves)", "proteína principal: carne". */
+  reasons: string[];
+}
+
+/** Só as dietas em `Conflict`; `Unverifiable` e `NoKnownConflict` não avisam. */
+export function summarizeDietConflicts(restrictions: RecipeRestrictionsDto): MemberDietConflict[] {
+  return restrictions.members.flatMap((member) =>
+    (member.restrictions ?? [])
+      .filter((r) => r.restriction in dietLabels && r.result === 0)
+      .map((r) => ({
+        memberId: member.memberId,
+        name: member.name,
+        diet: dietLabels[r.restriction],
+        reasons: [
+          ...(r.conflictingMainProtein != null
+            ? [tr().enums.mainProteinReason(mainProteinInline(r.conflictingMainProtein))]
+            : []),
+          ...r.conflictingIngredients.map((i) => (i.source === "Name" ? i.name : `${i.name} (${i.allergen})`)),
+        ],
+      })),
+  );
+}
+
+function mainProteinInline(protein: number): string {
+  const names: Record<number, string> = tr().enums.mainProteinInline;
+  return names[protein] ?? tr().enums.otherProteinInline;
 }

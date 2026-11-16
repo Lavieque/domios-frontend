@@ -10,6 +10,8 @@ import {
   type PriceInsightDto,
 } from "../api/types";
 import { formatPercent, money, priceDigits } from "../catalog/offers";
+import { dateTimeFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
 /**
  * Uma linha com preço (produto, oferta, promoção, loja): o nome à esquerda, a foto
@@ -54,11 +56,11 @@ export function ShelfLabel({
 
 /** O preço na etiqueta amarela do almanaque: "0,89 €". `from` antepõe "desde". */
 export function LabelPrice({ amount, from = false }: { amount: number | null | undefined; from?: boolean }) {
-  if (amount === undefined) return <div className="label-price is-empty loading">A ler preços…</div>;
-  if (amount === null) return <div className="label-price is-empty">Sem preço observado</div>;
+  if (amount === undefined) return <div className="label-price is-empty loading">{tr().ui.price.reading}</div>;
+  if (amount === null) return <div className="label-price is-empty">{tr().ui.price.noPrice}</div>;
   return (
-    <div className="label-price" aria-label={`${from ? "desde " : ""}${money.format(amount)}`}>
-      {from && <span className="label-price-from">desde</span>}
+    <div className="label-price" aria-label={`${from ? `${tr().ui.price.from} ` : ""}${money.format(amount)}`}>
+      {from && <span className="label-price-from">{tr().ui.price.from}</span>}
       <span className="price-tag">
         {priceDigits(amount)}
         <small> €</small>
@@ -99,13 +101,13 @@ export function VerdictBand({
   if (!insight || insight.label === PriceLabel.InsufficientHistory) {
     return (
       <span className="price-verdict is-quiet">
-        {insight ? priceLabelLabels[insight.label] : "Sem histórico de preços"}
+        {insight ? priceLabelLabels[insight.label] : tr().ui.price.noHistory}
       </span>
     );
   }
   const days = insight.windowDays;
   const text =
-    insight.label === PriceLabel.HistoricLow ? `Mínimo dos últimos ${days} dias` : priceLabelLabels[insight.label];
+    insight.label === PriceLabel.HistoricLow ? tr().ui.price.lowestInDays(days) : priceLabelLabels[insight.label];
   return (
     <span className={`price-verdict${insight.label === PriceLabel.HistoricLow ? " is-strong" : ""}`}>
       <span className="price-scale" aria-hidden="true">
@@ -126,24 +128,24 @@ export function PriceRange({ insight }: { insight: PriceInsightDto }) {
   return (
     <div
       className="price-range"
-      aria-label={`Entre ${money.format(lowest)} e ${money.format(highest)} nos últimos ${insight.windowDays} dias`}
+      aria-label={tr().ui.price.rangeLabel(money.format(lowest), money.format(highest), insight.windowDays)}
     >
       <div className="price-range-track">
         {average !== null && (
-          <span className="price-range-avg" style={{ left: at(average) }} title={`Média ${money.format(average)}`} />
+          <span className="price-range-avg" style={{ left: at(average) }} title={tr().ui.price.average(money.format(average))} />
         )}
-        <span className="price-range-now" style={{ left: at(current) }} title={`Agora ${money.format(current)}`} />
+        <span className="price-range-now" style={{ left: at(current) }} title={tr().ui.price.now(money.format(current))} />
       </div>
       <div className="price-range-legend">
-        <span>mín {money.format(lowest)}</span>
-        {average !== null && <span>média {money.format(average)}</span>}
-        <span>máx {money.format(highest)}</span>
+        <span>{tr().ui.price.min} {money.format(lowest)}</span>
+        {average !== null && <span>{tr().ui.price.avg} {money.format(average)}</span>}
+        <span>{tr().ui.price.max} {money.format(highest)}</span>
       </div>
     </div>
   );
 }
 
-const dateFormat = new Intl.DateTimeFormat("pt-PT", {
+const dateFormat = dateTimeFormat({
   day: "numeric",
   month: "short",
   year: "numeric",
@@ -156,8 +158,8 @@ export function InsightNotes({ insight }: { insight: PriceInsightDto }) {
   return (
     <ul className="insight-notes">
       <li>
-        {insight.observationCount} {insight.observationCount === 1 ? "observação" : "observações"}
-        {insight.since && <> desde {dateFormat.format(new Date(insight.since))}</>}
+        {insight.observationCount} {tr().ui.price.observations(insight.observationCount)}
+        {insight.since && <> {tr().ui.price.since} {dateFormat.format(new Date(insight.since))}</>}
       </li>
       {check && (
         <li>
@@ -165,10 +167,10 @@ export function InsightNotes({ insight }: { insight: PriceInsightDto }) {
           {check.verdict !== PromotionVerdict.InsufficientHistory && check.realDiscountPercent !== null && (
             <>
               {": "}
-              {formatPercent(check.realDiscountPercent)} contra o mínimo de 30 dias
+              {formatPercent(check.realDiscountPercent)} {tr().ui.price.againstLowest30}
               {check.lowest30Days !== null && <> ({money.format(check.lowest30Days)})</>}
               {check.announcedDiscountPercent !== null && (
-                <>, anunciado {formatPercent(check.announcedDiscountPercent)}</>
+                <>, {tr().ui.price.announced} {formatPercent(check.announcedDiscountPercent)}</>
               )}
             </>
           )}
@@ -176,8 +178,8 @@ export function InsightNotes({ insight }: { insight: PriceInsightDto }) {
       )}
       {frequency.pattern !== PromotionPattern.InsufficientHistory && (
         <li>
-          {promotionPatternLabels[frequency.pattern]}: {frequency.weeksOnPromotion} de {frequency.weeksObserved} semanas
-          {frequency.typicalIntervalDays !== null && <>, em regra a cada {frequency.typicalIntervalDays} dias</>}
+          {promotionPatternLabels[frequency.pattern]}: {tr().ui.price.weeksOf(frequency.weeksOnPromotion, frequency.weeksObserved)}
+          {frequency.typicalIntervalDays !== null && tr().ui.price.everyDays(frequency.typicalIntervalDays)}
         </li>
       )}
     </ul>

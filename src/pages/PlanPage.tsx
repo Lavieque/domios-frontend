@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
@@ -384,7 +385,7 @@ function CookButton({ meal, onCook }: { meal: PlannedMealDto; onCook: (leftoverS
         </label>
       )}
       <button type="submit" className="button-primary" disabled={busy}>
-        {busy ? tr().plan.logging : tr().plan.log}
+        {busy ? <Busy>{tr().plan.logging}</Busy> : tr().plan.log}
       </button>
       <button type="button" className="link-button" onClick={() => setOpen(false)}>
         {tr().common.cancel}

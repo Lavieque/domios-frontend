@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -425,7 +426,7 @@ function ApplyTemplateForm({ household, template }: { household: CallerHousehold
         </p>
       )}
       <button type="submit" className="button-primary" disabled={submitting}>
-        {submitting ? tr().templateDetail.applying : tr().templateDetail.apply}
+        {submitting ? <Busy>{tr().templateDetail.applying}</Busy> : tr().templateDetail.apply}
       </button>
     </form>
   );

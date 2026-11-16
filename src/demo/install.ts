@@ -26,8 +26,20 @@ function signIn() {
   window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(demoSession()));
 }
 
-/** Small pause so loading states show as they do against the real Api. */
-const latency = () => new Promise((resolve) => setTimeout(resolve, 60 + Math.random() * 120));
+/**
+ * Small pause so loading states show as they do against the real Api. To test a slow Api,
+ * set `localStorage["domios.demo.latency"]` to the milliseconds each request should take.
+ */
+function latencyMs(): number {
+  try {
+    const forced = Number(window.localStorage.getItem("domios.demo.latency"));
+    if (forced > 0) return forced;
+  } catch {
+    // No localStorage: the usual pause.
+  }
+  return 60 + Math.random() * 120;
+}
+const latency = () => new Promise((resolve) => setTimeout(resolve, latencyMs()));
 
 function json(status: number, value: unknown): Response {
   return new Response(JSON.stringify(value), { status, headers: { "Content-Type": "application/json" } });

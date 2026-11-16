@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
@@ -83,7 +84,7 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
         <form className="inline-form new-list-form" onSubmit={handleCreate}>
           <input type="text" aria-label={tr().lists.listName} placeholder={tr().lists.newListPlaceholder} maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
           <button type="submit" className="button-primary" disabled={creating}>
-            {creating ? tr().common.creating : tr().lists.newList}
+            {creating ? <Busy>{tr().common.creating}</Busy> : tr().lists.newList}
           </button>
         </form>
       </div>

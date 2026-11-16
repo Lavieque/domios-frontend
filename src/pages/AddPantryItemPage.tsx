@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getProduct, searchIngredients, searchProducts, type IngredientDto } from "../api/client";
@@ -328,7 +329,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                 </span>
                 <button type="submit" className="button-primary" disabled={submitting}>
                   {submitting
-                    ? tr().addPantry.saving
+                    ? <Busy>{tr().addPantry.saving}</Busy>
                     : drafts.length === 1
                       ? tr().addPantry.saveOne
                       : tr().addPantry.saveMany(drafts.length)}

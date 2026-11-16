@@ -1,5 +1,7 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { CardsSkeleton } from "../components/CardsSkeleton";
 import { getCategories, getChains, searchCurrentPromotions } from "../api/client";
 import { CategoryScope, ChainStatus, type CategoryDto, type ChainDto, type CurrentPromotionDto } from "../api/types";
 import { GroceryOnlyToggle } from "../components/GroceryOnlyToggle";
@@ -255,10 +257,11 @@ export function PromotionsPage() {
 
       <p className="results-count">
         {loading || total === null
-          ? tr().lists2.searching
+          ? <Busy>{tr().lists2.searching}</Busy>
           : tr().promotions.count(count.format(total), total)}
       </p>
 
+      {loading && <CardsSkeleton count={8} />}
       {!loading && offers.length === 0 ? (
         <p className="empty-state">{tr().promotions.none}</p>
       ) : (

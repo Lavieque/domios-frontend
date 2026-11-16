@@ -1,3 +1,4 @@
+import { Busy } from "./Busy";
 import { useEffect, useState, type FormEvent } from "react";
 import { searchIngredients, type IngredientDto } from "../api/client";
 import type { MemberDto } from "../api/households";
@@ -229,7 +230,7 @@ function AddAvoidedForm({ householdId, memberId, onSaved, onError }: AddAvoidedF
           </label>
           <div className="button-row member-form-wide">
             <button type="submit" className="button-primary" disabled={busy}>
-              {busy ? tr().common.saving : tr().prefs.add}
+              {busy ? <Busy>{tr().common.saving}</Busy> : tr().prefs.add}
             </button>
           </div>
         </>
@@ -339,7 +340,7 @@ export function NutritionGoalsPanel({ householdId, member, canEdit, onClose }: P
           <div className="button-row member-form-wide">
             {canEdit && (
               <button type="submit" className="button-primary" disabled={busy}>
-                {busy ? tr().common.saving : tr().common.save}
+                {busy ? <Busy>{tr().common.saving}</Busy> : tr().common.save}
               </button>
             )}
             {canEdit && isSet && (

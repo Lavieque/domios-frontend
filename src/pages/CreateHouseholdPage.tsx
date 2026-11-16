@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createHousehold } from "../api/households";
@@ -76,7 +77,7 @@ export function CreateHouseholdPage() {
           </p>
         )}
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? tr().common.creating : tr().createHousehold.title}
+          {submitting ? <Busy>{tr().common.creating}</Busy> : tr().createHousehold.title}
         </button>
       </form>
     </div>

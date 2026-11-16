@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
@@ -399,7 +400,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                   <>
                     <p className="side-empty">{tr().shoppingList.compareHint}</p>
                     <button type="button" className="button-secondary" onClick={() => void startCompare()} disabled={comparing}>
-                      {comparing ? tr().shoppingList.comparing : tr().shoppingList.compare}
+                      {comparing ? <Busy>{tr().shoppingList.comparing}</Busy> : tr().shoppingList.compare}
                     </button>
                   </>
                 )
@@ -464,7 +465,7 @@ function StoreInPantryPanel({ count, onStore }: { count: number; onStore: (locat
           ))}
         </select>
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? tr().common.saving : tr().shoppingList.toPantry}
+          {submitting ? <Busy>{tr().common.saving}</Busy> : tr().shoppingList.toPantry}
         </button>
       </form>
       {error && (
@@ -1045,7 +1046,7 @@ function PaidPrice({ item, chains, listChainId, onSave }: { item: ShoppingListIt
         </select>
       )}
       <button type="submit" className="button-primary" disabled={saving}>
-        {saving ? tr().common.saving : tr().common.save}
+        {saving ? <Busy>{tr().common.saving}</Busy> : tr().common.save}
       </button>
       {typed && (
         <button type="button" className="link-button" disabled={saving} onClick={() => void save(null)} title={tr().shoppingList.clearTyped}>
@@ -1296,7 +1297,7 @@ function ConversionAsk({
         g
       </label>{" "}
       <button type="submit" className="link-button" disabled={saving || grams.trim() === ""}>
-        {saving ? tr().common.saving : tr().common.save}
+        {saving ? <Busy>{tr().common.saving}</Busy> : tr().common.save}
       </button>
       <div className="muted">{tr().shoppingList.forAll}</div>
       {error && (

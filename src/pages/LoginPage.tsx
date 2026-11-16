@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { signIn } from "../auth/actions";
@@ -68,7 +69,7 @@ export function LoginPage() {
           </p>
         )}
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? t.auth.signingIn : t.common.signIn}
+          {submitting ? <Busy>{t.auth.signingIn}</Busy> : t.common.signIn}
         </button>
       </form>
 

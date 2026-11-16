@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, register } from "../api/auth";
@@ -135,7 +136,7 @@ export function RegisterPage() {
           </p>
         )}
         <button type="submit" className="button-primary" disabled={submitting}>
-          {submitting ? t.auth.creatingAccount : t.auth.createAccount}
+          {submitting ? <Busy>{t.auth.creatingAccount}</Busy> : t.auth.createAccount}
         </button>
       </form>
 

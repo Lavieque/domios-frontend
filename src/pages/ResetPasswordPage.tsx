@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, resetPassword } from "../api/auth";
@@ -104,7 +105,7 @@ export function ResetPasswordPage() {
             </p>
           )}
           <button type="submit" className="button-primary" disabled={submitting}>
-            {submitting ? t.common.saving : t.auth.savePassword}
+            {submitting ? <Busy>{t.common.saving}</Busy> : t.auth.savePassword}
           </button>
         </form>
       )}

@@ -1,3 +1,4 @@
+import { Busy } from "../components/Busy";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "../api/auth";
@@ -53,7 +54,7 @@ export function ForgotPasswordPage() {
             </p>
           )}
           <button type="submit" className="button-primary" disabled={submitting}>
-            {submitting ? t.common.sending : t.auth.sendLink}
+            {submitting ? <Busy>{t.common.sending}</Busy> : t.auth.sendLink}
           </button>
         </form>
       )}

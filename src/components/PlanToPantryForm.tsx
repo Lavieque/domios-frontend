@@ -1,3 +1,4 @@
+import { Busy } from "./Busy";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { addPantryItemsBatch, PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
@@ -95,7 +96,7 @@ export function PlanToPantryForm({ householdId, lines, onDone }: Props) {
             ))}
           </select>
           <button type="submit" className="button-secondary" disabled={submitting || chosen.length === 0}>
-            {submitting ? tr().common.saving : tr().ui.planToPantry.put(chosen.length)}
+            {submitting ? <Busy>{tr().common.saving}</Busy> : tr().ui.planToPantry.put(chosen.length)}
           </button>
         </div>
         {error && (

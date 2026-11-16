@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { admin, type AccessRequest } from "../api";
-import { ConfirmAction, PageHead, Pager, State } from "../components";
+import { Avatar, ConfirmAction, PageHead, Pager, State } from "../components";
 import { dateTime, useLoad } from "../hooks";
 
 const FILTERS = [
@@ -64,6 +64,7 @@ function RequestRow({ request: r, onChanged }: { request: AccessRequest; onChang
   };
   return (
     <li className="row">
+      <Avatar name={r.name} />
       <div className="row-main">
         <div className="row-title">
           <strong>{r.name}</strong>

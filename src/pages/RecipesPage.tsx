@@ -31,7 +31,8 @@ function parseEnum<T extends number>(value: string | null, allowed: T[]): T | un
 }
 
 export function RecipesPage() {
-  const pageSize = usePageSize(20, 10);
+  // 25 = a receita em destaque + 24 na grelha, que enche filas de 2, 3 e 4 cartões.
+  const pageSize = usePageSize(25, 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") ?? "";
   const page = Number(searchParams.get("page") ?? "1") || 1;
@@ -44,6 +45,8 @@ export function RecipesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const filtered = search !== "" || dishType !== undefined || mainProtein !== undefined || difficulty !== undefined;
+  // A primeira receita vai em destaque; a lista a seguir não a repete.
+  const featured = !filtered && page === 1 && !loading && recipes.length > 0;
 
   function applyFilters(next: {
     search?: string;
@@ -104,7 +107,7 @@ export function RecipesPage() {
         </div>
       </header>
 
-      {!filtered && page === 1 && !loading && recipes[0] && (
+      {featured && (
         <FeatureCard
           eyebrow={tr().recipes.ourPick}
           title={recipes[0].title}
@@ -188,7 +191,7 @@ export function RecipesPage() {
       ) : (
         !loading && (
           <ul className="recipe-rows">
-            {recipes.map((recipe) => (
+            {(featured ? recipes.slice(1) : recipes).map((recipe) => (
               <RecipeRow key={recipe.recipeId} title={recipe.title} to={`/receitas/${recipe.recipeId}`} imageUrl={recipe.imageUrl}>
                 <span className="recipe-row-meta">
                   {[

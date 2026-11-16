@@ -42,6 +42,8 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
   // O destaque: a primeira que dá para fazer já, das guardadas e depois das outras.
   const all = result ? [...result.saved, ...result.others] : [];
   const suggestion = all.find((r) => r.verdict === RecipeVerdict.CanCook) ?? all[0] ?? null;
+  // A receita em destaque não se repete nas listas de baixo.
+  const notFeatured = (r: { recipeId: string }) => r.recipeId !== suggestion?.recipeId;
 
   return (
     <div className="page cook-page">
@@ -81,7 +83,7 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
                 {tr().cook.noSaved.before} <Link to="/receitas">{tr().cook.noSaved.link}</Link> {tr().cook.noSaved.after}
               </p>
             ) : (
-              <CookableRecipeList recipes={result.saved} onRemove={remove} />
+              <CookableRecipeList recipes={result.saved.filter(notFeatured)} onRemove={remove} />
             )}
           </section>
 
@@ -92,7 +94,7 @@ function Cook({ household }: { household: CallerHouseholdDto }) {
                 {tr().cook.nothingElse} <Link to="/despensa">{tr().cook.seePantry}</Link>
               </p>
             ) : (
-              <CookableRecipeList recipes={result.others} />
+              <CookableRecipeList recipes={result.others.filter(notFeatured)} />
             )}
           </section>
         </div>

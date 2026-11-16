@@ -1557,6 +1557,8 @@
 .editorial .store-grid {
   display: flex;
   flex-direction: column;
+  /* Todos os cartões com a largura do painel (o editorial.css deixa-os encolher ao conteúdo). */
+  align-items: stretch;
   gap: 8px;
   margin: 0 0 16px;
   border-top: 0;

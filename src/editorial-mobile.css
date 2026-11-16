@@ -772,8 +772,10 @@
     grid-area: when;
     align-self: start;
     text-align: right;
+    /* Prazos longos ("Expirou a 15 de novembro de 2026") partem em linhas em vez de esmagar o nome. */
+    max-width: 8.5rem;
     font-size: 12.5px;
-    white-space: nowrap;
+    text-wrap: balance;
   }
 
   .app.editorial .pantry-page :is(.pantry-actions, .pantry-inline) {

@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { APP_LOGIN_URL } from "./config";
+import { ArrowIcon, MenuIcon } from "./components/Icons";
 import { makeContext, SiteProvider, useSite } from "./context";
 import { dicts, LANGS, pathFor, parseRoute, switchLanguage, type Lang, type Route } from "./i18n";
 import { FeaturePage } from "./pages/FeaturePage";
@@ -9,6 +10,8 @@ import { GuidePage } from "./pages/GuidePage";
 import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { RequestPage } from "./pages/RequestPage";
+import { useScrollMotion } from "./motion";
+import { useReveal } from "./reveal";
 
 export function Site() {
   const { pathname } = useLocation();
@@ -18,6 +21,8 @@ export function Site() {
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [pathname]);
+  useReveal(pathname);
+  useScrollMotion(pathname);
 
   useEffect(() => {
     document.documentElement.lang = t.htmlLang;
@@ -61,7 +66,7 @@ function titleOf(route: Route, t: (typeof dicts)[Lang]): string {
   const name = t.siteName;
   switch (route.kind) {
     case "home":
-      return `${name}: ${t.home.title}`;
+      return `${name}: ${t.home.title.join(" ")}`;
     case "features":
       return `${t.featuresPage.title} · ${name}`;
     case "feature":
@@ -121,7 +126,7 @@ export function Brand() {
         <polyline
           points="30,72 30,46 60,20 90,46 90,72"
           fill="none"
-          stroke="var(--accent)"
+          stroke="#2a6a78"
           strokeWidth="8"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -129,7 +134,7 @@ export function Brand() {
         <polyline
           points="52,88 52,62 82,36 112,62 112,88"
           fill="none"
-          stroke="var(--accent-2)"
+          stroke="#1e3a5c"
           strokeWidth="8"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -144,15 +149,41 @@ export function Brand() {
 
 function Header({ pathname }: { pathname: string }) {
   const { lang, t, to } = useSite();
+  const [open, setOpen] = useState(false);
+  const [stuck, setStuck] = useState(false);
+
+  // The header starts clear over the photograph and takes a solid ground once the page moves.
+  useEffect(() => {
+    const onScroll = () => setStuck(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const classes = ["site-header", stuck || open ? "is-solid" : "", open ? "is-open" : ""].filter(Boolean).join(" ");
   return (
-    <header className="site-header">
+    <header className={classes}>
       <div className="site-header-inner">
         <Brand />
-        <nav className="site-nav" aria-label={t.nav.main}>
-          <Link to={to({ kind: "features" })}>{t.nav.features}</Link>
-          <Link to={to({ kind: "guide" })}>{t.nav.guide}</Link>
-        </nav>
-        <div className="site-actions">
+        <div className="site-menu" id="site-menu">
+          <nav className="site-nav" aria-label={t.nav.main}>
+            <Link to={to({ kind: "features" })}>{t.nav.features}</Link>
+            <Link to={to({ kind: "guide" })}>{t.nav.guide}</Link>
+            <a href={APP_LOGIN_URL}>{t.nav.enter}</a>
+          </nav>
           <nav className="lang-switch" aria-label={t.nav.language}>
             {LANGS.map((code) => (
               <Link
@@ -166,13 +197,14 @@ function Header({ pathname }: { pathname: string }) {
               </Link>
             ))}
           </nav>
-          <a className="header-login" href={APP_LOGIN_URL}>
-            {t.nav.enter}
-          </a>
-          <Link className="button-primary" to={to({ kind: "request" })}>
-            {t.nav.request}
-          </Link>
         </div>
+        <Link className="button" to={to({ kind: "request" })}>
+          {t.nav.request}
+        </Link>
+        <button type="button" className="menu-toggle" aria-expanded={open} aria-controls="site-menu" onClick={() => setOpen(!open)}>
+          <MenuIcon open={open} />
+          <span className="sr-only">{open ? t.nav.menuClose : t.nav.menuOpen}</span>
+        </button>
       </div>
     </header>
   );
@@ -195,7 +227,10 @@ function Footer() {
         <nav aria-label={t.footer.help}>
           <h2>{t.footer.help}</h2>
           <Link to={to({ kind: "request" })}>{t.nav.request}</Link>
-          <a href={APP_LOGIN_URL}>{t.nav.enter}</a>
+          <a href={APP_LOGIN_URL}>
+            {t.nav.enter}
+            <ArrowIcon />
+          </a>
         </nav>
         <p className="footer-honest">{t.footer.honest}</p>
       </div>

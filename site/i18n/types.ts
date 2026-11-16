@@ -1,8 +1,8 @@
 export type Lang = "pt" | "en";
 export const LANGS: Lang[] = ["pt", "en"];
 
-/** Uma entrada por menu da app. A ordem é a do menu da app: "Em casa" e depois "Catálogo". */
-export const FEATURE_KEYS = ["today", "plan", "pantry", "lists", "products", "promotions", "recipes", "household"] as const;
+/** Uma entrada por página da app, pela ordem do menu da app. */
+export const FEATURE_KEYS = ["today", "plan", "pantry", "lists", "cook", "recipes", "templates", "nutrition", "products", "promotions", "household"] as const;
 export type FeatureKey = (typeof FEATURE_KEYS)[number];
 
 export interface FeatureCopy {
@@ -54,25 +54,32 @@ export interface Dict {
     aboveAverage: string;
   };
   home: {
-    title: string;
+    /** O título em duas linhas: a segunda vai na cor de destaque. */
+    title: [string, string];
     lede: string;
     primary: string;
     secondary: string;
+    /** O resumo de um dia, por baixo do título. São sempre dados de exemplo. */
+    glance: { label: string; example: string; items: { label: string; value: string; note: string }[] };
+    storyTitle: string;
+    storyIntro: string;
+    story: { key: FeatureKey; title: string; text: string; points: string[] }[];
+    tourTitle: string;
+    tourIntro: string;
+    tourTabs: string;
+    tourOpen: string;
+    tourCaption: string;
     exampleTag: string;
     exampleName: string;
     exampleUnit: string;
+    /** The words printed on the example carton: the big name and the kind under it. */
+    exampleCarton: [string, string];
     exampleNote: string;
     pickVerdict: string;
     range: { min: string; avg: string; max: string };
     judgeTitle: string;
     judgeIntro: string;
     judge: { title: string; text: string }[];
-    connectedTitle: string;
-    connectedIntro: string;
-    groupHome: string;
-    groupCatalog: string;
-    flowTitle: string;
-    flow: { title: string; text: string }[];
     guideTitle: string;
     guideText: string;
     guideCta: string;
@@ -83,6 +90,7 @@ export interface Dict {
     title: string;
     lede: string;
     groupHome: string;
+    groupKitchen: string;
     groupCatalog: string;
     seeMenu: string;
   };
@@ -95,6 +103,8 @@ export interface Dict {
     guideLink: string;
     cta: string;
   };
+  /** Notes pinned on a capture, read with the mouse or keyboard; the positions live in site/hotspots.ts. */
+  shotNotes: { label: string; notes: Partial<Record<FeatureKey, string[]>> };
   features: Record<FeatureKey, FeatureCopy>;
   guide: {
     title: string;

@@ -1,17 +1,18 @@
 import { FeatureList } from "../components/FeatureList";
+import { PageHead } from "../components/PageHead";
 import { RequestCta } from "../components/RequestCta";
 import { useSite } from "../context";
+import { PHOTO } from "../photos";
 
 export function FeaturesPage() {
   const { t } = useSite();
   const p = t.featuresPage;
   return (
     <>
-      <header className="page-head">
-        <h1>{p.title}</h1>
-        <p className="lede">{p.lede}</p>
-      </header>
-      <FeatureList groupHome={p.groupHome} groupCatalog={p.groupCatalog} />
+      <PageHead title={p.title} lede={p.lede} photo={PHOTO.kitchen} />
+      <div className="page-body">
+        <FeatureList />
+      </div>
       <RequestCta title={t.home.closeTitle} text={t.home.closeText} />
     </>
   );

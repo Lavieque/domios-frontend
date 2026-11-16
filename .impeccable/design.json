@@ -1,430 +1,785 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-09T12:00:00Z",
+  "generatedAt": "2026-11-13T22:09:57Z",
   "title": "Design System: DomiOS",
   "extensions": {
     "colorMeta": {
+      "green-950": {
+        "role": "primary",
+        "displayName": "Night Forest",
+        "canonical": "#0c241b",
+        "oklch": "oklch(23.8% 0.035 166.5)",
+        "tonalRamp": [
+          "#0c241b",
+          "#102c23",
+          "#17392c",
+          "#204e39",
+          "#608e77",
+          "#85b19a",
+          "#abd5be",
+          "#d2f9e4"
+        ],
+        "note": "Ramp starts from the site's own green scale (950, 900, 800, 700) and continues lighter on the same hue."
+      },
+      "green-900": {
+        "role": "primary",
+        "displayName": "Forest",
+        "canonical": "#102c23",
+        "oklch": "oklch(26.8% 0.038 169.8)",
+        "tonalRamp": [
+          "#0c241b",
+          "#102c23",
+          "#17392c",
+          "#204e39",
+          "#608e77",
+          "#85b19a",
+          "#abd5be",
+          "#d2f9e4"
+        ],
+        "note": "Ramp starts from the site's own green scale (950, 900, 800, 700) and continues lighter on the same hue."
+      },
+      "green-800": {
+        "role": "primary",
+        "displayName": "Deep Forest",
+        "canonical": "#17392c",
+        "oklch": "oklch(31.5% 0.047 166.1)",
+        "tonalRamp": [
+          "#0c241b",
+          "#102c23",
+          "#17392c",
+          "#204e39",
+          "#608e77",
+          "#85b19a",
+          "#abd5be",
+          "#d2f9e4"
+        ],
+        "note": "Ramp starts from the site's own green scale (950, 900, 800, 700) and continues lighter on the same hue."
+      },
+      "green-700": {
+        "role": "primary",
+        "displayName": "Bottle Green",
+        "canonical": "#204e39",
+        "oklch": "oklch(38.5% 0.063 161.5)",
+        "tonalRamp": [
+          "#0c241b",
+          "#102c23",
+          "#17392c",
+          "#204e39",
+          "#608e77",
+          "#85b19a",
+          "#abd5be",
+          "#d2f9e4"
+        ],
+        "note": "Ramp starts from the site's own green scale (950, 900, 800, 700) and continues lighter on the same hue."
+      },
+      "green-pressed": {
+        "role": "primary",
+        "displayName": "Pressed Green",
+        "canonical": "#163a29",
+        "oklch": "oklch(31.6% 0.052 160.7)",
+        "tonalRamp": [
+          "#0c241b",
+          "#102c23",
+          "#17392c",
+          "#204e39",
+          "#608e77",
+          "#85b19a",
+          "#abd5be",
+          "#d2f9e4"
+        ],
+        "note": "Ramp starts from the site's own green scale (950, 900, 800, 700) and continues lighter on the same hue."
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "#faf7f0",
+        "oklch": "oklch(97.7% 0.010 87.5)",
+        "tonalRamp": [
+          "#0c0b08",
+          "#272521",
+          "#44423d",
+          "#63615b",
+          "#85827c",
+          "#a7a59f",
+          "#cbc9c3",
+          "#f1eee9"
+        ]
+      },
       "paper": {
         "role": "neutral",
         "displayName": "Paper",
-        "canonical": "#ffffff",
-        "dark": "#141414",
+        "canonical": "#f4f0e6",
+        "oklch": "oklch(95.5% 0.014 88.7)",
         "tonalRamp": [
-          "#262626",
-          "#3d3d3c",
-          "#5a5a57",
-          "#7c7c79",
-          "#a3a3a0",
-          "#cbcbc8",
-          "#f1f1ef",
-          "#ffffff"
+          "#0d0b07",
+          "#27251f",
+          "#45423b",
+          "#646159",
+          "#868279",
+          "#a8a59c",
+          "#ccc9c1",
+          "#f1eee6"
         ]
       },
-      "paper-shade": {
+      "paper-2": {
         "role": "neutral",
-        "displayName": "Paper Shade",
-        "canonical": "#f1f1ef",
-        "dark": "#252523",
+        "displayName": "Paper 2",
+        "canonical": "#e9e4d4",
+        "oklch": "oklch(91.8% 0.022 92.5)",
         "tonalRamp": [
-          "#262625",
-          "#3d3d3b",
-          "#5a5a57",
-          "#7c7c78",
-          "#a3a39f",
-          "#cbcbc7",
-          "#e6e6e3",
-          "#f1f1ef"
+          "#0d0b04",
+          "#28251b",
+          "#454237",
+          "#656154",
+          "#878274",
+          "#a9a597",
+          "#cdc9bc",
+          "#f2eee2"
         ]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Ink",
-        "canonical": "#141414",
-        "dark": "#f2f1ed",
+        "canonical": "#182c22",
+        "oklch": "oklch(27.2% 0.032 161.5)",
         "tonalRamp": [
-          "#141414",
-          "#2a2a2a",
-          "#454545",
-          "#626262",
-          "#828282",
-          "#a6a6a6",
-          "#cccccc",
-          "#f2f2f2"
+          "#030e08",
+          "#1a2921",
+          "#35473d",
+          "#52675c",
+          "#72897c",
+          "#95ab9f",
+          "#bacfc3",
+          "#e0f4e9"
         ]
       },
       "ink-dim": {
         "role": "neutral",
         "displayName": "Ink Dim",
-        "canonical": "#5a5a57",
-        "dark": "#a8a7a2",
+        "canonical": "#4f6150",
+        "oklch": "oklch(47.2% 0.035 146.5)",
         "tonalRamp": [
-          "#1b1b1a",
-          "#30302e",
-          "#454543",
-          "#5a5a57",
-          "#7c7c79",
-          "#a3a3a0",
-          "#cbcbc8",
-          "#f1f1ef"
+          "#050e05",
+          "#1c291d",
+          "#384739",
+          "#566656",
+          "#758876",
+          "#99ab99",
+          "#bdcfbe",
+          "#e3f4e4"
         ]
       },
       "line": {
         "role": "neutral",
-        "displayName": "Hairline",
-        "canonical": "rgb(20 20 20 / 0.15)",
-        "dark": "rgb(242 241 237 / 0.16)"
-      },
-      "rule": {
-        "role": "neutral",
-        "displayName": "Black Rule",
-        "canonical": "#141414",
-        "dark": "#f2f1ed"
-      },
-      "calendar-red": {
-        "role": "primary",
-        "displayName": "Calendar Red",
-        "canonical": "#d4261c",
-        "dark": "#ff6a5c",
+        "displayName": "Line",
+        "canonical": "rgb(24 44 34 / 0.16)",
+        "oklch": "oklch(27.2% 0.032 161.5)",
         "tonalRamp": [
-          "#3d0a07",
-          "#62120d",
-          "#8a1912",
-          "#b02018",
-          "#d4261c",
-          "#e86a60",
-          "#f4aaa4",
-          "#fbe6e4"
-        ]
+          "#030e08",
+          "#1a2921",
+          "#35473d",
+          "#52675c",
+          "#72897c",
+          "#95ab9f",
+          "#bacfc3",
+          "#e0f4e9"
+        ],
+        "note": "Translucent token (alpha 0.16); the ramp is built from its opaque base."
       },
-      "calendar-red-soft": {
-        "role": "primary",
-        "displayName": "Calendar Red Soft",
-        "canonical": "#fbe6e4",
-        "dark": "rgb(255 106 92 / 0.14)"
-      },
-      "danger": {
-        "role": "neutral",
-        "displayName": "Danger",
-        "canonical": "#c8231a",
-        "dark": "#ff7a6e"
-      },
-      "danger-soft": {
-        "role": "neutral",
-        "displayName": "Danger Soft",
-        "canonical": "rgb(200 35 26 / 0.1)",
-        "dark": "rgb(255 122 110 / 0.14)"
-      },
-      "have-it-green": {
-        "role": "tertiary",
-        "displayName": "Tens-Tudo Green",
-        "canonical": "#23683a",
-        "dark": "#7cc78e",
-        "tonalRamp": [
-          "#0b2213",
-          "#123a20",
-          "#1a522d",
-          "#23683a",
-          "#3f8a57",
-          "#7cc78e",
-          "#b5e0bf",
-          "#e2efe5"
-        ]
-      },
-      "have-it-green-soft": {
-        "role": "tertiary",
-        "displayName": "Tens-Tudo Green Soft",
-        "canonical": "#e2efe5",
-        "dark": "rgb(124 199 142 / 0.14)"
-      },
-      "almanac-yellow": {
+      "sage": {
         "role": "secondary",
-        "displayName": "Almanac Yellow",
-        "canonical": "#f2c230",
-        "dark": "#f2c230",
+        "displayName": "Sage",
+        "canonical": "#d6e2bb",
+        "oklch": "oklch(89.4% 0.053 121.4)",
         "tonalRamp": [
-          "#3a2c04",
-          "#5e480a",
-          "#866812",
-          "#ae881c",
-          "#d6a926",
-          "#f2c230",
-          "#f8dc85",
-          "#fdf3d2"
+          "#090d00",
+          "#22280f",
+          "#3e462a",
+          "#5d6646",
+          "#7d8864",
+          "#a0aa88",
+          "#c4cead",
+          "#eaf3d4"
         ]
       },
-      "almanac-ink": {
+      "sage-light": {
         "role": "secondary",
-        "displayName": "Almanac Ink",
-        "canonical": "#141414",
-        "dark": "#141414"
+        "displayName": "Sage Light",
+        "canonical": "#e7efd3",
+        "oklch": "oklch(93.9% 0.038 120.1)",
+        "tonalRamp": [
+          "#0a0d02",
+          "#232716",
+          "#3f4531",
+          "#5e644e",
+          "#7f866d",
+          "#a2a990",
+          "#c6cdb5",
+          "#ebf2dc"
+        ]
+      },
+      "sage-muted": {
+        "role": "secondary",
+        "displayName": "Muted Sage",
+        "canonical": "#b8c8a7",
+        "oklch": "oklch(81.2% 0.048 128.6)",
+        "tonalRamp": [
+          "#070e01",
+          "#1f2914",
+          "#3b462e",
+          "#59664b",
+          "#7a886a",
+          "#9dab8d",
+          "#c1cfb2",
+          "#e7f4d9"
+        ]
+      },
+      "sage-muted-light": {
+        "role": "secondary",
+        "displayName": "Muted Sage Light",
+        "canonical": "#d0ddc0",
+        "oklch": "oklch(88.0% 0.041 127.0)",
+        "tonalRamp": [
+          "#080d02",
+          "#212816",
+          "#3d4631",
+          "#5b664e",
+          "#7c876d",
+          "#9eaa90",
+          "#c3ceb5",
+          "#e8f3dc"
+        ]
+      },
+      "on-dark": {
+        "role": "neutral",
+        "displayName": "On Dark",
+        "canonical": "#fffdf3",
+        "oklch": "oklch(99.3% 0.013 97.4)",
+        "tonalRamp": [
+          "#0c0b07",
+          "#26251f",
+          "#44423b",
+          "#636159",
+          "#84827a",
+          "#a7a59d",
+          "#cbc9c1",
+          "#f0efe7"
+        ]
+      },
+      "on-dark-dim": {
+        "role": "neutral",
+        "displayName": "On Dark Dim",
+        "canonical": "#d3dbc8",
+        "oklch": "oklch(88.0% 0.027 125.7)",
+        "tonalRamp": [
+          "#090d05",
+          "#22271c",
+          "#3f4437",
+          "#5e6455",
+          "#7e8574",
+          "#a1a897",
+          "#c5ccbc",
+          "#ebf1e2"
+        ]
+      },
+      "on-glass-dim": {
+        "role": "neutral",
+        "displayName": "On Glass Dim",
+        "canonical": "#e3e7d8",
+        "oklch": "oklch(92.1% 0.020 119.0)",
+        "tonalRamp": [
+          "#0a0c06",
+          "#24261d",
+          "#414339",
+          "#606357",
+          "#818477",
+          "#a3a79a",
+          "#c8cbbe",
+          "#edf0e4"
+        ]
+      },
+      "line-dark": {
+        "role": "neutral",
+        "displayName": "Line on Dark",
+        "canonical": "rgb(248 245 223 / 0.22)",
+        "oklch": "oklch(96.7% 0.029 100.6)",
+        "tonalRamp": [
+          "#0d0b03",
+          "#272518",
+          "#454333",
+          "#646250",
+          "#86836f",
+          "#a8a693",
+          "#cccab8",
+          "#f2efde"
+        ],
+        "note": "Translucent token (alpha 0.22); the ramp is built from its opaque base."
+      },
+      "glass-tint": {
+        "role": "neutral",
+        "displayName": "Glass Tint",
+        "canonical": "rgb(14 45 31 / 0.3)",
+        "oklch": "oklch(26.9% 0.046 161.4)",
+        "tonalRamp": [
+          "#000f07",
+          "#132b1f",
+          "#2f493b",
+          "#4c695a",
+          "#6a8b7a",
+          "#8eae9d",
+          "#b4d2c1",
+          "#daf7e7"
+        ],
+        "note": "Translucent token (alpha 0.30); the ramp is built from its opaque base."
+      },
+      "glass-edge": {
+        "role": "neutral",
+        "displayName": "Glass Edge",
+        "canonical": "rgb(248 245 223 / 0.24)",
+        "oklch": "oklch(96.7% 0.029 100.6)",
+        "tonalRamp": [
+          "#0d0b03",
+          "#272518",
+          "#454333",
+          "#646250",
+          "#86836f",
+          "#a8a693",
+          "#cccab8",
+          "#f2efde"
+        ],
+        "note": "Translucent token (alpha 0.24); the ramp is built from its opaque base."
+      },
+      "field-glass": {
+        "role": "neutral",
+        "displayName": "Field Glass",
+        "canonical": "rgb(16 45 35 / 0.45)",
+        "oklch": "oklch(27.1% 0.040 168.2)",
+        "tonalRamp": [
+          "#000f09",
+          "#142a22",
+          "#2f483e",
+          "#4c685d",
+          "#6b8a7e",
+          "#8fada1",
+          "#b5d1c5",
+          "#dbf6ea"
+        ],
+        "note": "Translucent token (alpha 0.45); the ramp is built from its opaque base."
+      },
+      "rail-glass": {
+        "role": "neutral",
+        "displayName": "Rail Glass",
+        "canonical": "rgb(16 44 35 / 0.85)",
+        "oklch": "oklch(26.8% 0.038 169.8)",
+        "tonalRamp": [
+          "#010f09",
+          "#152a23",
+          "#30483f",
+          "#4d685e",
+          "#6c8a7f",
+          "#90ada1",
+          "#b5d0c6",
+          "#dcf5eb"
+        ],
+        "note": "Translucent token (alpha 0.85); the ramp is built from its opaque base."
+      },
+      "butter": {
+        "role": "tertiary",
+        "displayName": "Butter",
+        "canonical": "#fff2c9",
+        "oklch": "oklch(96.1% 0.055 92.5)",
+        "tonalRamp": [
+          "#110a00",
+          "#2d2409",
+          "#4b4123",
+          "#6b613f",
+          "#8e825d",
+          "#b0a581",
+          "#d4c9a7",
+          "#f9eece"
+        ]
+      },
+      "gold": {
+        "role": "tertiary",
+        "displayName": "Gold",
+        "canonical": "#d6be94",
+        "oklch": "oklch(81.2% 0.062 81.5)",
+        "tonalRamp": [
+          "#140800",
+          "#312204",
+          "#513f1e",
+          "#725e3a",
+          "#957f57",
+          "#b8a27c",
+          "#dbc6a2",
+          "#ffecca"
+        ]
+      },
+      "gold-light": {
+        "role": "tertiary",
+        "displayName": "Gold Light",
+        "canonical": "#f5ddb0",
+        "oklch": "oklch(90.6% 0.064 83.1)",
+        "tonalRamp": [
+          "#140800",
+          "#312202",
+          "#503f1d",
+          "#725e38",
+          "#957f55",
+          "#b7a27a",
+          "#dbc7a1",
+          "#ffecc9"
+        ]
+      },
+      "coral": {
+        "role": "tertiary",
+        "displayName": "Coral",
+        "canonical": "#ffb4a8",
+        "oklch": "oklch(83.8% 0.090 29.2)",
+        "tonalRamp": [
+          "#200000",
+          "#41140f",
+          "#653029",
+          "#8b4e45",
+          "#b26d63",
+          "#d49187",
+          "#f7b7ac",
+          "#ffddd3"
+        ]
+      },
+      "rust": {
+        "role": "tertiary",
+        "displayName": "Rust",
+        "canonical": "#874a35",
+        "oklch": "oklch(47.8% 0.089 39.6)",
+        "tonalRamp": [
+          "#1f0000",
+          "#411606",
+          "#643221",
+          "#89503c",
+          "#b06f59",
+          "#d3947e",
+          "#f6b9a4",
+          "#ffdfcc"
+        ]
+      },
+      "clay": {
+        "role": "tertiary",
+        "displayName": "Clay",
+        "canonical": "#a3371f",
+        "oklch": "oklch(49.0% 0.147 34.0)",
+        "tonalRamp": [
+          "#2a0000",
+          "#500000",
+          "#771d07",
+          "#a03c26",
+          "#cb5c43",
+          "#ee836a",
+          "#ffaa92",
+          "#ffd2bb"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
-        "displayName": "Day Number",
-        "purpose": "Today's day number only. 62% width. Smaller cousins: the shopping-list remaining count (clamp(72px, 9vw, 112px), ink), Semana day numbers (56px, 44px on phones), list tally and lists-index counts (48px), next-day numbers (44px)."
+        "displayName": "Display",
+        "purpose": "The site hero only, two lines, the second in sage."
       },
       "headline": {
-        "displayName": "Dish Name",
-        "purpose": "The dish name is the interface. 70% width, max 18ch, no frame. In rows (Semana meals, lists index) the dish is 900 at 72% width, 22px to 28px. Condensed headings open word spacing to 0.08em."
-      },
-      "page-title": {
-        "displayName": "Page Title",
-        "purpose": "h1 on other pages, 72% width."
+        "displayName": "Headline",
+        "purpose": "App page titles, the product name, the auth title; the site's page and section heads at their own clamps."
       },
       "title": {
-        "displayName": "Section Head",
-        "purpose": "Heads under the 6px black rule, uppercase in side blocks, 80% width."
+        "displayName": "Title",
+        "purpose": "Panel and section headings in the app."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Prices, meter values, the site's demo price and guide step numbers."
       },
       "body": {
-        "displayName": "Body",
-        "purpose": "Running text and UI at normal width. Readiness and ledes are 17px."
+        "displayName": "Body (site)",
+        "purpose": "Reading on the site's paper, 34-40rem measures."
+      },
+      "body-app": {
+        "displayName": "Body (app)",
+        "purpose": "Ledes and running text on the app's glass, 36rem cap."
+      },
+      "card-title": {
+        "displayName": "Card Title",
+        "purpose": "Product and recipe names on cards; h3 in the app."
+      },
+      "button": {
+        "displayName": "Button (app)",
+        "purpose": "Every button label in the app."
+      },
+      "button-site": {
+        "displayName": "Button (site)",
+        "purpose": "Every button label on the site."
       },
       "label": {
-        "displayName": "Calendar Label",
-        "purpose": "Weekday and month in the day column, uppercase, 75% width. Weekday never wraps, clamp(14px, 1.4vw, 17px); month clamp(14px, 1.4vw, 20px), never larger than the weekday. The small label (13px/800, 0.06em, ink-dim) serves slot labels, Semana weekdays, item-group and table heads."
+        "displayName": "Label",
+        "purpose": "Small uppercase outlined tags on the site."
       }
     },
-    "shadows": [],
-    "rules": [
+    "shadows": [
       {
-        "name": "section-rule",
-        "value": "border-top: 6px solid var(--rule)",
-        "purpose": "Opens every section, legacy panel and today's sheet."
+        "name": "glass",
+        "value": "0 12px 36px rgb(6 23 14 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.1)",
+        "purpose": "Every glass panel at rest."
       },
       {
-        "name": "strip-rule",
-        "value": "border-top: 2px solid var(--rule)",
-        "purpose": "Top of the next-days strip, tables and the pantry list."
+        "name": "lift",
+        "value": "0 14px 38px rgb(6 23 14 / 0.3)",
+        "purpose": "A whole-card link on hover, with translateY(-3px)."
       },
       {
-        "name": "sheet-edges",
-        "value": "two 1px rules, 7px apart, 55% opacity, 9px above the strip",
-        "purpose": "The edges of the sheets under today's."
+        "name": "lift-small",
+        "value": "0 8px 20px rgb(6 23 14 / 0.25)",
+        "purpose": "Small photo cards on hover."
       },
       {
-        "name": "hairline",
-        "value": "1px solid var(--line)",
-        "purpose": "Row and cell dividers, and the line above empty states."
+        "name": "plaque",
+        "value": "0 6px 18px rgb(6 23 14 / 0.25)",
+        "purpose": "The logo plaque."
+      },
+      {
+        "name": "menu-button",
+        "value": "0 4px 14px rgb(6 23 14 / 0.28)",
+        "purpose": "The phone menu button."
+      },
+      {
+        "name": "tab-bar",
+        "value": "0 -10px 30px rgb(6 23 14 / 0.25)",
+        "purpose": "The phone tab bar, cast upward."
+      },
+      {
+        "name": "capture",
+        "value": "0 36px 60px -34px rgb(16 44 35 / 0.6), 0 12px 22px -14px rgb(16 44 35 / 0.32)",
+        "purpose": "App screenshots on the site's paper."
+      },
+      {
+        "name": "capture-dark",
+        "value": "0 40px 70px -36px rgb(0 0 0 / 0.7)",
+        "purpose": "App screenshots on the site's green bands."
       }
     ],
     "motion": [
       {
-        "name": "sheet-tear",
-        "value": "0.9s cubic-bezier(0.55, 0, 0.75, 0.2) 0.35s",
-        "purpose": "The previous day's sheet tears upward once on day change. The clip is one nine-point polygon in every keyframe so the rag interpolates. Hidden under reduced motion. Not visually verified yet."
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Shared entrance easing: the site's rise and panel-in, the app's top menu opening (0.42s)."
       },
       {
-        "name": "sheet-up",
-        "value": "0.32s cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "The Mais bottom sheet rises."
+        "name": "ease-exit",
+        "value": "cubic-bezier(0.4, 0, 1, 1)",
+        "purpose": "The app's top menu leaving (0.22s)."
+      },
+      {
+        "name": "card-lift",
+        "value": "transform 0.18s ease, box-shadow 0.18s ease",
+        "purpose": "Whole-card links lifting on hover."
       },
       {
         "name": "state",
-        "value": "0.15s ease",
-        "purpose": "Colour and background transitions on hover and active."
+        "value": "0.15s-0.2s colour and background transitions",
+        "purpose": "Hover and selected states on buttons, tabs, chips."
+      },
+      {
+        "name": "rise",
+        "value": "1s ease-out-expo, from opacity 0, translateY(22px), blur(6px)",
+        "purpose": "The site hero and page heads, staggered 0.12-0.36s; off under reduced motion."
+      },
+      {
+        "name": "photo-settle",
+        "value": "2.4s ease-out-expo, from scale(1.06)",
+        "purpose": "The site hero photograph settling once."
       }
     ],
     "breakpoints": [
       {
-        "name": "phone-shell",
-        "value": "899px",
-        "purpose": "At this width and below, the rail becomes the bottom tab bar and the Mais sheet."
+        "name": "tiny",
+        "value": "340px"
       },
       {
-        "name": "two-column-stack",
-        "value": "1100px",
-        "purpose": "Hoje, Semana and Compras move their side column under the main column; the Compras comparison stops being sticky."
+        "name": "xs",
+        "value": "480px"
       },
       {
-        "name": "row-collapse",
-        "value": "720px",
-        "purpose": "Page heads, Semana meal rows and Despensa rows stack; the page-head action goes full width."
+        "name": "sm",
+        "value": "640px"
       },
       {
-        "name": "sheet-rotate",
-        "value": "640px",
-        "purpose": "The day column lies down into a row and actions go full width; shopping-list row actions drop under the item name."
+        "name": "capture",
+        "value": "700px"
       },
       {
-        "name": "strip-rows",
-        "value": "680px (container)",
-        "purpose": "The next-days strip turns into rows."
-      }
-    ],
-    "urgencyScale": [
-      {
-        "level": 0,
-        "diameter": "6px",
-        "color": "var(--ink-dim)",
-        "when": "no expiry or more than 7 days"
+        "name": "md",
+        "value": "760px"
       },
       {
-        "level": 1,
-        "diameter": "10px",
-        "color": "var(--ink)",
-        "when": "4 to 7 days"
+        "name": "site-menu",
+        "value": "860px"
       },
       {
-        "level": 2,
-        "diameter": "15px",
-        "color": "var(--today)",
-        "when": "1 to 3 days"
+        "name": "app-phone",
+        "value": "899px"
       },
       {
-        "level": 3,
-        "diameter": "20px",
-        "color": "var(--today)",
-        "when": "today or expired"
+        "name": "site-stack",
+        "value": "900px"
       }
     ]
   },
   "components": [
     {
-      "name": "Primary Button",
+      "name": "Primary Button (app)",
       "kind": "button",
-      "refersTo": "button-primary-lg",
-      "description": "Ink slab for the main action of the day, such as Cozinhar. Flushes calendar red on hover.",
-      "html": "<button class=\"ds-btn-primary\">Cozinhar</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0.6rem 1.4rem; border: 1px solid var(--ink, #141414); border-radius: 10px; background: var(--ink, #141414); color: var(--bg, #ffffff); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; font-size: 16.5px; font-weight: 750; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease; } .ds-btn-primary:hover { background: var(--today, #d4261c); border-color: var(--today, #d4261c); color: #fff; } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; }"
+      "refersTo": "button-primary",
+      "description": "The main action on any app page: a small bottle-green slab with cream text.",
+      "html": "<div class=\"ds-scene\"><button class=\"ds-btn-primary\">Adicionar ao plano</button></div>",
+      "css": ".ds-scene { padding: 24px; background: linear-gradient(90deg, rgb(12 49 35 / 0.86), rgb(23 48 33 / 0.42)), #17392c; } .ds-btn-primary { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; display: inline-flex; align-items: center; padding: 11px 17px; border: 1px solid rgb(214 223 203 / 0.55); border-radius: 7px; background: #204e39; color: #fffdf3; font-size: 12px; font-weight: 600; line-height: 1.2; cursor: pointer; transition: background-color 0.15s; } .ds-btn-primary:hover { background: #163a29; color: #fff; } .ds-btn-primary:focus-visible { outline: 2px solid #fffdf3; outline-offset: 2px; } .ds-btn-primary:active { transform: translateY(1px); }"
     },
     {
-      "name": "Secondary Button",
+      "name": "Sage Button (app)",
       "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "Paper with a 2px ink border, the second action on every page.",
-      "html": "<button class=\"ds-btn-secondary\">Pôr o que falta na lista</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0.6rem 1.4rem; border: 2px solid var(--ink, #141414); border-radius: 10px; background: var(--surface, #ffffff); color: var(--ink, #141414); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; font-size: 16.5px; font-weight: 750; cursor: pointer; transition: transform 0.1s ease; } .ds-btn-secondary:active { transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; }"
+      "refersTo": "button-sage",
+      "description": "The second action in the app: muted sage with dark green text.",
+      "html": "<div class=\"ds-scene\"><button class=\"ds-btn-sage\">Pôr na lista</button></div>",
+      "css": ".ds-scene { padding: 24px; background: linear-gradient(90deg, rgb(12 49 35 / 0.86), rgb(23 48 33 / 0.42)), #17392c; } .ds-btn-sage { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; padding: 11px 17px; border: 1px solid #d6dfcb; border-radius: 7px; background: #b8c8a7; color: #172c21; font-size: 12px; font-weight: 600; line-height: 1.2; cursor: pointer; transition: background-color 0.15s; } .ds-btn-sage:hover { background: #d0ddc0; } .ds-btn-sage:focus-visible { outline: 2px solid #fffdf3; outline-offset: 2px; }"
     },
     {
-      "name": "Link Button",
+      "name": "Primary Button (site)",
       "kind": "button",
-      "refersTo": "link-button",
-      "description": "Quiet inline action in ink, underlined; the underline thickens on hover.",
-      "html": "<button class=\"ds-link\">Saltar</button>",
-      "css": ".ds-link { background: none; border: none; padding: 0.25rem 0; font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: 650; color: var(--ink, #141414); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; cursor: pointer; } .ds-link:hover { text-decoration-thickness: 2px; } .ds-link:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; }"
+      "refersTo": "button-site",
+      "description": "The site's call to action: a sage slab with ink text and an arrow that slides on hover.",
+      "html": "<div class=\"ds-band\"><a class=\"ds-btn-site\" href=\"#\">Pedir acesso <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></a></div>",
+      "css": ".ds-band { padding: 24px; background: #102c23; } .ds-btn-site { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; display: inline-flex; align-items: center; gap: 0.55rem; min-height: 46px; padding: 0 1.15rem; border-radius: 10px; background: var(--sage, #d6e2bb); color: var(--ink, #182c22); font-size: 0.94rem; font-weight: 600; text-decoration: none; transition: background-color 0.2s, transform 0.15s; } .ds-btn-site:hover { background: var(--sage-light, #e7efd3); } .ds-btn-site:active { transform: translateY(1px); } .ds-btn-site:focus-visible { outline: 2px solid #d6e2bb; outline-offset: 3px; } .ds-icon { width: 1.15em; height: 1.15em; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-site:hover .ds-icon { transform: translateX(4px); }"
     },
     {
-      "name": "Almanac Rail",
+      "name": "Glass Panel",
+      "kind": "card",
+      "refersTo": "glass-panel",
+      "description": "The app's one content surface: frosted green glass over the area photograph, serif title.",
+      "html": "<div class=\"ds-scene\"><section class=\"ds-glass\"><h2 class=\"ds-glass-title\">Usar primeiro</h2><p class=\"ds-glass-text\">Iogurte natural · termina amanhã</p><a class=\"ds-glass-link\" href=\"#\">Ver despensa</a></section></div>",
+      "css": ".ds-scene { padding: 28px; background: linear-gradient(90deg, rgb(12 49 35 / 0.86), rgb(23 48 33 / 0.42)), url('/editorial/pantry.png') center / cover, #17392c; } .ds-glass { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; padding: 1.5rem; border: 1px solid rgb(248 245 223 / 0.24); border-radius: 16px; background: linear-gradient(120deg, rgb(14 45 31 / 0.3), rgb(14 35 25 / 0.16)); backdrop-filter: blur(32px) saturate(0.8); -webkit-backdrop-filter: blur(32px) saturate(0.8); box-shadow: 0 12px 36px rgb(6 23 14 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.1); color: #fffdf3; } .ds-glass-title { font-family: 'Libre Caslon Display', Georgia, 'Times New Roman', serif; margin: 0 0 0.75rem; font-size: 30px; font-weight: 400; line-height: 1.1; letter-spacing: -0.3px; } .ds-glass-text { margin: 0 0 0.5rem; color: #f0f1e5; font-size: 14px; } .ds-glass-link { display: inline-block; padding: 8px 0; color: #fff2c9; font-size: 12px; font-weight: 700; text-decoration: none; } .ds-glass-link:hover { text-decoration: underline; } .ds-glass-link:focus-visible { outline: 2px solid #fffdf3; outline-offset: 2px; }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "product-card",
+      "description": "A product or recipe as a whole-card link: photograph on top, glass body, serif price; lifts on hover.",
+      "html": "<div class=\"ds-scene\"><a class=\"ds-card\" href=\"#\"><span class=\"ds-card-media\"></span><span class=\"ds-card-body\"><span class=\"ds-card-name\">Azeite virgem extra 750 ml</span><span class=\"ds-card-meta\">Continente · 9,79 €/l</span><span class=\"ds-card-price\">7,34 €</span></span></a></div>",
+      "css": ".ds-scene { padding: 28px; background: linear-gradient(90deg, rgb(12 49 35 / 0.86), rgb(23 48 33 / 0.42)), #17392c; } .ds-card { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; width: 17rem; overflow: hidden; border: 1px solid rgb(248 245 223 / 0.24); border-radius: 16px; background: linear-gradient(120deg, rgb(14 45 31 / 0.3), rgb(14 35 25 / 0.16)); backdrop-filter: blur(32px) saturate(0.8); box-shadow: 0 12px 36px rgb(6 23 14 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.1); color: #fffdf3; text-decoration: none; transition: transform 0.18s ease, box-shadow 0.18s ease; } .ds-card:hover { transform: translateY(-3px); box-shadow: 0 14px 38px rgb(6 23 14 / 0.3); } .ds-card:focus-visible { outline: 2px solid #fffdf3; outline-offset: 2px; } .ds-card-media { display: block; height: 185px; background: rgb(255 255 240 / 0.08); } .ds-card-body { display: grid; gap: 4px; padding: 18px; } .ds-card-name { font-size: 15px; font-weight: 700; line-height: 1.35; } .ds-card-meta { font-size: 12px; color: #e8ebdc; } .ds-card-price { font-family: 'Libre Caslon Display', Georgia, 'Times New Roman', serif; margin-top: 6px; font-size: 26px; font-variant-numeric: lining-nums tabular-nums; }"
+    },
+    {
+      "name": "Search Field (app)",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "The top bar's search: a cream pill with dark text, the one light field on the dark glass.",
+      "html": "<div class=\"ds-scene\"><label class=\"ds-search\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg><input placeholder=\"Procurar produtos, receitas…\"></label></div>",
+      "css": ".ds-scene { padding: 24px; background: linear-gradient(90deg, rgb(12 49 35 / 0.86), rgb(23 48 33 / 0.42)), #17392c; } .ds-search { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; display: flex; align-items: center; gap: 12px; width: min(380px, 100%); padding: 10px 18px; border: 1px solid rgb(255 255 255 / 0.53); border-radius: 30px; background: rgb(250 247 240 / 0.91); color: #29271f; } .ds-search:focus-within { outline: 2px solid #fffdf3; outline-offset: 2px; } .ds-search svg { width: 17px; height: 17px; flex: none; } .ds-search input { width: 100%; border: 0; outline: 0; background: none; color: #29271f; font: inherit; font-size: 13px; } .ds-search input::placeholder { color: #736c60; }"
+    },
+    {
+      "name": "Text Field (site)",
+      "kind": "input",
+      "refersTo": "field-site",
+      "description": "A form field on the site's paper: cream ground, ink hairline, bottle-green focus.",
+      "html": "<div class=\"ds-paper\"><label class=\"ds-field\"><span>Email</span><input type=\"email\" placeholder=\"nome@exemplo.pt\"></label></div>",
+      "css": ".ds-paper { padding: 24px; background: #f4f0e6; } .ds-field { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; display: grid; gap: 0.4rem; max-width: 22rem; color: #182c22; } .ds-field span { font-size: 0.92rem; font-weight: 600; } .ds-field input { padding: 0.8rem 0.95rem; border: 1px solid rgb(24 44 34 / 0.4); border-radius: 10px; background: #faf7f0; color: #182c22; font: inherit; font-size: 1rem; caret-color: #204e39; } .ds-field input:hover { border-color: rgb(24 44 34 / 0.6); } .ds-field input:focus-visible { border-color: #204e39; outline: 2px solid #204e39; outline-offset: 1px; } .ds-field input::placeholder { color: #4f6150; }"
+    },
+    {
+      "name": "Rail Navigation (app)",
       "kind": "nav",
       "refersTo": "rail",
-      "description": "Desktop navigation. A yellow column whose four everyday destinations are larger, with active shown as an ink inversion.",
-      "html": "<nav class=\"ds-rail\"><a class=\"ds-rail-link ds-main ds-active\" href=\"#\">Hoje</a><a class=\"ds-rail-link ds-main\" href=\"#\">Semana</a><a class=\"ds-rail-link ds-main\" href=\"#\">Despensa</a><a class=\"ds-rail-link ds-main\" href=\"#\">Compras</a><div class=\"ds-rail-sep\"></div><a class=\"ds-rail-link\" href=\"#\">Receitas</a><a class=\"ds-rail-link\" href=\"#\">Preços</a></nav>",
-      "css": ".ds-rail { display: flex; flex-direction: column; gap: 0.15rem; width: 15.5rem; padding: 1.5rem 1rem; background: var(--almanac, #f2c230); color: var(--almanac-ink, #141414); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; } .ds-rail-sep { margin: 0.6rem 0; border-top: 1px solid rgb(20 20 20 / 0.28); } .ds-rail-link { display: flex; align-items: center; min-height: 42px; padding: 0.6rem 0.7rem; border-radius: 6px; color: var(--almanac-ink, #141414); text-decoration: none; font-size: 15.5px; font-weight: 650; transition: background-color 0.15s ease, color 0.15s ease; } .ds-rail-link.ds-main { min-height: 46px; font-size: 18px; font-weight: 800; font-stretch: 88%; } .ds-rail-link:hover { background: rgb(20 20 20 / 0.09); } .ds-rail-link.ds-active { background: var(--almanac-ink, #141414); color: var(--almanac, #f2c230); } .ds-rail-link:focus-visible { outline: 2px solid var(--almanac-ink, #141414); outline-offset: 2px; }"
+      "description": "The desktop rail: forest glass, the logo on its cream plaque, links with a gold inset for the current place.",
+      "html": "<nav class=\"ds-rail\"><span class=\"ds-plaque\"><b>Domi</b><em>OS</em></span><a class=\"ds-rail-link is-active\" href=\"#\">Hoje</a><a class=\"ds-rail-link\" href=\"#\">Despensa</a><a class=\"ds-rail-link\" href=\"#\">Plano</a><a class=\"ds-rail-link\" href=\"#\">Compras</a></nav>",
+      "css": ".ds-rail { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; width: 216px; padding: 28px 18px 22px; background: rgb(16 44 35 / 0.85); backdrop-filter: blur(16px); border-right: 1px solid rgb(231 230 203 / 0.14); } .ds-plaque { align-self: flex-start; margin-bottom: 1.6rem; padding: 0.5rem 0.85rem 0.5rem 0.7rem; border-radius: 12px; background: #faf7f0; box-shadow: 0 6px 18px rgb(6 23 14 / 0.25); color: #16241f; font-size: 1.2rem; font-weight: 800; } .ds-plaque em { font-style: normal; color: #1e3a5c; } .ds-rail-link { display: flex; align-items: center; margin: 2px 0; padding: 10px 15px; border-radius: 7px; color: #ddd5c8; font-size: 14px; font-weight: 500; text-decoration: none; transition: background-color 0.15s, color 0.15s; } .ds-rail-link:hover { background: rgb(255 255 255 / 0.1); color: #fff; } .ds-rail-link:focus-visible { outline: 2px solid #fffdf3; outline-offset: 2px; } .ds-rail-link.is-active { background: rgb(255 255 255 / 0.1); color: #fff; box-shadow: inset 3px 0 #d6be94; }"
     },
     {
-      "name": "Phone Tab Bar",
-      "kind": "nav",
-      "refersTo": "tab",
-      "description": "Five yellow slots at thumb reach: Hoje, Semana, Despensa, Compras, Mais.",
-      "html": "<nav class=\"ds-tabbar\"><a class=\"ds-tab ds-active\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\"><rect x=\"4\" y=\"5\" width=\"16\" height=\"15\" rx=\"2\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M4 9.5h16M8.5 3v4M15.5 3v4\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>Hoje</a><a class=\"ds-tab\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M4 6h16M4 12h16M4 18h16\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M8 4v4M8 10v4M8 16v4\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>Semana</a><a class=\"ds-tab\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M3.5 5h2.2l2 10.5h10.6l1.9-7.5H7\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Compras</a></nav>",
-      "css": ".ds-tabbar { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0.35rem; background: var(--almanac, #f2c230); border-top: 2px solid var(--almanac-ink, #141414); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; } .ds-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 54px; border-radius: 8px; color: var(--almanac-ink, #141414); font-size: 12.5px; font-weight: 750; text-decoration: none; } .ds-tab svg { width: 24px; height: 24px; } .ds-tab.ds-active { background: var(--almanac-ink, #141414); color: var(--almanac, #f2c230); } .ds-tab:focus-visible { outline: 2px solid var(--almanac-ink, #141414); outline-offset: 1px; }"
-    },
-    {
-      "name": "Today's Sheet",
-      "kind": "custom",
-      "refersTo": "display",
-      "description": "Signature. A 6px rule on top, then the red condensed day number in a fixed column, and the dish name as the unframed interface.",
-      "html": "<article class=\"ds-sheet\"><div class=\"ds-day\"><span class=\"ds-wd\">Segunda-feira</span><span class=\"ds-num\">9</span><span class=\"ds-wd\">Novembro</span><span class=\"ds-season\">Outono</span></div><div class=\"ds-body\"><h1 class=\"ds-dish\">Arroz de pato com laranja</h1><p class=\"ds-meta\">Jantar para 4 pessoas</p><p class=\"ds-ready\"><span class=\"ds-dot\"></span><strong>Tens 6 de 8.</strong> Faltam pato e laranjas.</p></div></article>",
-      "css": ".ds-sheet { display: grid; grid-template-columns: 11rem minmax(0, 1fr); border-top: 6px solid var(--rule, #141414); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; color: var(--ink, #141414); } .ds-day { display: flex; flex-direction: column; padding: 1rem 1.25rem 1.25rem 0; } .ds-wd { font-size: 17px; font-weight: 850; font-stretch: 75%; text-transform: uppercase; letter-spacing: 0.04em; } .ds-num { margin: 0.35rem 0 0.15rem; font-size: 160px; font-weight: 900; font-stretch: 62%; line-height: 0.8; letter-spacing: -0.035em; color: var(--today, #d4261c); } .ds-season { margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--line, rgb(20 20 20 / 0.15)); font-size: 14px; color: var(--ink-dim, #5a5a57); } .ds-body { padding: 1.15rem 0 1.5rem 1.75rem; border-left: 1px solid var(--rule, #141414); } .ds-dish { margin: 0 0 1.25rem; max-width: 18ch; font-size: 56px; font-weight: 900; font-stretch: 70%; line-height: 0.95; letter-spacing: -0.015em; } .ds-meta { margin: -0.6rem 0 1.25rem; font-size: 17px; font-weight: 650; color: var(--ink-dim, #5a5a57); } .ds-ready { display: flex; align-items: baseline; gap: 0.6rem; font-size: 17px; } .ds-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--today, #d4261c); transform: translateY(1px); }"
-    },
-    {
-      "name": "Next Days Strip",
-      "kind": "custom",
-      "refersTo": "display",
-      "description": "The edges of the sheets below today's, shown as three cells with fixed number columns.",
-      "html": "<div class=\"ds-next\"><a class=\"ds-nd\" href=\"#\"><span class=\"ds-nn\">10</span><span><b>Bacalhau à Brás</b><br><span class=\"ds-ok\">Tens tudo</span></span></a><a class=\"ds-nd\" href=\"#\"><span class=\"ds-nn\">11</span><span><b>Caldo verde</b><br><span class=\"ds-miss\">Falta 1</span></span></a><a class=\"ds-nd\" href=\"#\"><span class=\"ds-nn ds-sun\">15</span><span class=\"ds-open\">Por planear</span></a></div>",
-      "css": ".ds-next { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 9px; border-top: 2px solid var(--rule, #141414); border-bottom: 1px solid var(--line, rgb(20 20 20 / 0.15)); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; } .ds-next::before { content: ''; position: absolute; inset: -9px 0 auto 0; height: 7px; border-top: 1px solid var(--rule, #141414); border-bottom: 1px solid var(--rule, #141414); opacity: 0.55; } .ds-nd { display: flex; gap: 0.85rem; min-height: 84px; padding: 0.85rem 1rem; color: var(--ink, #141414); text-decoration: none; transition: background-color 0.15s ease; } .ds-nd + .ds-nd { border-left: 1px solid var(--line, rgb(20 20 20 / 0.15)); } .ds-nd:hover { background: var(--surface-2, #f1f1ef); } .ds-nn { width: 1.15em; font-size: 44px; font-weight: 900; font-stretch: 62%; line-height: 0.85; } .ds-sun { color: var(--today, #d4261c); } .ds-ok { font-size: 14px; font-weight: 650; color: var(--accent, #23683a); } .ds-miss { font-size: 14px; font-weight: 650; color: var(--today, #d4261c); } .ds-open { color: var(--ink-dim, #5a5a57); font-weight: 550; }"
-    },
-    {
-      "name": "Week Day Row",
-      "kind": "custom",
-      "refersTo": "display",
-      "description": "Semana. Days as rows under a 6px rule, the condensed number in a fixed column (red for today and Sunday), meals as slot label plus condensed dish.",
-      "html": "<ol class=\"ds-week\"><li class=\"ds-wday ds-past\"><div class=\"ds-wdate\"><span class=\"ds-wnum\">8</span><span class=\"ds-wwd\">Domingo</span></div><p class=\"ds-wempty\">Nada planeado.</p></li><li class=\"ds-wday\"><div class=\"ds-wdate\"><span class=\"ds-wnum ds-red\">9</span><span class=\"ds-wwd\">Segunda <span class=\"ds-red\">· hoje</span></span></div><ul class=\"ds-meals\"><li><span class=\"ds-slot\">Almoço</span><a class=\"ds-wdish\" href=\"#\">Caldo verde</a></li><li><span class=\"ds-slot\">Jantar</span><a class=\"ds-wdish\" href=\"#\">Arroz de pato com laranja</a></li></ul></li></ol>",
-      "css": ".ds-week { list-style: none; margin: 0; padding: 0; border-top: 6px solid var(--rule, #141414); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; color: var(--ink, #141414); } .ds-wday { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: 0 1.5rem; padding: 0.9rem 0; border-bottom: 1px solid var(--line, rgb(20 20 20 / 0.15)); } .ds-wdate { display: flex; flex-direction: column; } .ds-wnum { font-size: 56px; font-weight: 900; font-stretch: 62%; line-height: 0.85; letter-spacing: -0.02em; } .ds-red { color: var(--today, #d4261c); } .ds-wwd, .ds-slot { margin-top: 0.35rem; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-dim, #5a5a57); } .ds-past .ds-wnum { color: var(--ink-dim, #5a5a57); } .ds-wempty { align-self: center; margin: 0; color: var(--ink-dim, #5a5a57); } .ds-meals { list-style: none; margin: 0; padding: 0; } .ds-meals li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); align-items: baseline; gap: 1rem; padding: 0.35rem 0; } .ds-meals li + li { border-top: 1px solid var(--line, rgb(20 20 20 / 0.15)); padding-top: 0.6rem; } .ds-wdish { font-size: 26px; font-weight: 900; font-stretch: 72%; line-height: 1.05; color: var(--ink, #141414); text-decoration: none; } .ds-wdish:hover { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.12em; } .ds-wdish:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; }"
-    },
-    {
-      "name": "Urgency Row",
-      "kind": "custom",
-      "refersTo": "calendar-red",
-      "description": "Usar primeiro and Despensa rows. The dot diameter on a fixed scale carries the urgency; both pages share one urgency function.",
-      "html": "<ul class=\"ds-use\"><li class=\"ds-u3\"><span class=\"ds-udot\"></span><span>Iogurte Natural x4</span><span class=\"ds-when\">Hoje</span></li><li class=\"ds-u2\"><span class=\"ds-udot\"></span><span>Couve Portuguesa</span><span class=\"ds-when\">2 dias</span></li><li class=\"ds-u1\"><span class=\"ds-udot\"></span><span>Pão de Forma</span><span class=\"ds-when\">5 dias</span></li><li><span class=\"ds-udot\"></span><span>Arroz Agulha</span><span class=\"ds-when\">Sem validade</span></li></ul>",
-      "css": ".ds-use { list-style: none; margin: 0; padding: 0; border-top: 6px solid var(--rule, #141414); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; } .ds-use li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 0.75rem; min-height: 56px; border-bottom: 1px solid var(--line, rgb(20 20 20 / 0.15)); font-weight: 700; } .ds-udot { justify-self: center; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-dim, #5a5a57); } .ds-u1 .ds-udot { width: 10px; height: 10px; background: var(--ink, #141414); } .ds-u2 .ds-udot { width: 15px; height: 15px; background: var(--today, #d4261c); } .ds-u3 .ds-udot { width: 20px; height: 20px; background: var(--today, #d4261c); } .ds-when { font-size: 14.5px; font-weight: 750; white-space: nowrap; } .ds-u2 .ds-when, .ds-u3 .ds-when { color: var(--today, #d4261c); }"
-    },
-    {
-      "name": "Price Tag",
+      "name": "Chip (site)",
       "kind": "chip",
-      "refersTo": "price-tag",
-      "description": "Prices are set on almanac yellow with ink, never in green.",
-      "html": "<span class=\"ds-price\">23,87 €</span>",
-      "css": ".ds-price { display: inline-block; padding: 0.05rem 0.4rem; border-radius: 3px; background: var(--almanac, #f2c230); color: var(--almanac-ink, #141414); font-family: 'Archivo Variable', 'Segoe UI', Arial, sans-serif; font-weight: 800; white-space: nowrap; }"
+      "refersTo": "chip",
+      "description": "A pill choice on green: cream hairline at rest, sage fill when selected.",
+      "html": "<div class=\"ds-band\"><button class=\"ds-chip\" aria-pressed=\"true\">Continente</button> <button class=\"ds-chip\" aria-pressed=\"false\">Pingo Doce</button></div>",
+      "css": ".ds-band { display: flex; gap: 0.4rem; padding: 24px; background: #17392c; } .ds-chip { font-family: 'DM Sans Variable', 'DM Sans', 'Segoe UI', Arial, sans-serif; min-height: 44px; padding: 0 0.9rem; border: 1px solid rgb(248 245 223 / 0.22); border-radius: 999px; background: transparent; color: #fffdf3; font-size: 0.88rem; cursor: pointer; transition: background-color 0.2s, border-color 0.2s, color 0.2s; } .ds-chip:hover { background: rgb(255 253 243 / 0.1); } .ds-chip:focus-visible { outline: 2px solid #d6e2bb; outline-offset: 3px; } .ds-chip[aria-pressed=\"true\"] { border-color: #d6e2bb; background: #d6e2bb; color: #182c22; font-weight: 600; }"
     }
   ],
   "narrative": {
-    "northStar": "A Folha do Dia",
-    "overview": "DomiOS is printed like a Portuguese tear-off wall calendar crossed with the Borda d'Água almanac. White newsprint ground, black ink, almanac yellow framing the app, calendar red for the day itself. A household lives by days, so the app is built around the day as a sheet: a huge condensed red number in a fixed column, a thick black rule across the top, and what gets eaten that day set large and unframed beside it. Below today's sheet you can see the edges of the next ones.\n\nIt is dense the way a printed almanac is dense: hierarchy comes from type width and weight and from black rules, never from boxes. There are no card frames, no panel shadows and no dashboard of equal tiles. Sections start under a 6px black rule and their rows are split by hairlines. Colour has a job or it isn't there: red means today, Sunday or \"running out\", the single green means \"tens tudo\", and yellow means the shell.\n\nScope of this world (honest state, 2026-11-09, second pass). The first pass rebuilt the world tokens, the app shell (desktop rail, phone tab bar, \"Mais\" sheet, guest header) and the Hoje page. The second pass rebuilt the other three everyday destinations, Semana, Despensa and Compras (the list and the lists index), and restyled the shared components every route uses: panels lost their frames and gained the 6px rule, pills and tags went to 3px, tables and the pantry list are headed by a 2px rule, notices became a paper-shade wash, and the page fade-in is gone. Receitas, Cozinhar, Ementas, Nutrição, Preços/Produtos, Promoções, Casa, Conta and the auth pages have only been touched by that shared restyle. Their own layouts (cards, verdict chips, shelf labels, aisle hues from src/shared/tokens.css) are legacy, pending migration, not examples of this world. The store comparison in Compras still uses the legacy shelf labels and verdict bands, and the shopping list's item-group headings still carry aisle-hue dots. The public site (site/) and the admin (admin/) still use the old shared tokens and Schibsted Grotesk and are not in this world yet.",
+    "northStar": "The Kitchen Through Green Glass",
+    "overview": "DomiOS is a household's own kitchen seen at the end of the day, through a pane of green glass. Every area of the app has its own atmospheric photograph (the pantry shelves, the market basket, the stove, the table), fixed behind the page and darkened by a deep green veil that runs from nearly opaque on the reading side to almost clear on the far side. Content floats over it on frosted panels: a green-tinted gradient, a heavy blur, a thin cream edge and soft corners. Titles and prices are set in a high-contrast display serif; everything you read or press is in a quiet geometric sans.\n\nThe app is dark-only and warm: cream type on green glass, sage for the second action, a thread of gold for \"you are here\", butter-yellow for links. Density is moderate: cards of a fixed width flow in an auto-fill grid with a 20px gap, panels breathe at 1 to 1.5rem of padding, and the phone turns photo cards into compact rows so several fit on one screen in the supermarket aisle. The public site lives in the same world, but it alternates: dark green bands with photography carry the header, the hero, the tour, the inner page heads and the footer, while long reading runs on light cream paper with dark green ink.\n\nThis world replaced the tear-off calendar (\"Folha do Dia\") on the app and the old shared-token look on the site. Its condensed Archivo numerals, 6px ink rules, calendar red and pale teal frame are retired.",
     "keyCharacteristics": [
-      "Today's sheet is the signature: a red condensed day number in a fixed left column, a 6px black rule on top, and the dish name as the interface.",
-      "Archivo Variable runs on its width axis: condensed and heavy for numerals, dish names and headings, normal width for UI text.",
-      "Thick black rules head sections. Hairlines separate rows. No card chrome, no shadows.",
-      "Urgency is shown by dot diameter on a fixed four-step scale, not by more colours.",
-      "Almanac yellow owns the frame (rail, tab bar, Mais sheet) and the price tag. Content sits on white paper.",
-      "One motion moment: the previous day's sheet tears upward once when the day changes."
+      "An area photograph behind every app page, always under a green veil; the site reuses the same scenes on its page heads.",
+      "Frosted glass panels (gradient tint, 32px blur, 1px cream edge, 16px corners) as the one content surface in the app; glass inside glass goes flat.",
+      "Libre Caslon Display at 400 only, for titles, prices and big numerals; DM Sans for all reading and every control.",
+      "Cream type on green in the app; dark green ink on cream paper for reading on the site.",
+      "Gold marks the current place, sage marks the second action, butter marks links.",
+      "The original logo, unchanged, on a cream plaque."
     ],
     "rules": [
       {
-        "name": "The Calendar Red Rule",
-        "body": "Red marks today, Sundays and what is running out. Use it for nothing else, and never as decoration or section colour.",
+        "name": "The Green Veil Rule",
+        "body": "Text never sits on a bare photograph. A green gradient veil goes between them, darkest on the reading side (82 to 96% opaque) and thinning toward the far side (10 to 30%); on phones it turns vertical, clear at the top over the photograph and solid forest under the text. The site's closing band is the one inversion: a cream veil over a light photograph, for dark ink.",
         "section": "colors"
       },
       {
-        "name": "The One Green Rule",
-        "body": "There is exactly one green and it means \"tens tudo\". Prices, savings and \"cheapest store\" are not green. They go on the yellow price tag, including the cheapest price on each shopping-list line.",
+        "name": "The Gold Thread Rule",
+        "body": "In the app, gold means \"you are here\" and nothing else: the active rail link, the active tab, the open menu, the signed-in user. Selection elsewhere (a pressed chip, a filter) uses green or a cream wash, never gold.",
         "section": "colors"
       },
       {
-        "name": "The Yellow Frame Rule",
-        "body": "Almanac yellow belongs to the shell and the price tag. Don't use it as a content background or a status colour.",
+        "name": "The Plaque Rule",
+        "body": "The logo keeps its own colours (two roofs, \"Domi\" in `#16241f`, \"OS\" in `#1e3a5c`) and always sits on a cream plaque with 12px corners and a soft shadow, in the app and on the site. Never set it straight on green or recolour it.",
         "section": "colors"
       },
       {
-        "name": "The Width Axis Rule",
-        "body": "Hierarchy comes from width and weight on one family. Numerals and dish names are condensed (62–72%). Navigation and body copy stay at normal width, apart from the main rail destinations at 88%.",
+        "name": "The One Serif Rule",
+        "body": "The serif appears at 400 only, and only for h1, h2, prices and large numerals. Card titles, h3, buttons, labels, meta and body are DM Sans. Headings are never uppercase.",
         "section": "typography"
       },
       {
         "name": "The No Kicker Rule",
-        "body": "Don't put an eyebrow or kicker above a heading. Labels sit inline, like the meal slot before the dish, or beside the content, like the weekday in the day column.",
+        "body": "Don't put an eyebrow or kicker above a heading. The title carries the page; context sits in the lede under it or in the breadcrumb above it.",
         "section": "typography"
       },
       {
-        "name": "The Fixed Column Rule",
-        "body": "Days are rows ordered by time. A day's number always sits in its own column at a fixed width, like a split-flap board.",
+        "name": "The One Scene Per Area Rule",
+        "body": "Each app area has its own photograph (Hoje, Despensa, Plano, Compras, Cozinhar, Receitas, Ementas, Nutrição, Produtos, Promoções, Casa), and the site's inner page heads reuse the same scenes. A new area gets its own scene, under the same veil.",
         "section": "layout"
       },
       {
-        "name": "The Sheet Edge Rule",
-        "body": "To show that something is stacked or comes next, draw sheet edges (thin parallel rules). Don't use drop shadows.",
+        "name": "The Paper For Reading Rule",
+        "body": "On the site, dark green bands frame (header, hero, tour, page heads, footer) and paper carries the reading (story, feature lists, guide, forms). Don't run long text on green.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Inside Glass Rule",
+        "body": "Glass is one layer deep. A panel inside a panel loses its blur and shadow and becomes a 6% cream wash (`rgb(255 255 240 / 0.06)`); lists inside panels lose their box entirely.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Lift Means Link Rule",
+        "body": "Only something you can open as a whole (a product, recipe or photo card) lifts on hover. Panels, rows and buttons don't move.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do head every section with a 6px black rule and split its rows with hairlines.",
-      "Do set day numbers and counts in Archivo at 900 weight and 62% width, and dish names at 70%.",
-      "Do keep a day's number in a fixed column wherever days are listed.",
-      "Do show urgency by dot diameter on the fixed 6 / 10 / 15 / 20px scale.",
-      "Do put prices on the yellow price tag.",
-      "Do keep almanac yellow on the shell: rail, tab bar, Mais sheet, guest header.",
-      "Do open a page with the title on the left and its primary action on the right."
+      "**Do** put an area photograph behind every app page and a green veil between it and the text.",
+      "**Do** set content on glass panels (16px corners, 1px cream edge, glass shadow) and flatten any panel nested inside one.",
+      "**Do** use Libre Caslon Display at 400 for titles, prices and big numerals, and DM Sans for everything else.",
+      "**Do** mark the current place with gold and only with gold.",
+      "**Do** keep the logo in its own colours on the cream plaque.",
+      "**Do** use soft, green-black shadows, and lift only whole-card links on hover.",
+      "**Do** turn photo cards into compact thumbnail rows on the phone and keep the tab bar within thumb reach."
     ],
     "donts": [
-      "Don't wrap content in cards, panels with chrome, or drop shadows.",
-      "Don't use calendar red for anything except today, Sundays and \"running out\".",
-      "Don't use green for anything except \"tens tudo\", including prices and savings.",
-      "Don't put an eyebrow or kicker above a heading.",
-      "Don't animate ordinary page mounts. The tear is the only entrance, and it happens once per day.",
-      "Don't treat the legacy route components or the aisle hues in src/shared/tokens.css as part of this world."
+      "**Don't** put an eyebrow or kicker above a heading.",
+      "**Don't** put text straight on a photograph without the veil.",
+      "**Don't** set the serif in bold, in uppercase, or for body, buttons or labels.",
+      "**Don't** use hard-edged, offset or grey shadows.",
+      "**Don't** nest blurred glass inside blurred glass.",
+      "**Don't** set running text or meta lines below 12px; only the phone tab labels (11.5px, under their icons) go smaller.",
+      "**Don't** bring back the Folha do Dia: condensed Archivo numerals, 6px ink rules, calendar red, the pale teal frame."
     ]
   }
 }

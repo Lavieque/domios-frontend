@@ -1,76 +1,133 @@
+import type { PointerEvent } from "react";
 import { Link } from "react-router-dom";
+import { ArrowIcon, CheckIcon } from "../components/Icons";
 import { RequestCta } from "../components/RequestCta";
-import { FeatureList } from "../components/FeatureList";
 import { ShelfDemo } from "../components/ShelfDemo";
+import { Shot } from "../components/Shot";
+import { Tour } from "../components/Tour";
 import { useSite } from "../context";
+import { PHOTO, SCENE } from "../photos";
 
 export function HomePage() {
-  const { t, to } = useSite();
+  const { lang, t, to } = useSite();
   const h = t.home;
+  // The date is real (the household's timezone); what follows it in the strip is example data.
+  const today = new Intl.DateTimeFormat(lang === "pt" ? "pt-PT" : "en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "Europe/Lisbon",
+  }).format(new Date());
+
+  // A warm light follows the mouse across the kitchen, like the window's light on the table.
+  function light(event: PointerEvent<HTMLElement>) {
+    if (event.pointerType !== "mouse") return;
+    const box = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--lx", `${event.clientX - box.left}px`);
+    event.currentTarget.style.setProperty("--ly", `${event.clientY - box.top}px`);
+    event.currentTarget.classList.add("is-lit");
+  }
+  function dark(event: PointerEvent<HTMLElement>) {
+    event.currentTarget.classList.remove("is-lit");
+  }
+
   return (
     <>
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <h1 id="hero-title">{h.title}</h1>
-          <p className="lede">{h.lede}</p>
+      <section className="hero" aria-labelledby="hero-title" onPointerMove={light} onPointerLeave={dark}>
+        <img className="hero-photo" src={PHOTO.kitchen} alt="" fetchPriority="high" decoding="async" />
+        <span className="hero-light" aria-hidden="true" />
+        <div className="hero-inner">
+          <h1 id="hero-title">
+            <span>{h.title[0]}</span> <span className="hero-accent">{h.title[1]}</span>
+          </h1>
+          <p className="hero-lede">{h.lede}</p>
           <div className="hero-actions">
-            <Link className="button-primary button-lg" to={to({ kind: "request" })}>
+            <Link className="button button-lg" to={to({ kind: "request" })}>
               {h.primary}
+              <ArrowIcon />
             </Link>
-            <a className="text-link" href="#como-funciona">
+            <a className="button button-ghost button-lg" href="#como-funciona">
               {h.secondary}
+              <ArrowIcon down />
             </a>
           </div>
         </div>
-        <ShelfDemo />
-      </section>
 
-      <section id="como-funciona" className="band judge" aria-labelledby="judge-title">
-        <div className="judge-intro">
-          <h2 id="judge-title">{h.judgeTitle}</h2>
-          <p className="band-intro">{h.judgeIntro}</p>
-        </div>
-        <ol className="judge-list">
-          {h.judge.map((item, i) => (
-            <li key={item.title}>
-              <span className="judge-n" aria-hidden="true">
-                {i + 1}
-              </span>
-              <div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+        <aside className="glance" aria-label={h.glance.label}>
+          <p className="glance-day">
+            <span>{today}</span>
+            <span className="tag">{h.glance.example}</span>
+          </p>
+          <dl>
+            {h.glance.items.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>
+                  <strong>{item.value}</strong>
+                  <span>{item.note}</span>
+                </dd>
               </div>
-            </li>
-          ))}
-        </ol>
+            ))}
+          </dl>
+        </aside>
       </section>
 
-      <section className="band" aria-labelledby="menus-title">
-        <h2 id="menus-title">{h.connectedTitle}</h2>
-        <p className="band-intro">{h.connectedIntro}</p>
-        <FeatureList groupHome={h.groupHome} groupCatalog={h.groupCatalog} />
+      <section id="como-funciona" className="story" aria-labelledby="story-title">
+        <header className="section-head">
+          <h2 id="story-title">{h.storyTitle}</h2>
+          <p>{h.storyIntro}</p>
+        </header>
+        {h.story.map((s) => {
+          const f = t.features[s.key];
+          // The shopping list is a phone screen: it is shown as one, in front of its scene.
+          const phone = s.key === "lists";
+          return (
+            <article key={s.key} className={phone ? "story-row story-row-phone" : "story-row"}>
+              <div className="story-copy">
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+                <ul className="points">
+                  {s.points.map((point) => (
+                    <li key={point}>
+                      <CheckIcon />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+                <Link className="text-link" to={to({ kind: "feature", key: s.key })}>
+                  {f.name}: {f.hint.toLowerCase()}
+                  <ArrowIcon />
+                </Link>
+              </div>
+              {phone ? (
+                <div className="story-scene">
+                  <img className="story-scene-photo" src={SCENE[s.key]} alt="" loading="lazy" decoding="async" />
+                  <Shot shot={s.key} alt={f.shotAlt} caption={h.tourCaption} phone />
+                </div>
+              ) : (
+                <Shot shot={s.key} alt={f.shotAlt} caption={h.tourCaption} />
+              )}
+            </article>
+          );
+        })}
       </section>
 
-      <section className="band" aria-labelledby="flow-title">
-        <h2 id="flow-title">{h.flowTitle}</h2>
-        <ol className="flow">
-          {h.flow.map((step) => (
-            <li key={step.title}>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <Tour />
 
-      <section className="guide-teaser" aria-labelledby="guide-teaser-title">
-        <div>
-          <h2 id="guide-teaser-title">{h.guideTitle}</h2>
-          <p>{h.guideText}</p>
+      <section className="judge" aria-labelledby="judge-title">
+        <div className="judge-copy">
+          <h2 id="judge-title">{h.judgeTitle}</h2>
+          <p className="judge-intro">{h.judgeIntro}</p>
+          <dl className="judge-list">
+            {h.judge.map((item) => (
+              <div key={item.title}>
+                <dt>{item.title}</dt>
+                <dd>{item.text}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <Link className="button-secondary" to={to({ kind: "guide" })}>
-          {h.guideCta}
-        </Link>
+        <ShelfDemo />
       </section>
 
       <RequestCta title={h.closeTitle} text={h.closeText} />

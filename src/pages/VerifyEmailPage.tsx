@@ -7,11 +7,13 @@ import { AuthSheet } from "../components/AuthSheet";
 import { tokenFromHash } from "../auth/links";
 import { sessionStore } from "../auth/sessionStore";
 import { useSession } from "../auth/useSession";
+import { useT } from "../i18n";
 
 type Status = "verifying" | "verified" | "invalid" | "error";
 
 /** Destino do link do email `{Frontend:BaseUrl}/verify-email#token=...` (caminho fixado pela Api). */
 export function VerifyEmailPage() {
+  const t = useT();
   const session = useSession();
   const navigate = useNavigate();
   const hashToken = tokenFromHash(useLocation().hash);
@@ -45,13 +47,13 @@ export function VerifyEmailPage() {
   }, [hashToken, navigate]);
 
   return (
-    <AuthSheet title="Confirmar email">
-      {status === "verifying" && <p className="muted loading">A confirmar…</p>}
-      {status === "verified" && <p className="notice">Email confirmado. Obrigado!</p>}
+    <AuthSheet title={t.auth.confirmEmailTitle}>
+      {status === "verifying" && <p className="muted loading loading-text">{t.auth.confirming}</p>}
+      {status === "verified" && <p className="notice">{t.auth.emailConfirmed}</p>}
       {status === "invalid" && (
         <p className="form-error" role="alert">
-          Link já usado ou expirado — se já confirmaste o email, não precisas de fazer nada.
-          {session && !session.emailVerified && " Podes pedir um link novo na tua conta."}
+          {t.auth.verifyLinkUsed}
+          {session && !session.emailVerified && t.auth.verifyAskNewLink}
         </p>
       )}
       {status === "error" && (
@@ -61,7 +63,7 @@ export function VerifyEmailPage() {
       )}
 
       <p className="form-links">
-        {session ? <Link to="/conta">Ir para a conta</Link> : <Link to="/entrar">Entrar</Link>}
+        {session ? <Link to="/conta">{t.auth.goToAccount}</Link> : <Link to="/entrar">{t.common.signIn}</Link>}
       </p>
     </AuthSheet>
   );

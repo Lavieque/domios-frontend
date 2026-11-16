@@ -1,0 +1,2338 @@
+/* =====================================================================
+   Editorial, segunda passagem: o que ainda divergia do preview.
+   Carregado depois de editorial.css; vale só dentro de `.app.editorial`.
+   ===================================================================== */
+
+/* Títulos nunca em maiúsculas; as secções dentro de painéis seguem o h2 serifado. */
+.editorial :is(h1, h2, .side-head h2, .panel > h2, .panel > h2:first-child, .list-main > h2, .recipe-section-head h2) {
+  text-transform: none;
+  letter-spacing: -0.3px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+}
+
+.editorial .panel > h2,
+.editorial .side-head h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(26px, 2.4vw, 32px);
+  line-height: 1.08;
+}
+
+.editorial .side-head {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* Listas dentro de painéis: sem caixa por dentro da caixa. */
+.editorial :is(.panel, .side-block, .list-main, .list-side) :is(.settings-list, .member-list, .store-rows, .table-wrap, .event-timeline, .pantry-list) {
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.editorial .side-block {
+  border-top: 0;
+}
+
+/* Cabeçalho de secção e ligações com seta. */
+.editorial .section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 0 0 19px;
+}
+
+.editorial :is(.home-grid, .stats) .panel {
+  margin: 0;
+}
+
+.editorial a:not([class]) {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.editorial a:not([class]):hover {
+  text-decoration: underline;
+}
+
+.editorial .section-head h2 {
+  margin: 0;
+}
+
+.editorial .section-head-loose {
+  margin: 28px 0 18px;
+}
+
+.editorial .arrow-link,
+.editorial .side-head a,
+.editorial .link-button,
+.editorial .settings-action {
+  display: inline-block;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: #fff2c9;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.editorial .arrow-link:hover,
+.editorial .side-head a:hover,
+.editorial .link-button:hover,
+.editorial .settings-action:hover {
+  text-decoration: underline;
+}
+
+/* Botões do preview: pequenos, verdes ou salva. */
+.editorial :is(.button-primary, .button-secondary, .button-danger, .button-sage) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 11px 17px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.editorial .button-lg {
+  padding: 13px 20px;
+  font-size: 13px;
+}
+
+.editorial :is(.button-secondary, .button-sage) {
+  background: #b8c8a7;
+  border: 1px solid #d6dfcb;
+  color: #172c21;
+}
+
+.editorial :is(.button-secondary, .button-sage):hover:not(:disabled) {
+  background: #d0ddc0;
+  color: #172c21;
+}
+
+.editorial .button-danger {
+  background: #874a35;
+  border: 1px solid #a5604a;
+  color: #fffdf3;
+}
+
+.editorial .row-action {
+  padding: 6px 11px;
+  border: 1px solid rgb(255 255 230 / 0.35);
+  border-radius: 7px;
+  background: rgb(255 255 240 / 0.1);
+  color: #fffdf3;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.editorial .chip {
+  padding: 8px 15px;
+  border-radius: 25px;
+  font-size: 12px;
+}
+
+.editorial .chip[aria-pressed="true"] {
+  background: var(--green);
+  border-color: #d6dfcb;
+  color: #fff;
+}
+
+/* Etiquetas pequenas (badges). */
+.editorial :is(.badge, .pill, .settings-flag, .status-tag) {
+  display: inline-block;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 20px;
+  background: #e5ebdd;
+  color: #35503b;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.editorial :is(.badge-warn, .settings-flag.is-pending) {
+  background: #f5ddb0;
+  color: #805317;
+}
+
+/* Rodapé. */
+.editorial .app-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 clamp(16px, 2.4vw, 34px);
+  padding: 16px 0 22px;
+  border-top: 1px solid rgb(255 255 255 / 0.25);
+  color: #f0e7d7;
+  font-size: 10px;
+}
+
+/* ---------- Hoje ---------- */
+
+.editorial .today-intro .eyebrow {
+  margin-bottom: 1rem;
+}
+
+.editorial .stats {
+  display: flex;
+  gap: 14px;
+  max-width: 790px;
+  margin: 8px 0 25px;
+}
+
+.editorial .stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(26px) saturate(0.8);
+  -webkit-backdrop-filter: blur(26px) saturate(0.8);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.editorial .stat svg {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  color: #dfedca;
+}
+
+.editorial .stat b {
+  display: block;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.editorial .stat small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: #f0f1e5;
+}
+
+.editorial .home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr);
+  gap: 19px;
+  align-items: stretch;
+}
+
+.editorial .home-grid-bottom {
+  margin: 19px 0;
+}
+
+.editorial .photo-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.editorial .photo-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--glass-edge);
+  border-radius: 9px;
+  background: rgb(255 255 240 / 0.04);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.editorial a.photo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgb(6 23 14 / 0.25);
+}
+
+.editorial .photo-card-media {
+  display: block;
+  height: 155px;
+  /* Sem foto fica uma tigela desenhada, como no telemóvel; a foto tapa-a quando carrega. */
+  background: rgb(255 255 240 / 0.08)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e3e7d8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' opacity='.55'%3E%3Cpath d='M4 13h16a8 8 0 0 1-16 0z M8 9c0-2 1-3 2-4 M12 9c0-2 1-3 2-4'/%3E%3C/svg%3E")
+    center / 34px no-repeat;
+}
+
+.editorial .photo-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial .photo-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+}
+
+.editorial .photo-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.editorial .photo-card-meta {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #f0f1e5;
+}
+
+.editorial .use-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgb(255 249 220 / 0.19);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.editorial .use-row-thumb {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #e8e2d4;
+}
+
+.editorial .use-row-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial .use-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.editorial .use-row-text strong {
+  font-size: 16px;
+}
+
+.editorial .use-row-text span {
+  font-size: 13px;
+  color: #f0f1e5;
+}
+
+/* Painéis com fotografia na extremidade direita. */
+.editorial .panel.edge-photo {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-right: calc(clamp(78px, 31%, 280px) + 18px);
+}
+
+.editorial .edge-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -1;
+  width: 68%;
+  background: var(--edge-image) center / cover no-repeat;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgb(0 0 0 / 0.03) 14%,
+    rgb(0 0 0 / 0.12) 29%,
+    rgb(0 0 0 / 0.32) 45%,
+    rgb(0 0 0 / 0.62) 63%,
+    rgb(0 0 0 / 0.88) 82%,
+    #000 100%
+  );
+  pointer-events: none;
+}
+
+.editorial .edge-shopping {
+  --edge-image: url("/editorial/scene-compras.jpg");
+}
+
+.editorial .edge-offers {
+  --edge-image: url("/editorial/scene-promocoes.jpg");
+}
+
+.editorial .shop-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.editorial .shop-banner h2 {
+  max-width: 310px;
+  font-size: 35px;
+}
+
+.editorial .panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 17px;
+}
+
+/* ---------- Destaque (Receitas, Cozinhar) ---------- */
+
+.editorial .feature-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  margin-bottom: 25px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: var(--glass-shadow);
+}
+
+.editorial .feature-card-media {
+  min-height: 290px;
+  max-height: 290px;
+  background: rgb(255 255 240 / 0.08);
+}
+
+.editorial .feature-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial .feature-card-body {
+  align-self: center;
+  padding: 30px;
+}
+
+.editorial .feature-card-body h2 {
+  margin: 10px 0;
+  font-size: clamp(30px, 3vw, 39px);
+}
+
+.editorial .feature-card-meta {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: #f0f1e5;
+}
+
+/* ---------- Planeamento: a semana como calendário ---------- */
+
+.editorial .week-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.editorial .week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(125px, 1fr));
+  gap: 0;
+  padding: 0;
+  overflow-x: auto;
+  border-top: 1px solid var(--glass-edge);
+}
+
+.editorial .week-day {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 270px;
+  padding: 0 8px 12px;
+  border-bottom: 0;
+  border-right: 1px solid rgb(215 215 203 / 0.25);
+}
+
+.editorial .week-day:last-child {
+  border-right: 0;
+}
+
+.editorial .week-day.is-today {
+  background: rgb(228 235 211 / 0.12);
+}
+
+.editorial .week-day-date {
+  flex-direction: column-reverse;
+  align-items: center;
+  margin: 0 -8px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgb(215 215 203 / 0.25);
+  background: rgb(245 245 233 / 0.08);
+}
+
+.editorial .week-day-number {
+  margin-top: 8px;
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  font-stretch: 100%;
+  color: var(--ink);
+}
+
+.editorial .week-day-number.is-red {
+  color: #f5ddb0;
+}
+
+.editorial .week-day-weekday {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: #f0f1e5;
+}
+
+.editorial .week-day-today {
+  display: block;
+  color: #f5ddb0;
+}
+
+.editorial .week-day-empty {
+  align-self: center;
+  font-size: 12px;
+}
+
+.editorial .week-meal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 1px solid rgb(255 249 220 / 0.19);
+  border-radius: 6px;
+  background: rgb(228 235 211 / 0.14);
+}
+
+.editorial .week-meal + .week-meal {
+  border-top: 1px solid rgb(255 249 220 / 0.19);
+  padding-top: 8px;
+}
+
+.editorial .week-meal-slot {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: #e3e8da;
+}
+
+.editorial .week-meal-dish {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  font-stretch: 100%;
+  line-height: 1.3;
+}
+
+.editorial .week-meal-meta {
+  font-size: 11px;
+}
+
+.editorial .week-meal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.editorial .week-meal-actions .link-button {
+  padding: 2px 0;
+  font-size: 11px;
+}
+
+.editorial .week-side {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 19px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.editorial .week-side .side-block {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+/* "Ver tudo" / "Ver mais" por baixo de uma lista curta do plano. */
+.editorial .week-side .side-more {
+  display: inline-block;
+  margin: 10px 0 14px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+/* ---------- Despensa: cartões com a fotografia em cima ---------- */
+
+.editorial .pantry-page .pantry-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 20px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.editorial .pantry-page .pantry-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+.editorial .pantry-page .pantry-row > .urgency-dot {
+  display: none;
+}
+
+.editorial .pantry-page .pantry-main {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.editorial .pantry-page .pantry-thumb {
+  width: 100%;
+  height: 185px;
+  border-radius: 0;
+  background: rgb(255 255 240 / 0.08);
+}
+
+.editorial .pantry-page .pantry-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: normal;
+}
+
+.editorial .pantry-page :is(.pantry-text, .pantry-expiry, .pantry-actions, .pantry-inline) {
+  padding: 0 18px;
+}
+
+.editorial .pantry-page .pantry-text .meal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.editorial .pantry-page .pantry-expiry {
+  font-size: 12px;
+}
+
+.editorial .pantry-page .pantry-actions {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.editorial .pantry-page .pantry-actions .button-danger {
+  margin-left: 0;
+}
+
+/* ---------- Conta e Casa: avatares em círculo ---------- */
+
+.editorial .profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.editorial .profile-card h2 {
+  margin: 0 0 4px;
+  font-size: clamp(24px, 2.4vw, 32px);
+  overflow-wrap: anywhere;
+}
+
+.editorial .profile-card .muted {
+  margin: 0;
+}
+
+.editorial .profile-card .button-primary {
+  margin-left: auto;
+}
+
+.editorial .profile-avatar,
+.editorial .member-lead-number.is-initials {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #dce6d4;
+  color: var(--green);
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* Produtos: a ligação ao detalhe no fim do cartão. */
+.editorial .price-row .arrow-link {
+  padding-bottom: 0;
+}
+
+.editorial .price-row .price-row-body {
+  gap: 0.45rem;
+}
+
+/* ---------- Telemóvel: o menu desliza por cima, como no preview ---------- */
+
+.menu-backdrop {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .editorial .rail-toggle {
+    display: grid;
+  }
+
+  .editorial.menu-open .app-rail {
+    display: flex;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 40;
+    width: 230px;
+    height: 100%;
+  }
+
+  .editorial.menu-open .menu-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    border: 0;
+    background: rgb(33 27 22 / 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .editorial .app-topline,
+  .editorial .tabbar {
+    display: none;
+  }
+
+  .editorial .app-main {
+    padding-bottom: 2rem;
+  }
+
+  .editorial .stats {
+    gap: 7px;
+  }
+
+  .editorial .stat {
+    display: block;
+    padding: 12px;
+  }
+
+  .editorial .stat svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin-bottom: 5px;
+  }
+
+  .editorial .stat b {
+    font-size: 19px;
+  }
+
+  .editorial .stat small {
+    font-size: 10px;
+  }
+
+  .editorial .home-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .photo-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .photo-card {
+    flex-direction: row;
+  }
+
+  .editorial .photo-card-media {
+    width: 38%;
+    height: auto;
+    min-height: 125px;
+  }
+
+  .editorial .photo-card-body {
+    align-self: center;
+  }
+
+  .editorial .shop-banner {
+    display: block;
+  }
+
+  .editorial .feature-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .feature-card-media {
+    min-height: 180px;
+    max-height: 180px;
+  }
+
+  .editorial .feature-card-body {
+    padding: 23px;
+  }
+
+  .editorial .week-days {
+    grid-template-columns: repeat(7, 155px);
+  }
+
+  .editorial .app-footer {
+    display: block;
+    line-height: 2;
+  }
+
+  .editorial .app-footer span {
+    display: block;
+  }
+}
+
+/* =====================================================================
+   Terceira passagem: revisão com os dados reais da Api.
+   ===================================================================== */
+
+/* Grelhas com dezenas de cartões: sem desfoque por cartão (pesa a deslocar a página);
+   o vidro fica só nos painéis grandes. */
+.editorial :is(.price-row, .recipe-row, .photo-card),
+.editorial .pantry-page .pantry-row {
+  background: linear-gradient(135deg, rgb(24 52 39 / 0.84), rgb(38 46 32 / 0.78));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* As fotos da Api são embalagens em fundo branco: inteiras numa placa creme, nunca cortadas. */
+.editorial .price-row .product-thumb,
+.editorial .pantry-page .pantry-thumb:not(.is-empty),
+.editorial .article-sheet .article-photo,
+.editorial .use-row-thumb,
+.editorial .list-thumb,
+.editorial .label-thumb {
+  background: #fbf8f1;
+}
+
+.editorial .price-row .product-thumb img,
+.editorial .pantry-page .pantry-thumb img,
+.editorial .article-sheet .article-photo img,
+.editorial .use-row-thumb img {
+  object-fit: contain;
+  padding: 8%;
+  mix-blend-mode: multiply;
+}
+
+.editorial .use-row-thumb img {
+  padding: 4px;
+}
+
+/* Botões nunca partem a seta para a linha de baixo. */
+.editorial :is(.button-primary, .button-secondary, .button-danger, .button-sage, .arrow-link, .row-action) {
+  white-space: nowrap;
+}
+
+.editorial .link-button {
+  font-family: var(--font);
+  letter-spacing: 0;
+}
+
+/* Números grandes das listas em serifa, como os preços do preview. */
+.editorial .list-tally-count,
+.editorial .member-lead-number {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+
+/* Todos os números e nomes de destaque da Folha do Dia (letra condensada e pesada) passam à serifa. */
+.editorial :is(
+    .dish-name,
+    .next-day-number,
+    .week-range,
+    .recipe-facts dd,
+    .promotion-discount,
+    .store-row-price,
+    .nutrition-score-value strong,
+    .nutrition-component-points,
+    .nutrition-goal-percent,
+    .nutrition-day-number,
+    .history-time,
+    .breakdown-table td:nth-child(4)
+  ),
+.editorial .recipe-page .step-list li::before {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+
+/* Nomes dentro de listas: DM Sans a negrito, sem a condensada. */
+.editorial :is(
+    .suggestion-dish,
+    .lists-row-name,
+    .cookable-picks a,
+    .store-row-name strong,
+    .nutrition-component-name,
+    .nutrition-goal-name,
+    .nutrition-score-label,
+    .member-name,
+    .draft-row .meal-title
+  ) {
+  font-family: var(--font);
+  font-weight: 700;
+  font-stretch: 100%;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.editorial :is(.suggestion-dish, .lists-row-name, .member-name) {
+  font-size: 17px;
+}
+
+.editorial .recipe-page .recipe-section-head h2 {
+  font-size: clamp(26px, 2.4vw, 32px);
+}
+
+.editorial[data-area="nutricao"] .week-head h1::before {
+  content: "Nutrição";
+}
+
+.editorial .week-range {
+  font-size: clamp(20px, 2vw, 26px);
+}
+
+.editorial .week-nav-link {
+  color: #fff2c9;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.editorial .week-nav-link:hover {
+  text-decoration: underline;
+}
+
+.editorial :is(.week-nav button, .week-nav a:not(.week-nav-link), .week-step) {
+  padding: 8px 15px;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Produtos: três colunas ao lado dos filtros; a ligação ao detalhe fica no fim do cartão. */
+.editorial .catalog-results .price-rows {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+}
+
+.editorial .price-row .price-row-body {
+  height: 100%;
+}
+
+.editorial .price-row .arrow-link {
+  order: 3;
+  margin-top: auto;
+}
+
+/* Adicionar à despensa: o cesto é um painel de vidro, sem a régua antiga. */
+.editorial .add-basket {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+.editorial .add-basket > h2 {
+  padding-top: 0;
+  border-top: 0;
+  font-size: clamp(26px, 2.4vw, 32px);
+}
+
+.editorial .add-basket .draft-list {
+  border-top: 0;
+}
+
+.editorial .list-main h2 {
+  font-size: clamp(24px, 2.2vw, 30px);
+  line-height: 1.1;
+}
+
+/* A última linha de uma lista não fecha com filete. */
+.editorial :is(.lists-row, .settings-row, .member-row, .use-row, .store-row):last-child {
+  border-bottom: 0;
+}
+
+/* Colunas que só agrupam painéis não são elas próprias um painel. */
+.editorial .list-side {
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.editorial .list-side > .panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(0.8);
+  -webkit-backdrop-filter: blur(32px) saturate(0.8);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ---------- Grelhas de cartões: todos do mesmo tamanho ---------- */
+
+.editorial .price-rows,
+.editorial .catalog-results .price-rows,
+.editorial .recipe-rows,
+.editorial .pantry-page .pantry-list {
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+
+.editorial .price-row,
+.editorial .recipe-row,
+.editorial .pantry-page .pantry-row {
+  height: 100%;
+}
+
+/* A fotografia ocupa sempre o mesmo espaço, mesmo quando a Api não tem imagem. */
+.editorial .price-row-media,
+.editorial .price-row .product-thumb {
+  height: 185px;
+  min-height: 185px;
+  background: #fbf8f1;
+}
+
+.editorial .price-row:not(.has-media)::before,
+.editorial .recipe-row:not(.has-lead):not(:has(.recipe-row-photo))::before {
+  content: "";
+  display: block;
+  order: 1;
+  flex: none;
+  background: rgb(255 255 240 / 0.08)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e3e7d8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' opacity='.55'%3E%3Cpath d='M6 8h12l-1 12H7z M9 8V6a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E")
+    center / 34px no-repeat;
+}
+
+.editorial .price-row:not(.has-media)::before {
+  height: 185px;
+}
+
+.editorial .recipe-row:not(.has-lead):not(:has(.recipe-row-photo))::before {
+  aspect-ratio: 16 / 10;
+}
+
+.editorial .price-row .price-row-body,
+.editorial .recipe-row-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+/* Nomes até duas linhas, para os cartões não crescerem com títulos compridos. */
+.editorial :is(.price-row .label-name, .recipe-row-name, .pantry-page .pantry-text .meal-title) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.editorial .price-row .arrow-link {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.editorial .pantry-page .pantry-actions {
+  margin-top: auto;
+}
+
+/* ---------- Paginação ---------- */
+
+.editorial .pagination {
+  border-top-color: rgb(255 255 255 / 0.22);
+  color: #f0f1e5;
+}
+
+.editorial .pagination button {
+  min-height: 0;
+  padding: 8px 15px;
+  border: 1px solid rgb(255 255 230 / 0.35);
+  border-radius: 25px;
+  background: rgb(255 255 240 / 0.14);
+  color: #fffdf3;
+  font-size: 12px;
+}
+
+.editorial .pagination button:hover:not(:disabled) {
+  background: rgb(255 255 240 / 0.24);
+  border-color: rgb(255 255 230 / 0.6);
+}
+
+/* ---------- Nutrição, como no preview ---------- */
+
+.editorial .nutrition-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -6px 0 18px;
+}
+
+.editorial .nutrition-controls .nutrition-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 12px;
+  color: #f0f1e5;
+}
+
+.editorial .nutrition-controls select {
+  min-height: 0;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.editorial .status-card {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  margin: 0 0 20px;
+  padding: 25px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 9px;
+  background: rgb(255 255 240 / 0.04);
+}
+
+.editorial .status-circle {
+  display: grid;
+  place-items: center;
+  width: 110px;
+  height: 110px;
+  border: 8px solid rgb(224 231 212 / 0.85);
+  border-radius: 50%;
+  font-family: var(--serif);
+  font-size: 35px;
+  color: #fffdf3;
+}
+
+.editorial .status-body h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.editorial .status-body p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.editorial .status-parts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editorial .status-parts li {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.editorial .status-part-points {
+  font-family: var(--serif);
+  font-size: 14px;
+}
+
+.editorial .meter {
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: rgb(222 222 209 / 0.25);
+}
+
+.editorial .meter > span {
+  display: block;
+  height: 100%;
+  border-radius: 9px;
+  background: #b8c8a7;
+}
+
+.editorial .metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.editorial .metric {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 9px;
+  background: rgb(255 255 240 / 0.04);
+}
+
+.editorial .metric .muted {
+  font-size: 13px;
+}
+
+.editorial .metric b {
+  display: block;
+  margin: 10px 0;
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.editorial .metric-hint {
+  font-size: 11px;
+  color: #f0f1e5;
+}
+
+.editorial .edge-nutrition {
+  --edge-image: url("/editorial/scene-nutricao.jpg");
+}
+
+.editorial .edge-balanced {
+  --edge-image: url("/editorial/salad.jpg");
+}
+
+.editorial .nutrition-days-panel > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.editorial .nutrition-days-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.editorial .nutrition-days-panel > summary h2 {
+  margin: 0;
+}
+
+.editorial .nutrition-days-panel[open] > summary {
+  margin-bottom: 18px;
+}
+
+.editorial .nutrition-days-panel[open] .arrow-link {
+  visibility: hidden;
+}
+
+@media (max-width: 899px) {
+  .editorial .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .editorial .metric {
+    padding: 13px;
+  }
+
+  .editorial .status-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .editorial .status-parts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .nutrition-controls .nutrition-who {
+    margin-left: 0;
+  }
+}
+
+/* ---------- Hoje: a primeira fila mais baixa, com fotografia atrás ---------- */
+
+/* Uma só fila de cartões compactos e três artigos a usar: os dois painéis ficam da mesma altura, mais baixos. */
+.editorial .home-grid-top .photo-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.editorial .home-grid-top .photo-card-media {
+  height: 112px;
+}
+
+.editorial .home-grid-top .photo-card-body {
+  gap: 4px;
+  padding: 11px 12px 12px;
+}
+
+.editorial .home-grid-top .photo-card-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.editorial .home-grid-top .section-head {
+  margin-bottom: 14px;
+}
+
+.editorial .use-first-panel .use-row {
+  gap: 12px;
+  padding: 9px 0;
+}
+
+.editorial .use-first-panel .use-row-thumb {
+  width: 40px;
+  height: 40px;
+}
+
+.editorial .use-first-panel .use-row-text strong {
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.editorial .use-first-panel .use-row-text span {
+  font-size: 12px;
+}
+
+.editorial .use-first-panel .arrow-link {
+  padding-bottom: 0;
+}
+
+/* Fotografia suave: atrás do painel inteiro, sem reservar coluna para ela
+   (o conteúdo destes painéis ocupa a largura toda). */
+.editorial .panel.edge-photo.edge-soft {
+  padding-right: clamp(1rem, 2vw, 1.5rem);
+}
+
+.editorial .edge-soft::before {
+  width: 62%;
+  opacity: 0.55;
+}
+
+.editorial .edge-plan {
+  --edge-image: url("/editorial/scene-plano.jpg");
+}
+
+.editorial .edge-pantry {
+  --edge-image: url("/editorial/pantry.png");
+}
+
+.editorial .use-first-panel.edge-soft::before {
+  width: 85%;
+  opacity: 0.7;
+}
+
+@media (max-width: 899px) {
+  .editorial .home-grid-top .photo-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorial .home-grid-top .photo-card-media {
+    height: auto;
+  }
+}
+
+/* ---------- Planeamento: "O que falta" e "Sugestões" baixos e transparentes ---------- */
+
+/* Sem vidro: um véu verde que desvanece para a direita, para a fotografia da página se ver.
+   Os painéis do Planeamento, o calendário e os painéis das Ementas. */
+.editorial .week-side .side-block,
+.editorial .week-days,
+.editorial .templates-page > .panel {
+  border: 1px solid rgb(248 245 223 / 0.16);
+  border-right-color: transparent;
+  background: linear-gradient(90deg, rgb(12 40 29 / 0.62) 0%, rgb(12 40 29 / 0.38) 55%, rgb(12 40 29 / 0) 100%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.editorial .week-side .side-block,
+.editorial .week-days {
+  text-shadow: 0 1px 8px rgb(8 22 16 / 0.55);
+}
+
+.editorial .week-side .side-block {
+  padding: 20px 22px;
+}
+
+/* "O que falta" com a mesma altura das Sugestões. */
+.editorial .week-side {
+  align-items: stretch;
+}
+
+/* Com uma lista aberta, só esse cartão cresce: o outro fica do tamanho do que tem. */
+.editorial .week-side.is-expanded {
+  align-items: start;
+}
+
+.editorial .week-day-date {
+  background: rgb(12 40 29 / 0.18);
+}
+
+.editorial .templates-page > .panel :is(h2, .muted, .page-head-sub) {
+  text-shadow: 0 1px 8px rgb(8 22 16 / 0.55);
+}
+
+.editorial .week-day.is-today {
+  background: rgb(228 235 211 / 0.1);
+}
+
+/* Do lado transparente, as refeições ganham fundo próprio para se lerem sobre a fotografia. */
+.editorial .week-meal {
+  background: rgb(14 42 31 / 0.55);
+  border-color: rgb(255 249 220 / 0.22);
+  text-shadow: none;
+}
+
+/* Ementas: a foto do prato no cimo de cada refeição, para se reconhecer de relance.
+   Sem foto (ou enquanto carrega) fica um prato desenhado no mesmo lugar. */
+.editorial .week-meal-photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  aspect-ratio: 16 / 10;
+  margin: -2px -2px 4px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgb(228 235 211 / 0.08);
+  color: rgb(240 241 229 / 0.38);
+}
+
+.editorial .week-meal-photo-empty {
+  width: 30%;
+  max-width: 34px;
+  height: auto;
+}
+
+.editorial .week-meal-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.editorial .week-meal-photo[data-state="loaded"] img {
+  opacity: 1;
+}
+
+/* Com a foto ao lado, as ações do plano passam à linha seguinte em vez de saírem do cartão. */
+.editorial .week-meal.has-photo .week-meal-actions {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial .week-meal-photo img {
+    transition: none;
+  }
+}
+
+/* No telemóvel os dias são linhas: a foto passa a miniatura à esquerda do texto. */
+@media (max-width: 899px) {
+  .app.editorial .week-meal.has-photo {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-auto-rows: min-content;
+    column-gap: 12px;
+    row-gap: 2px;
+  }
+
+  .app.editorial .week-meal.has-photo > :not(.week-meal-photo) {
+    grid-column: 2;
+  }
+
+  .app.editorial .week-meal-photo {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    align-self: start;
+    aspect-ratio: 1;
+    margin: 0;
+  }
+}
+
+/* ---------- Comparação de lojas (lista de compras) ---------- */
+
+.editorial .chain-logo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #fbf8f1;
+}
+
+/* Logótipos são largos: a caixa também, para não ficarem minúsculos. */
+.editorial .chain-logo-md {
+  width: 58px;
+  height: 42px;
+  padding: 4px 5px;
+}
+
+.editorial .chain-logo-sm {
+  width: 38px;
+  height: 26px;
+  padding: 2px 3px;
+  border-radius: 6px;
+}
+
+.editorial .chain-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.editorial .chain-logo.is-initials {
+  padding: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.editorial .chain-logo-sm.is-initials {
+  font-size: 10px;
+}
+
+/* Cartões de loja compactos, uns por baixo dos outros. */
+.editorial .store-grid {
+  display: flex;
+  flex-direction: column;
+  /* Todos os cartões com a largura do painel (o editorial.css deixa-os encolher ao conteúdo). */
+  align-items: stretch;
+  gap: 8px;
+  margin: 0 0 16px;
+  border-top: 0;
+}
+
+.editorial .store-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "logo text price"
+    "logo badge price";
+  align-items: center;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border: 1px solid rgb(248 245 223 / 0.18);
+  border-radius: 10px;
+  background: rgb(255 255 240 / 0.05);
+}
+
+.editorial .store-card.is-best {
+  border-color: rgb(225 237 190 / 0.55);
+  background: rgb(210 230 174 / 0.12);
+}
+
+.editorial .store-card > .chain-logo {
+  grid-area: logo;
+}
+
+.editorial .store-card-text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.editorial .store-card-text strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.editorial .store-card-text span {
+  font-size: 11px;
+  color: #e3e7d8;
+}
+
+.editorial .store-card > .badge {
+  grid-area: badge;
+  justify-self: start;
+  padding: 3px 7px;
+  font-size: 9.5px;
+}
+
+.editorial .badge-soft {
+  background: rgb(255 255 240 / 0.16);
+  color: #f0f1e5;
+}
+
+.editorial .store-card-price {
+  grid-area: price;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.editorial .store-card-price .price-tag {
+  padding: 0;
+  background: none;
+  color: #fffdf3;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.editorial .store-card-price span:not(.price-tag) {
+  font-size: 10.5px;
+  color: #e3e7d8;
+}
+
+/* "O que comprar no X": linhas simples, alinhadas, com o total à direita e a seta no fim. */
+.editorial .store-breakdown {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid rgb(255 249 220 / 0.16);
+  border-radius: 0;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.editorial .store-breakdown:last-of-type {
+  border-bottom: 1px solid rgb(255 249 220 / 0.16);
+}
+
+.editorial .store-breakdown > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 2px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editorial .store-breakdown > summary::-webkit-details-marker {
+  display: none;
+}
+
+.editorial .store-breakdown > summary::after {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin: 0 4px 3px 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.editorial .store-breakdown[open] > summary::after {
+  margin-bottom: -3px;
+  transform: rotate(-135deg);
+}
+
+.editorial .store-breakdown > summary:hover,
+.editorial .store-breakdown[open] > summary {
+  background: none;
+  color: #fff2c9;
+}
+
+.editorial .store-breakdown-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.editorial .store-breakdown-total {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.editorial .store-breakdown > .table-wrap,
+.editorial .store-breakdown > p {
+  margin: 4px 0 12px;
+}
+
+.editorial .breakdown-table {
+  font-size: 12px;
+}
+
+/* ---------- Itens da lista de compras numa só linha ----------
+   O nome encolhe e corta com "…" (o nome inteiro fica no title); quantidade, embalagem,
+   loja e apagar mantêm o tamanho e ficam alinhados. */
+.editorial .list-row {
+  flex-wrap: nowrap;
+  gap: 10px 14px;
+  padding: 10px 0;
+}
+
+.editorial .list-row > .item-check {
+  flex: 1 1 0;
+  min-width: 5rem;
+  overflow: hidden;
+}
+
+.editorial .list-row .meal-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.editorial .list-row > :not(.item-check) {
+  flex: none;
+  white-space: nowrap;
+}
+
+.editorial .list-row .pill {
+  padding: 4px 9px;
+  font-size: 11px;
+}
+
+.editorial .list-row-price {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editorial .list-row-price .price-tag {
+  padding: 0;
+  background: none;
+  color: #fffdf3;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* Duas linhas: em cima o nome, a loja e o apagar; por baixo, pequenos, a quantidade, a embalagem
+   e o "Ligar a produto". O ::after é a quebra de linha entre as duas (é um item do flex). */
+.editorial .list-row {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.editorial .list-row > .item-check {
+  order: 1;
+}
+
+.editorial .list-row > .list-row-price {
+  order: 2;
+}
+
+.editorial .list-row > .icon-danger {
+  order: 3;
+}
+
+.editorial .list-row::after {
+  content: "";
+  order: 4;
+  flex-basis: 100%;
+  height: 0;
+}
+
+.editorial .list-row > :is(.muted, .pill, .link-button) {
+  order: 5;
+}
+
+.editorial .list-row > .muted {
+  margin-left: 34px;
+  font-size: 12px;
+}
+
+.editorial .list-row:has(.list-thumb) > .muted {
+  margin-left: 86px;
+}
+
+.editorial .list-row > .pill {
+  padding: 2px 8px;
+  font-size: 10.5px;
+}
+
+.editorial .list-row > .link-button {
+  padding: 0;
+  font-size: 11px;
+}
+
+.editorial .list-row > .item-check {
+  min-height: 0;
+}
+
+.editorial .list-row .list-thumb {
+  width: 40px;
+  height: 40px;
+}
+
+/* O seletor de produto (Ligar a produto) abre por baixo da linha, a toda a largura. */
+.editorial .list-row > .link-picker {
+  order: 6;
+}
+
+/* O seletor de produto (Ligar a produto) abre por baixo da linha, a toda a largura. */
+.editorial .list-row:has(.link-picker) {
+  flex-wrap: wrap;
+}
+
+.editorial .list-row .link-picker {
+  flex: 1 1 100%;
+  white-space: normal;
+}
+
+/* Telemóvel: a mesma organização em duas linhas (anula a grelha antiga do corredor);
+   a loja e o preço descem para a segunda linha para o nome ter a largura toda. */
+@media (max-width: 640px) {
+  .editorial .list-main .list-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .editorial .list-main .list-row > :is(.list-row-link, .list-row-price, .pill) {
+    grid-column: auto;
+    grid-row: auto;
+    margin-left: 0;
+  }
+
+  .editorial .list-main .list-row > .list-row-price {
+    order: 5;
+    margin-left: auto;
+  }
+
+  .editorial .list-main .list-row > .muted {
+    margin-left: 34px;
+  }
+
+  .editorial .list-main .list-row:has(.list-thumb) > .muted {
+    margin-left: 86px;
+  }
+}
+
+/* ---------- Cartões clicáveis em toda a área ----------
+   A ligação do nome estica-se por cima do cartão inteiro; os botões e campos de cada
+   cartão ficam por cima dela e continuam a funcionar. */
+.editorial :is(.recipe-row, .pantry-page .pantry-row, .week-meal) {
+  position: relative;
+}
+
+.editorial :is(a.recipe-row-name, .pantry-page .pantry-text .meal-title, a.week-meal-dish)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.editorial :is(.recipe-row-action, .pantry-page .pantry-actions, .pantry-page .pantry-inline, .pantry-page .pantry-scan, .week-meal-actions) {
+  position: relative;
+  z-index: 2;
+}
+
+.editorial :is(.recipe-row, .pantry-page .pantry-row, .week-meal):has(:is(a.recipe-row-name, .meal-title, a.week-meal-dish)) {
+  cursor: pointer;
+}
+
+.editorial .recipe-row:hover,
+.editorial .pantry-page .pantry-row:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+}
+
+.editorial .week-meal:hover {
+  border-color: rgb(255 249 220 / 0.45);
+}
+
+/* O foco do teclado continua a marcar o cartão inteiro. */
+.editorial :is(a.recipe-row-name, .pantry-page .pantry-text .meal-title, a.week-meal-dish):focus-visible {
+  outline: none;
+}
+
+.editorial :is(a.recipe-row-name, .pantry-page .pantry-text .meal-title, a.week-meal-dish):focus-visible::after {
+  outline: 2px solid #fff2c9;
+  outline-offset: -2px;
+  border-radius: inherit;
+}
+
+.editorial .week-side .side-head {
+  margin-bottom: 10px;
+}
+
+.editorial .week-side .side-head h2 {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 26px);
+}
+
+.editorial .week-side :is(.side-empty, .side-ok) {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* O que falta: linhas curtas, e as ações numa só fila. */
+.editorial .week-side .missing-list {
+  margin: 0 0 12px;
+}
+
+.editorial .week-side .missing-list li {
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom-color: rgb(255 249 220 / 0.14);
+}
+
+.editorial .week-side .missing-list li:last-child {
+  border-bottom: 0;
+}
+
+.editorial .week-side .inline-form {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.editorial .week-side :is(.inline-form select, .inline-form input) {
+  min-height: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  text-shadow: none;
+}
+
+.editorial .week-side .inline-form select {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.editorial .week-side .inline-form input[type="date"] {
+  flex: 0 0 8.6rem;
+}
+
+.editorial .week-side .inline-form :is(.button-primary, .button-secondary) {
+  flex: none;
+  padding: 9px 13px;
+  text-shadow: none;
+}
+
+.editorial .week-side .have-it-already {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* Sugestões: título e meta numa linha, e o "Adicionar ao plano" logo por baixo, numa fila. */
+.editorial .week-side .suggestion-list li {
+  gap: 6px;
+  padding: 10px 0;
+  border-top-color: rgb(255 249 220 / 0.14);
+}
+
+.editorial .week-side .suggestion-list li:first-child {
+  padding-top: 0;
+}
+
+.editorial .week-side .suggestion-dish {
+  font-size: 15px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.editorial .week-side :is(.suggestion-meta, .suggestion-note) {
+  margin: 0;
+  font-size: 12px;
+}
+
+@media (max-width: 899px) {
+  .editorial .week-side .inline-form {
+    flex-wrap: wrap;
+  }
+
+  .editorial .week-side .side-block {
+    background: linear-gradient(180deg, rgb(12 40 29 / 0.6), rgb(12 40 29 / 0.25));
+  }
+}
+
+/* Despensa: "Deitar fora" existe em todos os cartões; fica discreto até ser preciso. */
+.editorial .pantry-page .pantry-actions .button-danger {
+  padding: 6px 11px;
+  border-color: rgb(255 180 168 / 0.45);
+  background: none;
+  color: #ffc9bf;
+}
+
+.editorial .pantry-page .pantry-actions .button-danger:hover {
+  background: #874a35;
+  color: #fffdf3;
+}
+
+/* ---------- Cozinhar: cartões de receita compactos ---------- */
+
+.editorial .recipe-row:has(.readiness) .recipe-row-text {
+  gap: 8px;
+}
+
+/* Estado numa linha (ponto, "Falta 8 · 3 de 11 em casa"); o que falta por baixo, a toda a largura. */
+.editorial .recipe-row .readiness-compact {
+  grid-template-columns: 10px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.editorial .recipe-row .readiness-compact .readiness-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.editorial .recipe-row .readiness-list {
+  grid-column: 1 / -1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #dfe3d2;
+}
+
+.editorial .recipe-row .recipe-row-expiring {
+  grid-template-columns: 10px minmax(0, 1fr);
+  column-gap: 8px;
+  font-size: 12.5px;
+}
+
+.editorial .recipe-row .recipe-row-expiring .urgency-dot {
+  width: 8px;
+  height: 8px;
+}
+
+/* Numa só coluna não há fila para igualar: cada cartão fica com a sua altura. */
+@media (max-width: 640px) {
+  .editorial .recipe-rows {
+    grid-auto-rows: auto;
+  }
+}
+
+.editorial .recipe-row .recipe-row-expiring > span:last-child {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/* "No plano" encostado ao fundo, alinhado entre cartões da mesma fila. */
+.editorial .recipe-row:has(.readiness) .recipe-row-meta {
+  margin-top: auto;
+  padding-top: 4px;
+  font-weight: 600;
+}
+
+/* ---------- Avatar do utilizador ---------- */
+
+.editorial .bar-avatar.has-photo,
+.editorial .profile-avatar.has-photo {
+  overflow: hidden;
+  padding: 0;
+}
+
+.editorial :is(.bar-avatar, .profile-avatar) img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Largura fixa: o texto ao lado não salta quando aparece "Remover". */
+.editorial .avatar-picker {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 10.5rem;
+}
+
+/* Na conta o avatar é maior e é ele próprio o botão para mudar a fotografia. */
+.editorial .avatar-picker .profile-avatar {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  min-height: 0;
+  border: 2px solid rgb(248 245 223 / 0.5);
+  font-size: 32px;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.editorial .avatar-picker .profile-avatar:focus-visible {
+  outline: 2px solid #f6f1df;
+  outline-offset: 3px;
+}
+
+.editorial .avatar-picker-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #1f3b2c;
+  border-radius: 50%;
+  background: #f6f1df;
+  color: #1f3b2c;
+}
+
+.editorial .avatar-picker-badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.editorial .avatar-picker-actions {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.editorial .avatar-picker .form-error {
+  max-width: 14rem;
+  margin: 0;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ---------- Loja e preço da compra ----------
+   A loja da lista por baixo do título; o preço de cada linha comprada no lugar do preço da
+   comparação (em cima, à direita); o formulário abre por baixo, a toda a largura. */
+.editorial .list-store {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.editorial .list-store .category-select {
+  min-height: 0;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.editorial .purchased-total {
+  margin: -4px 0 8px;
+  font-size: 13px;
+}
+
+.editorial .list-row > .paid-price {
+  order: 2;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.editorial .list-row > .paid-price .muted {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.editorial .list-row > .paid-price-form {
+  order: 6;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  white-space: normal;
+}
+
+.editorial .list-row > .paid-price-form .amount-input {
+  width: 6rem;
+}
+
+/* ---------- Gastos ---------- */
+.editorial .spending-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  align-items: baseline;
+}
+
+.editorial .spending-month {
+  margin-top: 18px;
+}
+
+.editorial .spending-month h2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.editorial .spending-chains {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.editorial .spending-chains li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.editorial .spending-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.editorial .last-paid {
+  margin: 10px 0 0;
+  font-size: 14px;
+}
+
+/* ---------- Lojas perto e deslocação ---------- */
+.editorial .travel-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.editorial .store-card-near {
+  grid-column: 2 / -1;
+  font-size: 12px;
+}
+
+/* "Vou comprar aqui": grava a cadeia (e a loja física, com a deslocação) na lista. */
+.editorial .store-card-choose {
+  grid-column: 2 / -1;
+  justify-self: start;
+  font-size: 13px;
+}
+
+.editorial .nearby-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.editorial .nearby-store {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+}
+
+.editorial .nearby-store-text,
+.editorial .nearby-store-distance {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.editorial .nearby-store-distance {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.editorial .nearby-store .muted {
+  font-size: 12px;
+}
+
+.editorial .nearby-attribution {
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+/* ---------- Desperdício e sobras ---------- */
+.editorial .waste-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.editorial .waste-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.editorial .waste-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.editorial .waste-list li > :last-child {
+  flex: none;
+  text-align: right;
+}
+
+.editorial .cook-form {
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}

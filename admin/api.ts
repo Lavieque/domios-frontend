@@ -121,7 +121,7 @@ export interface SystemStatus {
   database: { ok: boolean; latencyMs: number };
   accounts: { users: number; disabledUsers: number; platformAdmins: number; pendingAccessRequests: number; households: number; activeSessions: number };
   catalog: { products: Freshness; offers: Freshness; recipes: Freshness; activePromotions: number; promotionsLastUpdatedAt: string | null };
-  email: { sender: string; configured: boolean; fromAddress: string | null; pending: number };
+  email: { sender: string; configured: boolean; fromAddress: string | null; pending: number; adminNotifyEmail: string | null };
 }
 
 export interface Nutrition {
@@ -306,7 +306,8 @@ function base(): string {
 
 async function raw(path: string, init: RequestInit): Promise<Response> {
   try {
-    return await fetch(`${base()}${path}`, init);
+    // O admin lê logo a seguir ao que edita: nunca da cache do browser (a Api marca o catálogo como público).
+    return await fetch(`${base()}${path}`, { ...init, cache: "no-store" });
   } catch {
     throw new ApiError(0, "network", "Sem ligação à Api.");
   }

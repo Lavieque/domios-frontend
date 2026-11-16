@@ -3,11 +3,44 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#102c23" />
     <title>DomiOS</title>
+    <!-- Ecrã de arranque: aparece antes do JavaScript e o React substitui-o ao montar.
+         Igual em site/index.html. -->
+    <style>
+      html, body { margin: 0; background: #102c23; }
+      .boot { position: fixed; inset: 0; z-index: 10; background: #102c23; display: grid; place-items: center; align-content: center; gap: 22px; }
+      .boot > * { opacity: 0; animation: boot-in 0.4s ease 0.25s forwards; }
+      .boot-plaque { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 12px; background: #faf7f0; box-shadow: 0 10px 30px rgb(6 23 14 / 0.35); }
+      .boot-plaque svg { width: 58px; height: 58px; }
+      .boot-roof { stroke-dasharray: 1; stroke-dashoffset: 1; animation: boot-draw 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+      .boot-roof + .boot-roof { animation-delay: 0.2s; }
+      .boot-line { position: relative; width: 96px; height: 2px; border-radius: 2px; overflow: hidden; background: rgb(255 253 243 / 0.14); }
+      .boot-line::after { content: ""; position: absolute; inset: 0; width: 40%; border-radius: inherit; background: #e7efd3; animation: boot-slide 1.4s ease-in-out infinite; }
+      .boot-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      @keyframes boot-in { to { opacity: 1; } }
+      @keyframes boot-draw { 0% { stroke-dashoffset: 1; } 45%, 70% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
+      @keyframes boot-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-roof { animation: none; stroke-dashoffset: 0; }
+        .boot-line::after { animation: none; width: 100%; opacity: 0.4; }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot" role="status">
+        <span class="boot-label">A carregar o DomiOS…</span>
+        <div class="boot-plaque" aria-hidden="true">
+          <svg viewBox="0 0 120 120">
+            <polyline class="boot-roof" pathLength="1" points="30,72 30,46 60,20 90,46 90,72" fill="none" stroke="#2a6a78" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+            <polyline class="boot-roof" pathLength="1" points="52,88 52,62 82,36 112,62 112,88" fill="none" stroke="#1e3a5c" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="boot-line" aria-hidden="true"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -4,6 +4,7 @@
 import { authedRequest } from "../auth/sessionStore";
 import type { IsoDate } from "../plan/dates";
 import type { MeasurementUnit } from "./types";
+import { localized } from "../i18n";
 
 export const MealType = {
   Breakfast: 0,
@@ -14,13 +15,7 @@ export const MealType = {
 } as const;
 export type MealType = (typeof MealType)[keyof typeof MealType];
 
-export const mealTypeLabels: Record<MealType, string> = {
-  [MealType.Breakfast]: "Pequeno-almoço",
-  [MealType.Lunch]: "Almoço",
-  [MealType.Dinner]: "Jantar",
-  [MealType.Snack]: "Lanche",
-  [MealType.Other]: "Outra",
-};
+export const mealTypeLabels: Record<MealType, string> = localized((t) => t.enums.mealType);
 
 /** Ordem do enum = ordem em que a Api devolve as refeições do dia. */
 export const mealTypes: MealType[] = [MealType.Breakfast, MealType.Lunch, MealType.Dinner, MealType.Snack, MealType.Other];
@@ -32,11 +27,7 @@ export const PlannedMealStatus = {
 } as const;
 export type PlannedMealStatus = (typeof PlannedMealStatus)[keyof typeof PlannedMealStatus];
 
-export const plannedMealStatusLabels: Record<PlannedMealStatus, string> = {
-  [PlannedMealStatus.Planned]: "Planeada",
-  [PlannedMealStatus.Cooked]: "Cozinhada",
-  [PlannedMealStatus.Skipped]: "Saltada",
-};
+export const plannedMealStatusLabels: Record<PlannedMealStatus, string> = localized((t) => t.enums.plannedMealStatus);
 
 export interface PlannedMealDto {
   plannedMealId: string;
@@ -102,14 +93,7 @@ export const SuggestionReason = {
 } as const;
 export type SuggestionReason = (typeof SuggestionReason)[keyof typeof SuggestionReason];
 
-export const suggestionReasonLabels: Record<SuggestionReason, string> = {
-  [SuggestionReason.UsesPantry]: "Usa o que tens",
-  [SuggestionReason.UsesExpiringItems]: "Aproveita o que está a expirar",
-  [SuggestionReason.RecentlyCooked]: "Cozinhada há pouco",
-  [SuggestionReason.AlreadyPlanned]: "Já está no plano",
-  [SuggestionReason.RestrictionsUnverifiable]: "Restrições por confirmar",
-  [SuggestionReason.ContainsAvoided]: "Leva algo que evitam",
-};
+export const suggestionReasonLabels: Record<SuggestionReason, string> = localized((t) => t.enums.suggestionReason);
 
 export interface IngredientReferenceDto {
   ingredientId: string;
@@ -219,4 +203,16 @@ export interface ApplyTemplateResultDto {
 
 export function applyTemplate(householdId: string, request: ApplyTemplateRequest): Promise<ApplyTemplateResultDto> {
   return authedRequest<ApplyTemplateResultDto>(`${base(householdId)}/from-template`, { method: "POST", body: request });
+}
+
+/**
+ * Cozinha a receita planeada: regista a refeição e gasta a despensa (DomiOS_API_Fase6.md, 1.6). Idempotente.
+ * `leftoverServings`: doses feitas e não comidas, de 0 a `servings` - 1; entram na despensa como "Sobras"
+ * (adenda 2026-11-09 de DomiOS_API_Fase4.md, D.3).
+ */
+export function cookPlannedMeal(householdId: string, plannedMealId: string, leftoverServings: number): Promise<{ plannedMeal: PlannedMealDto }> {
+  return authedRequest<{ plannedMeal: PlannedMealDto }>(`${base(householdId)}/${plannedMealId}/cook`, {
+    method: "POST",
+    body: { consumePantry: true, leftoverServings },
+  });
 }

@@ -7,9 +7,11 @@ import { Pagination } from "../components/Pagination";
 import { eventDetail, eventLabel, eventLink, timelineAreas } from "../history/events";
 import { useEventNames } from "../history/useEventNames";
 import { HouseholdGate } from "../household/HouseholdGate";
+import { dateTimeFormat } from "../i18n/format";
+import { tr } from "../i18n";
 
 const NO_EVENTS: DomainEventLogEntryDto[] = [];
-const time = new Intl.DateTimeFormat("pt-PT", {
+const time = dateTimeFormat({
   timeZone: "Europe/Lisbon",
   hour: "2-digit",
   minute: "2-digit",
@@ -21,12 +23,12 @@ const dayKey = new Intl.DateTimeFormat("en-CA", {
   month: "2-digit",
   day: "2-digit",
 });
-const weekday = new Intl.DateTimeFormat("pt-PT", {
+const weekday = dateTimeFormat({
   timeZone: "Europe/Lisbon",
   weekday: "short",
 });
-const month = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", month: "long" });
-const year = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", year: "numeric" });
+const month = dateTimeFormat({ timeZone: "Europe/Lisbon", month: "long" });
+const year = dateTimeFormat({ timeZone: "Europe/Lisbon", year: "numeric" });
 const thisYear = year.format(new Date());
 const weekdayIndex = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Lisbon", weekday: "short" });
 
@@ -52,8 +54,8 @@ export function HouseholdHistoryPage() {
 }
 
 function HouseholdHistory({ householdId, name }: { householdId: string; name: string }) {
-  const [area, setArea] = useState(timelineAreas[0].label);
-  const areaOption = timelineAreas.find((option) => option.label === area) ?? timelineAreas[0];
+  const [area, setArea] = useState(timelineAreas[0].area);
+  const areaOption = timelineAreas.find((option) => option.area === area) ?? timelineAreas[0];
   const [page, setPage] = useState(1);
   const [result, setResult] = useState<PagedResult<DomainEventLogEntryDto> | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,31 +76,31 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
 
   return (
     <div className="page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <Link to="/casa" className="back-link">
           {name}
         </Link>
       </nav>
       <header className="page-head">
         <div>
-          <h1>Histórico</h1>
-          <p className="page-head-sub">O que mudou na casa, do mais recente para o mais antigo.</p>
+          <h1>{tr().history.title}</h1>
+          <p className="page-head-sub">{tr().history.subtitle}</p>
         </div>
       </header>
 
-      <div className="chip-row" role="group" aria-label="Área do histórico">
+      <div className="chip-row" role="group" aria-label={tr().history.area}>
         {timelineAreas.map((option) => (
           <button
-            key={option.label}
+            key={option.area}
             type="button"
             className="chip"
-            aria-pressed={area === option.label}
+            aria-pressed={area === option.area}
             onClick={() => {
-              setArea(option.label);
+              setArea(option.area);
               setPage(1);
             }}
           >
-            {option.label}
+            {tr().enums.timelineAreas[option.area]}
           </button>
         ))}
       </div>
@@ -108,8 +110,8 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
           {error}
         </p>
       )}
-      {!error && result === null && <p className="muted loading">A carregar…</p>}
-      {result !== null && result.items.length === 0 && <p className="empty-state">Nada registado aqui ainda.</p>}
+      {!error && result === null && <p className="muted loading">{tr().common.loading}</p>}
+      {result !== null && result.items.length === 0 && <p className="empty-state">{tr().history.empty}</p>}
       {result !== null && result.items.length > 0 && (
         <>
           {/* Os dias em linhas, o número numa coluna fixa, como em Semana. */}

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { createPlannedMeal, MealType, mealTypeLabels, mealTypes, type PlannedMealDto } from "../api/planning";
 import { describeError } from "../auth/errors";
 import { isIsoDate, type IsoDate } from "../plan/dates";
+import { tr } from "../i18n";
 
 interface Props {
   householdId: string;
@@ -21,7 +22,7 @@ export function AddToPlanForm({ householdId, recipeId, defaultDate, defaultMealT
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!isIsoDate(date)) {
-      setError("Escolhe um dia.");
+      setError(tr().ui.addToPlan.pickDay);
       return;
     }
     setError(null);
@@ -29,7 +30,7 @@ export function AddToPlanForm({ householdId, recipeId, defaultDate, defaultMealT
     try {
       onAdded(await createPlannedMeal(householdId, { date, mealType, recipeId }));
     } catch (err) {
-      setError(describeError(err, { "forbidden-recipe-scope": "Esta receita não pode ser usada pela tua casa." }));
+      setError(describeError(err, { "forbidden-recipe-scope": tr().ui.addToPlan.forbidden }));
     } finally {
       setSubmitting(false);
     }
@@ -37,10 +38,10 @@ export function AddToPlanForm({ householdId, recipeId, defaultDate, defaultMealT
 
   return (
     <form className="inline-form" onSubmit={handleSubmit}>
-      <input type="date" aria-label="Dia" required value={date} onChange={(e) => setDate(e.target.value)} />
+      <input type="date" aria-label={tr().ui.addToPlan.day} required value={date} onChange={(e) => setDate(e.target.value)} />
       <select
         className="category-select"
-        aria-label="Refeição"
+        aria-label={tr().ui.addToPlan.meal}
         value={mealType}
         onChange={(e) => setMealType(Number(e.target.value) as MealType)}
       >
@@ -51,7 +52,7 @@ export function AddToPlanForm({ householdId, recipeId, defaultDate, defaultMealT
         ))}
       </select>
       <button type="submit" className="button-primary" disabled={submitting}>
-        {submitting ? "A adicionar…" : "Adicionar ao plano"}
+        {submitting ? tr().ui.addToPlan.adding : tr().ui.addToPlan.add}
       </button>
       {error && (
         <p className="form-error" role="alert">

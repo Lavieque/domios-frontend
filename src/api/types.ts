@@ -1,3 +1,4 @@
+import { localized } from "../i18n";
 // Espelha os DTOs reais da DomiOS.Api (repo DomiOS) — sem geração automática,
 // ver justificação no plano ("3 páginas não justificam essa máquina"). A Api
 // serializa enums como NÚMEROS (sem JsonStringEnumConverter), nunca como
@@ -24,13 +25,7 @@ export const MeasurementUnit = {
 } as const;
 export type MeasurementUnit = (typeof MeasurementUnit)[keyof typeof MeasurementUnit];
 
-export const measurementUnitLabels: Record<MeasurementUnit, string> = {
-  [MeasurementUnit.Unit]: "un",
-  [MeasurementUnit.Gram]: "g",
-  [MeasurementUnit.Kilogram]: "kg",
-  [MeasurementUnit.Milliliter]: "ml",
-  [MeasurementUnit.Liter]: "l",
-};
+export const measurementUnitLabels: Record<MeasurementUnit, string> = localized((t) => t.enums.measurementUnit);
 
 export const ProductStatus = {
   Active: 0,
@@ -145,13 +140,7 @@ export const PriceLabel = {
 } as const;
 export type PriceLabel = (typeof PriceLabel)[keyof typeof PriceLabel];
 
-export const priceLabelLabels: Record<PriceLabel, string> = {
-  [PriceLabel.InsufficientHistory]: "Histórico insuficiente",
-  [PriceLabel.HistoricLow]: "Mínimo do período",
-  [PriceLabel.BelowAverage]: "Abaixo da média",
-  [PriceLabel.Usual]: "Preço habitual",
-  [PriceLabel.AboveAverage]: "Acima da média",
-};
+export const priceLabelLabels: Record<PriceLabel, string> = localized((t) => t.enums.priceLabel);
 
 export const PromotionVerdict = {
   InsufficientHistory: 0,
@@ -161,12 +150,7 @@ export const PromotionVerdict = {
 } as const;
 export type PromotionVerdict = (typeof PromotionVerdict)[keyof typeof PromotionVerdict];
 
-export const promotionVerdictLabels: Record<PromotionVerdict, string> = {
-  [PromotionVerdict.InsufficientHistory]: "Sem histórico para verificar o desconto",
-  [PromotionVerdict.NoRealDiscount]: "Sem desconto real face aos 30 dias anteriores",
-  [PromotionVerdict.InflatedReference]: "Preço de referência inflacionado",
-  [PromotionVerdict.Genuine]: "Desconto verdadeiro",
-};
+export const promotionVerdictLabels: Record<PromotionVerdict, string> = localized((t) => t.enums.promotionVerdict);
 
 export const PromotionPattern = {
   InsufficientHistory: 0,
@@ -178,14 +162,7 @@ export const PromotionPattern = {
 } as const;
 export type PromotionPattern = (typeof PromotionPattern)[keyof typeof PromotionPattern];
 
-export const promotionPatternLabels: Record<PromotionPattern, string> = {
-  [PromotionPattern.InsufficientHistory]: "Histórico insuficiente",
-  [PromotionPattern.Never]: "Nunca em promoção",
-  [PromotionPattern.Rare]: "Raramente em promoção",
-  [PromotionPattern.Occasional]: "Em promoção de vez em quando",
-  [PromotionPattern.Frequent]: "Em promoção com frequência",
-  [PromotionPattern.AlmostAlways]: "Quase sempre em promoção",
-};
+export const promotionPatternLabels: Record<PromotionPattern, string> = localized((t) => t.enums.promotionPattern);
 
 /** Promoção sem cartão contra o mínimo dos 30 dias anteriores (Diretiva Omnibus). */
 export interface PromotionCheckDto {
@@ -249,12 +226,7 @@ export const PromotionStatus = {
 } as const;
 export type PromotionStatus = (typeof PromotionStatus)[keyof typeof PromotionStatus];
 
-export const promotionTypeLabels: Record<PromotionType, string> = {
-  [PromotionType.PercentageOff]: "Desconto percentual",
-  [PromotionType.FixedAmountOff]: "Desconto fixo",
-  [PromotionType.BuyXGetY]: "Compre X, leve Y",
-  [PromotionType.BundlePrice]: "Preço de pack",
-};
+export const promotionTypeLabels: Record<PromotionType, string> = localized((t) => t.enums.promotionType);
 
 export interface PromotionDto {
   promotionId: string;
@@ -314,10 +286,13 @@ export const RecipeDifficulty = {
 } as const;
 export type RecipeDifficulty = (typeof RecipeDifficulty)[keyof typeof RecipeDifficulty];
 
-export const recipeDifficultyLabels: Record<RecipeDifficulty, string> = {
-  [RecipeDifficulty.Easy]: "Fácil",
-  [RecipeDifficulty.Medium]: "Média",
-  [RecipeDifficulty.Hard]: "Difícil",
+export const recipeDifficultyLabels: Record<RecipeDifficulty, string> = localized((t) => t.enums.recipeDifficulty);
+
+/** Como a Api espera a dificuldade em query (`?difficulty=Easy`). */
+export const recipeDifficultyNames: Record<RecipeDifficulty, string> = {
+  [RecipeDifficulty.Easy]: "Easy",
+  [RecipeDifficulty.Medium]: "Medium",
+  [RecipeDifficulty.Hard]: "Hard",
 };
 
 export const RecipeStatus = {
@@ -350,20 +325,7 @@ export const DishType = {
 } as const;
 export type DishType = (typeof DishType)[keyof typeof DishType];
 
-export const dishTypeLabels: Record<DishType, string> = {
-  [DishType.MainCourse]: "Prato principal",
-  [DishType.Soup]: "Sopa",
-  [DishType.Starter]: "Entrada",
-  [DishType.SideDish]: "Acompanhamento",
-  [DishType.Salad]: "Salada",
-  [DishType.Dessert]: "Sobremesa",
-  [DishType.Breakfast]: "Pequeno-almoço",
-  [DishType.Snack]: "Lanche",
-  [DishType.Drink]: "Bebida",
-  [DishType.Sauce]: "Molho",
-  [DishType.Preserve]: "Conserva",
-  [DishType.Other]: "Outro",
-};
+export const dishTypeLabels: Record<DishType, string> = localized((t) => t.enums.dishType);
 
 export const MainProtein = {
   Meat: 0,
@@ -373,12 +335,7 @@ export const MainProtein = {
 } as const;
 export type MainProtein = (typeof MainProtein)[keyof typeof MainProtein];
 
-export const mainProteinLabels: Record<MainProtein, string> = {
-  [MainProtein.Meat]: "Carne",
-  [MainProtein.Fish]: "Peixe",
-  [MainProtein.Seafood]: "Marisco",
-  [MainProtein.Vegetarian]: "Vegetariano",
-};
+export const mainProteinLabels: Record<MainProtein, string> = localized((t) => t.enums.mainProtein);
 
 export interface QuantityDto {
   amount: number;

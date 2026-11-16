@@ -1,5 +1,6 @@
 import type { ShoppingListItemDto } from "../api/shopping";
 import type { CategoryDto, ProductDto } from "../api/types";
+import { localeOf } from "../i18n/format";
 
 export const OTHERS_GROUP = "Outros";
 
@@ -32,7 +33,7 @@ export function groupByTopCategory(
     else groups.set(name, [item]);
   }
   const named = [...groups.entries()]
-    .sort(([a], [b]) => a.localeCompare(b, "pt-PT"))
+    .sort(([a], [b]) => a.localeCompare(b, localeOf()))
     .map(([name, groupItems]) => ({ name, items: groupItems }));
   return others.length > 0 ? [...named, { name: OTHERS_GROUP, items: others }] : named;
 }

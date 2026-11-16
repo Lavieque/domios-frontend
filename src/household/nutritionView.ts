@@ -4,6 +4,7 @@
 
 import type { MemberNutritionGoalsDto } from "../api/memberPreferences";
 import type { NutrientKey, NutritionSummaryDto } from "../api/nutrition";
+import { tr } from "../i18n";
 
 interface NutrientInfo {
   key: NutrientKey;
@@ -14,15 +15,25 @@ interface NutrientInfo {
   isMax: boolean;
 }
 
+/** O rótulo lê-se na língua atual sempre que é pedido. */
+function nutrient(info: Omit<NutrientInfo, "label">): NutrientInfo {
+  return {
+    ...info,
+    get label() {
+      return tr().ui.nutrients[info.key];
+    },
+  };
+}
+
 export const NUTRIENTS: NutrientInfo[] = [
-  { key: "energyKcal", label: "Energia", unit: "kcal", goal: "energyKcal", isMax: false },
-  { key: "protein", label: "Proteína", unit: "g", goal: "proteinG", isMax: false },
-  { key: "carbs", label: "Hidratos de carbono", unit: "g", goal: "carbsG", isMax: false },
-  { key: "fat", label: "Gordura", unit: "g", goal: "fatG", isMax: false },
-  { key: "fiber", label: "Fibra", unit: "g", goal: "fiberG", isMax: false },
-  { key: "sugar", label: "Açúcares", unit: "g", goal: "sugarG", isMax: true },
-  { key: "saturates", label: "Saturados", unit: "g", goal: "saturatesG", isMax: true },
-  { key: "salt", label: "Sal", unit: "g", goal: "saltG", isMax: true },
+  nutrient({ key: "energyKcal", unit: "kcal", goal: "energyKcal", isMax: false }),
+  nutrient({ key: "protein", unit: "g", goal: "proteinG", isMax: false }),
+  nutrient({ key: "carbs", unit: "g", goal: "carbsG", isMax: false }),
+  nutrient({ key: "fat", unit: "g", goal: "fatG", isMax: false }),
+  nutrient({ key: "fiber", unit: "g", goal: "fiberG", isMax: false }),
+  nutrient({ key: "sugar", unit: "g", goal: "sugarG", isMax: true }),
+  nutrient({ key: "saturates", unit: "g", goal: "saturatesG", isMax: true }),
+  nutrient({ key: "salt", unit: "g", goal: "saltG", isMax: true }),
 ];
 
 export interface GoalRow {

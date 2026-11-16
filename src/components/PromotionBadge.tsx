@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPromotion } from "../api/client";
 import { promotionTypeLabels, type PromotionDto } from "../api/types";
+import { useT } from "../i18n";
 
 interface PromotionBadgeProps {
   promotionId: string;
@@ -13,6 +14,7 @@ interface PromotionBadgeProps {
 export function PromotionBadge({ promotionId }: PromotionBadgeProps) {
   const [promotion, setPromotion] = useState<PromotionDto | null>(null);
 
+  const t = useT();
   useEffect(() => {
     let cancelled = false;
     getPromotion(promotionId).then((result) => {
@@ -27,11 +29,11 @@ export function PromotionBadge({ promotionId }: PromotionBadgeProps) {
 
   const title = promotion
     ? `${promotionTypeLabels[promotion.type]} — ${promotion.description}`
-    : "A carregar promoção…";
+    : t.ui.promotion.loading;
 
   return (
     <span className="promotion-badge" title={title}>
-      Promoção
+      {t.ui.promotion.badge}
     </span>
   );
 }

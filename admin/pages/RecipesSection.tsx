@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { admin, type NewRecipe, type RecipeDetail, type RecipeSummary } from "../api";
-import { ConfirmAction, Pager, State } from "../components";
+import { ConfirmAction, Pager, State, Thumb } from "../components";
 import { EditForm, Field } from "../fields";
 import { UNITS, splitList, toNumber, unitLabel } from "../values";
 import { describe, useLoad } from "../hooks";
@@ -107,6 +107,7 @@ function RecipeRow({ recipe: r, onChanged }: { recipe: RecipeSummary; onChanged:
         />
       ) : (
         <>
+          <Thumb src={r.imageUrl} name={r.title} />
           <div className="row-main">
             <div className="row-title">
               <strong>{r.title}</strong>

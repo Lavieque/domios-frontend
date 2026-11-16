@@ -1,28 +1,34 @@
+import { Busy } from "../components/Busy";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { CardsSkeleton } from "../components/CardsSkeleton";
 import { getCategories, searchProducts } from "../api/client";
-import { CategoryScope, measurementUnitLabels, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
+import { CategoryScope, ProductStatus, type CategoryDto, type ProductDto } from "../api/types";
 import { topCategory } from "../catalog/aisles";
+import { formatPackage } from "../catalog/package";
 import { isOnSale, money, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { ProductThumb } from "../components/ProductThumb";
 import { LabelPrice, ShelfLabel, VerdictBand } from "../components/ShelfLabel";
+import { usePageSize } from "../usePageSize";
+import { numberFormat } from "../i18n/format";
+import { tr, type Dict } from "../i18n";
 
-const count = new Intl.NumberFormat("pt-PT");
-const PAGE_SIZE = 20;
+const count = numberFormat();
 
 /** Grupos da barra de filtros, pela ordem em que aparecem. */
-const SCOPE_GROUPS: { scope: CategoryScope; label: string }[] = [
-  { scope: CategoryScope.Food, label: "Alimentação" },
-  { scope: CategoryScope.Household, label: "Casa e higiene" },
-  { scope: CategoryScope.NonGrocery, label: "Acessórios e outros" },
-  { scope: CategoryScope.Unclassified, label: "Por classificar" },
+const SCOPE_GROUPS: { scope: CategoryScope; label: keyof Dict["products"]["scopes"] }[] = [
+  { scope: CategoryScope.Food, label: "food" },
+  { scope: CategoryScope.Household, label: "household" },
+  { scope: CategoryScope.NonGrocery, label: "nonGrocery" },
+  { scope: CategoryScope.Unclassified, label: "unclassified" },
 ];
 /** Categorias à vista por grupo antes de "Mais N". */
 const GROUP_PREVIEW = 8;
 
 export function ProductsPage() {
+  const pageSize = usePageSize(20, 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") ?? "";
   const categoryId = searchParams.get("categoryId");
@@ -121,13 +127,13 @@ export function ProductsPage() {
 
   useEffect(() => {
     setLoading(true);
-    searchProducts(search, page, PAGE_SIZE, categoryId ?? undefined, groceryOnly)
+    searchProducts(search, page, pageSize, categoryId ?? undefined, groceryOnly)
       .then((result) => {
         setProducts(result.items);
         setTotal(result.total);
       })
       .finally(() => setLoading(false));
-  }, [search, page, categoryId, groceryOnly]);
+  }, [search, page, pageSize, categoryId, groceryOnly]);
 
   const selectedCategory = categoryId ? categoriesById.get(categoryId) : undefined;
   // Primeira carga sem nada para mostrar; depois a grelha anterior fica à
@@ -138,16 +144,16 @@ export function ProductsPage() {
     <div className="page">
       <header className="page-head">
         <div>
-          <h1>Produtos</h1>
-          <p className="page-head-sub">Preços observados nas lojas, com o veredicto do histórico de cada oferta.</p>
+          <h1>{tr().products.title}</h1>
+          <p className="page-head-sub">{tr().products.subtitle}</p>
         </div>
       </header>
 
       <div className="catalog-layout">
         <div className="toolbar catalog-toolbar">
           <SearchField
-            label="Pesquisar produtos"
-            placeholder="Pesquisar por nome ou marca…"
+            label={tr().products.search}
+            placeholder={tr().products.searchPlaceholder}
             value={search}
             onChange={(value) => applyFilters({ search: value, page: 1 })}
           />
@@ -158,11 +164,11 @@ export function ProductsPage() {
             aria-controls="product-filters"
             onClick={() => setShowFilters((open) => !open)}
           >
-            {activeFilterCount > 0 ? `Filtros · ${activeFilterCount}` : "Filtros"}
+            {activeFilterCount > 0 ? tr().promotions.filtersCount(activeFilterCount) : tr().products.filters}
           </button>
         </div>
 
-        <aside className={`filter-sidebar${showFilters ? " is-open" : ""}`} id="product-filters" aria-label="Filtros">
+        <aside className={`filter-sidebar${showFilters ? " is-open" : ""}`} id="product-filters" aria-label={tr().products.filters}>
           <label className="filter-check">
             <input
               type="checkbox"
@@ -170,8 +176,8 @@ export function ProductsPage() {
               onChange={(e) => applyFilters({ groceryOnly: e.target.checked, page: 1 })}
             />
             <span>
-              Só supermercado
-              <span className="filter-check-hint">Esconde brinquedos, decoração e afins</span>
+              {tr().ui.groceryOnly}
+              <span className="filter-check-hint">{tr().products.groceryHint}</span>
             </span>
           </label>
 
@@ -182,7 +188,7 @@ export function ProductsPage() {
               aria-pressed={categoryId === null}
               onClick={() => applyFilters({ categoryId: null, page: 1 })}
             >
-              Todas as categorias
+              {tr().lists2.allCategories}
             </button>
           )}
 
@@ -206,7 +212,7 @@ export function ProductsPage() {
                   aria-controls={listId}
                   onClick={() => toggleGroup(group.scope)}
                 >
-                  <span>{group.label}</span>
+                  <span>{tr().products.scopes[group.label]}</span>
                   <span className="filter-group-count">{group.categories.length}</span>
                 </button>
                 {open && (
@@ -237,7 +243,7 @@ export function ProductsPage() {
                         className="link-button filter-more"
                         onClick={() => toggleExpanded(group.scope)}
                       >
-                        {expanded ? "Mostrar menos" : `Mais ${rest}`}
+                        {expanded ? tr().products.showLess : tr().products.more(rest)}
                       </button>
                     )}
                   </div>
@@ -250,34 +256,35 @@ export function ProductsPage() {
         <div className="catalog-results" aria-busy={loading}>
           <div className="results-head">
             <p className="results-count">
-              {firstLoad ? "A procurar…" : `${count.format(total)} ${total === 1 ? "produto" : "produtos"}`}
+              {firstLoad ? <Busy>{tr().lists2.searching}</Busy> : tr().products.count(count.format(total), total)}
             </p>
             {selectedCategory && (
               <button
                 type="button"
                 className="active-filter"
-                aria-label={`Tirar filtro ${selectedCategory.name}`}
+                aria-label={tr().products.removeFilter(selectedCategory.name)}
                 onClick={() => applyFilters({ categoryId: null, page: 1 })}
               >
                 {selectedCategory.name}
                 <span className="active-filter-x" aria-hidden="true" />
               </button>
             )}
-            {!groceryOnly && <span className="pill pill-muted">Inclui fora do supermercado</span>}
+            {!groceryOnly && <span className="pill pill-muted">{tr().products.includesNonGrocery}</span>}
             {activeFilterCount > 0 && (
               <button
                 type="button"
                 className="link-button results-clear"
                 onClick={() => applyFilters({ categoryId: null, groceryOnly: true, page: 1 })}
               >
-                Limpar filtros
+                {tr().products.clearFilters}
               </button>
             )}
           </div>
 
+          {firstLoad && <CardsSkeleton />}
           {!loading && products.length === 0 ? (
             <p className="empty-state">
-              {search || categoryId ? "Sem produtos para estes filtros." : "Sem produtos no catálogo."}
+              {search || categoryId ? tr().products.noneForFilters : tr().products.noneInCatalog}
             </p>
           ) : (
             products.length > 0 && (
@@ -296,7 +303,7 @@ export function ProductsPage() {
 
           <Pagination
             page={page}
-            pageSize={PAGE_SIZE}
+            pageSize={pageSize}
             total={total}
             onPageChange={(nextPage) => applyFilters({ page: nextPage })}
           />
@@ -315,10 +322,10 @@ function ProductLabel({ product, top }: { product: ProductDto; index: number; to
   const unit = cheapest ? unitPriceLabel(cheapest) : null;
 
   let band;
-  if (product.status === ProductStatus.Discontinued) band = <VerdictBand tone="none">Descontinuado</VerdictBand>;
-  else if (offers === undefined) band = <VerdictBand tone="none">A ler histórico…</VerdictBand>;
+  if (product.status === ProductStatus.Discontinued) band = <VerdictBand tone="none">{tr().products.discontinued}</VerdictBand>;
+  else if (offers === undefined) band = <VerdictBand tone="none"><Busy>{tr().products.readingHistory}</Busy></VerdictBand>;
   else if (cheapest) band = <VerdictBand insight={cheapest.priceInsight} />;
-  else band = <VerdictBand tone="none">Sem preço observado</VerdictBand>;
+  else band = <VerdictBand tone="none">{tr().ui.price.noPrice}</VerdictBand>;
 
   return (
     <ShelfLabel
@@ -329,7 +336,7 @@ function ProductLabel({ product, top }: { product: ProductDto; index: number; to
     >
       <div className="label-name">{product.name}</div>
       <div className="label-meta">
-        {product.brand ?? "Sem marca"} · {product.packageQuantity} {measurementUnitLabels[product.packageUnit]} ·{" "}
+        {product.brand ?? tr().products.noBrand} · {formatPackage(product.packageQuantity, product.packageUnit)} ·{" "}
         {aisleName}
       </div>
       {(offers === undefined || cheapest) && (
@@ -343,12 +350,13 @@ function ProductLabel({ product, top }: { product: ProductDto; index: number; to
               {unit && <strong>{unit}</strong>}
               {unit && " · "}
               {cheapest.chainName}
-              {priced.length > 1 && ` · ${priced.length} lojas`}
-              {cheapest.cardPrice && ` · ${money.format(cheapest.cardPrice.amount)} com cartão`}
+              {priced.length > 1 && tr().products.stores(priced.length)}
+              {cheapest.cardPrice && ` · ${money.format(cheapest.cardPrice.amount)} ${tr().ui.price.withCard}`}
             </span>
           )}
         </div>
       )}
+      <span className="arrow-link">{tr().products.seeDetail}</span>
     </ShelfLabel>
   );
 }

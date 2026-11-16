@@ -1,5 +1,7 @@
 import { refresh } from "../api/auth";
 import { createAuthedRequest } from "../api/authed";
+import { clearApiCache } from "../api/cache";
+import { forgetStoredHouseholds } from "../household/currentHousehold";
 import { createSessionStore, SESSION_STORAGE_KEY } from "./session";
 
 export const sessionStore = createSessionStore({
@@ -14,3 +16,15 @@ export const sessionStore = createSessionStore({
 });
 
 export const authedRequest = createAuthedRequest(sessionStore);
+
+// Entrar, sair ou trocar de utilizador (também noutro separador) limpa a cache
+// de respostas, para nunca mostrar os dados da casa de outra sessão.
+let cachedUserId = sessionStore.getSession()?.userId ?? null;
+sessionStore.subscribe(() => {
+  const userId = sessionStore.getSession()?.userId ?? null;
+  if (userId !== cachedUserId) {
+    if (cachedUserId && userId === null) forgetStoredHouseholds(cachedUserId);
+    cachedUserId = userId;
+    clearApiCache();
+  }
+});

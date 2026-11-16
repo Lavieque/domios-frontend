@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { admin, type HouseholdRow } from "../api";
-import { PageHead, Pager, State } from "../components";
+import { Avatar, PageHead, Pager, State } from "../components";
 import { dateOnly, useLoad } from "../hooks";
 
 export function HouseholdsPage() {
@@ -49,6 +49,7 @@ export function HouseholdsPage() {
 function HouseholdListRow({ household: h }: { household: HouseholdRow }) {
   return (
     <li className="row row-link-row">
+      <Avatar name={h.name} />
       <div className="row-main">
         <div className="row-title">
           <Link to={`/casas/${h.householdId}`} className="row-link-name">

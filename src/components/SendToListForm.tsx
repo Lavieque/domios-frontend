@@ -4,6 +4,7 @@ import { createShoppingList, type ShoppingListDto } from "../api/shopping";
 import { describeError } from "../auth/errors";
 import { useOpenLists } from "../shopping/useOpenLists";
 import { ListPicker, NEW_LIST } from "./ListPicker";
+import { tr } from "../i18n";
 
 interface SendResult {
   list: ShoppingListDto;
@@ -30,7 +31,7 @@ export function SendToListForm({ householdId, newListName, submitLabel, send, ch
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  if (lists === null) return <p className="muted loading">A carregar listas…</p>;
+  if (lists === null) return <p className="muted loading">{tr().ui.sendToList.loadingLists}</p>;
   const listId = chosen ?? lists[0]?.shoppingListId ?? NEW_LIST;
 
   async function handleSubmit(event: FormEvent) {
@@ -44,7 +45,7 @@ export function SendToListForm({ householdId, newListName, submitLabel, send, ch
       setChosen(targetId);
       reload();
     } catch (err) {
-      setError(describeError(err, { "invalid-state-transition": "Essa lista já está fechada." }));
+      setError(describeError(err, { "invalid-state-transition": tr().ui.sendToList.listClosed }));
     } finally {
       setSubmitting(false);
     }
@@ -55,16 +56,16 @@ export function SendToListForm({ householdId, newListName, submitLabel, send, ch
       <ListPicker lists={lists} value={listId} onChange={setChosen} />
       {children}
       <button type="submit" className="button-primary" disabled={submitting}>
-        {submitting ? "A acrescentar…" : submitLabel}
+        {submitting ? tr().ui.sendToList.adding : submitLabel}
       </button>
       {result && (
         <p className="notice inline-notice">
           {result.added === 0
             ? result.covered
-              ? `${result.list.name} já tem o que isto pede.`
-              : `Nada a acrescentar a ${result.list.name}.`
-            : `${result.added} ${result.added === 1 ? "item acrescentado" : "itens acrescentados"} a ${result.list.name}.`}{" "}
-          <Link to={`/listas/${result.list.shoppingListId}`}>Ver a lista</Link>
+              ? tr().ui.sendToList.alreadyHas(result.list.name)
+              : tr().ui.sendToList.nothingToAdd(result.list.name)
+            : tr().ui.sendToList.added(result.added, result.list.name)}{" "}
+          <Link to={`/listas/${result.list.shoppingListId}`}>{tr().ui.sendToList.seeList}</Link>
         </p>
       )}
       {error && (

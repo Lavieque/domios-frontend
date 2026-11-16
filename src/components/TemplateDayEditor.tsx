@@ -1,8 +1,10 @@
+import { Busy } from "./Busy";
 import { useEffect, useRef, useState } from "react";
 import type { MealPlanTemplateEntryDto } from "../api/mealPlanTemplates";
 import { MealType, mealTypeLabels, mealTypes } from "../api/planning";
 import { dishTypeLabels, RecipeStatus, type DishType } from "../api/types";
 import { RecipePicker } from "./RecipePicker";
+import { tr } from "../i18n";
 
 /** Uma refeição do dia enquanto se edita. `entry` = a original, para manter doses e notas. */
 export interface DayRow {
@@ -76,14 +78,14 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
   const pickingRow = rows.find((row) => row.key === picking) ?? null;
 
   return (
-    <div className="day-editor" role="group" aria-label={`Editar dia ${dayIndex}`} tabIndex={-1} ref={root}>
-      {rows.length === 0 && <p className="muted day-empty">Sem refeições.</p>}
+    <div className="day-editor" role="group" aria-label={tr().ui.dayEditor.editDay(dayIndex)} tabIndex={-1} ref={root}>
+      {rows.length === 0 && <p className="muted day-empty">{tr().ui.dayEditor.noMeals}</p>}
       <ul className="day-editor-rows">
         {rows.map((row) => (
           <li key={row.key}>
             <select
               className="category-select"
-              aria-label={`Refeição de ${row.recipeTitle}`}
+              aria-label={tr().ui.dayEditor.mealOf(row.recipeTitle)}
               data-focus={`meal-${row.key}`}
               value={row.mealType}
               onChange={(e) => update(row.key, { mealType: Number(e.target.value) as MealType })}
@@ -97,25 +99,25 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
             <span className="day-editor-title">
               {row.recipeTitle}
               {row.dishType !== null && <span className="muted"> · {dishTypeLabels[row.dishType]}</span>}
-              {row.unavailable && <span className="day-editor-unavailable"> · Já não está disponível</span>}
+              {row.unavailable && <span className="day-editor-unavailable">{tr().ui.dayEditor.unavailable}</span>}
             </span>
             <span className="day-editor-actions">
               <button
                 type="button"
                 className="link-button"
-                aria-label={`Trocar ${row.recipeTitle}`}
+                aria-label={tr().ui.dayEditor.swapLabel(row.recipeTitle)}
                 data-focus={`swap-${row.key}`}
                 onClick={() => setPicking(row.key)}
               >
-                Trocar receita
+                {tr().ui.dayEditor.swap}
               </button>
               <button
                 type="button"
                 className="link-button"
-                aria-label={`Remover ${row.recipeTitle}`}
+                aria-label={tr().ui.dayEditor.removeLabel(row.recipeTitle)}
                 onClick={() => remove(row.key)}
               >
-                Remover
+                {tr().common.remove}
               </button>
             </span>
           </li>
@@ -124,7 +126,7 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
 
       {picking !== null ? (
         <RecipePicker
-          label={pickingRow ? `Trocar ${pickingRow.recipeTitle} por…` : `Acrescentar ao dia ${dayIndex}`}
+          label={pickingRow ? tr().ui.dayEditor.swapFor(pickingRow.recipeTitle) : tr().ui.dayEditor.addToDay(dayIndex)}
           defaultDishType={pickingRow?.dishType ?? null}
           onCancel={closePicker}
           onPick={(recipe) => {
@@ -157,7 +159,7 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
         />
       ) : (
         <button type="button" className="link-button" data-focus="add" onClick={() => setPicking("new")}>
-          Acrescentar refeição
+          {tr().ui.dayEditor.addMeal}
         </button>
       )}
 
@@ -168,10 +170,10 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
       )}
       <div className="button-row">
         <button type="button" className="button-primary" disabled={saving || picking !== null} onClick={() => onSave(rows)}>
-          {saving ? "A guardar…" : "Guardar dia"}
+          {saving ? <Busy>{tr().common.saving}</Busy> : tr().ui.dayEditor.saveDay}
         </button>
         <button type="button" className="button-secondary" disabled={saving} onClick={onCancel}>
-          Cancelar
+          {tr().common.cancel}
         </button>
       </div>
     </div>

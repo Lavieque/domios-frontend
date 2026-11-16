@@ -1,16 +1,19 @@
+import { PageSkeleton } from "../components/PageSkeleton";
 import { useEffect, useState, type CSSProperties } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../api/client";
+import { PaidPriceSource } from "../api/shopping";
 import { addShoppingListItem } from "../api/shopping";
+import { getProductPurchases, type ProductPurchaseDto } from "../api/spending";
 import {
   MeasurementUnit,
-  measurementUnitLabels,
   ProductStatus,
   StoreOfferAvailability,
   type ProductDto,
   type ProductStoreOfferDto,
 } from "../api/types";
 import { topCategory } from "../catalog/aisles";
+import { allergenLabel, formatPackage } from "../catalog/package";
 import { isOnSale, money, priceDigits, sortOffers, unitPriceLabel, useOffers } from "../catalog/offers";
 import { useCategories } from "../catalog/useCategories";
 import { EventTimeline } from "../components/EventTimeline";
@@ -18,8 +21,11 @@ import { PromotionBadge } from "../components/PromotionBadge";
 import { SendToListForm } from "../components/SendToListForm";
 import { InsightNotes, LabelPrice, PriceRange, VerdictBand } from "../components/ShelfLabel";
 import { useHouseholds } from "../household/useHouseholds";
+import { dateTimeFormat } from "../i18n/format";
+import { tr } from "../i18n";
+import { localized } from "../i18n";
 
-const dateFormat = new Intl.DateTimeFormat("pt-PT", {
+const dateFormat = dateTimeFormat({
   day: "numeric",
   month: "short",
 });
@@ -31,6 +37,7 @@ export function ProductDetailPage() {
   const offers = useOffers(id ?? "");
   const categories = useCategories();
   const { current } = useHouseholds();
+  const lastPaid = useLastPaid(current?.householdId ?? null, id ?? null);
 
   useEffect(() => {
     if (!id) return;
@@ -39,7 +46,7 @@ export function ProductDetailPage() {
   }, [id]);
 
   if (!id) return null;
-  if (!product) return <p className="muted loading">A carregar…</p>;
+  if (!product) return <PageSkeleton />;
 
   const sorted = offers ? sortOffers(offers) : [];
   const onSale = sorted.filter(isOnSale);
@@ -48,13 +55,13 @@ export function ProductDetailPage() {
   const highest = onSale[onSale.length - 1]?.latestPrice?.price.amount;
   const top = topCategory(product.category, categories) ?? product.category;
   const unit = cheapest ? unitPriceLabel(cheapest) : null;
-  const pack = `${product.packageQuantity} ${measurementUnitLabels[product.packageUnit]}`;
+  const pack = formatPackage(product.packageQuantity, product.packageUnit);
 
   return (
     <div className="page">
-      <nav className="crumb" aria-label="Caminho">
+      <nav className="crumb" aria-label={tr().common.breadcrumb}>
         <button type="button" className="back-link" onClick={() => navigate(-1)}>
-          Voltar
+          {tr().products.back}
         </button>
         <span aria-hidden="true">·</span>
         <Link to={`/produtos?categoryId=${top.categoryId}`}>{top.name}</Link>
@@ -84,7 +91,7 @@ export function ProductDetailPage() {
                 {cheapest.cardPrice && (
                   <>
                     <br />
-                    Com cartão {money.format(cheapest.cardPrice.amount)}
+                    {tr().products.withCard(money.format(cheapest.cardPrice.amount))}
                   </>
                 )}
               </span>
@@ -95,7 +102,7 @@ export function ProductDetailPage() {
         <div className="article-sheet-body">
           <h1 className="article-name">{product.name}</h1>
           <p className="article-brand">
-            {product.brand ?? "Sem marca"} · {pack}
+            {product.brand ?? tr().products.noBrand} · {pack}
           </p>
 
           {product.imageUrl && (
@@ -107,13 +114,13 @@ export function ProductDetailPage() {
           {product.status === ProductStatus.Active ? (
             <div className="article-actions">
               <Link to={`/despensa/adicionar?produto=${product.productId}`} className="button-primary">
-                Adicionar à despensa
+                {tr().products.addToPantry}
               </Link>
               {current && (
                 <SendToListForm
                   householdId={current.householdId}
-                  newListName="Compras"
-                  submitLabel="Adicionar à lista"
+                  newListName={tr().products.defaultListName}
+                  submitLabel={tr().products.addToList}
                   send={async (listId) => ({
                     list: await addShoppingListItem(current.householdId, listId, {
                       label: product.name,
@@ -127,15 +134,17 @@ export function ProductDetailPage() {
             </div>
           ) : (
             <p className="notice article-notice">
-              Descontinuado: já não se vende nas lojas acompanhadas.
+              {tr().products.discontinuedNotice}
               {product.substitutedByProductId && (
                 <>
                   {" "}
-                  <Link to={`/produtos/${product.substitutedByProductId}`}>Ver o produto que o substitui</Link>
+                  <Link to={`/produtos/${product.substitutedByProductId}`}>{tr().products.seeReplacement}</Link>
                 </>
               )}
             </p>
           )}
+
+          {lastPaid && <LastPaid purchase={lastPaid} product={product} />}
 
           {cheapest?.priceInsight && (
             <div className="article-insight">
@@ -146,21 +155,21 @@ export function ProductDetailPage() {
 
           <dl className="article-specs">
             <div>
-              <dt>Categoria</dt>
+              <dt>{tr().products.category}</dt>
               <dd>{product.category.name}</dd>
             </div>
             <div>
-              <dt>Embalagem</dt>
+              <dt>{tr().products.package}</dt>
               <dd>{pack}</dd>
             </div>
             <div>
-              <dt>EAN</dt>
+              <dt>{tr().products.ean}</dt>
               <dd>{product.barcode ?? "—"}</dd>
             </div>
             {product.allergens.length > 0 && (
               <div>
-                <dt>Alergénios</dt>
-                <dd>{product.allergens.join(", ")}</dd>
+                <dt>{tr().products.allergens}</dt>
+                <dd>{product.allergens.map(allergenLabel).join(", ")}</dd>
               </div>
             )}
           </dl>
@@ -169,12 +178,12 @@ export function ProductDetailPage() {
 
       <section className="panel article-stores" aria-labelledby="article-stores-title">
         <div className="side-head">
-          <h2 id="article-stores-title">Onde comprar</h2>
-          {onSale.length > 1 && <span className="side-head-count">{onSale.length} lojas com preço</span>}
+          <h2 id="article-stores-title">{tr().products.whereToBuy}</h2>
+          {onSale.length > 1 && <span className="side-head-count">{tr().products.storesWithPrice(onSale.length)}</span>}
         </div>
-        {offers === undefined && <p className="muted loading">A ler preços…</p>}
-        {offers === null && <p className="form-error">Não deu para ler os preços deste produto.</p>}
-        {offers && offers.length === 0 && <p className="empty-state">Nenhuma loja acompanhada vende este produto.</p>}
+        {offers === undefined && <p className="muted loading">{tr().ui.price.reading}</p>}
+        {offers === null && <p className="form-error">{tr().products.readFailed}</p>}
+        {offers && offers.length === 0 && <p className="empty-state">{tr().products.noStores}</p>}
         {offers && offers.length > 0 && (
           <ul className="store-rows">
             {sorted.map((offer, index) => (
@@ -191,19 +200,19 @@ export function ProductDetailPage() {
       </section>
 
       <section className="panel" aria-labelledby="article-history-title">
-        <h2 id="article-history-title">Histórico</h2>
+        <h2 id="article-history-title">{tr().products.history}</h2>
         <EventTimeline aggregateType="Product" aggregateId={product.productId} />
       </section>
     </div>
   );
 }
 
-const availabilityLabels: Record<StoreOfferAvailability, string | null> = {
+const availabilityLabels: Record<StoreOfferAvailability, string | null> = localized((t) => ({
   [StoreOfferAvailability.Unknown]: null,
-  [StoreOfferAvailability.InStock]: "Disponível",
+  [StoreOfferAvailability.InStock]: t.products.inStock,
   // Saiu do site (o scraper marca-a), não necessariamente esgotada.
-  [StoreOfferAvailability.OutOfStock]: "Indisponível",
-};
+  [StoreOfferAvailability.OutOfStock]: t.products.outOfStock,
+}));
 
 /** Uma loja: nome, barra à escala do preço mais alto, preço e veredicto; abre para o histórico. */
 function StoreRow({
@@ -242,25 +251,25 @@ function StoreRow({
           </span>
           <span className="store-row-price">
             {price !== undefined ? <span className={best ? "price-tag" : undefined}>{priceDigits(price)} €</span> : "—"}
-            {offer.cardPrice && <small>{money.format(offer.cardPrice.amount)} com cartão</small>}
+            {offer.cardPrice && <small>{money.format(offer.cardPrice.amount)} {tr().ui.price.withCard}</small>}
           </span>
           <span className="store-row-tag">
             {best ? (
-              <VerdictBand tone="1">Mais barato</VerdictBand>
+              <VerdictBand tone="1">{tr().products.cheapest}</VerdictBand>
             ) : out ? (
-              <VerdictBand tone="none">Indisponível</VerdictBand>
+              <VerdictBand tone="none">{tr().products.outOfStock}</VerdictBand>
             ) : offer.latestPrice ? (
               <VerdictBand insight={offer.priceInsight} />
             ) : (
-              <VerdictBand tone="none">Sem preço</VerdictBand>
+              <VerdictBand tone="none">{tr().products.noPrice}</VerdictBand>
             )}
           </span>
         </summary>
         <div className="store-row-detail">
           <div className="label-foot">
-            {offer.latestPrice && <span>Visto a {dateFormat.format(new Date(offer.latestPrice.observedAt))}</span>}
+            {offer.latestPrice && <span>{tr().products.seenOn(dateFormat.format(new Date(offer.latestPrice.observedAt)))}</span>}
             {availability && !out && <span>{availability}</span>}
-            {offer.cardPrice && <span>Cartão até {dateFormat.format(new Date(offer.cardPrice.endsAt))}</span>}
+            {offer.cardPrice && <span>{tr().products.cardUntil(dateFormat.format(new Date(offer.cardPrice.endsAt)))}</span>}
             {offer.latestPrice?.promotionId && <PromotionBadge promotionId={offer.latestPrice.promotionId} />}
           </div>
           {offer.priceInsight ? (
@@ -270,11 +279,63 @@ function StoreRow({
             </>
           ) : (
             <p className="muted" style={{ margin: 0 }}>
-              Sem histórico de preços nesta loja.
+              {tr().products.noStoreHistory}
             </p>
           )}
         </div>
       </details>
     </li>
   );
+}
+
+/** A última compra deste produto pela casa com preço; null sem casa, sem compras ou se falhar. */
+function useLastPaid(householdId: string | null, productId: string | null): ProductPurchaseDto | null {
+  const [purchase, setPurchase] = useState<ProductPurchaseDto | null>(null);
+  useEffect(() => {
+    setPurchase(null);
+    if (!householdId || !productId) return;
+    let active = true;
+    getProductPurchases(householdId, productId, 10)
+      .then((result) => active && setPurchase(result.items.find((p) => p.paidPrice?.currency === "EUR") ?? null))
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [householdId, productId]);
+  return purchase;
+}
+
+/** "Pagaste 1,29 € a 2 nov. no Continente" (DomiOS_API_Fase1.md, adenda 2026-11-09). */
+function LastPaid({ purchase, product }: { purchase: ProductPurchaseDto; product: ProductDto }) {
+  const where = purchase.physicalStoreName ?? purchase.chainName;
+  const total = purchase.paidPrice!.amount;
+  // O preço pago é o da linha toda; com várias embalagens, mostra também o de cada uma, como a prateleira.
+  const packs = packagesOf(purchase.quantity.amount, purchase.quantity.unit, product.packageQuantity, product.packageUnit);
+  return (
+    <p className="muted last-paid">
+      {tr().products.youPaid}{" "}
+      {packs !== null && packs > 1 ? (
+        <>
+          <strong>{money.format(total / packs)}</strong>
+          {tr().products.perPack(money.format(total), packs)}
+        </>
+      ) : (
+        <strong>{money.format(total)}</strong>
+      )}{" "}
+      {tr().products.on(dateFormat.format(new Date(purchase.purchasedAt)))}
+      {where && tr().products.at(where)}
+      {purchase.paidPriceSource === PaidPriceSource.Offer && tr().products.shelfPrice}.
+    </p>
+  );
+}
+
+/** Embalagens inteiras numa compra; null quando a unidade não se compara com a da embalagem. */
+function packagesOf(amount: number, unit: MeasurementUnit, packageQuantity: number, packageUnit: MeasurementUnit): number | null {
+  if (unit === MeasurementUnit.Unit) return Math.max(1, Math.round(amount));
+  const base = (u: MeasurementUnit, q: number) =>
+    u === MeasurementUnit.Kilogram ? { dim: "g", q: q * 1000 } : u === MeasurementUnit.Liter ? { dim: "ml", q: q * 1000 } : { dim: u === MeasurementUnit.Gram ? "g" : "ml", q };
+  const bought = base(unit, amount);
+  const pack = base(packageUnit, packageQuantity);
+  if (packageUnit === MeasurementUnit.Unit || bought.dim !== pack.dim || !(pack.q > 0)) return null;
+  return Math.max(1, Math.ceil(bought.q / pack.q - 1e-9));
 }

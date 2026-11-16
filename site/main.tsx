@@ -1,7 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import "@fontsource-variable/schibsted-grotesk";
+import "@fontsource-variable/dm-sans/index.css";
+import "@fontsource/libre-caslon-display/400.css";
 import "./site.css";
 import { Site } from "./Site";
 

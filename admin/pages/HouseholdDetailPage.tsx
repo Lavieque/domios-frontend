@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { admin, MEMBER_ROLE, type HouseholdDetail, type HouseholdMember } from "../api";
-import { ConfirmAction, State } from "../components";
+import { Avatar, ConfirmAction, State } from "../components";
 import { dateOnly, describe, useLoad } from "../hooks";
 
 const ROLE_LABEL: Record<number, string> = { 0: "Administrador", 1: "Adulto", 2: "Criança", 3: "Convidado" };
@@ -95,6 +95,7 @@ function MemberRow({ houseId, member: m, onChanged }: { houseId: string; member:
   const isAdmin = m.role === MEMBER_ROLE.Admin;
   return (
     <li className="row">
+      <Avatar name={m.name} />
       <div className="row-main">
         <div className="row-title">
           <strong>{m.name}</strong>

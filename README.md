@@ -161,3 +161,24 @@ utilizadores (procurar, terminar sessões, desativar, reativar) e auditoria. Ent
 - `npm run dev:admin` (porta 5175), `npm run build:admin` (saída `dist-admin`), Vercel: projeto à parte, Build Command `npm run build:admin`, Output Directory `dist-admin` (no painel).
 - Um administrador faz-se só por SQL: `UPDATE identity.users SET is_platform_admin = true WHERE email = '...'`.
 - Variável: `VITE_API_BASE_URL`. A Api tem de permitir a origem do admin em `Cors__AllowedOrigins`.
+
+## Demo (`src/demo/`)
+
+A mesma app, sem Api: um backend falso corre no browser e responde a todas as
+rotas com dados de exemplo (casa "Casa Lopes", despensa, listas, plano,
+receitas, ementas, promoções, gastos, nutrição). Os nomes do catálogo existem em
+português e inglês e seguem a língua da app.
+
+```bash
+npm run dev:demo      # http://localhost:5175
+npm run build:demo    # gera dist-demo/
+```
+
+- Liga-se com `--mode demo` (`.env.demo`: `VITE_DEMO=true`). Os outros builds não
+  levam nenhum código da demo.
+- A primeira visita já entra com sessão; depois de sair, qualquer email e
+  palavra-passe servem.
+- O que se muda fica em `localStorage` (`domios.demo.state`) até carregar em
+  "Repor demo", na faixa do topo.
+- Deploy: projeto Vercel à parte com o comando `npm run build:demo` e a pasta
+  `dist-demo` (o `vercel.json` já reescreve as rotas para o `index.html`).

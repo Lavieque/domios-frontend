@@ -13,6 +13,10 @@ import { REQUEST_ACCESS_URL } from "./siteUrl";
 import { useT } from "./i18n";
 import { GuestLanguageSwitch } from "./components/GuestLanguageSwitch";
 
+// Só no build de demonstração; nos outros builds este import nem entra no bundle.
+const DemoBanner =
+  import.meta.env.VITE_DEMO === "true" ? lazy(() => import("./demo/DemoBanner").then((m) => ({ default: m.DemoBanner }))) : null;
+
 
 // Cada página é um ficheiro à parte, pedido só quando é precisa: o arranque
 // carrega só o essencial. Hoje e Entrar ficam no ficheiro principal (são a
@@ -144,6 +148,11 @@ function App() {
       {menuOpen && <button type="button" className="menu-backdrop" aria-label={t.shell.closeMenu} onClick={() => setMenuOpen(false)} />}
 
       <div className="app-column">
+      {DemoBanner && (
+        <Suspense fallback={null}>
+          <DemoBanner signedIn={session !== null} />
+        </Suspense>
+      )}
       {session ? (
         <>
           <EditorialBar brand={brand} collapsed={railCollapsed} menuOpen={menuOpen} onToggle={toggleRail} />

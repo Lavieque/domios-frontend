@@ -16,6 +16,8 @@ export interface MealPlanTemplateSummaryDto {
   tags: string[];
   status: RecipeStatus;
   entryCount: number;
+  /** Foto própria da ementa; a Api não a manda (só a demo), e então escolhe-se pelas etiquetas. */
+  imageUrl?: string | null;
 }
 
 export interface MealPlanTemplateEntryDto {

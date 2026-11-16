@@ -12,7 +12,6 @@ import App from './App.tsx'
 import { useLanguage } from './i18n'
 import { startAccountLanguageSync } from './i18n/accountLanguage'
 
-startAccountLanguageSync()
 
 /**
  * Quando a língua muda, a app remonta: os textos lidos fora dos componentes
@@ -23,10 +22,20 @@ function LanguageRoot() {
   return <App key={lang} />
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <LanguageRoot />
-    </BrowserRouter>
-  </StrictMode>,
-)
+async function boot() {
+  // Build de demonstração: a Api é falsa e corre no próprio browser (src/demo).
+  if (import.meta.env.VITE_DEMO === 'true') {
+    const { installDemo } = await import('./demo/install')
+    installDemo()
+  }
+  startAccountLanguageSync()
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <BrowserRouter>
+        <LanguageRoot />
+      </BrowserRouter>
+    </StrictMode>,
+  )
+}
+
+void boot()

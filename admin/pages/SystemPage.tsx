@@ -55,6 +55,17 @@ export function SystemPage() {
               pillText={s.email.sender === "Logging" ? "Só log" : s.email.configured ? "Ativo" : "Desligado"}
               extra={s.email.pending > 0 ? `${s.email.pending} na fila` : undefined}
             />
+            <Fact
+              label="Aviso de pedidos"
+              value={s.email.adminNotifyEmail ?? "Ninguém"}
+              detail={
+                s.email.adminNotifyEmail
+                  ? "Recebe um email por cada novo pedido de acesso."
+                  : "Os pedidos ficam gravados mas ninguém é avisado. Definir ADMIN_NOTIFY_EMAIL."
+              }
+              pill={s.email.adminNotifyEmail ? "pill-good" : "pill-danger"}
+              pillText={s.email.adminNotifyEmail ? "Ativo" : "Desligado"}
+            />
           </dl>
 
           <h2>Contas</h2>

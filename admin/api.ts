@@ -121,7 +121,7 @@ export interface SystemStatus {
   database: { ok: boolean; latencyMs: number };
   accounts: { users: number; disabledUsers: number; platformAdmins: number; pendingAccessRequests: number; households: number; activeSessions: number };
   catalog: { products: Freshness; offers: Freshness; recipes: Freshness; activePromotions: number; promotionsLastUpdatedAt: string | null };
-  email: { sender: string; configured: boolean; fromAddress: string | null; pending: number };
+  email: { sender: string; configured: boolean; fromAddress: string | null; pending: number; adminNotifyEmail: string | null };
 }
 
 export interface Nutrition {

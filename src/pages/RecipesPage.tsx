@@ -169,12 +169,12 @@ export function RecipesPage() {
           meta={[
             recipes[0].dishType !== null ? dishTypeLabels[recipes[0].dishType] : null,
             recipeDifficultyLabels[recipes[0].difficulty],
-            cooked.has(recipes[0].recipeId) ? tr().recipes.cookedShort : null,
           ]
             .filter(Boolean)
             .join(" · ")}
           imageUrl={recipes[0].imageUrl}
           to={`/receitas/${recipes[0].recipeId}`}
+          badge={cooked.has(recipes[0].recipeId) ? <CookedMark cooked={cooked.get(recipes[0].recipeId)!} /> : undefined}
         />
       )}
 

@@ -29,3 +29,13 @@ dist-ssr
 # Impeccable: capturas e scripts locais de revisão
 .impeccable/review/
 .impeccable/scripts/
+
+# Material de trabalho local (capturas, maquetes, pacotes do redesign): fica fora do repositório
+.impeccable/mock-images/
+prints-marca/
+redesigndoprojeto/
+*.zip
+
+# Claude Code: definições pessoais e worktrees (o launch.json é partilhado)
+.claude/settings.local.json
+.claude/worktrees/

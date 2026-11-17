@@ -228,10 +228,35 @@ export function save(): void {
   }
 }
 
-export function resetState(): void {
-  const language = state?.language ?? "pt";
-  state = seed(language);
+/**
+ * Back to the sample data or, with `empty`, to a new account: no household,
+ * plan, lists or pantry (the guided tour fills them in). The catalogue
+ * (products, stores, recipes, public menus) is the same either way.
+ */
+export function resetState(empty = false): void {
+  const language = state?.language ?? (window.localStorage.getItem("domios.language") === "en" ? "en" : "pt");
+  state = empty ? emptySeed(language) : seed(language);
   save();
+}
+
+function emptySeed(language: "pt" | "en"): DemoState {
+  return {
+    ...seed(language),
+    avatar: null,
+    households: [],
+    pantry: [],
+    lists: [],
+    planned: [],
+    meals: [],
+    saved: [],
+    templates: [],
+    opportunityStatus: {},
+    events: [],
+    goals: {},
+    avoided: {},
+    purchases: [],
+    conversions: {},
+  };
 }
 
 export function nextId(prefix: string): string {

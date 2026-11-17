@@ -6,6 +6,7 @@ import { subscribeLanguage } from "../i18n/language";
 import { SESSION_STORAGE_KEY } from "../auth/session";
 import { DemoHttpError, handle } from "./router";
 import { DEMO_EMAIL, DEMO_STATE_KEY, DEMO_USER_ID, getState, resetState } from "./state";
+import { DEMO_API_EVENT, clearTour, freshTour, writeTour, type DemoApiDetail } from "./tour";
 
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string).replace(/\/+$/, "");
 
@@ -70,6 +71,8 @@ export function installDemo(): void {
     await latency();
     try {
       const result = await handle(method, path, url.searchParams, body, blob);
+      // For the guided tour: a step finishes when the visitor does what it asks.
+      window.dispatchEvent(new CustomEvent<DemoApiDetail>(DEMO_API_EVENT, { detail: { method, path, body, result } }));
       if (result instanceof Blob) return new Response(result, { status: 200, headers: { "Content-Type": result.type } });
       if (result === undefined) return new Response(null, { status: 204 });
       return json(200, result);
@@ -81,13 +84,38 @@ export function installDemo(): void {
   };
 }
 
-/** Back to the sample data, signed in again, on the Today page. */
-export function resetDemo(): void {
-  resetState();
+function forgetHousehold() {
   for (const key of Object.keys(window.localStorage)) {
     if (key.startsWith("domios.household")) window.localStorage.removeItem(key);
   }
+}
+
+/**
+ * Back to the sample data, signed in again, on the Today page. The welcome
+ * dialog shows again, unless `skipTour` (the visitor asked for the sample data).
+ */
+export function resetDemo(options: { skipTour?: boolean } = {}): void {
+  resetState();
+  forgetHousehold();
+  if (options.skipTour) writeTour(freshTour("off"));
+  else clearTour();
   signIn();
   clearApiCache();
   window.location.assign("/");
+}
+
+/**
+ * Starts the guided tour on a new, empty account: no household, plan, lists or
+ * pantry. Opens the household form with the visitor's name already in it.
+ */
+export function startTour(name: string): void {
+  resetState(true);
+  forgetHousehold();
+  writeTour(freshTour("active", name));
+  signIn();
+  clearApiCache();
+  // React Router reads `usr` from history.state as the location state, and a
+  // reload keeps history.state: the form gets the name after the clean start.
+  window.history.replaceState({ usr: { memberName: name }, key: "demo-tour", idx: 0 }, "", "/casa/nova");
+  window.location.reload();
 }

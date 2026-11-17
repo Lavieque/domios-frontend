@@ -66,7 +66,7 @@ const text = {
       },
       plan: {
         title: "Planeia a semana",
-        body: "Abre uma ementa, põe a data de início em hoje e carrega em “Aplicar ao plano”. Também dá para abrir uma receita e carregar em “Adicionar ao plano”.",
+        body: "Abre uma ementa e carrega em “Aplicar ao plano”: começa hoje. Também dá para abrir uma receita e carregar em “Adicionar ao plano”.",
         cta: "Ver ementas",
         alt: { label: "ou receitas", to: "/receitas" },
       },
@@ -102,7 +102,7 @@ const text = {
       },
       end: {
         title: "A casa está a andar",
-        body: "A receita que fizeste está em “Receitas feitas”. Na lista de receitas fica marcada com um ✓: passa o rato por cima para ver quando foi.",
+        body: "A receita que fizeste está em “Receitas feitas”. Na lista de receitas fica marcada com um ✓: passa o rato por cima ou toca-lhe para ver quando foi.",
         cta: "Ver receitas feitas",
       },
     } satisfies Record<StepId | "cookNothingToday", StepText>,
@@ -143,7 +143,7 @@ const text = {
       },
       plan: {
         title: "Plan the week",
-        body: "Open a menu, set the start date to today and press “Apply to plan”. You can also open a recipe and press “Add to plan”.",
+        body: "Open a menu and press “Apply to plan”: it starts today. You can also open a recipe and press “Add to plan”.",
         cta: "See menus",
         alt: { label: "or recipes", to: "/receitas" },
       },
@@ -179,7 +179,7 @@ const text = {
       },
       end: {
         title: "Your home is up and running",
-        body: "The recipe you made is under “Cooked recipes”. In the recipe list it carries a ✓: hover over it to see when.",
+        body: "The recipe you made is under “Cooked recipes”. In the recipe list it carries a ✓: hover over or tap it to see when.",
         cta: "See cooked recipes",
       },
     } satisfies Record<StepId | "cookNothingToday", StepText>,
@@ -253,9 +253,16 @@ function Welcome() {
   const t = text[useLanguage()].welcome;
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
 
-  useEffect(() => input.current?.focus(), []);
+  // A modal <dialog>: keeps keyboard focus inside and makes the page behind inert.
+  useEffect(() => {
+    const element = dialog.current;
+    if (element && !element.open) element.showModal();
+    input.current?.focus();
+    return () => element?.close();
+  }, []);
 
   function start(event: FormEvent) {
     event.preventDefault();
@@ -265,11 +272,21 @@ function Welcome() {
   }
 
   return (
-    <div className="demo-tour-overlay">
-      <form className="demo-tour-welcome" role="dialog" aria-modal="true" aria-labelledby="demo-tour-title" onSubmit={start}>
+    <dialog
+      ref={dialog}
+      className="demo-tour-welcome"
+      aria-labelledby="demo-tour-title"
+      aria-describedby="demo-tour-lede"
+      // Esc means "not now": the visitor stays with the sample data.
+      onCancel={(event) => {
+        event.preventDefault();
+        if (!busy) setTourStatus("off");
+      }}
+    >
+      <form className="demo-tour-welcome-form" onSubmit={start}>
         <p className="demo-tour-eyebrow">{t.eyebrow}</p>
         <h2 id="demo-tour-title">{t.title}</h2>
-        <p className="demo-tour-lede">{t.lede}</p>
+        <p id="demo-tour-lede" className="demo-tour-lede">{t.lede}</p>
         <label className="form-field">
           <span>{t.name}</span>
           <input
@@ -293,14 +310,15 @@ function Welcome() {
         </div>
         <p className="demo-tour-note">{t.note}</p>
       </form>
-    </div>
+    </dialog>
   );
 }
 
 function StepCard({ tour, save }: { tour: TourState; save: (next: TourState) => void }) {
   const t = text[useLanguage()];
   const navigate = useNavigate();
-  const { pathname, search } = useLocation();
+  const location = useLocation();
+  const { pathname, search } = location;
   const id = currentStep(tour);
   const mealToday = useMealToday();
   // Cooking needs a meal for today; without one the step sends to the recipes instead.
@@ -320,6 +338,14 @@ function StepCard({ tour, save }: { tour: TourState; save: (next: TourState) => 
     const timer = window.setTimeout(() => setJustDone(null), 3200);
     return () => window.clearTimeout(timer);
   }, [id, t]);
+
+  // After the clean start the form opens without the name: give it the one from the welcome.
+  const givenName = (location.state as { memberName?: unknown } | null)?.memberName;
+  useEffect(() => {
+    if (id === "household" && pathname === "/casa/nova" && tour.name && givenName === undefined) {
+      navigate("/casa/nova", { replace: true, state: { memberName: tour.name } });
+    }
+  }, [id, pathname, tour.name, givenName, navigate]);
 
   const listPath = tour.listId ? `/listas/${tour.listId}` : "/listas";
   const target: Record<StepId, string> = {
@@ -348,7 +374,7 @@ function StepCard({ tour, save }: { tour: TourState; save: (next: TourState) => 
 
   if (minimized) {
     return (
-      <button type="button" className="demo-tour-pill" onClick={() => setMinimized(false)} aria-label={t.expand}>
+      <button type="button" className="demo-tour-pill" onClick={() => setMinimized(false)} aria-expanded="false" title={t.expand}>
         <span className="demo-tour-pill-dot" aria-hidden="true" />
         {n > 0 ? `${t.tour} · ${n}/${COUNTED.length}` : t.tour}
       </button>
@@ -356,10 +382,14 @@ function StepCard({ tour, save }: { tour: TourState; save: (next: TourState) => 
   }
 
   return (
-    <aside className="demo-tour-card" aria-live="polite" aria-label={t.tour}>
+    <aside className="demo-tour-card" aria-label={t.tour}>
+      {/* Says the new step aloud without moving the focus away from the page. */}
+      <p className="demo-tour-sr" aria-live="polite">
+        {[justDone && t.done(justDone), n > 0 ? t.step(n, COUNTED.length) : null, step.title].filter(Boolean).join(". ")}
+      </p>
       <div className="demo-tour-head">
         <p className="demo-tour-eyebrow">{n > 0 ? t.step(n, COUNTED.length) : t.tour}</p>
-        <button type="button" className="demo-tour-icon" onClick={() => setMinimized(true)} aria-label={t.minimize} title={t.minimize}>
+        <button type="button" className="demo-tour-icon" onClick={() => setMinimized(true)} aria-label={t.minimize} aria-expanded="true" title={t.minimize}>
           <svg viewBox="0 0 16 16" aria-hidden="true">
             <path d="M4 8h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </svg>

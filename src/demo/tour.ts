@@ -110,13 +110,15 @@ export function applyRequest(tour: TourState, detail: DemoApiDetail): TourState 
     (s) => s.finishedBy && s.method === detail.method && s.finishedBy.test(detail.path) && !tour.done.includes(s.id),
   ).map((s) => s.id);
 
+  // The list the shopping steps open: the one the plan went to, or else the one the visitor
+  // created. Never any list a request happens to touch, which could be an unrelated one.
   let listId = tour.listId;
   const body = detail.body as { shoppingListId?: unknown } | undefined;
+  const created = detail.result as { shoppingListId?: unknown } | undefined;
   if (detail.method === "POST" && /\/planned-meals\/shopping-list$/.test(detail.path) && typeof body?.shoppingListId === "string") {
     listId = body.shoppingListId;
-  } else if (!listId) {
-    const match = detail.path.match(/\/shopping-lists\/([^/]+)\//);
-    if (match) listId = match[1];
+  } else if (!listId && detail.method === "POST" && /\/shopping-lists$/.test(detail.path) && typeof created?.shoppingListId === "string") {
+    listId = created.shoppingListId;
   }
 
   let planFrom = tour.planFrom;

@@ -27,7 +27,7 @@ The catalog is real: prices are observed per store and chain, and the Api judges
 
 ## Capabilities and Constraints
 
-- React 19, React Router 7, Vite, TypeScript (`erasableSyntaxOnly`: no `enum`), Vitest, no UI framework. Hand-written CSS: `src/index.css` is the base, and the editorial redesign (`src/editorial.css`, `editorial-pages.css`, `editorial-mobile.css`) sets its own tokens inside `.app.editorial`. The app has one scheme, forest glass over area photographs; `index.css` still has `prefers-color-scheme: dark` rules from before the redesign, but the editorial tokens set the colours, so there is no separate light or dark theme to design for.
+- React 19, React Router 7, Vite, TypeScript (`erasableSyntaxOnly`: no `enum`), Vitest, no UI framework. Hand-written CSS: `src/index.css` is the base, and the editorial redesign (`src/editorial.css`, `editorial-pages.css`, `editorial-mobile.css`) sets its own tokens inside `.app.editorial`. The app has one scheme, forest glass over area photographs, with no separate light or dark theme. Only the shared tokens (`src/shared/tokens.css`, also used by the site and admin) still switch with `prefers-color-scheme`.
 - DTOs are hand-written in `src/api/types.ts`, mirroring the real Api DTOs (repo `DomiOS`); enums are numbers.
 - Api fields the frontend may surface: `unitPrice`, `cardPrice`, `priceInsight` (label, lowest/highest/average, promotion check, promotion frequency) on store offers; `discountPercent` on promotions; `dishType`, `mainProtein`, `sourceUrl` on recipes; `substitutedByProductId` on products.
 - Never invent prices, savings or counts: every number on screen comes from the Api.

@@ -122,10 +122,21 @@ describe("applyRequest", () => {
     expect(tour.listId).toBe("sl-9");
   });
 
-  it("sem lista do plano, fica com a primeira lista onde se mexeu", () => {
-    const tour = applyRequest(active(), call("POST", "/households/h-1/shopping-lists/sl-3/items/sli-1/purchase"));
+  it("sem lista do plano, fica com a lista que o visitante criou", () => {
+    const tour = applyRequest(active(), call("POST", "/households/h-1/shopping-lists", { name: null }, { shoppingListId: "sl-3" }));
     expect(tour.listId).toBe("sl-3");
-    expect(applyRequest(tour, call("GET", "/households/h-1/shopping-lists/sl-4/store-comparison")).listId).toBe("sl-3");
+    expect(applyRequest(tour, call("POST", "/households/h-1/shopping-lists", {}, { shoppingListId: "sl-4" })).listId).toBe("sl-3");
+  });
+
+  it("mexer numa lista qualquer não a torna a lista do tour", () => {
+    const tour = applyRequest(active(), call("POST", "/households/h-1/shopping-lists/sl-7/items/sli-1/purchase"));
+    expect(tour.listId).toBeNull();
+  });
+
+  it("a lista do plano ganha à que se criou antes", () => {
+    const created = applyRequest(active(), call("POST", "/households/h-1/shopping-lists", {}, { shoppingListId: "sl-3" }));
+    const fromPlan = applyRequest(created, call("POST", "/households/h-1/planned-meals/shopping-list", { shoppingListId: "sl-9" }));
+    expect(fromPlan.listId).toBe("sl-9");
   });
 
   it("guarda o primeiro dia planeado, de uma ementa ou de uma receita", () => {

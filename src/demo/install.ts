@@ -114,8 +114,7 @@ export function startTour(name: string): void {
   writeTour(freshTour("active", name));
   signIn();
   clearApiCache();
-  // React Router reads `usr` from history.state as the location state, and a
-  // reload keeps history.state: the form gets the name after the clean start.
-  window.history.replaceState({ usr: { memberName: name }, key: "demo-tour", idx: 0 }, "", "/casa/nova");
-  window.location.reload();
+  // A full load, so no screen keeps the sample household in memory. The tour card
+  // hands the name to the household form once the app is up (DemoTour.tsx).
+  window.location.assign("/casa/nova");
 }

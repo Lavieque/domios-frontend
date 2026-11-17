@@ -57,16 +57,21 @@
 
 /* ---------- Guided tour: welcome dialog and step card ---------- */
 
-.demo-tour-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: grid;
-  place-items: center;
-  padding: 16px;
+/* The welcome dialog is a modal <dialog>: the browser centres it and puts the backdrop behind. */
+.demo-tour-welcome::backdrop {
   background: rgb(6 23 14 / 0.6);
   backdrop-filter: blur(6px);
   animation: demo-tour-fade 0.2s ease-out;
+}
+
+.demo-tour-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .demo-tour-welcome,
@@ -80,11 +85,18 @@
 }
 
 .demo-tour-welcome {
-  width: min(460px, 100%);
+  width: min(460px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
   padding: 28px;
+  overflow: auto;
+  animation: demo-tour-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.demo-tour-welcome-form {
   display: grid;
   gap: 14px;
-  animation: demo-tour-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .demo-tour-welcome h2 {
@@ -313,7 +325,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .demo-tour-overlay,
+  .demo-tour-welcome::backdrop,
   .demo-tour-welcome,
   .demo-tour-card,
   .demo-tour-done,

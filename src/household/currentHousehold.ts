@@ -49,3 +49,12 @@ export function pickHouseholdId(householdIds: string[], storedId: string | null)
   if (storedId && householdIds.includes(storedId)) return storedId;
   return householdIds[0] ?? null;
 }
+
+/** Avisado quando a lista de casas muda (casa criada, saída): cada `useHouseholds` volta a pedi-la. */
+export const HOUSEHOLDS_CHANGED = "domios:households-changed";
+
+/** Esquece a lista guardada e avisa os ecrãs abertos (barra, menu) para a pedirem de novo. */
+export function householdsChanged(userId: string) {
+  forgetStoredHouseholds(userId);
+  window.dispatchEvent(new Event(HOUSEHOLDS_CHANGED));
+}

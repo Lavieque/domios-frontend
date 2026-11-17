@@ -3,6 +3,7 @@ import { listMyHouseholds, type CallerHouseholdDto } from "../api/households";
 import { describeError } from "../auth/errors";
 import { useSession } from "../auth/useSession";
 import {
+  HOUSEHOLDS_CHANGED,
   getStoredHouseholdId,
   getStoredHouseholds,
   pickHouseholdId,
@@ -74,6 +75,12 @@ export function useHouseholds(): HouseholdsState {
   }, [userId, version]);
 
   const reload = useCallback(() => setVersion((v) => v + 1), []);
+
+  // Outro ecrã mudou as casas (criou uma, saiu de uma): esta instância também volta a pedir.
+  useEffect(() => {
+    window.addEventListener(HOUSEHOLDS_CHANGED, reload);
+    return () => window.removeEventListener(HOUSEHOLDS_CHANGED, reload);
+  }, [reload]);
 
   const select = useCallback(
     (householdId: string) => {

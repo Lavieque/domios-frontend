@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "../i18n";
+import { today } from "../plan/dates";
 import { resetDemo, startTour } from "./install";
+import { getState } from "./state";
 import {
   DEMO_API_EVENT,
   STEP_RULES,
@@ -90,15 +92,20 @@ const text = {
       },
       cook: {
         title: "Cozinha uma refeição",
-        body: "No plano, na refeição de hoje, carrega em “Cozinhei”. A despensa desconta os ingredientes. Nada para hoje? Abre uma receita e junta-a ao plano de hoje.",
+        body: "No plano, na refeição de hoje, carrega em “Cozinhei”. A despensa desconta os ingredientes e as sobras ficam guardadas.",
         cta: "Abrir o plano",
+      },
+      cookNothingToday: {
+        title: "Cozinha uma refeição",
+        body: "Ainda não há nada planeado para hoje, e só se cozinha o que é de hoje ou de dias passados. Abre uma receita e carrega em “Adicionar ao plano”, com a data de hoje.",
+        cta: "Escolher uma receita",
       },
       end: {
         title: "A casa está a andar",
         body: "A receita que fizeste está em “Receitas feitas”. Na lista de receitas fica marcada com um ✓: passa o rato por cima para ver quando foi.",
         cta: "Ver receitas feitas",
       },
-    } satisfies Record<StepId, StepText>,
+    } satisfies Record<StepId | "cookNothingToday", StepText>,
   },
   en: {
     welcome: {
@@ -162,17 +169,39 @@ const text = {
       },
       cook: {
         title: "Cook a meal",
-        body: "On the plan, on today's meal, press “I cooked it”. The pantry takes off the ingredients. Nothing for today? Open a recipe and add it to today's plan.",
+        body: "On the plan, on today's meal, press “I cooked it”. The pantry takes off the ingredients and keeps any leftovers.",
         cta: "Open the plan",
+      },
+      cookNothingToday: {
+        title: "Cook a meal",
+        body: "Nothing is planned for today yet, and only today's or past meals can be cooked. Open a recipe and press “Add to plan”, with today's date.",
+        cta: "Pick a recipe",
       },
       end: {
         title: "Your home is up and running",
         body: "The recipe you made is under “Cooked recipes”. In the recipe list it carries a ✓: hover over it to see when.",
         cta: "See cooked recipes",
       },
-    } satisfies Record<StepId, StepText>,
+    } satisfies Record<StepId | "cookNothingToday", StepText>,
   },
 };
+
+/** A recipe meal planned for today and not cooked yet: what the cook step needs. */
+function hasMealToday(): boolean {
+  const day = today();
+  return getState().planned.some((p) => p.date === day && p.status === 0 && p.recipeId !== null);
+}
+
+/** Re-reads `hasMealToday` after every Api request (planning, skipping, cooking). */
+function useMealToday(): boolean {
+  const [value, setValue] = useState(hasMealToday);
+  useEffect(() => {
+    const sync = () => setValue(hasMealToday());
+    window.addEventListener(DEMO_API_EVENT, sync);
+    return () => window.removeEventListener(DEMO_API_EVENT, sync);
+  }, []);
+  return value;
+}
 
 /** Steps counted on the card ("Step 3 of 8"): the closing card isn't one. */
 const COUNTED = STEP_RULES.filter((s) => s.id !== "end").map((s) => s.id);
@@ -273,7 +302,10 @@ function StepCard({ tour, save }: { tour: TourState; save: (next: TourState) => 
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const id = currentStep(tour);
-  const step: StepText = t.steps[id];
+  const mealToday = useMealToday();
+  // Cooking needs a meal for today; without one the step sends to the recipes instead.
+  const nothingToday = id === "cook" && !mealToday;
+  const step: StepText = nothingToday ? t.steps.cookNothingToday : t.steps[id];
   const [minimized, setMinimized] = useState(false);
   const [justDone, setJustDone] = useState<string | null>(null);
   const previous = useRef(id);
@@ -301,7 +333,7 @@ function StepCard({ tour, save }: { tour: TourState; save: (next: TourState) => 
     cook: "/plano",
     end: "/cozinhar/feitas",
   };
-  const to = target[id];
+  const to = nothingToday ? "/receitas" : target[id];
   const here = pathname + search === to;
   const n = COUNTED.indexOf(id) + 1;
 
@@ -374,6 +406,7 @@ function StepCard({ tour, save }: { tour: TourState; save: (next: TourState) => 
             onClick={() => {
               // Skipped, not done: no "Done" line for it.
               previous.current = currentStep(skipStep(tour, id));
+              setJustDone(null);
               save(skipStep(tour, id));
             }}
           >

@@ -2353,6 +2353,10 @@
 }
 
 /* ---------- Receita já feita: ponto no canto do cartão, texto ao passar o rato ---------- */
+.editorial .feature-card-media {
+  position: relative;
+}
+
 .editorial .recipe-row-badge {
   position: absolute;
   top: 10px;

@@ -322,6 +322,7 @@ Small, firm green slabs in the app; larger sage slabs on the site.
 - **Style:** pills. App chips are 8px 15px, 12px, on the glass wash with a cream hairline; site chips are 44px tall with a cream hairline on green.
 - **State:** selected fills bottle green (app) or sage with ink (site); hover is a 10% cream wash.
 - **Badges (app):** sentence-case pills, pale sage ground with dark green text; pending uses the gold-light ground.
+- **Cooked mark (app):** a 24px sage circle with a dark green check, top-left over a recipe card's photograph. It is informational only: the text ("cooked 2 times, last on …") shows in a forest tooltip on hover or keyboard focus, never as a label on the card.
 
 ### Cards / Containers
 - **Corner Style:** 16px glass panels and product/recipe cards; 9px photo cards; 18px boxes on the site.
@@ -344,6 +345,9 @@ Small, firm green slabs in the app; larger sage slabs on the site.
 
 ### Glass Panel over a Scene (signature)
 The defining object: a frosted panel over the area's photograph. Some panels carry a second photograph inside, masked in from the right edge (the "edge photo"), so the kitchen continues behind the content. On the site the same object appears as the hero's glance strip, a glass band over the photograph showing one day in the app.
+
+### Demo Tour Card
+Demo build only. The welcome dialog is a centred forest-gradient box (16px corners) over a blurred, darkened scene, with a serif title and one name field. The step card sits bottom right (16px gutter on phones, 360px wide at most), never over the whole page: tracked sage eyebrow ("Step 3 of 8"), a row of 3px progress segments (done in sage), a short sage "Done: …" line after a step finishes, a 23px serif title, and a sage primary button that leads to the right page. It shrinks to a pill with a pulsing sage dot, and while it is open the page gets extra bottom padding, so it never hides the last controls.
 
 ### Price Verdict
 Prices are serif numerals. The 90-day verdict is a row of four small squares from cheapest to dearest with the current cell filled (sage on the site), and the range is a 2px hairline with a tick at the average and a dot at today's price.

@@ -241,8 +241,11 @@ export function resetState(empty = false): void {
 
 function emptySeed(language: "pt" | "en"): DemoState {
   return {
-    ...seed(language),
+    version: VERSION,
+    seededOn: today(),
+    language,
     avatar: null,
+    emailVerified: true,
     households: [],
     pantry: [],
     lists: [],
@@ -256,6 +259,7 @@ function emptySeed(language: "pt" | "en"): DemoState {
     avoided: {},
     purchases: [],
     conversions: {},
+    seq: 0,
   };
 }
 

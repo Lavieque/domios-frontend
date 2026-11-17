@@ -91,3 +91,20 @@ export interface CookedRecipeDto {
 export function listCookedRecipes(householdId: string, page = 1, pageSize = 20): Promise<PagedResult<CookedRecipeDto>> {
   return authedRequest<PagedResult<CookedRecipeDto>>(`${base(householdId)}/recipes/cooked`, { params: { page, pageSize } });
 }
+
+/** Páginas de 100 (o máximo da Api) e um teto para uma casa com um histórico enorme. */
+const COOKED_PAGE_SIZE = 100;
+const COOKED_MAX_PAGES = 10;
+
+/**
+ * Todas as receitas já feitas (até 1000), para marcar listas. A primeira página diz o
+ * total; as restantes pedem-se todas ao mesmo tempo.
+ */
+export async function listAllCookedRecipes(householdId: string): Promise<CookedRecipeDto[]> {
+  const first = await listCookedRecipes(householdId, 1, COOKED_PAGE_SIZE);
+  const pages = Math.min(COOKED_MAX_PAGES, Math.ceil(first.total / COOKED_PAGE_SIZE));
+  const rest = await Promise.all(
+    Array.from({ length: Math.max(0, pages - 1) }, (_, i) => listCookedRecipes(householdId, i + 2, COOKED_PAGE_SIZE)),
+  );
+  return [first, ...rest].flatMap((page) => page.items);
+}

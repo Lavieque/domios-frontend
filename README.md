@@ -77,9 +77,12 @@ Retrato da cobertura da Api a 2026-10-23 (já ultrapassado em boa parte):
   dispositivo (`.../nearby-stores`).
 - **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,
   adenda 2026-10-23 da Api), escolha da casa atual (guardada neste browser,
-  por utilizador), membros; criar casa (Europe/Lisbon, EUR). Ao criar ou sair
-  de uma casa, `householdsChanged()` esquece a lista guardada e avisa todos os
-  `useHouseholds` abertos (barra, menu), que a pedem de novo. `/casa/nova` aceita o nome do membro em
+  por utilizador), membros; criar casa (Europe/Lisbon, EUR). `GET /households`
+  é partilhado (`src/household/fetchHouseholds.ts`): um só pedido em voo e a
+  resposta serve 30 s a quem montar a seguir. Ao criar ou sair de uma casa,
+  `householdsChanged()` invalida-a, esquece a lista guardada e avisa todos os
+  `useHouseholds` abertos (barra, menu), que a pedem de novo sem voltar ao
+  esqueleto. `/casa/nova` aceita o nome do membro em
   `location.state.memberName` (o tour da demo usa-o).
 - **`/casa/historico`** — eventos da casa por dia (`.../timeline`).
 - **`/conta`** — email, estado da confirmação, sair, sair em
@@ -141,6 +144,19 @@ diretamente.
 `Dockerfile` é multi-stage: `node:20-alpine` faz o build, `nginx:alpine`
 serve `dist/` com fallback de SPA (`nginx.conf`) para o React Router
 funcionar em qualquer rota, incluindo depois de recarregar a página.
+
+### Verificações
+
+```bash
+npx tsc -b       # TypeScript 7
+npm run lint     # oxlint (.oxlintrc.json)
+npm test         # vitest: lógica pura, sem DOM
+```
+
+No oxlint, `react/set-state-in-effect` está desligada. Os ecrãs que pedem dados
+limpam o estado e voltam a pedir quando a chave muda (página, filtro, id), com
+cancelamento. O padrão é intencional e funciona; reescrevê-lo em cerca de 30
+sítios, sem testes de DOM, arriscava mais do que ganhava.
 
 ## Arquitetura
 

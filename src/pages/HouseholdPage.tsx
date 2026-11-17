@@ -17,6 +17,8 @@ import {
 import { describeError } from "../auth/errors";
 import { AvoidedIngredientsPanel, NutritionGoalsPanel } from "../components/MemberPreferencesPanels";
 import { useHouseholds } from "../household/useHouseholds";
+import { householdsChanged } from "../household/currentHousehold";
+import { useSession } from "../auth/useSession";
 import { localeOf, numberFormat } from "../i18n/format";
 import { localized, tr } from "../i18n";
 
@@ -30,7 +32,8 @@ const MEMBER_ERRORS = localized((t) => ({
 }));
 
 export function HouseholdPage() {
-  const { loading, error, households, current, select, reload } = useHouseholds();
+  const { loading, error, households, current, select } = useHouseholds();
+  const userId = useSession()?.userId ?? null;
   const [household, setHousehold] = useState<HouseholdDto | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
@@ -136,7 +139,8 @@ export function HouseholdPage() {
                   onSaved={setHousehold}
                   onRemoved={(left) => {
                     if (left) {
-                      reload();
+                      // A barra e o menu também mostram as casas: todos voltam a pedir a lista.
+                      if (userId) householdsChanged(userId);
                     } else {
                       setHousehold({
                         ...household,

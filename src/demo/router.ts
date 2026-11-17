@@ -9,7 +9,7 @@ import {
 } from "./catalog";
 import {
   LEFTOVER_PREFIX, baseUnit, cardPrice, checkRecipe, consumeIngredient, dateRange, hash, ingredientAllergens, ingredientRef,
-  inStock, offerFor, offersFor, pantryStock, priceInsight, productFor, promotionDto, recipeNutritionPerServing,
+  inStock, offerById, offerFor, offersFor, pantryStock, priceHistoryDto, priceInsight, productFor, promotionDto, recipeNutritionPerServing,
   round2, shelfPrice, storeOfferDto, toBase, toGrams, txt, unitPriceDto, type Offer,
 } from "./logic";
 import {
@@ -385,6 +385,14 @@ route("GET", "/products/:id/store-offers", (c) => {
   const product = productFor(c.m[0]);
   if (!product) throw notFound("product-not-found");
   return offersFor(product).map(storeOfferDto);
+});
+
+route("GET", "/stores/:s/offers/:o/price-history", (c) => {
+  const offer = offerById(c.m[1]);
+  if (!offer || offer.chain.storeId !== c.m[0]) throw notFound("store-offer-not-found");
+  const from = c.params.get("from");
+  const to = c.params.get("to");
+  return priceHistoryDto(offer).filter((p) => (!from || p.observedAt >= from) && (!to || p.observedAt <= to));
 });
 
 route("GET", "/ingredients", (c) => {

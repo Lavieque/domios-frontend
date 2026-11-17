@@ -23,6 +23,7 @@ import { InsightNotes, LabelPrice, PriceRange, VerdictBand } from "../components
 import { useHouseholds } from "../household/useHouseholds";
 import { dateTimeFormat } from "../i18n/format";
 import { tr } from "../i18n";
+import { PriceHistory } from "../components/PriceHistory";
 import { localized } from "../i18n";
 
 const dateFormat = dateTimeFormat({
@@ -231,13 +232,15 @@ function StoreRow({
   const availability = availabilityLabels[offer.availability];
   const out = offer.availability === StoreOfferAvailability.OutOfStock;
   const width = price !== undefined && highest ? Math.max(8, (price / highest) * 100) : 0;
+  // O histórico só se pede quando a loja se abre.
+  const [open, setOpen] = useState(false);
 
   return (
     <li
       className={`store-row${best ? " is-best" : ""}${out ? " is-out" : ""}`}
       style={{ "--i": Math.min(index, 12) } as CSSProperties}
     >
-      <details>
+      <details onToggle={(event) => setOpen(event.currentTarget.open)}>
         <summary>
           <span className="store-row-name">
             <strong>{offer.chainName}</strong>
@@ -282,6 +285,7 @@ function StoreRow({
               {tr().products.noStoreHistory}
             </p>
           )}
+          {open && offer.latestPrice && <PriceHistory storeId={offer.storeId} storeOfferId={offer.storeOfferId} />}
         </div>
       </details>
     </li>

@@ -21,6 +21,15 @@ export const ui = {
     everyDays: (days: number) => `, em regra a cada ${days} dias`,
     withCard: "com cartão",
     minQuantity: (n: number) => `Mín. ${n} un`,
+    history: (days: number) => `Preço nos últimos ${days} dias`,
+    historyLoading: "A ler o histórico…",
+    historyTooFew: "Ainda há poucas observações nesta loja para mostrar a evolução.",
+    historySummary: (count: number, lowest: string, highest: string) =>
+      `${count} ${count === 1 ? "observação" : "observações"}, entre ${lowest} e ${highest}.`,
+    historyPoint: (price: string, date: string) => `${price} a ${date}`,
+    historyOnPromotion: "em promoção",
+    historyDate: "Data",
+    historyPrice: "Preço",
   },
   promotion: {
     loading: "A carregar promoção…",

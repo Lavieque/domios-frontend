@@ -25,7 +25,10 @@ export function Site() {
   useScrollMotion(pathname);
 
   useEffect(() => {
+    // O <html> e o título são do documento, fora do React: é num efeito que se mudam.
+    // oxlint-disable-next-line react/immutability
     document.documentElement.lang = t.htmlLang;
+    // oxlint-disable-next-line react/immutability
     document.title = titleOf(route, t);
     setMeta("description", descriptionOf(route, t));
     setAlternates(route);

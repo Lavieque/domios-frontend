@@ -17,7 +17,6 @@ export function CreateHouseholdPage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const location = useLocation();
-  // Quem chega com o nome já dito (o tour do demo) não o escreve outra vez.
   // O nome pode vir no estado da navegação, mesmo depois de a página abrir (o tour da demo dá-o
   // assim): enquanto não se escreve nada, o campo mostra-o.
   const given = (location.state as { memberName?: unknown } | null)?.memberName;

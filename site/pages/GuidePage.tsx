@@ -72,18 +72,22 @@ function GuideToc({ label, items }: { label: string; items: TocItem[] }) {
   const list = useRef<HTMLOListElement>(null);
   const links = useRef<(HTMLLIElement | null)[]>([]);
 
+  // Os ids dizem que secções há; o array `items` é novo a cada render e não serve de dependência.
+  const ids = items.map((item) => item.id).join("|");
+
   useEffect(() => {
+    const sectionIds = ids.split("|");
     let frame = 0;
     function update() {
       frame = 0;
       const line = window.innerHeight * 0.34;
-      const sections = items.map((item) => document.getElementById(item.id));
+      const sections = sectionIds.map((id) => document.getElementById(id));
       let index = 0;
       sections.forEach((el, i) => {
         if (el && el.getBoundingClientRect().top <= line) index = i;
       });
       // At the very bottom the last section may never reach the line: it is still the one being read.
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) index = items.length - 1;
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) index = sectionIds.length - 1;
       const box = sections[index]?.getBoundingClientRect();
       const within = box ? Math.min(1, Math.max(0, (line - box.top) / box.height)) : 0;
       setActive(index);
@@ -93,7 +97,7 @@ function GuideToc({ label, items }: { label: string; items: TocItem[] }) {
         ol.style.setProperty("--mark-y", `${li.offsetTop}px`);
         ol.style.setProperty("--mark-h", `${li.offsetHeight}px`);
         ol.style.setProperty("--fill", `${li.offsetTop + within * li.offsetHeight}px`);
-        ol.style.setProperty("--fill-x", ((index + within) / items.length).toFixed(4));
+        ol.style.setProperty("--fill-x", ((index + within) / sectionIds.length).toFixed(4));
       }
     }
     function request() {
@@ -107,7 +111,7 @@ function GuideToc({ label, items }: { label: string; items: TocItem[] }) {
       window.removeEventListener("scroll", request);
       window.removeEventListener("resize", request);
     };
-  }, [items.length]);
+  }, [ids]);
 
   return (
     <nav className="guide-toc" aria-label={label}>

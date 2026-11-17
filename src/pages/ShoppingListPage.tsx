@@ -48,7 +48,8 @@ import { groupByTopCategory, OTHERS_GROUP, type ItemGroup } from "../shopping/gr
 import { moveItem, withPendingOrder } from "../shopping/order";
 import { rankStores } from "../shopping/storeRanking";
 import { planForStore, planFromSplit, toPlanRequest, type StorePlan } from "../shopping/storePlan";
-import { LinkPicker, SuggestionList, useCatalogSuggestions, type CatalogPick } from "../shopping/CatalogSuggestions";
+import { LinkPicker, SuggestionList, type CatalogPick } from "../shopping/CatalogSuggestions";
+import { useCatalogSuggestions } from "../shopping/useCatalogSuggestions";
 import { numberFormat } from "../i18n/format";
 import { tr } from "../i18n";
 

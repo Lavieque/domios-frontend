@@ -1,5 +1,5 @@
 import { Busy } from "../components/Busy";
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, register } from "../api/auth";
 import { ApiError } from "../api/http";
@@ -21,10 +21,11 @@ export function RegisterPage() {
   const location = useLocation();
   // O convite vem no fragmento do link do email. Lembra-se o último visto:
   // sobrevive a um re-render mesmo que o fragmento desapareça do URL.
-  const inviteRef = useRef<string | null>(null);
   const hashInvite = inviteFromHash(location.hash);
-  if (hashInvite) inviteRef.current = hashInvite;
-  const invite = inviteRef.current;
+  const [lastInvite, setLastInvite] = useState<string | null>(hashInvite);
+  // Ajuste durante o render (padrão do React para estado que segue uma prop): sem efeito nem ref.
+  if (hashInvite && hashInvite !== lastInvite) setLastInvite(hashInvite);
+  const invite = hashInvite ?? lastInvite;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

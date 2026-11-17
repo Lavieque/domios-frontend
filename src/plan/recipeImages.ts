@@ -41,10 +41,11 @@ export function useRecipeImages(ids: readonly (string | null)[]): ReadonlyMap<st
   const key = [...new Set(ids.filter((id): id is string => id !== null))].sort().join(",");
 
   useEffect(() => {
-    const missing = key ? key.split(",").filter((id) => !requested.current.has(id)) : [];
+    const asked = requested.current;
+    const missing = key ? key.split(",").filter((id) => !asked.has(id)) : [];
     if (missing.length === 0) return;
     const pending = new Set(missing);
-    for (const id of missing) requested.current.add(id);
+    for (const id of missing) asked.add(id);
     let cancelled = false;
     void loadEach(
       missing,
@@ -58,7 +59,7 @@ export function useRecipeImages(ids: readonly (string | null)[]): ReadonlyMap<st
     return () => {
       cancelled = true;
       // O que ficou por chegar volta a poder ser pedido (o pedido em voo é partilhado pela cache).
-      for (const id of pending) requested.current.delete(id);
+      for (const id of pending) asked.delete(id);
     };
   }, [key]);
 

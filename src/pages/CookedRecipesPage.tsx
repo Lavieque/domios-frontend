@@ -6,19 +6,12 @@ import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { RecipeRow } from "../components/RecipeRow";
 import { HouseholdGate } from "../household/HouseholdGate";
-import { longDate, type IsoDate } from "../plan/dates";
+import { localDay, longDate } from "../plan/dates";
 import { usePageSize } from "../usePageSize";
 import { tr } from "../i18n";
 
 export function CookedRecipesPage() {
   return <HouseholdGate>{(household) => <Cooked household={household} />}</HouseholdGate>;
-}
-
-/** O dia local de um instante, para mostrar "a 3 de novembro". */
-function localDay(instant: string): IsoDate {
-  const date = new Date(instant);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` as IsoDate;
 }
 
 /** As receitas que a casa já fez: quantas vezes e a última. */

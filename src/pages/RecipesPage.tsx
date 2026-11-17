@@ -22,7 +22,7 @@ import { numberFormat } from "../i18n/format";
 import { tr } from "../i18n";
 import { listCookedRecipes } from "../api/savedRecipes";
 import { useHouseholds } from "../household/useHouseholds";
-import { longDate, type IsoDate } from "../plan/dates";
+import { localDay, longDate } from "../plan/dates";
 
 const count = numberFormat();
 const dishTypes = Object.values(DishType) as DishType[];
@@ -40,11 +40,18 @@ interface Cooked {
   last: string;
 }
 
-/** O dia local de um instante, para mostrar "a 3 de novembro". */
-function localDay(instant: string): IsoDate {
-  const date = new Date(instant);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` as IsoDate;
+/** Páginas de 100 (o máximo da Api); um teto para uma casa com um histórico enorme. */
+const COOKED_PAGE_SIZE = 100;
+const COOKED_MAX_PAGES = 10;
+
+async function loadCooked(householdId: string): Promise<Map<string, Cooked>> {
+  const cooked = new Map<string, Cooked>();
+  for (let page = 1; page <= COOKED_MAX_PAGES; page++) {
+    const result = await listCookedRecipes(householdId, page, COOKED_PAGE_SIZE);
+    for (const item of result.items) cooked.set(item.recipeId, { times: item.timesCooked, last: item.lastCookedAt });
+    if (result.items.length < COOKED_PAGE_SIZE || cooked.size >= result.total) break;
+  }
+  return cooked;
 }
 
 /**
@@ -53,34 +60,51 @@ function localDay(instant: string): IsoDate {
  */
 function useCookedRecipes(): Map<string, Cooked> {
   const householdId = useHouseholds().current?.householdId ?? null;
-  const [cooked, setCooked] = useState<Map<string, Cooked>>(() => new Map());
+  const [cooked, setCooked] = useState<{ householdId: string; map: Map<string, Cooked> } | null>(null);
 
   useEffect(() => {
     if (!householdId) return;
     let active = true;
-    listCookedRecipes(householdId, 1, 100)
-      .then((result) => {
-        if (!active) return;
-        setCooked(new Map(result.items.map((item) => [item.recipeId, { times: item.timesCooked, last: item.lastCookedAt }])));
-      })
+    loadCooked(householdId)
+      .then((map) => active && setCooked({ householdId, map }))
       .catch(() => undefined);
     return () => {
       active = false;
     };
   }, [householdId]);
 
-  return cooked;
+  // Só as marcas da casa atual: ao mudar de casa (ou sem casa), as da anterior somem logo.
+  return cooked && cooked.householdId === householdId ? cooked.map : EMPTY;
 }
 
-/** Ponto no canto do cartão; o texto aparece ao passar o rato ou com o foco. */
+const EMPTY = new Map<string, Cooked>();
+
+/**
+ * Marca no canto do cartão. O texto aparece ao passar o rato, com o foco do teclado
+ * ou ao tocar (no telemóvel não há rato); tocar outra vez ou sair fecha-o.
+ */
 function CookedMark({ cooked }: { cooked: Cooked }) {
+  const [open, setOpen] = useState(false);
   const text = tr().recipes.cookedMark(cooked.times, longDate(localDay(cooked.last)));
   return (
-    <span className="cooked-mark" tabIndex={0} role="img" aria-label={text} data-tip={text}>
+    <button
+      type="button"
+      className="cooked-mark"
+      aria-label={text}
+      data-tip={text}
+      data-open={open || undefined}
+      onClick={(event) => {
+        // Por cima da ligação do cartão: tocar na marca não abre a receita.
+        event.preventDefault();
+        event.stopPropagation();
+        setOpen((value) => !value);
+      }}
+      onBlur={() => setOpen(false)}
+    >
       <svg viewBox="0 0 16 16" aria-hidden="true">
         <path d="M4 8.5l2.6 2.5L12 5.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-    </span>
+    </button>
   );
 }
 

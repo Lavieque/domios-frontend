@@ -22,7 +22,10 @@ Retrato da cobertura da Api a 2026-10-23 (já ultrapassado em boa parte):
   cartão e veredicto do histórico (`priceInsight`); detalhe com uma etiqueta por
   loja (`GET /products/{id}/store-offers`: régua mínimo/média/máximo, verificação
   Omnibus, frequência de promoção, produto substituto) e histórico de eventos
-  do produto (`GET /events?aggregateType=Product&aggregateId=`).
+  do produto (`GET /events?aggregateType=Product&aggregateId=`). Ao abrir uma
+  loja, um gráfico em escada mostra o preço dos últimos 90 dias
+  (`GET /stores/{id}/offers/{offerId}/price-history`, anónima, só pedida ao
+  abrir), com as promoções marcadas e uma tabela para leitores de ecrã.
 - **`/promocoes`** — promoções ativas (`GET /promotions?activeNow=true`), com o
   desconto anunciado (`discountPercent`) e o prazo.
 - **`/receitas`** — pesquisa, filtros por tipo de prato e proteína
@@ -44,8 +47,8 @@ Retrato da cobertura da Api a 2026-10-23 (já ultrapassado em boa parte):
   vazias sem despensa) com "Adicionar ao plano". As receitas também se
   adicionam a partir do detalhe.
 - **`/ementas`**, **`/ementas/:id`** — ementas prontas (`GET /meal-plan-templates`)
-  e aplicar ao plano a partir de um dia (`.../planned-meals/from-template`),
-  com a política para refeições já planeadas.
+  e aplicar ao plano a partir de um dia, hoje por omissão
+  (`.../planned-meals/from-template`), com a política para refeições já planeadas.
 - **`/despensa`** — itens da casa atual: por omissão o que há pela ordem em
   que deve ser usado (`sort=fifo`: abertos primeiro, depois validade), ou
   por estado e local; abrir, usar parte ou tudo, deitar fora com motivo,
@@ -74,9 +77,9 @@ Retrato da cobertura da Api a 2026-10-23 (já ultrapassado em boa parte):
   dispositivo (`.../nearby-stores`).
 - **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,
   adenda 2026-10-23 da Api), escolha da casa atual (guardada neste browser,
-  por utilizador), membros; criar casa (Europe/Lisbon, EUR). Ao criar, a
-  cópia guardada da lista de casas é esquecida, para a página da casa não
-  arrancar com a lista velha. `/casa/nova` aceita o nome do membro em
+  por utilizador), membros; criar casa (Europe/Lisbon, EUR). Ao criar ou sair
+  de uma casa, `householdsChanged()` esquece a lista guardada e avisa todos os
+  `useHouseholds` abertos (barra, menu), que a pedem de novo. `/casa/nova` aceita o nome do membro em
   `location.state.memberName` (o tour da demo usa-o).
 - **`/casa/historico`** — eventos da casa por dia (`.../timeline`).
 - **`/conta`** — email, estado da confirmação, sair, sair em
@@ -205,7 +208,8 @@ npm run build:demo    # gera dist-demo/
 ### Tour guiado
 
 A primeira visita (e cada "Repor demo") abre um diálogo de boas-vindas que
-pergunta o nome. Daí:
+pergunta o nome (um `<dialog>` modal: o foco fica lá dentro e Esc é o mesmo que
+"Saltar"). Daí:
 
 - **"Começar configuração"** troca os dados de exemplo por uma conta vazia
   (sem casa, plano, listas nem despensa; o catálogo fica) e abre `/casa/nova`

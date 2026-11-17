@@ -1,5 +1,42 @@
 # Levantamento: frontend vs. DomiOS.Api (2026-10-23)
 
+> **Documento histórico.** As secções 1 a 4 são o retrato de 2026-10-23, antes
+> do login e das casas, e ficam como estavam. O estado atual está logo a seguir,
+> em "Estado em 2026-11-17". As páginas e o que cada uma pede à Api estão no
+> `README.md`.
+
+## Estado em 2026-11-17
+
+Quase tudo o que estava em falta foi feito: login e conta, casas e membros,
+despensa, listas, comparação de lojas, plano, ementas, cozinha, nutrição,
+gastos, desperdício, oportunidades e lojas perto. O cliente HTTP lê o
+Problem Details (`type`, `Retry-After` nos 429) e há testes em Vitest.
+
+| Módulo (Api) | Estado | Notas |
+|---|---|---|
+| **Identity & Auth** | ✅ | Todas as rotas de `/auth/*`, com refresh partilhado e testado (`src/api/authed.test.ts`). Preferências e avatar da conta (`/account/*`). |
+| **Household** (casa, membros, papéis) | ✅ | `GET /households` resolveu a lacuna A (adenda 2026-10-23). Membros, ligar a uma conta, timeline da casa, objetivos e ingredientes evitados por membro. |
+| **Products / Categories** | ✅ | Também `/products/batch`, `/products/batch/store-offers` e códigos de barras (`/barcodes/{code}`). |
+| **Stores & Pricing: preços por produto** | ✅ | `unitPrice`, `cardPrice`, `priceInsight` (com Omnibus e frequência de promoção). Cadeias (`/chains`) e lojas perto (`.../nearby-stores`). |
+| **Stores & Pricing: lojas e histórico** (`/stores`, `/stores/{id}/offers`, `.../price-history`) | ⬜ | Continua sem uso. O gráfico do histórico de uma oferta seria o uso natural. |
+| **Promotions** | ✅ | Ativas, atuais e detalhe, com `discountPercent`. |
+| **Recipes** | ✅ | Filtros `dishType`/`mainProtein`, `sourceUrl`, restrições por casa, guardadas, "o que posso cozinhar" e já feitas. |
+| **Ingredients** | ✅ | Como apoio: pesquisa e conversões por casa. |
+| **History** (`GET /events`) | ✅ | No detalhe do produto. |
+| **Pantry** | ✅ | FIFO, abrir, usar, deitar fora, sobras, desperdício. |
+| **Shopping** | ✅ | Listas, itens, de receita e do plano, loja por item, preço pago, plano de compras, pôr na despensa. |
+| **Comparação de lojas** | ✅ | Com custo da deslocação. |
+| **Meals + Nutrition** | ✅ | Refeições cozinhadas, resumo e score. |
+| **Planning** | ✅ | Plano, sugestões, disponibilidade, lista do plano, cozinhar. |
+| **Ementas prontas** | ✅ | Catálogo, ementas da casa, aplicar ao plano. |
+| **Opportunities** | ✅ | Lista, resumo, agir e dispensar. |
+| **Spending** | ✅ | Por mês e por cadeia, compras de um produto. |
+
+Lacunas da secção 3 hoje: A resolvida (`GET /households`); B resolvida
+(`.env.example` aponta para a Api local); C resolvida (`vercel.json` reescreve
+as rotas para o `index.html`); D resolvida (`src/api/http.ts`); E resolvida
+(Vitest).
+
 Só leitura. Fontes: este repositório (`master` em `9b34554`) e o repositório
 `DomiOS` (`master` em `5c40bb7`): `DomiOS_API_MVP.md`, `DomiOS_API_Fase1.md` a
 `DomiOS_API_Fase8.md` com as adendas, `DomiOS_Estado.md` (secções 1, 3, 5 e 6),

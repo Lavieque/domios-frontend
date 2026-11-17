@@ -57,5 +57,4 @@ export const recipes = {
   none: "Sem receitas com estes filtros.",
   cookedMark: (times: number, last: string) =>
     `Já foi feita ${times === 1 ? "1 vez" : `${times} vezes`}, a última a ${last}.`,
-  cookedShort: "Feita",
 };

@@ -9,8 +9,10 @@ atrás do login (`RequireAuth` em `src/App.tsx`); sem sessão, só as páginas
 de conta. A Api continua a servir os catálogos sem autenticação — o bloqueio
 é só neste frontend. A conta (login, registo, recuperação de
 password, confirmação de email) segue a adenda 2026-10-22 de
-`DomiOS_API_Fase3.md`; as rotas `/households/{id}/...` ainda não são usadas.
-Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
+`DomiOS_API_Fase3.md`; as rotas da casa (`/households/{id}/...`) servem a
+despensa, o plano, as listas, a cozinha, os gastos e a nutrição.
+Retrato da cobertura da Api a 2026-10-23 (já ultrapassado em boa parte):
+`docs/levantamento-api-2026-10-23.md`.
 
 ## Páginas
 
@@ -25,7 +27,14 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
   desconto anunciado (`discountPercent`) e o prazo.
 - **`/receitas`** — pesquisa, filtros por tipo de prato e proteína
   (`dishType`, `mainProtein`), detalhe com ingredientes, passos e link para a
-  receita original (`sourceUrl`).
+  receita original (`sourceUrl`). As que a casa atual já fez levam um ✓ no
+  canto do cartão; ao passar o rato (ou com o foco) diz quantas vezes e a
+  última (`GET .../recipes/cooked`, só informativo: sem casa ou com erro, a
+  lista mostra-se igual).
+- **`/cozinhar`** — o que dá para fazer com a despensa: as receitas guardadas e
+  planeadas, e outras que a despensa cobre (`.../recipes/cookable`).
+- **`/cozinhar/feitas`** — receitas que a casa já fez, quantas vezes e a última
+  (`.../recipes/cooked`), com "Guardar para fazer outra vez".
 - **`/entrar`**, **`/registar`**, **`/esqueci-password`** — conta. O registo só abre com `#convite=...` (link do email de acesso aprovado); sem convite, a página manda para o site (`VITE_SITE_URL`, por omissão https://domios.pt) para pedir acesso.
 - **`/reset-password`**, **`/verify-email`** — destino dos links dos emails
   (caminhos fixados pela Api, token no fragmento `#token=`).
@@ -42,6 +51,8 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
   por estado e local; abrir, usar parte ou tudo, deitar fora com motivo,
   mudar de local. Os itens só trazem `productId`: os nomes vêm de
   `GET /products/{id}`, com cache.
+- **`/despensa/desperdicio`** — o que foi para o lixo, quanto valia e porquê
+  (`.../pantry/waste`, até 366 dias).
 - **`/despensa/adicionar`** (`?produto=`) — pesquisa no catálogo, quantidade
   (uma embalagem por omissão), local, validade e preço opcionais. Também a
   partir do detalhe do produto.
@@ -55,9 +66,19 @@ Estado da cobertura da Api: `docs/levantamento-api-2026-10-23.md`.
   `DomiOS_API_Fase5.md`). O que falta no plano da semana e os ingredientes de
   uma receita (todos ou só o que falta na despensa) vão para uma lista aberta
   ou para uma nova.
+- **`/gastos`** — o que a casa gastou por mês e por cadeia (`.../spending`, até
+  24 meses): o preço escrito por um membro e o estimado pela prateleira.
+- **`/nutricao`** — score nutricional da semana e médias por dia, com os
+  objetivos de cada membro.
+- **`/lojas`** — lojas físicas das cadeias com preços, a partir da posição do
+  dispositivo (`.../nearby-stores`).
 - **`/casa`**, **`/casa/nova`** — casas do utilizador (`GET /households`,
   adenda 2026-10-23 da Api), escolha da casa atual (guardada neste browser,
-  por utilizador), membros; criar casa (Europe/Lisbon, EUR).
+  por utilizador), membros; criar casa (Europe/Lisbon, EUR). Ao criar, a
+  cópia guardada da lista de casas é esquecida, para a página da casa não
+  arrancar com a lista velha. `/casa/nova` aceita o nome do membro em
+  `location.state.memberName` (o tour da demo usa-o).
+- **`/casa/historico`** — eventos da casa por dia (`.../timeline`).
 - **`/conta`** — email, estado da confirmação, sair, sair em
   todos os dispositivos.
 
@@ -180,5 +201,33 @@ npm run build:demo    # gera dist-demo/
   palavra-passe servem.
 - O que se muda fica em `localStorage` (`domios.demo.state`) até carregar em
   "Repor demo", na faixa do topo.
+
+### Tour guiado
+
+A primeira visita (e cada "Repor demo") abre um diálogo de boas-vindas que
+pergunta o nome. Daí:
+
+- **"Começar configuração"** troca os dados de exemplo por uma conta vazia
+  (sem casa, plano, listas nem despensa; o catálogo fica) e abre `/casa/nova`
+  com o nome já preenchido.
+- **"Saltar e ver o demo preenchido"** fica com os dados de exemplo.
+
+O tour tem 8 passos, num cartão no canto inferior direito: criar a casa,
+juntar membros (opcional), planear (ementa ou receita), pôr o que falta na
+lista, comparar lojas, marcar comprados, pôr na despensa e cozinhar. Um
+cartão final aponta para "Receitas feitas" e para a marca ✓ na lista de
+receitas. Cada passo termina sozinho quando o backend falso responde ao
+pedido certo: `install.ts` emite `domios-demo:api` com método, caminho,
+corpo e resposta, e `tour.ts` compara com as regras de cada passo. Por isso
+a ordem não importa e não há botão "Seguinte". Cada passo dá para saltar, e o
+tour para sair ou minimizar.
+
+- Estado em `localStorage` (`domios.demo.tour`): `welcome`, `active` ou `off`,
+  os passos feitos, o nome, a lista feita a partir do plano (os passos de
+  compras abrem-na) e o primeiro dia planeado (o plano abre nessa semana).
+- Depois de terminar ou sair, o botão "Tour guiado" na faixa do topo volta a
+  mostrar as boas-vindas.
+- Código: `src/demo/tour.ts` (estado e regras), `src/demo/DemoTour.tsx`
+  (diálogo e cartão, PT e EN), estilos em `src/demo/demo.css`.
 - Deploy: projeto Vercel à parte com o comando `npm run build:demo` e a pasta
   `dist-demo` (o `vercel.json` já reescreve as rotas para o `index.html`).

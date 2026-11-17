@@ -74,7 +74,11 @@ const browser = await chromium.launch({ channel: process.env.SHOT_CHANNEL ?? "ms
 async function session(width, height, scale) {
   const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale, locale: "pt-PT", colorScheme: "light" });
   await ctx.clock.setFixedTime(date);
-  await ctx.addInitScript(() => window.localStorage.setItem("domios.language", "pt"));
+  await ctx.addInitScript(() => {
+    window.localStorage.setItem("domios.language", "pt");
+    // Sem o diálogo de boas-vindas do tour guiado: as capturas mostram os dados de exemplo.
+    window.localStorage.setItem("domios.demo.tour", JSON.stringify({ status: "off" }));
+  });
   const page = await ctx.newPage();
   // First visit seeds the demo household and signs in; the next load starts from it.
   await page.goto(`${base}/`);

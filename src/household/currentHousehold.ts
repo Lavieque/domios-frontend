@@ -53,8 +53,16 @@ export function pickHouseholdId(householdIds: string[], storedId: string | null)
 /** Avisado quando a lista de casas muda (casa criada, saída): cada `useHouseholds` volta a pedi-la. */
 export const HOUSEHOLDS_CHANGED = "domios:households-changed";
 
+let generation = 0;
+
+/** Sobe a cada mudança de casas: uma resposta guardada de antes já não serve. */
+export function householdsGeneration(): number {
+  return generation;
+}
+
 /** Esquece a lista guardada e avisa os ecrãs abertos (barra, menu) para a pedirem de novo. */
 export function householdsChanged(userId: string) {
+  generation += 1;
   forgetStoredHouseholds(userId);
   window.dispatchEvent(new Event(HOUSEHOLDS_CHANGED));
 }

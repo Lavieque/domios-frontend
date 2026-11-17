@@ -2246,12 +2246,27 @@
 }
 
 /* ---------- Lojas perto e deslocação ---------- */
+/* Caixa, "Contar deslocação" e, por baixo do texto, a nota sobre a localização. */
 .editorial .travel-toggle {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 8px;
   align-items: baseline;
   margin: 0 0 10px;
   font-size: 13px;
+}
+
+.editorial .travel-toggle > .muted {
+  grid-column: 2;
+  font-size: 12px;
+}
+
+/* "Artigos X € + deslocação Y € (Z km)": linha própria por baixo do nome, para não
+   alargar a coluna do preço e esmagar o nome da cadeia. */
+.editorial .store-card-travel {
+  grid-column: 2 / -1;
+  font-size: 11px;
+  color: #e3e7d8;
 }
 
 .editorial .store-card-near {

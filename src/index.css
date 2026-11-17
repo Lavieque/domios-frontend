@@ -22,13 +22,6 @@
   font-size: 16px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --almanac: var(--surface);
-    --shadow: 0 2px 4px rgb(0 0 0 / 0.4), 0 12px 28px -12px rgb(0 0 0 / 0.7);
-  }
-}
-
 /* ---------- Base ---------- */
 
 * {
@@ -1476,12 +1469,6 @@ a.shelf-label:hover {
   text-overflow: ellipsis;
 }
 
-@media (prefers-color-scheme: dark) {
-  .product-photo img {
-    mix-blend-mode: normal;
-  }
-}
-
 .label-price {
   display: flex;
   align-items: baseline;
@@ -1647,13 +1634,6 @@ a.shelf-label:hover {
 
 .verdict-urgent::before {
   background: var(--danger);
-}
-
-@media (prefers-color-scheme: dark) {
-  .button-primary {
-    color: var(--bg);
-  }
-
 }
 
 /* Régua do histórico: mínimo a máximo, tique na média, ponto no preço atual. */
@@ -3715,12 +3695,6 @@ a.meal-title:hover {
   top: 1rem;
   font-size: 13.5px;
   padding: 0.3rem 0.8rem 0.3rem 0.65rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  .article-photo img {
-    mix-blend-mode: normal;
-  }
 }
 
 .article-info h1 {
@@ -7061,12 +7035,6 @@ a.price-row:hover .label-name {
   mix-blend-mode: multiply;
 }
 
-@media (prefers-color-scheme: dark) {
-  .product-thumb {
-    background: #f1f1ef;
-  }
-}
-
 @media (max-width: 640px) {
   .product-thumb {
     width: 4.75rem;
@@ -7234,12 +7202,6 @@ a.price-row:hover .label-name {
   margin-top: 1.25rem;
   border-radius: 4px;
   background: var(--surface-2);
-}
-
-@media (prefers-color-scheme: dark) {
-  .article-sheet .article-photo {
-    background: #f1f1ef;
-  }
 }
 
 .article-sheet .article-actions {

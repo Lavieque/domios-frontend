@@ -55,4 +55,7 @@ export const recipes = {
   anyDifficulty: "Qualquer dificuldade",
   mainProtein: "Proteína principal",
   none: "Sem receitas com estes filtros.",
+  cookedMark: (times: number, last: string) =>
+    `Já foi feita ${times === 1 ? "1 vez" : `${times} vezes`}, a última a ${last}.`,
+  cookedShort: "Feita",
 };

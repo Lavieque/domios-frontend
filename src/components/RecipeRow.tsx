@@ -11,13 +11,15 @@ interface Props {
   /** Linhas por baixo do nome: meta, prontidão, notas. */
   children?: ReactNode;
   action?: ReactNode;
+  /** Marca pequena no canto do cartão (ex.: "já feita"), por cima da foto. */
+  badge?: ReactNode;
 }
 
 /**
  * Uma receita numa linha: o nome do prato é a interface, sem cartão. A foto, quando
  * existe e carrega, fica à direita; sem foto o nome alinha na mesma coluna das outras.
  */
-export function RecipeRow({ title, to, imageUrl, lead, children, action }: Props) {
+export function RecipeRow({ title, to, imageUrl, lead, children, action, badge }: Props) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   // O campo da foto guarda o lugar, mas só se vê quando a imagem chega: nunca uma caixa cinzenta vazia.
@@ -27,6 +29,7 @@ export function RecipeRow({ title, to, imageUrl, lead, children, action }: Props
 
   return (
     <li className={classes}>
+      {badge !== undefined && <span className="recipe-row-badge">{badge}</span>}
       {lead !== undefined && <span className="recipe-row-lead">{lead}</span>}
       <div className="recipe-row-text">
         {to ? (

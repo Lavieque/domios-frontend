@@ -27,7 +27,7 @@ The catalog is real: prices are observed per store and chain, and the Api judges
 
 ## Capabilities and Constraints
 
-- React 19, React Router 7, Vite, TypeScript (`erasableSyntaxOnly`: no `enum`), hand-written CSS in `src/index.css`, no UI framework, light and dark via `prefers-color-scheme`.
+- React 19, React Router 7, Vite, TypeScript (`erasableSyntaxOnly`: no `enum`), Vitest, no UI framework. Hand-written CSS: `src/index.css` is the base, and the editorial redesign (`src/editorial.css`, `editorial-pages.css`, `editorial-mobile.css`) sets its own tokens inside `.app.editorial`. The app has one scheme, forest glass over area photographs; `index.css` still has `prefers-color-scheme: dark` rules from before the redesign, but the editorial tokens set the colours, so there is no separate light or dark theme to design for.
 - DTOs are hand-written in `src/api/types.ts`, mirroring the real Api DTOs (repo `DomiOS`); enums are numbers.
 - Api fields the frontend may surface: `unitPrice`, `cardPrice`, `priceInsight` (label, lowest/highest/average, promotion check, promotion frequency) on store offers; `discountPercent` on promotions; `dishType`, `mainProtein`, `sourceUrl` on recipes; `substitutedByProductId` on products.
 - Never invent prices, savings or counts: every number on screen comes from the Api.
@@ -41,7 +41,8 @@ The catalog is real: prices are observed per store and chain, and the Api judges
 ## Evidence on Hand
 
 - Real data from the Api: products (with optional `imageUrl`), offers, promotions, ~6000 published recipes (mostly without images), meal plan templates.
-- `docs/levantamento-api-2026-10-23.md`: coverage of the Api by the frontend.
+- `docs/levantamento-api-2026-10-23.md`: coverage of the Api by the frontend (historical 2026-10-23 snapshot, with the current state at the top).
+- Demo build (`src/demo/`): a fake Api in the browser with a sample household, and a guided tour that sets up a household from empty.
 - No testimonials, metrics or marketing claims exist; none may be invented.
 
 ## Product Principles

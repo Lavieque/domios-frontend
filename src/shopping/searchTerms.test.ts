@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { searchTerms } from "./CatalogSuggestions";
+import { searchTerms } from "./searchTerms";
 
 describe("searchTerms", () => {
   it("tries the text and its singular, never just the first word", () => {

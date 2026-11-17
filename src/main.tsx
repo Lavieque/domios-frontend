@@ -8,19 +8,8 @@ import './index.css'
 import './editorial.css'
 import './editorial-pages.css'
 import './editorial-mobile.css'
-import App from './App.tsx'
-import { useLanguage } from './i18n'
+import { LanguageRoot } from './LanguageRoot'
 import { startAccountLanguageSync } from './i18n/accountLanguage'
-
-
-/**
- * Quando a língua muda, a app remonta: os textos lidos fora dos componentes
- * (rótulos, formatadores) voltam a ser lidos na língua nova.
- */
-function LanguageRoot() {
-  const lang = useLanguage()
-  return <App key={lang} />
-}
 
 async function boot() {
   // Build de demonstração: a Api é falsa e corre no próprio browser (src/demo).

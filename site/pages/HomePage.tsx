@@ -1,4 +1,4 @@
-import type { PointerEvent } from "react";
+import { useState, type PointerEvent } from "react";
 import { Link } from "react-router-dom";
 import { ArrowIcon, CheckIcon } from "../components/Icons";
 import { RequestCta } from "../components/RequestCta";
@@ -13,12 +13,14 @@ export function HomePage() {
   const { lang, t, to } = useSite();
   const h = t.home;
   // The date is real (the household's timezone); what follows it in the strip is example data.
+  // Lida uma vez, ao abrir a página: o relógio não se lê a cada render.
+  const [now] = useState(() => new Date());
   const today = new Intl.DateTimeFormat(lang === "pt" ? "pt-PT" : "en-GB", {
     weekday: "long",
     day: "numeric",
     month: "long",
     timeZone: "Europe/Lisbon",
-  }).format(new Date());
+  }).format(now);
 
   // A warm light follows the mouse across the kitchen, like the window's light on the table.
   function light(event: PointerEvent<HTMLElement>) {

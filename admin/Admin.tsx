@@ -195,7 +195,7 @@ function LoginPage() {
   return (
     <>
       <div className="scene" style={{ backgroundImage: "url(/scenes/scene-casa.jpg)" }} aria-hidden="true" />
-      <div className="login">
+      <main className="login">
         <Brand />
         <section className="panel login-panel">
           <h1>Entrar</h1>
@@ -219,7 +219,7 @@ function LoginPage() {
             </button>
           </form>
         </section>
-      </div>
+      </main>
     </>
   );
 }

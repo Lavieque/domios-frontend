@@ -2289,8 +2289,14 @@ button {
     background: var(--green-700);
   }
 
+  /* Só se vê o nome da secção atual, mas os outros continuam a ser lidos: sem eles os links ficavam sem nome. */
   .guide-toc li:not(.is-current) .toc-label {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .guide-toc .toc-label {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { getPriceHistory } from "../api/client";
-import type { PriceObservationDto } from "../api/types";
+import { chartGeometry, nearestPoint, toPoints, type Point } from "../catalog/priceHistory";
 import { money } from "../catalog/offers";
 import { dateTimeFormat } from "../i18n/format";
 import { tr } from "../i18n";
@@ -12,26 +12,20 @@ const DAY = 86_400_000;
 const shortDate = dateTimeFormat({ day: "numeric", month: "short" });
 const longDate = dateTimeFormat({ day: "numeric", month: "short", year: "numeric" });
 
-interface Point {
-  at: number;
-  price: number;
-  promotion: boolean;
-}
-
 /**
  * As observações dos últimos 90 dias de uma oferta numa loja. Só pede quando se monta: o
  * detalhe da loja monta-o ao abrir. Sem observações suficientes, ou com erro, fica em texto.
  */
 export function PriceHistory({ storeId, storeOfferId }: { storeId: string; storeOfferId: string }) {
   // `now` fica com o momento do pedido: a linha vai até aí, sem ler o relógio a cada render.
-  const [data, setData] = useState<{ points: Point[]; now: number } | null>(null);
+  const [data, setData] = useState<{ points: Point[]; observed: number; now: number } | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
     const from = new Date(Date.now() - WINDOW_DAYS * DAY).toISOString();
     getPriceHistory(storeId, storeOfferId, from)
-      .then((observations) => active && setData({ points: toPoints(observations), now: Date.now() }))
+      .then((observations) => active && setData({ points: toPoints(observations), observed: observations.length, now: Date.now() }))
       .catch(() => active && setFailed(true));
     return () => {
       active = false;
@@ -40,40 +34,18 @@ export function PriceHistory({ storeId, storeOfferId }: { storeId: string; store
 
   if (failed) return null;
   if (data === null) return <p className="muted price-history-note">{tr().ui.price.historyLoading}</p>;
-  if (data.points.length < 2) return <p className="muted price-history-note">{tr().ui.price.historyTooFew}</p>;
+  // Só em euros: um histórico noutra moeda não se mostra (nem se diz que há poucas observações).
+  if (data.points.length < 2) {
+    return data.observed - data.points.length > 0 ? null : <p className="muted price-history-note">{tr().ui.price.historyTooFew}</p>;
+  }
   return <Chart points={data.points} now={data.now} />;
-}
-
-function toPoints(observations: PriceObservationDto[]): Point[] {
-  return observations
-    .filter((o) => o.price.currency === "EUR")
-    .map((o) => ({ at: Date.parse(o.observedAt), price: o.price.amount, promotion: o.promotionId !== null }))
-    .filter((p) => Number.isFinite(p.at))
-    .sort((a, b) => a.at - b.at);
 }
 
 function Chart({ points, now }: { points: Point[]; now: number }) {
   const plot = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<number | null>(null);
 
-  const geometry = useMemo(() => {
-    const start = points[0].at;
-    // O último preço vale até hoje: a linha estende-se até ao fim do período.
-    const end = Math.max(now, points[points.length - 1].at);
-    const prices = points.map((p) => p.price);
-    const low = Math.min(...prices);
-    const high = Math.max(...prices);
-    const pad = high > low ? (high - low) * 0.15 : Math.max(0.05, low * 0.05);
-    const bottom = low - pad;
-    const top = high + pad;
-    const x = (at: number) => (end > start ? ((at - start) / (end - start)) * 100 : 0);
-    const y = (price: number) => 100 - ((price - bottom) / (top - bottom)) * 100;
-    // Escada: cada preço mantém-se até à observação seguinte.
-    let path = `M ${x(points[0].at)} ${y(points[0].price)}`;
-    for (let i = 1; i < points.length; i++) path += ` H ${x(points[i].at)} V ${y(points[i].price)}`;
-    path += ` H 100`;
-    return { start, end, low, high, x, y, path };
-  }, [points, now]);
+  const geometry = useMemo(() => chartGeometry(points, now), [points, now]);
 
   const { low, high, x, y, path, start, end } = geometry;
   const anyPromotion = points.some((p) => p.promotion);
@@ -84,10 +56,7 @@ function Chart({ points, now }: { points: Point[]; now: number }) {
     const box = plot.current?.getBoundingClientRect();
     if (!box || box.width === 0) return;
     const ratio = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width)) * 100;
-    let best = 0;
-    for (let i = 1; i < points.length; i++) {
-      if (Math.abs(x(points[i].at) - ratio) < Math.abs(x(points[best].at) - ratio)) best = i;
-    }
+    const best = nearestPoint(points, x, ratio);
     setHover(best);
   }
 

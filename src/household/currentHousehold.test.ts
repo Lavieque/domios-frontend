@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { forgetStoredHouseholds, getStoredHouseholds, pickHouseholdId, storeHouseholds } from "./currentHousehold";
+import {
+  HOUSEHOLDS_CHANGED,
+  forgetStoredHouseholds,
+  getStoredHouseholds,
+  householdsChanged,
+  pickHouseholdId,
+  storeHouseholds,
+} from "./currentHousehold";
 
 function stubStorage() {
   const values = new Map<string, string>();
@@ -53,5 +60,15 @@ describe("lista de casas guardada", () => {
     storeHouseholds("u1", [casa]);
     forgetStoredHouseholds("u1");
     expect(getStoredHouseholds("u1")).toBeNull();
+  });
+
+  it("ao mudar as casas, esquece a lista guardada e avisa os ecrãs abertos", () => {
+    stubStorage();
+    const events: string[] = [];
+    vi.stubGlobal("window", { ...window, dispatchEvent: (event: Event) => events.push(event.type) > 0 });
+    storeHouseholds("u1", [casa]);
+    householdsChanged("u1");
+    expect(getStoredHouseholds("u1")).toBeNull();
+    expect(events).toEqual([HOUSEHOLDS_CHANGED]);
   });
 });

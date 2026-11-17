@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { listMyHouseholds, type CallerHouseholdDto } from "../api/households";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CallerHouseholdDto } from "../api/households";
+import { fetchHouseholds } from "./fetchHouseholds";
 import { describeError } from "../auth/errors";
 import { useSession } from "../auth/useSession";
 import {
@@ -43,6 +44,9 @@ export function useHouseholds(): HouseholdsState {
   const [loading, setLoading] = useState(initial.households === null);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
+  // Já mostra uma lista: ao revalidar (outra casa criada, saída) fica com ela no ecrã
+  // em vez de voltar ao esqueleto.
+  const shown = useRef(initial.households !== null);
 
   useEffect(() => {
     if (!userId) return;
@@ -51,12 +55,13 @@ export function useHouseholds(): HouseholdsState {
     if (stored.households) {
       setHouseholds(stored.households);
       setCurrentId(stored.currentId);
-    } else {
+    } else if (!shown.current) {
       setLoading(true);
     }
-    listMyHouseholds()
+    fetchHouseholds(userId)
       .then((result) => {
         if (cancelled) return;
+        shown.current = true;
         storeHouseholds(userId, result);
         setHouseholds(result);
         setCurrentId(pickHouseholdId(result.map((h) => h.householdId), getStoredHouseholdId(userId)));
@@ -64,7 +69,7 @@ export function useHouseholds(): HouseholdsState {
       })
       .catch((err: unknown) => {
         // Com a lista guardada já no ecrã, uma falha ao revalidar não tapa a página.
-        if (!cancelled && !stored.households) setError(describeError(err));
+        if (!cancelled && !stored.households && !shown.current) setError(describeError(err));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

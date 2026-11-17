@@ -36,6 +36,6 @@ prints-marca/
 redesigndoprojeto/
 *.zip
 
-# Claude Code: definições pessoais e worktrees (o launch.json é partilhado)
-.claude/settings.local.json
-.claude/worktrees/
+# Claude Code: tudo local. O launch.json fica de fora porque a entrada "domios-mock" usa
+# .impeccable/scripts/, que também não está no repositório; os comandos estão no README.
+.claude/

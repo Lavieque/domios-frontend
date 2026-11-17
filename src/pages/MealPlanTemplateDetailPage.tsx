@@ -305,7 +305,8 @@ const policyLabels = localized<Record<ConflictPolicy, string>>((t) => ({
 
 function ApplyTemplateForm({ household, template }: { household: CallerHouseholdDto; template: MealPlanTemplateDto }) {
   const navigate = useNavigate();
-  const [startDate, setStartDate] = useState(() => addDays(startOfWeek(today()), 7));
+  // Começa hoje: quem abre uma ementa quer, quase sempre, pô-la já em uso. Outro dia escolhe-se no campo.
+  const [startDate, setStartDate] = useState<string>(() => today());
   const [servings, setServings] = useState(String(template.servingsBasis));
   const [policy, setPolicy] = useState<ConflictPolicy>(ConflictPolicy.Skip);
   const [result, setResult] = useState<ApplyTemplateResultDto | null>(null);

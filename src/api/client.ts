@@ -12,6 +12,7 @@ import {
   type MeasurementUnit,
   type PagedResult,
   type ProductDto,
+  type PriceObservationDto,
   type ProductStoreOfferDto,
   type PromotionDto,
   type RecipeDto,
@@ -65,6 +66,14 @@ export function getProductsBatch(productIds: string[]): Promise<ProductDto[]> {
 
 export function getProductStoreOffers(productId: string): Promise<ProductStoreOfferDto[]> {
   return get<ProductStoreOfferDto[]>(`/products/${productId}/store-offers`);
+}
+
+/**
+ * Todas as observações de preço de uma oferta numa loja, da mais antiga à mais recente
+ * (`GET /stores/{storeId}/offers/{offerId}/price-history`, anónima). `from` e `to` limitam o período.
+ */
+export function getPriceHistory(storeId: string, storeOfferId: string, from?: string, to?: string): Promise<PriceObservationDto[]> {
+  return get<PriceObservationDto[]>(`/stores/${storeId}/offers/${storeOfferId}/price-history`, { from, to });
 }
 
 /**

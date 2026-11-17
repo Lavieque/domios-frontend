@@ -237,6 +237,20 @@ export function storeOfferDto(o: Offer) {
   };
 }
 
+/**
+ * The observations behind the verdict: the 30 history prices every 3 days over the last
+ * 90 days, then today's (`observationCount` in the insight counts the same 31).
+ */
+export function priceHistoryDto(o: Offer) {
+  const observation = (id: string, amount: number, observedAt: string, promotionId: string | null) => ({
+    priceObservationId: id, price: { amount, currency: "EUR" }, observedAt, source: 1, confidence: 0.95, promotionId,
+  });
+  return [
+    ...o.history.map((amount, d) => observation(`po-${o.storeOfferId}-${d}`, amount, isoAt(-90 + d * 3, 7), null)),
+    observation(`po-${o.storeOfferId}`, o.price, isoAt(0, 7), o.promo && !o.promo.requiresCard ? o.promo.promotionId : null),
+  ];
+}
+
 /** Cheapest offer (by price per package count needed) among products. */
 export function cheapestOffer(productsToTry: DemoProduct[], chain: DemoChain): Offer | null {
   let best: Offer | null = null;

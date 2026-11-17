@@ -2373,6 +2373,8 @@
   border-radius: 50%;
   background: var(--accent);
   color: var(--green-deep);
+  padding: 0;
+  border: 0;
   box-shadow: 0 2px 8px rgb(6 23 14 / 0.35);
   cursor: help;
 }
@@ -2408,7 +2410,156 @@
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.editorial .cooked-mark:is(:hover, :focus-visible)::after {
+.editorial .cooked-mark:is(:hover, :focus-visible, [data-open])::after {
   opacity: 1;
   transform: none;
+}
+
+/* ---------- Histórico de preços de uma loja: escada de 90 dias, uma só série ---------- */
+.editorial .price-history {
+  margin: 16px 0 0;
+}
+
+.editorial .price-history-title {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.editorial .price-history-frame {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.editorial .price-history-scale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+  text-align: right;
+}
+
+.editorial .price-history-plot {
+  position: relative;
+  height: 120px;
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+
+.editorial .price-history-plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.editorial .price-history-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.editorial .price-history-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.editorial .price-history-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--green-deep);
+  pointer-events: none;
+}
+
+/* Promoção: anel em vez de ponto cheio, para não depender só da cor. */
+.editorial .price-history-dot.is-promotion {
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: var(--green-deep);
+  box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 2px var(--green-deep);
+}
+
+.editorial .price-history-dot.is-active {
+  transform: scale(1.4);
+}
+
+.editorial .price-history-dot.is-key {
+  position: static;
+  display: inline-block;
+  margin: 0 4px 0 0;
+  vertical-align: -1px;
+}
+
+.editorial .price-history-crosshair {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--rule);
+  pointer-events: none;
+}
+
+.editorial .price-history-tip {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 1px;
+  width: max-content;
+  padding: 6px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--green-deep);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lift);
+  font-size: 11px;
+  color: var(--ink-dim);
+  transform: translate(10px, -50%);
+  pointer-events: none;
+}
+
+.editorial .price-history-tip[data-side="left"] {
+  transform: translate(calc(-100% - 10px), -50%);
+}
+
+.editorial .price-history-tip strong {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.editorial .price-history-axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0 0;
+  padding-left: calc(10px + 4.5ch);
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
+.editorial .price-history-legend,
+.editorial .price-history-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
+/* Em ecrãs estreitos os pontos colam-se: fica a escada, as promoções e o ponto escolhido. */
+@media (max-width: 600px) {
+  .editorial .price-history-plot .price-history-dot:not(.is-promotion):not(.is-active) {
+    display: none;
+  }
 }

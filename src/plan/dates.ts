@@ -67,3 +67,10 @@ export function shortDate(date: IsoDate): string {
 export function longDate(date: IsoDate): string {
   return longFormat.format(parse(date));
 }
+
+/** O dia local de um instante (ex.: `lastCookedAt`), para mostrar "a 3 de novembro". */
+export function localDay(instant: string): IsoDate {
+  const date = new Date(instant);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` as IsoDate;
+}

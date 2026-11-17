@@ -20,6 +20,9 @@ import { RecipeRow } from "../components/RecipeRow";
 import { usePageSize } from "../usePageSize";
 import { numberFormat } from "../i18n/format";
 import { tr } from "../i18n";
+import { listCookedRecipes } from "../api/savedRecipes";
+import { useHouseholds } from "../household/useHouseholds";
+import { longDate, type IsoDate } from "../plan/dates";
 
 const count = numberFormat();
 const dishTypes = Object.values(DishType) as DishType[];
@@ -32,6 +35,55 @@ function parseEnum<T extends number>(value: string | null, allowed: T[]): T | un
   return allowed.includes(n) ? n : undefined;
 }
 
+interface Cooked {
+  times: number;
+  last: string;
+}
+
+/** O dia local de um instante, para mostrar "a 3 de novembro". */
+function localDay(instant: string): IsoDate {
+  const date = new Date(instant);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` as IsoDate;
+}
+
+/**
+ * As receitas que a casa escolhida já fez, por id. Só informativo: sem casa ou
+ * com erro fica vazio e a lista mostra-se igual.
+ */
+function useCookedRecipes(): Map<string, Cooked> {
+  const householdId = useHouseholds().current?.householdId ?? null;
+  const [cooked, setCooked] = useState<Map<string, Cooked>>(() => new Map());
+
+  useEffect(() => {
+    if (!householdId) return;
+    let active = true;
+    listCookedRecipes(householdId, 1, 100)
+      .then((result) => {
+        if (!active) return;
+        setCooked(new Map(result.items.map((item) => [item.recipeId, { times: item.timesCooked, last: item.lastCookedAt }])));
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [householdId]);
+
+  return cooked;
+}
+
+/** Ponto no canto do cartão; o texto aparece ao passar o rato ou com o foco. */
+function CookedMark({ cooked }: { cooked: Cooked }) {
+  const text = tr().recipes.cookedMark(cooked.times, longDate(localDay(cooked.last)));
+  return (
+    <span className="cooked-mark" tabIndex={0} role="img" aria-label={text} data-tip={text}>
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M4 8.5l2.6 2.5L12 5.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
+}
+
 export function RecipesPage() {
   // 25 = a receita em destaque + 24 na grelha, que enche filas de 2, 3 e 4 cartões.
   const pageSize = usePageSize(25, 10);
@@ -42,6 +94,7 @@ export function RecipesPage() {
   const mainProtein = parseEnum(searchParams.get("proteina"), proteins);
   const difficulty = parseEnum(searchParams.get("dificuldade"), difficulties);
 
+  const cooked = useCookedRecipes();
   const [recipes, setRecipes] = useState<RecipeSummaryDto[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -116,6 +169,7 @@ export function RecipesPage() {
           meta={[
             recipes[0].dishType !== null ? dishTypeLabels[recipes[0].dishType] : null,
             recipeDifficultyLabels[recipes[0].difficulty],
+            cooked.has(recipes[0].recipeId) ? tr().recipes.cookedShort : null,
           ]
             .filter(Boolean)
             .join(" · ")}
@@ -195,7 +249,13 @@ export function RecipesPage() {
         !loading && (
           <ul className="recipe-rows">
             {(featured ? recipes.slice(1) : recipes).map((recipe) => (
-              <RecipeRow key={recipe.recipeId} title={recipe.title} to={`/receitas/${recipe.recipeId}`} imageUrl={recipe.imageUrl}>
+              <RecipeRow
+                key={recipe.recipeId}
+                title={recipe.title}
+                to={`/receitas/${recipe.recipeId}`}
+                imageUrl={recipe.imageUrl}
+                badge={cooked.has(recipe.recipeId) ? <CookedMark cooked={cooked.get(recipe.recipeId)!} /> : undefined}
+              >
                 <span className="recipe-row-meta">
                   {[
                     recipe.dishType !== null ? dishTypeLabels[recipe.dishType] : null,

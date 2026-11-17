@@ -2246,12 +2246,27 @@
 }
 
 /* ---------- Lojas perto e deslocação ---------- */
+/* Caixa, "Contar deslocação" e, por baixo do texto, a nota sobre a localização. */
 .editorial .travel-toggle {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 8px;
   align-items: baseline;
   margin: 0 0 10px;
   font-size: 13px;
+}
+
+.editorial .travel-toggle > .muted {
+  grid-column: 2;
+  font-size: 12px;
+}
+
+/* "Artigos X € + deslocação Y € (Z km)": linha própria por baixo do nome, para não
+   alargar a coluna do preço e esmagar o nome da cadeia. */
+.editorial .store-card-travel {
+  grid-column: 2 / -1;
+  font-size: 11px;
+  color: #e3e7d8;
 }
 
 .editorial .store-card-near {
@@ -2335,4 +2350,61 @@
   gap: 6px;
   align-items: center;
   font-size: 13px;
+}
+
+/* ---------- Receita já feita: ponto no canto do cartão, texto ao passar o rato ---------- */
+.editorial .recipe-row-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+}
+
+.editorial .cooked-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--green-deep);
+  box-shadow: 0 2px 8px rgb(6 23 14 / 0.35);
+  cursor: help;
+}
+
+.editorial .cooked-mark svg {
+  width: 14px;
+  height: 14px;
+}
+
+.editorial .cooked-mark:focus-visible {
+  outline: 2px solid #fff2c9;
+  outline-offset: 2px;
+}
+
+.editorial .cooked-mark::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: max-content;
+  max-width: 220px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--green-deep);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: var(--shadow-lift);
+  opacity: 0;
+  transform: translateY(-2px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.editorial .cooked-mark:is(:hover, :focus-visible)::after {
+  opacity: 1;
+  transform: none;
 }

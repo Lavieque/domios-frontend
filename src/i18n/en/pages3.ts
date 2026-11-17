@@ -54,4 +54,6 @@ export const recipes: Dict["recipes"] = {
   anyDifficulty: "Any difficulty",
   mainProtein: "Main protein",
   none: "No recipes with these filters.",
+  cookedMark: (times, last) => `Cooked ${times === 1 ? "once" : `${times} times`}, last on ${last}.`,
+  cookedShort: "Cooked",
 };

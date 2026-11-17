@@ -1137,14 +1137,15 @@ function Comparison({
                 </div>
                 <div className="store-card-price">
                   <span className="price-tag">{money.format(store.totalWithTravel ?? store.total)}</span>
-                  {store.totalWithTravel != null && store.travelCost != null && store.nearestStore ? (
-                    <span>
-                      {tr().shoppingList.itemsPlusTravel(money.format(store.total), money.format(store.travelCost), kmFormat.format(store.nearestStore.roundTripKm))}
-                    </span>
-                  ) : (
-                    store.cardTotal < store.total && <span>{tr().shoppingList.withCard(money.format(store.cardTotal))}</span>
+                  {!(store.totalWithTravel != null && store.travelCost != null && store.nearestStore) && store.cardTotal < store.total && (
+                    <span>{tr().shoppingList.withCard(money.format(store.cardTotal))}</span>
                   )}
                 </div>
+                {store.totalWithTravel != null && store.travelCost != null && store.nearestStore && (
+                  <span className="store-card-travel">
+                    {tr().shoppingList.itemsPlusTravel(money.format(store.total), money.format(store.travelCost), kmFormat.format(store.nearestStore.roundTripKm))}
+                  </span>
+                )}
                 {store.nearestStore && <span className="store-card-near muted">{store.nearestStore.name}</span>}
                 <span className={isBest ? "badge" : complete ? "badge badge-soft" : "badge badge-warn"}>
                   {isBest ? tr().shoppingList.cheapestBadge : complete ? tr().shoppingList.hasAll : tr().shoppingList.missing(comparison.itemCount - store.coveredItemCount)}

@@ -1,10 +1,10 @@
 import { Busy } from "../components/Busy";
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createHousehold } from "../api/households";
 import { describeError } from "../auth/errors";
 import { useSession } from "../auth/useSession";
-import { storeHouseholdId } from "../household/currentHousehold";
+import { forgetStoredHouseholds, storeHouseholdId } from "../household/currentHousehold";
 import { tr } from "../i18n";
 
 // Todas as casas reais são em Portugal; a Api guarda o fuso para datas e
@@ -16,7 +16,12 @@ export function CreateHouseholdPage() {
   const session = useSession()!;
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [memberName, setMemberName] = useState("");
+  const location = useLocation();
+  // Quem chega com o nome já dito (o tour do demo) não o escreve outra vez.
+  const [memberName, setMemberName] = useState(() => {
+    const given = (location.state as { memberName?: unknown } | null)?.memberName;
+    return typeof given === "string" ? given : "";
+  });
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -32,6 +37,9 @@ export function CreateHouseholdPage() {
         adminMemberName: memberName.trim(),
       });
       storeHouseholdId(session.userId, household.householdId);
+      // A lista guardada ainda não tem esta casa: sem ela, a página da casa
+      // arrancava com a cópia velha (vazia) e mandava criar outra.
+      forgetStoredHouseholds(session.userId);
       navigate("/casa", { replace: true });
     } catch (err) {
       setError(

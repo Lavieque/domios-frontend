@@ -20,7 +20,7 @@ import { RecipeRow } from "../components/RecipeRow";
 import { usePageSize } from "../usePageSize";
 import { numberFormat } from "../i18n/format";
 import { tr } from "../i18n";
-import { listCookedRecipes } from "../api/savedRecipes";
+import { listAllCookedRecipes } from "../api/savedRecipes";
 import { useHouseholds } from "../household/useHouseholds";
 import { localDay, longDate } from "../plan/dates";
 
@@ -40,20 +40,6 @@ interface Cooked {
   last: string;
 }
 
-/** Páginas de 100 (o máximo da Api); um teto para uma casa com um histórico enorme. */
-const COOKED_PAGE_SIZE = 100;
-const COOKED_MAX_PAGES = 10;
-
-async function loadCooked(householdId: string): Promise<Map<string, Cooked>> {
-  const cooked = new Map<string, Cooked>();
-  for (let page = 1; page <= COOKED_MAX_PAGES; page++) {
-    const result = await listCookedRecipes(householdId, page, COOKED_PAGE_SIZE);
-    for (const item of result.items) cooked.set(item.recipeId, { times: item.timesCooked, last: item.lastCookedAt });
-    if (result.items.length < COOKED_PAGE_SIZE || cooked.size >= result.total) break;
-  }
-  return cooked;
-}
-
 /**
  * As receitas que a casa escolhida já fez, por id. Só informativo: sem casa ou
  * com erro fica vazio e a lista mostra-se igual.
@@ -65,8 +51,12 @@ function useCookedRecipes(): Map<string, Cooked> {
   useEffect(() => {
     if (!householdId) return;
     let active = true;
-    loadCooked(householdId)
-      .then((map) => active && setCooked({ householdId, map }))
+    listAllCookedRecipes(householdId)
+      .then((items) => {
+        if (!active) return;
+        const map = new Map(items.map((item) => [item.recipeId, { times: item.timesCooked, last: item.lastCookedAt }]));
+        setCooked({ householdId, map });
+      })
       .catch(() => undefined);
     return () => {
       active = false;
@@ -100,6 +90,12 @@ function CookedMark({ cooked }: { cooked: Cooked }) {
         setOpen((value) => !value);
       }}
       onBlur={() => setOpen(false)}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          event.stopPropagation();
+          setOpen(false);
+        }
+      }}
     >
       <svg viewBox="0 0 16 16" aria-hidden="true">
         <path d="M4 8.5l2.6 2.5L12 5.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

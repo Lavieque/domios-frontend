@@ -29,5 +29,7 @@ export default defineConfig(({ mode }) => ({
     // Os testes nunca falam com uma Api real: o fetch é sempre substituído.
     env: { VITE_API_BASE_URL: 'http://api.test/api/v1' },
     setupFiles: ['./src/test/setup.ts'],
+    // e2e/ é do Playwright (npm run e2e), não do Vitest.
+    include: ['{src,site,admin}/**/*.test.{ts,tsx}'],
   },
 }))

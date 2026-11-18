@@ -44,17 +44,47 @@ export function localeOf(lang: Lang = current): string {
   return LOCALE[lang];
 }
 
-/** Muda a língua neste browser (e nos outros separadores, pelo evento `storage`). */
-export function setLanguage(lang: Lang): void {
+/**
+ * Carrega o dicionário de uma língua; `null` quando já está carregado. O índice
+ * (`./index.ts`) regista-o, para este módulo não depender dos dicionários.
+ */
+type Loader = (lang: Lang) => Promise<void> | null;
+let loader: Loader = () => null;
+
+export function registerLanguageLoader(load: Loader): void {
+  loader = load;
+}
+
+/** A última língua pedida: um pedido mais recente ganha a um que ainda carrega. */
+let requested: Lang = current;
+
+function switchTo(lang: Lang) {
+  if (lang === current) return;
+  current = lang;
+  applyToDocument(lang);
+  for (const listener of listeners) listener();
+}
+
+/**
+ * Muda a língua neste browser (e nos outros separadores, pelo evento `storage`).
+ * Se o dicionário ainda não chegou, a app só muda quando chegar; a promessa
+ * resolve nesse momento.
+ */
+export function setLanguage(lang: Lang): Promise<void> {
   try {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
   } catch {
     // Sem localStorage: vale só para esta página.
   }
-  if (lang === current) return;
-  current = lang;
-  applyToDocument(lang);
-  for (const listener of listeners) listener();
+  requested = lang;
+  const loading = loader(lang);
+  if (!loading) {
+    switchTo(lang);
+    return Promise.resolve();
+  }
+  return loading.then(() => {
+    if (requested === lang) switchTo(lang);
+  });
 }
 
 export function subscribeLanguage(listener: () => void): () => void {
@@ -64,6 +94,6 @@ export function subscribeLanguage(listener: () => void): () => void {
 
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (event) => {
-    if (event.key === LANGUAGE_STORAGE_KEY && isLang(event.newValue)) setLanguage(event.newValue);
+    if (event.key === LANGUAGE_STORAGE_KEY && isLang(event.newValue)) void setLanguage(event.newValue);
   });
 }

@@ -16,7 +16,7 @@ function syncFromAccount() {
   getPreferences()
     .then((preferences) => {
       // Só se a sessão ainda for a mesma quando a resposta chega.
-      if (sessionStore.getSession()?.userId === userId && isLang(preferences.language)) setLanguage(preferences.language);
+      if (sessionStore.getSession()?.userId === userId && isLang(preferences.language)) void setLanguage(preferences.language);
     })
     // Api antiga sem a rota, ou sem rede: fica a língua deste browser.
     .catch(() => undefined);
@@ -31,5 +31,5 @@ export function startAccountLanguageSync(): void {
 /** Grava a língua na conta e muda a app. Lança o erro da Api se não gravar. */
 export async function saveAccountLanguage(lang: Lang): Promise<void> {
   const saved = await updatePreferences({ language: lang });
-  setLanguage(isLang(saved.language) ? saved.language : lang);
+  await setLanguage(isLang(saved.language) ? saved.language : lang);
 }

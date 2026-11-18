@@ -16,7 +16,7 @@ export function GuestLanguageSwitch() {
           lang={lang}
           aria-label={t.account.languageNames[lang]}
           aria-pressed={lang === language}
-          onClick={() => setLanguage(lang)}
+          onClick={() => void setLanguage(lang)}
         >
           {t.account.languageShort[lang]}
         </button>

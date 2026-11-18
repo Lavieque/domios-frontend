@@ -19,34 +19,52 @@ jobs:
       # Só para o build não falhar; nenhum teste fala com uma Api real.
       VITE_API_BASE_URL: http://localhost:5028/api/v1
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npx tsc -b
       - run: npm run lint
-      - run: npm test
+      # Os testes com cobertura; o resumo fica no log e o relatório HTML nos artefactos.
+      - run: npm run coverage
+      - uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
       - run: npx vite build
       - run: npx vite build --config vite.site.config.ts
       - run: npx vite build --config vite.admin.config.ts
       - run: npx vite build --mode demo --outDir dist-demo
 
   e2e:
-    name: Tour da demo (Playwright)
+    name: Demo de ponta a ponta (Playwright)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # O browser guarda-se entre runs, por versão do Playwright; as bibliotecas do
+      # sistema instalam-se sempre, porque o runner começa limpo.
+      - id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - id: browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       - run: npm run e2e
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-traces
           path: test-results/

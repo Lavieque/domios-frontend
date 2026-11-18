@@ -1,5 +1,6 @@
 import { Busy } from "../components/Busy";
 import { useEffect, useMemo, useState } from "react";
+import { useLoad } from "../useLoad";
 import { useSearchParams } from "react-router-dom";
 import { CardsSkeleton } from "../components/CardsSkeleton";
 import { getCategories, getChains, searchCurrentPromotions } from "../api/client";
@@ -42,9 +43,6 @@ export function PromotionsPage() {
 
   const [chains, setChains] = useState<ChainDto[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
-  const [offers, setOffers] = useState<CurrentPromotionDto[]>([]);
-  const [total, setTotal] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
   // Fechados por omissão: os quatro filtros juntos ocupavam meio ecrã no
   // telemóvel. As cadeias ficam sempre à vista.
   const [showFilters, setShowFilters] = useState(false);
@@ -103,23 +101,16 @@ export function PromotionsPage() {
     [chains],
   );
 
-  useEffect(() => {
-    setLoading(true);
-    searchCurrentPromotions(
-      chainId ?? undefined,
-      page,
-      pageSize,
-      categoryId ?? undefined,
-      groceryOnly,
-      requiresCard,
-      minDiscount,
-    )
-      .then((result) => {
-        setOffers(result.items);
-        setTotal(result.total);
-      })
-      .finally(() => setLoading(false));
-  }, [chainId, categoryId, groceryOnly, requiresCard, minDiscount, page, pageSize]);
+  // A grelha anterior fica à vista enquanto a nova carrega.
+  const found = useLoad(
+    [chainId, categoryId, groceryOnly, requiresCard, minDiscount, page, pageSize],
+    () =>
+      searchCurrentPromotions(chainId ?? undefined, page, pageSize, categoryId ?? undefined, groceryOnly, requiresCard, minDiscount),
+    { keepPrevious: true },
+  );
+  const offers: CurrentPromotionDto[] = found.data?.items ?? [];
+  const total: number | null = found.data?.total ?? null;
+  const loading = found.loading;
 
   return (
     <div className="page">

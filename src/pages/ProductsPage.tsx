@@ -1,5 +1,6 @@
 import { Busy } from "../components/Busy";
 import { useEffect, useMemo, useState } from "react";
+import { useLoad } from "../useLoad";
 import { useSearchParams } from "react-router-dom";
 import { CardsSkeleton } from "../components/CardsSkeleton";
 import { getCategories, searchProducts } from "../api/client";
@@ -38,9 +39,6 @@ export function ProductsPage() {
   const page = Number(searchParams.get("page") ?? "1") || 1;
 
   const [categories, setCategories] = useState<CategoryDto[]>([]);
-  const [products, setProducts] = useState<ProductDto[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
 
   function applyFilters(next: { search?: string; categoryId?: string | null; groceryOnly?: boolean; page?: number }) {
     const nextSearch = next.search ?? search;
@@ -100,10 +98,12 @@ export function ProductsPage() {
   // Só Alimentação aberta à partida; o grupo da categoria escolhida abre-se
   // sozinho para ela nunca ficar escondida.
   const [openGroups, setOpenGroups] = useState<Set<CategoryScope>>(() => new Set([CategoryScope.Food]));
-  useEffect(() => {
-    if (selectedScope === undefined) return;
-    setOpenGroups((open) => (open.has(selectedScope) ? open : new Set(open).add(selectedScope)));
-  }, [selectedScope]);
+  // Ao escolher outra categoria (ou quando as categorias chegam), o grupo dela abre-se já neste render.
+  const [shownScope, setShownScope] = useState<CategoryScope | undefined>(undefined);
+  if (selectedScope !== shownScope) {
+    setShownScope(selectedScope);
+    if (selectedScope !== undefined && !openGroups.has(selectedScope)) setOpenGroups(new Set(openGroups).add(selectedScope));
+  }
 
   function toggleGroup(scope: CategoryScope) {
     setOpenGroups((open) => {
@@ -125,15 +125,14 @@ export function ProductsPage() {
     });
   }
 
-  useEffect(() => {
-    setLoading(true);
-    searchProducts(search, page, pageSize, categoryId ?? undefined, groceryOnly)
-      .then((result) => {
-        setProducts(result.items);
-        setTotal(result.total);
-      })
-      .finally(() => setLoading(false));
-  }, [search, page, pageSize, categoryId, groceryOnly]);
+  const found = useLoad(
+    [search, page, pageSize, categoryId, groceryOnly],
+    () => searchProducts(search, page, pageSize, categoryId ?? undefined, groceryOnly),
+    { keepPrevious: true },
+  );
+  const products: ProductDto[] = found.data?.items ?? [];
+  const total = found.data?.total ?? 0;
+  const loading = found.loading;
 
   const selectedCategory = categoryId ? categoriesById.get(categoryId) : undefined;
   // Primeira carga sem nada para mostrar; depois a grelha anterior fica à

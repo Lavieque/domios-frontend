@@ -1,6 +1,7 @@
 import { Busy } from "../components/Busy";
 import { PageSkeleton } from "../components/PageSkeleton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe } from "../api/client";
 import type { PlannedMealDto } from "../api/planning";
@@ -11,7 +12,7 @@ import {
   listShoppingLists,
   ShoppingListStatus,
 } from "../api/shopping";
-import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels, type RecipeDto } from "../api/types";
+import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels } from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
 import { RecipeAvoidedNotice } from "../components/RecipeAvoidedNotice";
 import { SaveRecipeButton } from "../components/SaveRecipeButton";
@@ -46,9 +47,15 @@ type Task = "plan" | null;
 
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
+  if (!id) return null;
+  // Outra receita é outro ecrã: os ingredientes riscados e os formulários abertos não passam para ela.
+  return <RecipeDetail key={id} id={id} />;
+}
+
+function RecipeDetail({ id }: { id: string }) {
   const navigate = useNavigate();
   const { current } = useHouseholds();
-  const [recipe, setRecipe] = useState<RecipeDto | null>(null);
+  const { data: recipe, error } = useLoad([id], () => getRecipe(id));
   const [added, setAdded] = useState<PlannedMealDto | null>(null);
   // "Pôr na lista de compras": um clique, o que falta na despensa vai para a lista aberta.
   const [listResult, setListResult] = useState<{ listId: string; name: string; added: number } | null>(null);
@@ -57,25 +64,7 @@ export function RecipeDetailPage() {
   const [task, setTask] = useState<Task>(null);
   // Riscar ingredientes enquanto se cozinha; não sai deste ecrã.
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!id) return;
-    let active = true;
-    setRecipe(null);
-    setError(null);
-    setChecked(new Set());
-    setListResult(null);
-    setListError(null);
-    getRecipe(id)
-      .then((data) => active && setRecipe(data))
-      .catch((err: unknown) => active && setError(describeError(err)));
-    return () => {
-      active = false;
-    };
-  }, [id]);
-
-  if (!id) return null;
   if (error)
     return (
       <div className="page recipe-page">

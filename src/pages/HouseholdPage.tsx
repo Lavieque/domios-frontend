@@ -1,6 +1,7 @@
 import { Busy } from "../components/Busy";
 import { PageSkeleton } from "../components/PageSkeleton";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { useLoad } from "../useLoad";
 import { Link, Navigate } from "react-router-dom";
 import {
   addMember,
@@ -34,24 +35,15 @@ const MEMBER_ERRORS = localized((t) => ({
 export function HouseholdPage() {
   const { loading, error, households, current, select } = useHouseholds();
   const userId = useSession()?.userId ?? null;
-  const [household, setHousehold] = useState<HouseholdDto | null>(null);
-  const [detailError, setDetailError] = useState<string | null>(null);
-  const [adding, setAdding] = useState(false);
-
   const currentId = current?.householdId ?? null;
-  useEffect(() => {
-    if (!currentId) return;
-    let cancelled = false;
-    setHousehold(null);
-    setDetailError(null);
-    setAdding(false);
-    getHousehold(currentId)
-      .then((result) => !cancelled && setHousehold(result))
-      .catch((err: unknown) => !cancelled && setDetailError(describeError(err)));
-    return () => {
-      cancelled = true;
-    };
-  }, [currentId]);
+  const detail = useLoad(currentId ? [currentId] : null, () => getHousehold(currentId!));
+  const household = detail.data;
+  const detailError = detail.error;
+  const setHousehold = (next: HouseholdDto) => detail.update(() => next);
+  // O formulário de novo membro é da casa onde se abriu: ao mudar de casa fecha.
+  const [addingTo, setAddingTo] = useState<string | null>(null);
+  const adding = addingTo !== null && addingTo === currentId;
+  const setAdding = (open: boolean) => setAddingTo(open ? currentId : null);
 
   if (loading) {
     return <PageSkeleton />;

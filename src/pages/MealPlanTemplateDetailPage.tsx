@@ -1,6 +1,7 @@
 import { Busy } from "../components/Busy";
 import { PageSkeleton } from "../components/PageSkeleton";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import { ApiError } from "../api/http";
@@ -35,36 +36,27 @@ export function MealPlanTemplateDetailPage() {
   // Receitas que ficaram de fora ao personalizar (vem da navegação da cópia).
   const skippedOnCopy = (location.state as { skipped?: number } | null)?.skipped ?? 0;
   const { current } = useHouseholds();
-  const [template, setTemplate] = useState<MealPlanTemplateDto | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const loadedTemplate = useLoad(id ? [id] : null, () => getMealPlanTemplate(id!));
+  const template = loadedTemplate.data;
+  const error = loadedTemplate.error;
+  const setTemplate = (next: MealPlanTemplateDto) => loadedTemplate.update(() => next);
   // Dia aberto para editar, o erro dele e se está a guardar.
-  const [editingDay, setEditingDay] = useState<number | null>(null);
+  // O dia em edição é do menu onde se abriu: ao abrir outro menu, nenhum dia fica aberto.
+  const [editing, setEditing] = useState<{ id: string | undefined; day: number } | null>(null);
+  const editingDay = editing !== null && editing.id === id ? editing.day : null;
+  const setEditingDay = (day: number | null) => setEditing(day === null ? null : { id, day });
   const [dayError, setDayError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
   // O dia cujo editor acabou de fechar: o foco volta ao "Editar" dele.
-  const [closedDay, setClosedDay] = useState<number | null>(null);
+  const closedDay = useRef<number | null>(null);
 
   useEffect(() => {
-    if (closedDay === null || editingDay !== null) return;
-    document.querySelector<HTMLElement>(`[data-edit-day="${closedDay}"]`)?.focus();
-    setClosedDay(null);
-  }, [closedDay, editingDay]);
-
-  useEffect(() => {
-    if (!id) return;
-    let active = true;
-    setTemplate(null);
-    setError(null);
-    setEditingDay(null);
-    getMealPlanTemplate(id)
-      .then((data) => active && setTemplate(data))
-      .catch((err: unknown) => active && setError(describeError(err)));
-    return () => {
-      active = false;
-    };
-  }, [id]);
+    if (closedDay.current === null || editingDay !== null) return;
+    document.querySelector<HTMLElement>(`[data-edit-day="${closedDay.current}"]`)?.focus();
+    closedDay.current = null;
+  }, [editingDay]);
 
   if (error) {
     return (
@@ -130,7 +122,7 @@ export function MealPlanTemplateDetailPage() {
     try {
       setTemplate(await replaceMealPlanTemplateEntries(loaded.mealPlanTemplateId, [...others, ...day]));
       setEditingDay(null);
-      setClosedDay(dayIndex);
+      closedDay.current = dayIndex;
     } catch (err) {
       setDayError(
         describeError(err, {
@@ -211,7 +203,7 @@ export function MealPlanTemplateDetailPage() {
                     onCancel={() => {
                       setEditingDay(null);
                       setDayError(null);
-                      setClosedDay(dayIndex);
+                      closedDay.current = dayIndex;
                     }}
                   />
                 ) : entries.length === 0 ? (

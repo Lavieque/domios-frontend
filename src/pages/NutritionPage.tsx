@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useSearchParams } from "react-router-dom";
 import { getHousehold, type CallerHouseholdDto, type MemberDto } from "../api/households";
 import { getNutritionGoals, type MemberNutritionGoalsDto } from "../api/memberPreferences";
@@ -11,7 +11,6 @@ import {
   type NutritionScoreDto,
   type NutritionSummaryDto,
 } from "../api/nutrition";
-import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { goalRows, mealsOverFatLimit, type GoalRow } from "../household/nutritionView";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekdayTitle } from "../plan/dates";
@@ -53,50 +52,29 @@ function Nutrition({ household }: { household: CallerHouseholdDto }) {
   const last = today() >= monday && today() < sunday ? today() : sunday;
   const memberParam = searchParams.get("quem");
 
-  const [members, setMembers] = useState<MemberDto[]>([]);
-  const [summary, setSummary] = useState<NutritionSummaryDto | null>(null);
-  const [score, setScore] = useState<NutritionScoreDto | null>(null);
-  const [goals, setGoals] = useState<MemberNutritionGoalsDto | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    getHousehold(householdId)
-      .then((result) => !cancelled && setMembers(result.members))
-      .catch(() => !cancelled && setMembers([]));
-    return () => {
-      cancelled = true;
-    };
-  }, [householdId]);
+  // Sem a lista de membros (falhou), fica a casa toda.
+  const memberList = useLoad([householdId], () => getHousehold(householdId).then((result) => result.members, (): MemberDto[] => []));
+  const members: MemberDto[] = memberList.data ?? [];
 
   // Um membro que já saiu da casa cai na casa toda, em vez de dar 400.
   const memberId = members.some((m) => m.memberId === memberParam) ? memberParam : null;
-  const waitingForMembers = memberParam !== null && members.length === 0;
+  const waitingForMembers = memberParam !== null && memberList.loading;
 
-  useEffect(() => {
-    if (waitingForMembers) return;
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
+  const week = useLoad(waitingForMembers ? null : [householdId, monday, last, memberId], () =>
     Promise.all([
       getNutritionSummary(householdId, monday, last, memberId),
       getNutritionScore(householdId, monday, last, memberId),
       // Os objetivos são um extra: sem eles o resumo mostra-se na mesma.
       memberId ? getNutritionGoals(householdId, memberId).catch(() => null) : Promise.resolve(null),
-    ])
-      .then(([nextSummary, nextScore, nextGoals]) => {
-        if (cancelled) return;
-        setSummary(nextSummary);
-        setScore(nextScore);
-        setGoals(nextGoals);
-      })
-      .catch((err) => !cancelled && setError(describeError(err, {})))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [householdId, monday, last, memberId, waitingForMembers]);
+    ]),
+  );
+  const [summary, score, goals]: [NutritionSummaryDto | null, NutritionScoreDto | null, MemberNutritionGoalsDto | null] = week.data ?? [
+    null,
+    null,
+    null,
+  ];
+  const loading = waitingForMembers || week.loading;
+  const error = week.error;
 
   function change(next: { semana?: string; quem?: string | null }) {
     const params = new URLSearchParams(searchParams);

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { listSavedRecipes, removeSavedRecipe, saveRecipe } from "../api/savedRecipes";
 import { describeError } from "../auth/errors";
 import { tr } from "../i18n";
@@ -10,20 +11,15 @@ interface Props {
 
 /** Guardar para cozinhar mais tarde, sem pôr no plano. */
 export function SaveRecipeButton({ householdId, recipeId }: Props) {
-  const [saved, setSaved] = useState<boolean | null>(null);
+  const check = useLoad([householdId, recipeId], () => listSavedRecipes(householdId).then((list) => list.some((s) => s.recipeId === recipeId)));
+  // Depois de carregar no botão, vale o que se fez; até lá, o que a Api disse.
+  const [toggled, setToggled] = useState<{ key: string; saved: boolean } | null>(null);
+  const key = `${householdId}:${recipeId}`;
+  const saved = toggled?.key === key ? toggled.saved : check.data;
+  const setSaved = (value: boolean) => setToggled({ key, saved: value });
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    setSaved(null);
-    listSavedRecipes(householdId)
-      .then((list) => active && setSaved(list.some((s) => s.recipeId === recipeId)))
-      .catch(() => active && setError(tr().ui.saveRecipe.checkFailed));
-    return () => {
-      active = false;
-    };
-  }, [householdId, recipeId]);
+  const [actionError, setError] = useState<string | null>(null);
+  const error = actionError ?? (check.failure ? tr().ui.saveRecipe.checkFailed : null);
 
   async function toggle() {
     setError(null);

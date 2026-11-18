@@ -1,5 +1,6 @@
 import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import {
@@ -88,15 +89,31 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
   const locationFilter = rawLocation === null ? undefined : (Number(rawLocation) as PantryLocation);
   const page = Number(searchParams.get("page") ?? "1") || 1;
 
-  const [items, setItems] = useState<PantryItemDto[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [version, setVersion] = useState(0);
   // A pesquisa vai à Api (o nome vive em Products): procura em todos os itens, não só nos da página.
   // O pedido só sai quando se pára de escrever.
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
+  // A lista anterior fica no ecrã enquanto a nova carrega (filtro, página, depois de uma ação).
+  const list = useLoad(
+    [householdId, view, locationFilter, query, page, pageSize],
+    () =>
+      listPantryItems(householdId, {
+        // O que há e os estados com stock: a validade mais curta primeiro.
+        // Consumidos e descartados ficam pela data de compra.
+        sort: view === PantryState.Consumed || view === PantryState.Discarded ? undefined : "expiry",
+        state: view === "fifo" ? undefined : view,
+        location: locationFilter,
+        search: query === "" ? undefined : query,
+        page,
+        pageSize: pageSize,
+      }),
+    { keepPrevious: true },
+  );
+  const items: PantryItemDto[] = list.data?.items ?? [];
+  const total = list.data?.total ?? 0;
+  const loading = list.loading;
+  const [actionError, setError] = useState<string | null>(null);
+  const error = actionError ?? list.error;
   const products = useProducts(items.map((item) => item.productId));
   const chains = useActiveChains();
 
@@ -110,32 +127,6 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     }, 300);
     return () => clearTimeout(timer);
   }, [search, query, page, searchParams, setSearchParams]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    listPantryItems(householdId, {
-      // O que há e os estados com stock: a validade mais curta primeiro.
-      // Consumidos e descartados ficam pela data de compra.
-      sort: view === PantryState.Consumed || view === PantryState.Discarded ? undefined : "expiry",
-      state: view === "fifo" ? undefined : view,
-      location: locationFilter,
-      search: query === "" ? undefined : query,
-      page,
-      pageSize: pageSize,
-    })
-      .then((result) => {
-        if (cancelled) return;
-        setItems(result.items);
-        setTotal(result.total);
-        setError(null);
-      })
-      .catch((err: unknown) => !cancelled && setError(describeError(err)))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [householdId, view, locationFilter, query, page, pageSize, version]);
 
   function setFilter(next: { view?: View; location?: PantryLocation | null; page?: number }) {
     const params = new URLSearchParams();
@@ -153,7 +144,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
     setError(null);
     try {
       await action();
-      setVersion((v) => v + 1);
+      list.reload();
     } catch (err) {
       setError(describeError(err, { "invalid-state-transition": tr().pantry.actionNotAllowed }));
     }

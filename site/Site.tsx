@@ -152,25 +152,23 @@ export function Brand() {
 
 function Header({ pathname }: { pathname: string }) {
   const { lang, t, to } = useSite();
-  const [open, setOpen] = useState(false);
-  const [stuck, setStuck] = useState(false);
+  // Guarda a página onde se abriu: ao navegar, o menu fecha sozinho.
+  const [openAt, setOpenAt] = useState<string | null>(null);
+  const open = openAt === pathname;
+  const setOpen = (next: boolean) => setOpenAt(next ? pathname : null);
+  const [stuck, setStuck] = useState(() => typeof window !== "undefined" && window.scrollY > 24);
 
   // The header starts clear over the photograph and takes a solid ground once the page moves.
   useEffect(() => {
     const onScroll = () => setStuck(window.scrollY > 24);
-    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") setOpenAt(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

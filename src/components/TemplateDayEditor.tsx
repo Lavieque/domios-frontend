@@ -45,7 +45,7 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
   // Linha cuja receita se está a escolher; "new" = refeição nova.
   const [picking, setPicking] = useState<string | null>(null);
   // Para onde vai o foco depois de uma mudança que tira o botão carregado do ecrã.
-  const [focusTarget, setFocusTarget] = useState<string | null>(null);
+  const focusTarget = useRef<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
 
   // Ao abrir, o foco entra no editor.
@@ -54,10 +54,10 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
   }, []);
 
   useEffect(() => {
-    if (focusTarget === null) return;
-    root.current?.querySelector<HTMLElement>(`[data-focus="${focusTarget}"]`)?.focus();
-    setFocusTarget(null);
-  }, [focusTarget, rows, picking]);
+    if (focusTarget.current === null) return;
+    root.current?.querySelector<HTMLElement>(`[data-focus="${focusTarget.current}"]`)?.focus();
+    focusTarget.current = null;
+  }, [rows, picking]);
 
   function update(key: string, change: Partial<DayRow>) {
     setRows((current) => current.map((row) => (row.key === key ? { ...row, ...change } : row)));
@@ -67,11 +67,11 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
     const index = rows.findIndex((row) => row.key === key);
     const next = rows[index + 1] ?? rows[index - 1];
     setRows((current) => current.filter((row) => row.key !== key));
-    setFocusTarget(next ? `meal-${next.key}` : "add");
+    focusTarget.current = next ? `meal-${next.key}` : "add";
   }
 
   function closePicker() {
-    setFocusTarget(picking === "new" ? "add" : `swap-${picking}`);
+    focusTarget.current = picking === "new" ? "add" : `swap-${picking}`;
     setPicking(null);
   }
 
@@ -137,7 +137,7 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
                 dishType: recipe.dishType,
                 unavailable: false,
               });
-              setFocusTarget(`swap-${pickingRow.key}`);
+              focusTarget.current = `swap-${pickingRow.key}`;
             } else {
               const key = `new-${nextKey++}`;
               setRows((current) => [
@@ -152,7 +152,7 @@ export function TemplateDayEditor({ dayIndex, entries, saving, error, onSave, on
                   entry: null,
                 },
               ]);
-              setFocusTarget(`meal-${key}`);
+              focusTarget.current = `meal-${key}`;
             }
             setPicking(null);
           }}

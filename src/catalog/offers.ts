@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { getProductStoreOffers, getStoreOffersBatch, MAX_BATCH_PRODUCT_IDS } from "../api/client";
 import { ApiError } from "../api/http";
 import {
@@ -123,16 +123,7 @@ export function resetOffersCache() {
 
 /** undefined enquanto carrega; null se falhou. */
 export function useOffers(productId: string): ProductStoreOfferDto[] | null | undefined {
-  const [offers, setOffers] = useState<ProductStoreOfferDto[] | null | undefined>(undefined);
-
-  useEffect(() => {
-    let cancelled = false;
-    setOffers(undefined);
-    loadOffers(productId).then((result) => !cancelled && setOffers(result));
-    return () => {
-      cancelled = true;
-    };
-  }, [productId]);
-
-  return offers;
+  // `loadOffers` não falha: devolve null quando a Api falha.
+  const { data, loading } = useLoad([productId], () => loadOffers(productId));
+  return loading ? undefined : data;
 }

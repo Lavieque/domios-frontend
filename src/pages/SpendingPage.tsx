@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
-import { getSpending, type SpendingDto, type SpendingMonthDto } from "../api/spending";
-import { describeError } from "../auth/errors";
+import { getSpending, type SpendingMonthDto } from "../api/spending";
 import { ChainLogo } from "../components/ChainLogo";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { monthLabel, periodFor } from "../shopping/spending";
@@ -22,21 +22,10 @@ export function SpendingPage() {
 function Spending({ household }: { household: CallerHouseholdDto }) {
   const householdId = household.householdId;
   const [months, setMonths] = useState<number>(6);
-  const [spending, setSpending] = useState<SpendingDto | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    setSpending(null);
-    setError(null);
+  const { data: spending, error } = useLoad([householdId, months], () => {
     const { from, to } = periodFor(months);
-    getSpending(householdId, from, to)
-      .then((result) => active && setSpending(result))
-      .catch((err) => active && setError(describeError(err)));
-    return () => {
-      active = false;
-    };
-  }, [householdId, months]);
+    return getSpending(householdId, from, to);
+  });
 
   // Mais recentes primeiro; os meses sem nada não aparecem.
   const shown = spending ? [...spending.months].filter((m) => m.total > 0 || m.purchasesWithoutPrice > 0).reverse() : [];

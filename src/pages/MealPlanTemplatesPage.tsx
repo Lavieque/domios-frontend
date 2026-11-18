@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { useSearchParams } from "react-router-dom";
 import {
   listHouseholdMealPlanTemplates,
@@ -7,7 +8,6 @@ import {
 } from "../api/mealPlanTemplates";
 import { RecipeStatus } from "../api/types";
 import { useHouseholds } from "../household/useHouseholds";
-import { describeError } from "../auth/errors";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
 import { RecipeRow } from "../components/RecipeRow";
@@ -25,10 +25,11 @@ export function MealPlanTemplatesPage() {
   const search = searchParams.get("search") ?? "";
   const page = Number(searchParams.get("page") ?? "1") || 1;
 
-  const [templates, setTemplates] = useState<MealPlanTemplateSummaryDto[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // O total anterior fica enquanto a página nova carrega: a paginação não pisca.
+  const found = useLoad([search, page, pageSize], () => searchMealPlanTemplates(search, page, pageSize), { keepPrevious: true });
+  const templates: MealPlanTemplateSummaryDto[] = found.data?.items ?? [];
+  const total = found.data?.total ?? 0;
+  const { loading, error } = found;
 
   function applyFilters(next: { search?: string; page?: number }) {
     const params = new URLSearchParams();
@@ -38,23 +39,6 @@ export function MealPlanTemplatesPage() {
     if (nextPage > 1) params.set("page", String(nextPage));
     setSearchParams(params, { replace: true });
   }
-
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    searchMealPlanTemplates(search, page, pageSize)
-      .then((result) => {
-        if (!active) return;
-        setTemplates(result.items);
-        setTotal(result.total);
-        setError(null);
-      })
-      .catch((err: unknown) => active && setError(describeError(err)))
-      .finally(() => active && setLoading(false));
-    return () => {
-      active = false;
-    };
-  }, [search, page, pageSize]);
 
   return (
     <div className="page templates-page">

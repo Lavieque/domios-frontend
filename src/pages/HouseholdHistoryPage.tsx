@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link } from "react-router-dom";
 import { getHouseholdTimeline } from "../api/households";
-import type { DomainEventLogEntryDto, PagedResult } from "../api/types";
-import { describeError } from "../auth/errors";
+import type { DomainEventLogEntryDto } from "../api/types";
 import { Pagination } from "../components/Pagination";
 import { eventDetail, eventLabel, eventLink, timelineAreas } from "../history/events";
 import { useEventNames } from "../history/useEventNames";
@@ -57,20 +57,9 @@ function HouseholdHistory({ householdId, name }: { householdId: string; name: st
   const [area, setArea] = useState(timelineAreas[0].area);
   const areaOption = timelineAreas.find((option) => option.area === area) ?? timelineAreas[0];
   const [page, setPage] = useState(1);
-  const [result, setResult] = useState<PagedResult<DomainEventLogEntryDto> | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setResult(null);
-    setError(null);
-    getHouseholdTimeline(householdId, areaOption.aggregateType, areaOption.excludeAggregateType, page)
-      .then((loaded) => !cancelled && setResult(loaded))
-      .catch((err: unknown) => !cancelled && setError(describeError(err)));
-    return () => {
-      cancelled = true;
-    };
-  }, [householdId, areaOption, page]);
+  const { data: result, error } = useLoad([householdId, areaOption.area, page], () =>
+    getHouseholdTimeline(householdId, areaOption.aggregateType, areaOption.excludeAggregateType, page),
+  );
 
   const names = useEventNames(householdId, result?.items ?? NO_EVENTS);
 

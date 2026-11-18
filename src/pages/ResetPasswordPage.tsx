@@ -22,12 +22,13 @@ export function ResetPasswordPage() {
   const [linkInvalid, setLinkInvalid] = useState(!hashToken);
   const [submitting, setSubmitting] = useState(false);
 
-  // Guarda o token e tira-o da barra de endereço (não fica no histórico).
-  useEffect(() => {
-    if (!hashToken) return;
+  // Guarda o token (já neste render, se chegar outro link) e tira-o da barra de endereço (não fica no histórico).
+  if (hashToken && hashToken !== token) {
     setToken(hashToken);
     setLinkInvalid(false);
-    navigate({ hash: "" }, { replace: true });
+  }
+  useEffect(() => {
+    if (hashToken) navigate({ hash: "" }, { replace: true });
   }, [hashToken, navigate]);
 
   async function handleSubmit(event: FormEvent) {

@@ -1,0 +1,13 @@
+# Quebras de linha LF no repositório e no disco, em qualquer sistema.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.zip binary

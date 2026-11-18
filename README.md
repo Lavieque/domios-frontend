@@ -151,11 +151,20 @@ funcionar em qualquer rota, incluindo depois de recarregar a página.
 npx tsc -b       # TypeScript 7 (inclui e2e/ e playwright.config.ts)
 npm run lint     # oxlint (.oxlintrc.json)
 npm test         # vitest: lógica pura em node; hooks e componentes em happy-dom
-npm run e2e      # Playwright: o tour da demo de ponta a ponta (arranca o dev:demo)
+npm run coverage # o mesmo, com cobertura (resumo no terminal, HTML em coverage/)
+npm run e2e      # Playwright contra o dev:demo, que arranca sozinho
 ```
 
+O e2e (`e2e/`) faz o tour da demo de ponta a ponta (`demo-tour.spec.ts`), os
+fluxos fora do tour na demo preenchida (`demo-flows.spec.ts`: despensa, listas,
+produtos, inglês) e passa o axe pelos ecrãs principais (`a11y.spec.ts`: falham
+as violações WCAG 2.1 AA sérias e críticas).
+
 O CI (`.github/workflows/ci.yml`) corre tudo isto em cada push para `master` e em
-cada PR, mais os quatro builds. Localmente, o e2e pode usar um browser já
+cada PR, mais os quatro builds; o relatório de cobertura fica nos artefactos do
+run, e o Chromium do Playwright fica em cache entre runs. O Dependabot
+(`.github/dependabot.yml`) abre PRs semanais: menores e patches agrupados, major
+um a um, e as versões das actions. Localmente, o e2e pode usar um browser já
 instalado em vez de descarregar o Chromium: `PW_CHANNEL=msedge npm run e2e`.
 
 Os testes de componentes declaram o ambiente no topo do ficheiro

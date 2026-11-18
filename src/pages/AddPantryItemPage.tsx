@@ -1,5 +1,6 @@
 import { Busy } from "../components/Busy";
 import { useEffect, useState, type FormEvent } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getProduct, searchIngredients, searchProducts, type IngredientDto } from "../api/client";
 import type { CallerHouseholdDto } from "../api/households";
@@ -88,8 +89,6 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
 
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [search, setSearch] = useState("");
-  const [products, setProducts] = useState<ProductDto[]>([]);
-  const [ingredients, setIngredients] = useState<IngredientDto[]>([]);
   const [location, setLocation] = useState<PantryLocation>(PantryLocation.Pantry);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -107,32 +106,22 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
     }
   }, [productIdParam]);
 
-  useEffect(() => {
-    if (search.trim().length < 2) {
-      setProducts([]);
-      setIngredients([]);
-      return;
-    }
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      searchProducts(search.trim(), 1, 6)
-        .then((result) => !cancelled && setProducts(result.items))
-        .catch(() => undefined);
-      searchIngredients(search.trim(), 6)
-        .then((result) => !cancelled && setIngredients(result.items))
-        .catch(() => undefined);
-    }, 250);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [search]);
+  const term = search.trim();
+  // Cada lista falha sozinha: sem produtos, os ingredientes continuam a aparecer.
+  const found = useLoad(
+    term.length < 2 ? null : [term],
+    () =>
+      Promise.all([
+        searchProducts(term, 1, 6).then((r) => r.items, (): ProductDto[] => []),
+        searchIngredients(term, 6).then((r) => r.items, (): IngredientDto[] => []),
+      ]),
+    { delay: 250, keepPrevious: true },
+  );
+  const [products, ingredients] = term.length < 2 || !found.data ? [[], []] : found.data;
 
   function add(draft: Draft) {
     setDrafts((current) => [...current, draft]);
     setSearch("");
-    setProducts([]);
-    setIngredients([]);
   }
 
   function update(key: number, patch: Partial<Draft>) {
@@ -234,7 +223,7 @@ function AddPantryItem({ household }: { household: CallerHouseholdDto }) {
                 onKeyDown={(e) => e.key === "Escape" && setSearch("")}
               />
             </div>
-            {searching && !hasResults && (
+            {searching && !hasResults && !found.loading && (
               <p className="add-search-empty muted">{tr().addPantry.nothingFound(search.trim())}</p>
             )}
             {hasResults && (

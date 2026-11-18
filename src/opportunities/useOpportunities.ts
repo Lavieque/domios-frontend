@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
+import { useLoad } from "../useLoad";
 import { getOpportunitySummary, listOpportunities, type OpportunityListDto } from "../api/opportunities";
 
 // Cada leitura corre a geração na Api (o GoodPrice lê até 50 produtos), por
@@ -39,34 +40,23 @@ export interface OpportunitiesState {
 }
 
 export function useOpportunities(householdId: string): OpportunitiesState {
-  const [opportunities, setOpportunities] = useState<OpportunityListDto | null>(null);
-  const [headline, setHeadline] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setOpportunities(null);
-    setHeadline(null);
-    load(householdId).then((loaded) => {
-      if (cancelled) return;
-      setOpportunities(loaded);
-      if (loaded) loadHeadline(householdId).then((text) => !cancelled && setHeadline(text));
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [householdId]);
+  const list = useLoad([householdId], () => load(householdId));
+  // A síntese só se pede depois de haver sugestões.
+  const summary = useLoad(list.data ? [householdId] : null, () => loadHeadline(householdId));
+  const { update, data: opportunities } = list;
+  const { reload: reloadHeadline, data: headline } = summary;
 
   const remove = useCallback(
     (opportunityId: string, keepVisible = false) => {
-      const update = (list: OpportunityListDto | null) =>
-        list && { ...list, items: list.items.filter((o) => o.opportunityId !== opportunityId) };
+      const drop = (current: OpportunityListDto | null) =>
+        current && { ...current, items: current.items.filter((o) => o.opportunityId !== opportunityId) };
       const pending = cache.get(householdId);
-      if (pending) cache.set(householdId, pending.then(update));
-      if (!keepVisible) setOpportunities(update);
+      if (pending) cache.set(householdId, pending.then(drop));
+      if (!keepVisible) update((current) => drop(current)!);
       // Fechar uma muda as contas da síntese.
-      loadHeadline(householdId).then(setHeadline);
+      reloadHeadline();
     },
-    [householdId],
+    [householdId, update, reloadHeadline],
   );
 
   return { opportunities, headline, remove };

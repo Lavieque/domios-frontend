@@ -1,5 +1,6 @@
 import { Busy } from "./Busy";
 import { useEffect, useState, type FormEvent } from "react";
+import { useLoad } from "../useLoad";
 import { searchIngredients, type IngredientDto } from "../api/client";
 import type { MemberDto } from "../api/households";
 import {
@@ -135,30 +136,14 @@ interface AddAvoidedFormProps {
 
 function AddAvoidedForm({ householdId, memberId, onSaved, onError }: AddAvoidedFormProps) {
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState<IngredientDto[]>([]);
   const [chosen, setChosen] = useState<IngredientDto | null>(null);
   const [severity, setSeverity] = useState<AvoidSeverity>("Avoid");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    const text = search.trim();
-    if (text.length < 2 || chosen) {
-      setResults([]);
-      return;
-    }
-
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      searchIngredients(text)
-        .then((page) => !cancelled && setResults(page.items))
-        .catch(() => !cancelled && setResults([]));
-    }, 250);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [search, chosen]);
+  const text = search.trim();
+  const found = useLoad(text.length < 2 || chosen ? null : [text], () => searchIngredients(text), { delay: 250 });
+  const results: IngredientDto[] = text.length < 2 || chosen ? [] : (found.data?.items ?? []);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();

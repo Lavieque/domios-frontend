@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { CallerHouseholdDto } from "../api/households";
 import { fetchHouseholds } from "./fetchHouseholds";
 import { describeError } from "../auth/errors";
@@ -22,12 +22,22 @@ interface HouseholdsState {
   reload: () => void;
 }
 
+interface State {
+  userId: string | null;
+  households: CallerHouseholdDto[];
+  currentId: string | null;
+  loading: boolean;
+  error: string | null;
+  /** Já há uma lista no ecrã: ao revalidar (outra casa criada, saída) fica com ela em vez de voltar ao esqueleto. */
+  shown: boolean;
+}
+
 /** A última lista vista e a casa escolhida, para arrancar sem esperar pela Api. */
-function fromStorage(userId: string | null) {
+function fromStorage(userId: string | null): State {
   const households = userId ? getStoredHouseholds(userId) : null;
   const currentId =
     userId && households ? pickHouseholdId(households.map((h) => h.householdId), getStoredHouseholdId(userId)) : null;
-  return { households, currentId };
+  return { userId, households: households ?? [], currentId, loading: households === null, error: null, shown: households !== null };
 }
 
 /**
@@ -38,41 +48,34 @@ function fromStorage(userId: string | null) {
  */
 export function useHouseholds(): HouseholdsState {
   const userId = useSession()?.userId ?? null;
-  const [initial] = useState(() => fromStorage(userId));
-  const [households, setHouseholds] = useState<CallerHouseholdDto[]>(initial.households ?? []);
-  const [currentId, setCurrentId] = useState<string | null>(initial.currentId);
-  const [loading, setLoading] = useState(initial.households === null);
-  const [error, setError] = useState<string | null>(null);
+  let [state, setState] = useState(() => fromStorage(userId));
+  // Outro utilizador (entrou ou saiu): recomeça já neste render com o que este browser guardou dele.
+  if (state.userId !== userId) {
+    state = fromStorage(userId);
+    setState(state);
+  }
   const [version, setVersion] = useState(0);
-  // Já mostra uma lista: ao revalidar (outra casa criada, saída) fica com ela no ecrã
-  // em vez de voltar ao esqueleto.
-  const shown = useRef(initial.households !== null);
 
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    const stored = fromStorage(userId);
-    if (stored.households) {
-      setHouseholds(stored.households);
-      setCurrentId(stored.currentId);
-    } else if (!shown.current) {
-      setLoading(true);
-    }
     fetchHouseholds(userId)
       .then((result) => {
         if (cancelled) return;
-        shown.current = true;
         storeHouseholds(userId, result);
-        setHouseholds(result);
-        setCurrentId(pickHouseholdId(result.map((h) => h.householdId), getStoredHouseholdId(userId)));
-        setError(null);
+        setState((s) => ({
+          ...s,
+          households: result,
+          currentId: pickHouseholdId(result.map((h) => h.householdId), getStoredHouseholdId(userId)),
+          loading: false,
+          error: null,
+          shown: true,
+        }));
       })
       .catch((err: unknown) => {
-        // Com a lista guardada já no ecrã, uma falha ao revalidar não tapa a página.
-        if (!cancelled && !stored.households && !shown.current) setError(describeError(err));
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (cancelled) return;
+        // Com uma lista já no ecrã, uma falha ao revalidar não tapa a página.
+        setState((s) => ({ ...s, loading: false, error: s.shown ? s.error : describeError(err) }));
       });
     return () => {
       cancelled = true;
@@ -91,16 +94,16 @@ export function useHouseholds(): HouseholdsState {
     (householdId: string) => {
       if (!userId) return;
       storeHouseholdId(userId, householdId);
-      setCurrentId(householdId);
+      setState((s) => ({ ...s, currentId: householdId }));
     },
     [userId],
   );
 
   return {
-    loading,
-    error,
-    households,
-    current: households.find((h) => h.householdId === currentId) ?? null,
+    loading: state.loading,
+    error: state.error,
+    households: state.households,
+    current: state.households.find((h) => h.householdId === state.currentId) ?? null,
     select,
     reload,
   };

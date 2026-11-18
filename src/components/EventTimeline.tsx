@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { getEvents } from "../api/client";
-import type { DomainEventLogEntryDto } from "../api/types";
 import { eventDetail, eventLabel } from "../history/events";
 import { localeOf } from "../i18n/format";
 import { tr } from "../i18n";
@@ -11,12 +10,7 @@ interface EventTimelineProps {
 }
 
 export function EventTimeline({ aggregateType, aggregateId }: EventTimelineProps) {
-  const [events, setEvents] = useState<DomainEventLogEntryDto[] | null>(null);
-
-  useEffect(() => {
-    setEvents(null);
-    getEvents(aggregateType, aggregateId).then(setEvents);
-  }, [aggregateType, aggregateId]);
+  const events = useLoad([aggregateType, aggregateId], () => getEvents(aggregateType, aggregateId)).data;
 
   if (events === null) {
     return <p className="muted loading">{tr().ui.timeline.loading}</p>;

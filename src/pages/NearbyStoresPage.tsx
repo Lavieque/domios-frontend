@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import { getNearbyStores, type NearbyStoresDto } from "../api/nearbyStores";
@@ -22,30 +23,30 @@ function NearbyStores({ household }: { household: CallerHouseholdDto }) {
   const householdId = household.householdId;
   const chains = useActiveChains();
   const [chainId, setChainId] = useState("");
-  const [result, setResult] = useState<NearbyStoresDto | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   // Só pede a localização depois de um clique; se esta página já a tem, procura logo.
-  const [started, setStarted] = useState(() => lastDevicePosition() !== null);
-
-  useEffect(() => {
-    if (!started) return;
-    let active = true;
-    setLoading(true);
-    setError(null);
-    getDevicePosition()
-      .then((origin) => getNearbyStores(householdId, origin, undefined, chainId || undefined))
-      .then((found) => active && setResult(found))
-      .catch((err) => {
-        if (!active) return;
-        setError(err instanceof PositionError ? err.message : describeError(err, { "invalid-argument": tr().shoppingList.portugalOnly }));
-        if (err instanceof PositionError) setStarted(false);
-      })
-      .finally(() => active && setLoading(false));
-    return () => {
-      active = false;
-    };
-  }, [householdId, chainId, started]);
+  // Cada clique é uma tentativa nova (depois de recusar a localização, volta a pedir).
+  const [attempt, setAttempt] = useState(() => (lastDevicePosition() !== null ? 1 : 0));
+  const found = useLoad(
+    attempt > 0 ? [householdId, chainId, attempt] : null,
+    () =>
+      getDevicePosition().then(
+        (origin) => getNearbyStores(householdId, origin, undefined, chainId || undefined).then((stores) => ({ stores, refused: null })),
+        // Sem localização não há o que procurar: volta ao botão, com a razão.
+        (err: unknown) => {
+          if (err instanceof PositionError) return { stores: null, refused: err.message };
+          throw err;
+        },
+      ),
+    { keepPrevious: true },
+  );
+  // Enquanto uma tentativa nova carrega, a recusa anterior já não conta.
+  const refused = found.loading ? null : (found.data?.refused ?? null);
+  const started = attempt > 0 && refused === null;
+  const result: NearbyStoresDto | null = found.data?.stores ?? null;
+  const loading = found.loading;
+  const error =
+    refused ?? (found.failure ? describeError(found.failure, { "invalid-argument": tr().shoppingList.portugalOnly }) : null);
+  const setStarted = () => setAttempt((n) => n + 1);
 
   return (
     <div className="page nearby-page">
@@ -75,7 +76,7 @@ function NearbyStores({ household }: { household: CallerHouseholdDto }) {
       {!started ? (
         <section className="panel">
           <p>{tr().stores.needLocation}</p>
-          <button type="button" className="button-primary" onClick={() => setStarted(true)}>
+          <button type="button" className="button-primary" onClick={setStarted}>
             {tr().stores.useLocation}
           </button>
         </section>

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import { listCookedRecipes, saveRecipe, type CookedRecipeDto } from "../api/savedRecipes";
@@ -20,30 +21,21 @@ function Cooked({ household }: { household: CallerHouseholdDto }) {
   const householdId = household.householdId;
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get("page") ?? "1") || 1;
-  const [items, setItems] = useState<CookedRecipeDto[] | null>(null);
-  const [total, setTotal] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    setItems(null);
-    listCookedRecipes(householdId, page, pageSize)
-      .then((result) => {
-        if (!active) return;
-        setItems(result.items);
-        setTotal(result.total);
-      })
-      .catch((err) => active && setError(describeError(err)));
-    return () => {
-      active = false;
-    };
-  }, [householdId, page, pageSize]);
+  // O total anterior fica enquanto a página nova carrega: a paginação não pisca.
+  const cooked = useLoad([householdId, page, pageSize], () => listCookedRecipes(householdId, page, pageSize), { keepPrevious: true });
+  const items: CookedRecipeDto[] | null = cooked.loading ? null : (cooked.data?.items ?? null);
+  const total = cooked.data?.total ?? 0;
+  const [saveError, setError] = useState<string | null>(null);
+  const error = saveError ?? cooked.error;
 
   async function save(recipeId: string) {
     setError(null);
     try {
       await saveRecipe(householdId, recipeId);
-      setItems((current) => current?.map((item) => (item.recipeId === recipeId ? { ...item, isSaved: true } : item)) ?? null);
+      cooked.update((current) => ({
+        ...current,
+        items: current.items.map((item) => (item.recipeId === recipeId ? { ...item, isSaved: true } : item)),
+      }));
     } catch (err) {
       setError(describeError(err, { "saved-recipes-limit": tr().ui.saveRecipe.limit }));
     }

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
-import { discardReasonLabels, getPantryWaste, type PantryWasteDto } from "../api/pantry";
+import { discardReasonLabels, getPantryWaste } from "../api/pantry";
 import { measurementUnitLabels } from "../api/types";
-import { describeError } from "../auth/errors";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { periodFor } from "../shopping/spending";
 import { dateTimeFormat, localeOf, numberFormat } from "../i18n/format";
@@ -28,21 +28,10 @@ export function PantryWastePage() {
 function Waste({ household }: { household: CallerHouseholdDto }) {
   const householdId = household.householdId;
   const [months, setMonths] = useState<number>(1);
-  const [waste, setWaste] = useState<PantryWasteDto | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    setWaste(null);
-    setError(null);
+  const { data: waste, error } = useLoad([householdId, months], () => {
     const { from, to } = periodFor(months);
-    getPantryWaste(householdId, from, to)
-      .then((result) => active && setWaste(result))
-      .catch((err) => active && setError(describeError(err)));
-    return () => {
-      active = false;
-    };
-  }, [householdId, months]);
+    return getPantryWaste(householdId, from, to);
+  });
 
   return (
     <div className="page waste-page">

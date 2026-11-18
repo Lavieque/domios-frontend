@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { getRecipeRestrictions } from "../api/memberPreferences";
 import { summarizeAvoided, summarizeDietConflicts, type MemberAvoidedSummary, type MemberDietConflict } from "../household/avoidedMatches";
 import { useHouseholds } from "../household/useHouseholds";
@@ -11,25 +11,9 @@ import { tr } from "../i18n";
  */
 export function RecipeAvoidedNotice({ recipeId }: { recipeId: string }) {
   const householdId = useHouseholds().current?.householdId ?? null;
-  const [members, setMembers] = useState<MemberAvoidedSummary[]>([]);
-  const [diets, setDiets] = useState<MemberDietConflict[]>([]);
-
-  useEffect(() => {
-    if (!householdId) return;
-    let cancelled = false;
-    setMembers([]);
-    setDiets([]);
-    getRecipeRestrictions(householdId, recipeId)
-      .then((result) => {
-        if (cancelled) return;
-        setMembers(summarizeAvoided(result));
-        setDiets(summarizeDietConflicts(result));
-      })
-      .catch(() => !cancelled && setMembers([]));
-    return () => {
-      cancelled = true;
-    };
-  }, [householdId, recipeId]);
+  const restrictions = useLoad(householdId ? [householdId, recipeId] : null, () => getRecipeRestrictions(householdId!, recipeId)).data;
+  const members: MemberAvoidedSummary[] = restrictions ? summarizeAvoided(restrictions) : [];
+  const diets: MemberDietConflict[] = restrictions ? summarizeDietConflicts(restrictions) : [];
 
   if (members.length === 0 && diets.length === 0) return null;
 

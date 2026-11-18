@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLoad } from "../useLoad";
 import { searchRecipes } from "../api/client";
 import { dishTypeLabels, DishType, type RecipeSummaryDto } from "../api/types";
 import { SearchField } from "./SearchField";
@@ -20,7 +21,6 @@ interface Props {
 export function RecipePicker({ label, defaultDishType, onPick, onCancel }: Props) {
   const [search, setSearch] = useState("");
   const [dishType, setDishType] = useState<DishType | null>(defaultDishType);
-  const [results, setResults] = useState<RecipeSummaryDto[] | null>(null);
   const root = useRef<HTMLDivElement>(null);
 
   // Ao abrir, o foco vai para a procura.
@@ -28,19 +28,11 @@ export function RecipePicker({ label, defaultDishType, onPick, onCancel }: Props
     root.current?.querySelector<HTMLInputElement>("input")?.focus();
   }, []);
 
-  useEffect(() => {
-    let active = true;
-    setResults(null);
-    const timer = setTimeout(() => {
-      searchRecipes(search.trim(), 1, PAGE_SIZE, dishType === null ? {} : { dishType })
-        .then((page) => active && setResults(page.items))
-        .catch(() => active && setResults([]));
-    }, 300);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
-  }, [search, dishType]);
+  const found = useLoad([search.trim(), dishType], () => searchRecipes(search.trim(), 1, PAGE_SIZE, dishType === null ? {} : { dishType }), {
+    delay: 300,
+  });
+  // Com erro, a lista fica vazia em vez de "a procurar" para sempre.
+  const results: RecipeSummaryDto[] | null = found.loading ? null : (found.data?.items ?? []);
 
   return (
     <div className="recipe-picker" role="group" aria-label={label} ref={root}>

@@ -1,5 +1,6 @@
 import { PageSkeleton } from "../components/PageSkeleton";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../api/client";
 import { PaidPriceSource } from "../api/shopping";
@@ -34,17 +35,11 @@ const dateFormat = dateTimeFormat({
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [product, setProduct] = useState<ProductDto | null>(null);
+  const product = useLoad(id ? [id] : null, () => getProduct(id!)).data;
   const offers = useOffers(id ?? "");
   const categories = useCategories();
   const { current } = useHouseholds();
   const lastPaid = useLastPaid(current?.householdId ?? null, id ?? null);
-
-  useEffect(() => {
-    if (!id) return;
-    setProduct(null);
-    getProduct(id).then(setProduct);
-  }, [id]);
 
   if (!id) return null;
   if (!product) return <PageSkeleton />;
@@ -294,19 +289,9 @@ function StoreRow({
 
 /** A última compra deste produto pela casa com preço; null sem casa, sem compras ou se falhar. */
 function useLastPaid(householdId: string | null, productId: string | null): ProductPurchaseDto | null {
-  const [purchase, setPurchase] = useState<ProductPurchaseDto | null>(null);
-  useEffect(() => {
-    setPurchase(null);
-    if (!householdId || !productId) return;
-    let active = true;
-    getProductPurchases(householdId, productId, 10)
-      .then((result) => active && setPurchase(result.items.find((p) => p.paidPrice?.currency === "EUR") ?? null))
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [householdId, productId]);
-  return purchase;
+  return useLoad(householdId && productId ? [householdId, productId] : null, () =>
+    getProductPurchases(householdId!, productId!, 10).then((result) => result.items.find((p) => p.paidPrice?.currency === "EUR") ?? null),
+  ).data;
 }
 
 /** "Pagaste 1,29 € a 2 nov. no Continente" (DomiOS_API_Fase1.md, adenda 2026-11-09). */

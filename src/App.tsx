@@ -94,8 +94,10 @@ function App() {
   const scene = editorialScene(pathname);
   const [railCollapsed, setRailCollapsed] = useState(readRailCollapsed);
   // No telemóvel o mesmo botão abre o menu por cima da página; no ecrã largo recolhe-o.
-  const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => setMenuOpen(false), [pathname]);
+  // Guarda a página onde se abriu: ao navegar, o menu fecha sozinho.
+  const [menuOpenAt, setMenuOpenAt] = useState<string | null>(null);
+  const menuOpen = menuOpenAt === pathname;
+  const setMenuOpen = (open: boolean) => setMenuOpenAt(open ? pathname : null);
 
   useEffect(() => {
     if ("requestIdleCallback" in window) window.requestIdleCallback(preloadPages);
@@ -103,7 +105,7 @@ function App() {
   }, []);
   function toggleRail() {
     if (window.matchMedia("(max-width: 899px)").matches) {
-      setMenuOpen((open) => !open);
+      setMenuOpen(!menuOpen);
       return;
     }
     setRailCollapsed((collapsed) => {

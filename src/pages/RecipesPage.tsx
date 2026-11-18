@@ -1,5 +1,6 @@
 import { Busy } from "../components/Busy";
 import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { useSearchParams } from "react-router-dom";
 import { CardsSkeleton } from "../components/CardsSkeleton";
 import { searchRecipes } from "../api/client";
@@ -14,7 +15,6 @@ import {
 } from "../api/types";
 import { Pagination } from "../components/Pagination";
 import { SearchField } from "../components/SearchField";
-import { describeError } from "../auth/errors";
 import { FeatureCard } from "../components/FeatureCard";
 import { RecipeRow } from "../components/RecipeRow";
 import { usePageSize } from "../usePageSize";
@@ -115,10 +115,15 @@ export function RecipesPage() {
   const difficulty = parseEnum(searchParams.get("dificuldade"), difficulties);
 
   const cooked = useCookedRecipes();
-  const [recipes, setRecipes] = useState<RecipeSummaryDto[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // O total anterior fica enquanto a página nova carrega: a contagem e a paginação não piscam.
+  const found = useLoad(
+    [search, page, pageSize, dishType, mainProtein, difficulty],
+    () => searchRecipes(search, page, pageSize, { dishType, mainProtein, difficulty }),
+    { keepPrevious: true },
+  );
+  const recipes: RecipeSummaryDto[] = found.data?.items ?? [];
+  const total = found.data?.total ?? 0;
+  const { loading, error } = found;
   const filtered = search !== "" || dishType !== undefined || mainProtein !== undefined || difficulty !== undefined;
   // A primeira receita vai em destaque; a lista a seguir não a repete.
   const featured = !filtered && page === 1 && !loading && recipes.length > 0;
@@ -144,23 +149,6 @@ export function RecipesPage() {
     if (nextPage > 1) params.set("page", String(nextPage));
     setSearchParams(params, { replace: true });
   }
-
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError(null);
-    searchRecipes(search, page, pageSize, { dishType, mainProtein, difficulty })
-      .then((result) => {
-        if (!active) return;
-        setRecipes(result.items);
-        setTotal(result.total);
-      })
-      .catch((err: unknown) => active && setError(describeError(err)))
-      .finally(() => active && setLoading(false));
-    return () => {
-      active = false;
-    };
-  }, [search, page, pageSize, dishType, mainProtein, difficulty]);
 
   // O total só se diz quando a Api o deu; com filtros é o que eles encontram, não o catálogo.
   const countLine = loading

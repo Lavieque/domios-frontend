@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLoad } from "../useLoad";
 import { searchIngredients, searchProducts, type IngredientDto } from "../api/client";
 import type { ProductDto } from "../api/types";
 import { searchTerms } from "./searchTerms";
@@ -14,38 +14,22 @@ export interface Suggestions {
  * primeira que der alguma coisa.
  */
 export function useCatalogSuggestions(text: string, enabled = true): Suggestions {
-  const [state, setState] = useState<Suggestions>({ ingredients: [], products: [], loading: false });
-
-  useEffect(() => {
-    const terms = searchTerms(text);
-    if (!enabled || terms.length === 0 || text.trim().length < 2) {
-      setState({ ingredients: [], products: [], loading: false });
-      return;
-    }
-    let cancelled = false;
-    setState((s) => ({ ...s, loading: true }));
-    const timer = setTimeout(async () => {
-      try {
-        for (const term of terms) {
-          const [ingredients, products] = await Promise.all([searchIngredients(term, 4), searchProducts(term, 1, 5, undefined, true)]);
-          if (cancelled) return;
-          if (ingredients.items.length > 0 || products.items.length > 0) {
-            setState({ ingredients: ingredients.items, products: products.items, loading: false });
-            return;
-          }
-        }
-        if (!cancelled) setState({ ingredients: [], products: [], loading: false });
-      } catch {
-        if (!cancelled) setState({ ingredients: [], products: [], loading: false });
+  const terms = searchTerms(text);
+  const active = enabled && terms.length > 0 && text.trim().length >= 2;
+  // As sugestões anteriores ficam enquanto se escreve; uma falha deixa a lista vazia.
+  const found = useLoad(
+    active ? terms : null,
+    async () => {
+      for (const term of terms) {
+        const [ingredients, products] = await Promise.all([searchIngredients(term, 4), searchProducts(term, 1, 5, undefined, true)]);
+        if (ingredients.items.length > 0 || products.items.length > 0) return { ingredients: ingredients.items, products: products.items };
       }
-    }, 250);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [text, enabled]);
-
-  return state;
+      return { ingredients: [], products: [] };
+    },
+    { delay: 250, keepPrevious: true },
+  );
+  if (!active) return NONE;
+  return { ingredients: found.data?.ingredients ?? [], products: found.data?.products ?? [], loading: found.loading };
 }
 
-/** Lista de sugestões: ingredientes (qualquer marca) primeiro, depois produtos do catálogo. */
+const NONE: Suggestions = { ingredients: [], products: [], loading: false };

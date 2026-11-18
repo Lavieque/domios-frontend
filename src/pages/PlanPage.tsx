@@ -1,5 +1,6 @@
 import { Busy } from "../components/Busy";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import {
@@ -56,46 +57,33 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
   // Sugestões para hoje nesta semana; nas outras, para a segunda-feira.
   const suggestionDate = days.includes(today()) ? today() : monday;
 
-  const [meals, setMeals] = useState<PlannedMealDto[]>([]);
-  const [availability, setAvailability] = useState<PlanAvailabilityDto | null>(null);
-  const [suggestions, setSuggestions] = useState<MealSuggestionsDto | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [version, setVersion] = useState(0);
-  const reload = () => setVersion((v) => v + 1);
-  const [allMissing, setAllMissing] = useState(false);
-  const [allSuggestions, setAllSuggestions] = useState(false);
-  // Outra semana começa outra vez com as listas curtas.
-  useEffect(() => {
-    setAllMissing(false);
-    setAllSuggestions(false);
-  }, [monday]);
+  const householdId = household.householdId;
+  // A semana anterior fica no ecrã enquanto a nova carrega, e depois de uma mudança até chegar a resposta.
+  const week = useLoad(
+    [householdId, monday, sunday, suggestionDate],
+    () =>
+      Promise.all([
+        listPlannedMeals(householdId, monday, sunday),
+        getPlanAvailability(householdId, monday, sunday),
+        // As sugestões são um extra: se falharem, o plano mostra-se na mesma.
+        getSuggestions(householdId, suggestionDate, SUGGESTIONS_FETCHED).catch(() => null),
+      ]),
+    { keepPrevious: true },
+  );
+  const meals: PlannedMealDto[] = week.data?.[0] ?? [];
+  const availability: PlanAvailabilityDto | null = week.data?.[1] ?? null;
+  const suggestions: MealSuggestionsDto | null = week.data?.[2] ?? null;
+  const loading = week.loading;
+  const reload = week.reload;
+  const [actionError, setError] = useState<string | null>(null);
+  const error = actionError ?? week.error;
+  // As listas abertas são da semana onde se abriram: outra semana começa com as listas curtas.
+  const [allMissingAt, setAllMissingAt] = useState<string | null>(null);
+  const [allSuggestionsAt, setAllSuggestionsAt] = useState<string | null>(null);
+  const allMissing = allMissingAt === monday;
+  const allSuggestions = allSuggestionsAt === monday;
   // A foto de cada prato vem da receita: o plano só traz o id.
   const images = useRecipeImages(meals.map((meal) => meal.recipeId));
-
-  const householdId = household.householdId;
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    Promise.all([
-      listPlannedMeals(householdId, monday, sunday),
-      getPlanAvailability(householdId, monday, sunday),
-      // As sugestões são um extra: se falharem, o plano mostra-se na mesma.
-      getSuggestions(householdId, suggestionDate, SUGGESTIONS_FETCHED).catch(() => null),
-    ])
-      .then(([plannedMeals, planAvailability, mealSuggestions]) => {
-        if (cancelled) return;
-        setMeals(plannedMeals);
-        setAvailability(planAvailability);
-        setSuggestions(mealSuggestions);
-        setError(null);
-      })
-      .catch((err: unknown) => !cancelled && setError(describeError(err)))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [householdId, monday, sunday, suggestionDate, version]);
 
   function goToWeek(date: string) {
     setSearchParams(date === startOfWeek(today()) ? {} : { semana: date }, { replace: true });
@@ -262,7 +250,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                 type="button"
                 className="link-button side-more"
                 aria-expanded={allMissing}
-                onClick={() => setAllMissing((open) => !open)}
+                onClick={() => setAllMissingAt(allMissing ? null : monday)}
               >
                 {allMissing ? tr().plan.seeLess : tr().plan.seeAllMissing(missingLines.length)}
               </button>
@@ -335,7 +323,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                 type="button"
                 className="link-button side-more"
                 aria-expanded={allSuggestions}
-                onClick={() => setAllSuggestions((open) => !open)}
+                onClick={() => setAllSuggestionsAt(allSuggestions ? null : monday)}
               >
                 {allSuggestions ? tr().plan.seeLess : tr().plan.moreSuggestions}
               </button>

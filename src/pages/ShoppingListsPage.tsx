@@ -1,5 +1,6 @@
 import { Busy } from "../components/Busy";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { useLoad } from "../useLoad";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { CallerHouseholdDto } from "../api/households";
 import {
@@ -24,27 +25,13 @@ function ShoppingLists({ household }: { household: CallerHouseholdDto }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const status = (Number(searchParams.get("estado") ?? ShoppingListStatus.Open) || 0) as ShoppingListStatus;
 
-  const [lists, setLists] = useState<ShoppingListSummaryDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const found = useLoad([household.householdId, status], () => listShoppingLists(household.householdId, status), { keepPrevious: true });
+  const lists: ShoppingListSummaryDto[] = found.data?.items ?? [];
+  const loading = found.loading;
+  const [createError, setError] = useState<string | null>(null);
+  const error = createError ?? found.error;
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    listShoppingLists(household.householdId, status)
-      .then((result) => {
-        if (cancelled) return;
-        setLists(result.items);
-        setError(null);
-      })
-      .catch((err: unknown) => !cancelled && setError(describeError(err)))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [household.householdId, status]);
 
   async function handleCreate(event: FormEvent) {
     event.preventDefault();

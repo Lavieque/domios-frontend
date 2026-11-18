@@ -148,15 +148,29 @@ funcionar em qualquer rota, incluindo depois de recarregar a página.
 ### Verificações
 
 ```bash
-npx tsc -b       # TypeScript 7
+npx tsc -b       # TypeScript 7 (inclui e2e/ e playwright.config.ts)
 npm run lint     # oxlint (.oxlintrc.json)
-npm test         # vitest: lógica pura, sem DOM
+npm test         # vitest: lógica pura em node; hooks e componentes em happy-dom
+npm run e2e      # Playwright: o tour da demo de ponta a ponta (arranca o dev:demo)
 ```
 
-No oxlint, `react/set-state-in-effect` está desligada. Os ecrãs que pedem dados
-limpam o estado e voltam a pedir quando a chave muda (página, filtro, id), com
-cancelamento. O padrão é intencional e funciona; reescrevê-lo em cerca de 30
-sítios, sem testes de DOM, arriscava mais do que ganhava.
+O CI (`.github/workflows/ci.yml`) corre tudo isto em cada push para `master` e em
+cada PR, mais os quatro builds. Localmente, o e2e pode usar um browser já
+instalado em vez de descarregar o Chromium: `PW_CHANNEL=msedge npm run e2e`.
+
+Os testes de componentes declaram o ambiente no topo do ficheiro
+(`// @vitest-environment happy-dom`) e chamam `cleanup()` no `afterEach`.
+
+Os ecrãs pedem dados com `useLoad(chave, pedido)` (`src/useLoad.ts`): pede
+quando a chave muda, descarta respostas de chaves antigas e deduz o "a
+carregar" sem `setState` dentro de efeitos (a regra `react/set-state-in-effect`
+está como erro). Opções: `delay` para procuras enquanto se escreve,
+`keepPrevious` para a lista anterior ficar no ecrã até chegar a nova; `reload`
+e `update` para depois de uma ação.
+
+Os textos (`src/i18n`): o português vai no pacote principal e o inglês é um
+ficheiro à parte, pedido só por quem o usa. O arranque (`main.tsx`) espera pelo
+dicionário da língua guardada, e `setLanguage` só muda a app quando ele chega.
 
 ## Arquitetura
 

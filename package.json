@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "dev:site": "vite --config vite.site.config.ts",
     "build:site": "tsc -b && vite build --config vite.site.config.ts",
@@ -32,6 +33,7 @@
     "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
@@ -39,10 +41,11 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "@vitest/coverage-v8": "^5.1.1",
     "happy-dom": "^21.0.4",
     "oxlint": "^1.75.0",
     "typescript": "^7.0.2",
     "vite": "^8.2.0",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.1"
   }
 }

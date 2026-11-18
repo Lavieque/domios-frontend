@@ -31,5 +31,12 @@ export default defineConfig(({ mode }) => ({
     setupFiles: ['./src/test/setup.ts'],
     // e2e/ é do Playwright (npm run e2e), não do Vitest.
     include: ['{src,site,admin}/**/*.test.{ts,tsx}'],
+    // npm run coverage: o relatório HTML fica em coverage/.
+    coverage: {
+      provider: 'v8',
+      include: ['{src,site,admin}/**/*.{ts,tsx}'],
+      exclude: ['**/*.test.{ts,tsx}', 'src/test/**', 'src/i18n/{pt,en}/**', '**/*.d.ts'],
+      reporter: ['text-summary', 'html'],
+    },
   },
 }))

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { MemberNutritionGoalsDto } from "../api/memberPreferences";
 import type { GoalIntakePercentDto, NutrientsDto, NutritionDayDto, NutritionSummaryDto } from "../api/nutrition";
-import { goalRows, mealsOverFatLimit } from "./nutritionView";
+import type { MemberDto } from "../api/households";
+import type { MealNutritionDto } from "../api/nutrition";
+import { goalRows, mealShares, mealsOverFatLimit } from "./nutritionView";
 
 const zero: NutrientsDto = { energyKcal: 0, protein: 0, carbs: 0, sugar: 0, fat: 0, saturates: 0, fiber: 0, salt: 0 };
 const noPercent: GoalIntakePercentDto = {
@@ -62,5 +64,35 @@ describe("mealsOverFatLimit", () => {
 
   it("is null without a fat-per-meal target", () => {
     expect(mealsOverFatLimit(summary({}))).toBeNull();
+  });
+});
+
+describe("mealShares", () => {
+  const members = [{ memberId: "a", name: "Ana" }, { memberId: "b", name: "Rui" }] as MemberDto[];
+  const meal = (perMember: MealNutritionDto["perMember"]): MealNutritionDto => ({
+    mealId: "x", total: zero, perParticipant: null, coveredItemCount: 1, uncoveredItemCount: 0, perMember,
+  });
+
+  it("gives each participant their own part, with the name from the household", () => {
+    const rows = mealShares(
+      meal([
+        { memberId: "a", portion: 1, nutrients: { ...zero, energyKcal: 400 } },
+        { memberId: "b", portion: 0.5, nutrients: { ...zero, energyKcal: 200 } },
+      ]),
+      members,
+    );
+    expect(rows.map((r) => [r.name, r.portion, r.nutrients.energyKcal])).toEqual([["Ana", 1, 400], ["Rui", 0.5, 200]]);
+  });
+
+  it("keeps a member who left the household, with no name", () => {
+    const rows = mealShares(meal([{ memberId: "gone", portion: 1, nutrients: zero }]), members);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.name).toBeNull();
+  });
+
+  it("gives nothing when the Api has no perMember or no participants", () => {
+    expect(mealShares(meal(undefined), members)).toEqual([]);
+    expect(mealShares(meal(null), members)).toEqual([]);
+    expect(mealShares(meal([]), members)).toEqual([]);
   });
 });

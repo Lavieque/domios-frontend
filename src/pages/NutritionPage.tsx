@@ -11,6 +11,7 @@ import {
   type NutritionScoreDto,
   type NutritionSummaryDto,
 } from "../api/nutrition";
+import { MealSharesPanel } from "../components/MealSharesPanel";
 import { HouseholdGate } from "../household/HouseholdGate";
 import { goalRows, mealsOverFatLimit, type GoalRow } from "../household/nutritionView";
 import { addDays, isIsoDate, longDate, shortDate, startOfWeek, today, weekdayTitle } from "../plan/dates";
@@ -205,6 +206,10 @@ function Nutrition({ household }: { household: CallerHouseholdDto }) {
           </summary>
           <DaysTable summary={summary} />
         </details>
+      )}
+
+      {!loading && summary && summary.mealCount > 0 && (
+        <MealSharesPanel householdId={householdId} from={monday} to={last} memberId={memberId} members={members} />
       )}
     </div>
   );

@@ -76,6 +76,34 @@ export interface NutritionScoreDto {
   personalGoalsApplied: boolean;
 }
 
+/** A refeição como a lista devolve (`GET .../meals`); só o que o ecrã de nutrição usa. */
+export interface MealSummaryDto {
+  mealId: string;
+  title: string;
+  /** Número do `MealType`: Breakfast=0, Lunch=1, Dinner=2, Snack=3, Other=4. */
+  mealType: number;
+  eatenAt: string;
+  servings: number;
+  participantMemberIds: string[];
+}
+
+/** A parte de um participante numa refeição, pela sua porção (adenda 2026-11-09, D.2). */
+export interface MemberMealNutritionDto {
+  memberId: string;
+  portion: number;
+  nutrients: NutrientsDto;
+}
+
+/** `GET .../meals/{id}/nutrition`; `perMember` falta em Apis anteriores a 2026-11-09. */
+export interface MealNutritionDto {
+  mealId: string;
+  total: NutrientsDto;
+  perParticipant: NutrientsDto | null;
+  coveredItemCount: number;
+  uncoveredItemCount: number;
+  perMember?: MemberMealNutritionDto[] | null;
+}
+
 function base(householdId: string): string {
   return `/households/${householdId}/nutrition`;
 }
@@ -101,4 +129,15 @@ export function getNutritionScore(
   return authedRequest<NutritionScoreDto>(`${base(householdId)}/score`, {
     params: { from, to, ...(memberId ? { memberId } : {}) },
   });
+}
+
+/** As refeições registadas entre duas datas (inclusivas), da mais recente para a mais antiga. */
+export function listLoggedMeals(householdId: string, from: IsoDate, to: IsoDate, memberId: string | null) {
+  return authedRequest<{ items: MealSummaryDto[]; total: number }>(`/households/${householdId}/meals`, {
+    params: { from: `${from}T00:00:00Z`, to: `${to}T23:59:59Z`, status: "Logged", pageSize: 100, ...(memberId ? { memberId } : {}) },
+  });
+}
+
+export function getMealNutrition(householdId: string, mealId: string): Promise<MealNutritionDto> {
+  return authedRequest<MealNutritionDto>(`/households/${householdId}/meals/${mealId}/nutrition`);
 }

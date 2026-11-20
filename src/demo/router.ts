@@ -1732,6 +1732,42 @@ route("GET", "/households/:h/nutrition/score", (c) => {
   };
 });
 
+// As refeições registadas (para o ecrã "Refeição a refeição"): participam todos os membros da casa.
+function demoMealDto(meal: DemoState["meals"][number], h: Household) {
+  return {
+    mealId: meal.mealId, title: txt(meal.title), mealType: meal.mealType, eatenAt: `${meal.date}T12:00:00Z`,
+    servings: meal.servings, participantMemberIds: h.members.map((x) => x.memberId),
+  };
+}
+
+route("GET", "/households/:h/meals", (c) => {
+  const h = household(c.m[0]);
+  const from = (c.params.get("from") ?? "0000-01-01").slice(0, 10);
+  const to = (c.params.get("to") ?? "9999-12-31").slice(0, 10);
+  const memberId = c.params.get("memberId");
+  if (memberId) member(h, memberId);
+  const list = st().meals
+    .filter((x) => x.householdId === h.householdId && x.date >= from && x.date <= to)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map((x) => demoMealDto(x, h));
+  return paged(list, c);
+});
+
+route("GET", "/households/:h/meals/:id/nutrition", (c) => {
+  const h = household(c.m[0]);
+  const meal = st().meals.find((x) => x.mealId === c.m[1] && x.householdId === h.householdId);
+  if (!meal) throw notFound();
+  const total = mealNutrients(meal, null) ?? zero();
+  const portions = h.members.map((x) => x.defaultPortion);
+  const sum = portions.reduce((a, b) => a + b, 0) || 1;
+  const share = (portion: number) => Object.fromEntries(NUTRIENTS.map((k) => [k, round2((total[k] * portion) / sum)]));
+  return {
+    mealId: meal.mealId, total, perParticipant: h.members.length ? share(1) : null,
+    coveredItemCount: mealNutrients(meal, null) ? 1 : 0, uncoveredItemCount: mealNutrients(meal, null) ? 0 : 1, items: [],
+    perMember: h.members.map((x) => ({ memberId: x.memberId, portion: x.defaultPortion, nutrients: share(x.defaultPortion) })),
+  };
+});
+
 // --------------------------------------------------------- opportunities
 
 function buildOpportunities(h: Household) {

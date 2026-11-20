@@ -3,7 +3,8 @@
 // consumo médio, o alvo e a percentagem que a Api já calculou.
 
 import type { MemberNutritionGoalsDto } from "../api/memberPreferences";
-import type { NutrientKey, NutritionSummaryDto } from "../api/nutrition";
+import type { MemberDto } from "../api/households";
+import type { MealNutritionDto, NutrientKey, NutrientsDto, NutritionSummaryDto } from "../api/nutrition";
 import { tr } from "../i18n";
 
 interface NutrientInfo {
@@ -78,4 +79,25 @@ export function goalRows(summary: NutritionSummaryDto, goals: MemberNutritionGoa
 export function mealsOverFatLimit(summary: NutritionSummaryDto): number | null {
   if (summary.days.every((day) => day.mealsOverFatLimit === null)) return null;
   return summary.days.reduce((sum, day) => sum + (day.mealsOverFatLimit ?? 0), 0);
+}
+
+export interface MealShareRow {
+  memberId: string;
+  /** `null` num membro que já saiu da casa: o ecrã põe o texto. */
+  name: string | null;
+  portion: number;
+  nutrients: NutrientsDto;
+}
+
+/**
+ * A parte de cada participante numa refeição, como a Api a calculou pela porção de cada um
+ * (`perMember`). Uma Api sem esse campo, ou uma refeição sem participantes, dá lista vazia.
+ */
+export function mealShares(nutrition: MealNutritionDto, members: MemberDto[]): MealShareRow[] {
+  return (nutrition.perMember ?? []).map((share) => ({
+    memberId: share.memberId,
+    name: members.find((m) => m.memberId === share.memberId)?.name ?? null,
+    portion: share.portion,
+    nutrients: share.nutrients,
+  }));
 }

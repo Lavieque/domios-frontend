@@ -2563,3 +2563,10 @@
     display: none;
   }
 }
+
+/* As opções da linha abrem por baixo dela, a toda a largura (depois do seletor de produto). */
+.editorial .list-row > .list-row-menu {
+  order: 7;
+  flex: 1 1 100%;
+  white-space: normal;
+}

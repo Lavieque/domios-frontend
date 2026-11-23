@@ -8145,3 +8145,45 @@ a.price-row:focus-visible .label-name {
   padding: 0;
   border: 0;
 }
+
+/* Clicar no nome de uma linha da lista abre as opções dela; a caixa continua a marcar. */
+.item-name {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item-name:hover .meal-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.list-row-menu {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  white-space: normal;
+}
+
+.list-row-menu p {
+  margin: 0;
+}
+
+.list-row-menu .inline-form {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}

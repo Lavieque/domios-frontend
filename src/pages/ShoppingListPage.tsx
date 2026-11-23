@@ -35,6 +35,7 @@ import {
   type StoreInPantryResultDto,
 } from "../api/shopping";
 import { PantryLocation, pantryLocationLabels, pantryLocations } from "../api/pantry";
+import { useExpectedPrices } from "../shopping/expectedPrice";
 import { MeasurementUnit, measurementUnitLabels, type ChainDto } from "../api/types";
 import { describeError } from "../auth/errors";
 import { aisleClass, aisleOf } from "../catalog/aisles";
@@ -85,6 +86,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
   ]);
   const categories = useCategories();
   const chains = useActiveChains();
+  // O preço esperado de cada linha por comprar: média das lojas vezes as embalagens.
+  const expected = useExpectedPrices(list?.items.filter((item) => !item.isPurchased) ?? [], products, packaging);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,6 +119,14 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
     } catch (err) {
       setError(describeError(err, { "invalid-state-transition": tr().shoppingList.closed }));
     }
+  }
+
+  /** Pôr uma linha na despensa; se ainda não estava comprada, compra-se primeiro. */
+  async function storeOne(item: ShoppingListItemDto, location: PantryLocation) {
+    await act(async () => {
+      if (!item.isPurchased) await setItemPurchased(householdId, listId, item.shoppingListItemId, true);
+      await storeShoppingListInPantry(householdId, listId, location, [item.shoppingListItemId]);
+    });
   }
 
   const unlinked = list?.items.filter((item) => !item.isPurchased && !item.productId && !item.ingredientId) ?? [];
@@ -311,6 +322,8 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                   }
                   onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
                   onLink={link}
+                  expected={expected}
+                  onStore={storeOne}
                 />
               )}
               {purchased.length > 0 && (
@@ -326,6 +339,7 @@ function ShoppingList({ household, listId }: { household: CallerHouseholdDto; li
                     chains={chains}
                     onToggle={(item) => act(() => setItemPurchased(householdId, listId, item.shoppingListItemId, false))}
                     onDelete={(item) => act(() => deleteShoppingListItem(householdId, listId, item.shoppingListItemId))}
+                    onStore={storeOne}
                     pricing={
                       list.status === ShoppingListStatus.Cancelled
                         ? undefined
@@ -693,6 +707,8 @@ function PendingItems({
   onBuyElsewhere: (item: ShoppingListItemDto, chainId: string) => void;
   onDelete: (item: ShoppingListItemDto) => void;
   onLink: (item: ShoppingListItemDto, pick: CatalogPick) => void;
+  expected?: Map<string, number>;
+  onStore?: (item: ShoppingListItemDto, location: PantryLocation) => Promise<void>;
 }) {
   if (!groups || groups.length < 2) return <ItemList items={items} {...rest} />;
   return (
@@ -722,6 +738,8 @@ function ItemList({
   onBuyElsewhere,
   onDelete,
   onLink,
+  expected,
+  onStore,
   pricing,
 }: {
   items: ShoppingListItemDto[];
@@ -738,10 +756,15 @@ function ItemList({
   onBuyElsewhere?: (item: ShoppingListItemDto, chainId: string) => void;
   onDelete: (item: ShoppingListItemDto) => void;
   onLink?: (item: ShoppingListItemDto, pick: CatalogPick) => void;
+  /** Por comprar: o preço esperado da linha (média das lojas vezes as embalagens). */
+  expected?: Map<string, number>;
+  /** "Pôr na despensa" a partir do menu da linha; numa linha por comprar compra-a primeiro. */
+  onStore?: (item: ShoppingListItemDto, location: PantryLocation) => Promise<void>;
   /** Só nas compradas: preço pago e loja da linha. */
   pricing?: PricingProps;
 }) {
   const [linking, setLinking] = useState<string | null>(null);
+  const [menuFor, setMenuFor] = useState<string | null>(null);
   const withThumbs = thumbs !== undefined && items.some((item) => thumbs.has(item.shoppingListItemId));
   return (
     <ul className="pantry-list">
@@ -764,7 +787,18 @@ function ItemList({
                 )}
               </span>
             )}
-            <span className="meal-title" title={item.label}>{item.label}</span>
+            <button
+              type="button"
+              className="item-name"
+              aria-expanded={menuFor === item.shoppingListItemId}
+              aria-label={tr().shoppingList.itemOptions(item.label)}
+              onClick={(event) => {
+                event.preventDefault();
+                setMenuFor(menuFor === item.shoppingListItemId ? null : item.shoppingListItemId);
+              }}
+            >
+              <span className="meal-title" title={item.label}>{item.label}</span>
+            </button>
           </label>
           <span className="muted">
             {quantityFormat.format(item.quantity.amount)} {measurementUnitLabels[item.quantity.unit]}
@@ -818,6 +852,11 @@ function ItemList({
               <span className="price-tag">{money.format(cheapest.get(item.shoppingListItemId)!.lineTotal)}</span>
             </span>
           )}
+          {!item.isPurchased && !cheapest?.get(item.shoppingListItemId) && expected?.get(item.shoppingListItemId) !== undefined && (
+            <span className="list-row-price" title={tr().shoppingList.expectedPrice(money.format(expected.get(item.shoppingListItemId)!))}>
+              <span className="price-tag">≈ {money.format(expected.get(item.shoppingListItemId)!)}</span>
+            </span>
+          )}
           {open && (
             <button type="button" className="icon-danger" aria-label={tr().shoppingList.removeItem(item.label)} title={tr().shoppingList.remove} onClick={() => onDelete(item)}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -825,9 +864,100 @@ function ItemList({
               </svg>
             </button>
           )}
+          {menuFor === item.shoppingListItemId && (
+            <ItemMenu
+              item={item}
+              open={open}
+              productId={item.productId ?? packaging?.get(item.shoppingListItemId)?.productId ?? null}
+              expected={expected?.get(item.shoppingListItemId) ?? null}
+              onToggle={() => {
+                setMenuFor(null);
+                onToggle(item);
+              }}
+              onStore={onStore && (async (location) => {
+                await onStore(item, location);
+                setMenuFor(null);
+              })}
+              onClose={() => setMenuFor(null)}
+            />
+          )}
         </li>
       ))}
     </ul>
+  );
+}
+
+/** O que se pode fazer com uma linha: ver o artigo, marcá-la e pô-la na despensa sem passar pela lista toda. */
+function ItemMenu({
+  item,
+  open,
+  productId,
+  expected,
+  onToggle,
+  onStore,
+  onClose,
+}: {
+  item: ShoppingListItemDto;
+  open: boolean;
+  productId: string | null;
+  expected: number | null;
+  onToggle: () => void;
+  onStore?: (location: PantryLocation) => Promise<void>;
+  onClose: () => void;
+}) {
+  const t = tr().shoppingList;
+  const [location, setLocation] = useState<PantryLocation>(PantryLocation.Pantry);
+  const [busy, setBusy] = useState(false);
+  const storable = Boolean(item.productId || item.ingredientId);
+
+  return (
+    <div className="list-row-menu" role="group" aria-label={t.itemOptions(item.label)}>
+      {productId ? <Link to={`/produtos/${productId}`}>{t.seeDetail}</Link> : <span className="muted">{t.noDetail}</span>}
+      <p className="muted">{expected !== null ? t.expectedPrice(money.format(expected)) : !item.isPurchased && t.noExpectedPrice}</p>
+      <div className="inline-form">
+        {open && (
+          <button type="button" className="link-button" onClick={onToggle}>
+            {item.isPurchased ? t.unmarkBought : t.markBought}
+          </button>
+        )}
+        {item.storedInPantryAt ? (
+          <span className="muted">{t.alreadyInPantry}</span>
+        ) : !storable ? (
+          <span className="muted">{t.handWritten}</span>
+        ) : (
+          open &&
+          onStore && (
+            <>
+              <select className="category-select" aria-label={t.whereStored} value={location} onChange={(e) => setLocation(Number(e.target.value) as PantryLocation)}>
+                {pantryLocations.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {pantryLocationLabels[loc]}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="button-primary"
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await onStore(location);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                {busy ? <Busy>{tr().common.saving}</Busy> : item.isPurchased ? t.toPantryOne : t.boughtToPantryOne}
+              </button>
+            </>
+          )
+        )}
+        <button type="button" className="link-button" onClick={onClose}>
+          {t.closeOptions}
+        </button>
+      </div>
+    </div>
   );
 }
 

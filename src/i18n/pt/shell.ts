@@ -113,6 +113,22 @@ export const auth = {
   resendConfirmation: "Reenviar email de confirmação",
 };
 
+export const memberInvite = {
+  title: "Convite para a casa",
+  loading: "A abrir o convite…",
+  invalid: "Este convite não é válido: expirou, foi cancelado ou já foi usado. Pede a quem te convidou para o reenviar.",
+  intro: (household: string, member: string): string => `Foste convidado para a casa ${household}, como ${member}.`,
+  forEmail: (email: string): string => `O convite é para ${email}: só esse email o pode usar.`,
+  createAccount: "Cria a conta para entrar na casa:",
+  haveAccount: "Já tens conta com este email?",
+  signInToAccept: "Entra para aceitar",
+  accept: "Aceitar e entrar na casa",
+  accepting: "A aceitar…",
+  wrongAccount: (email: string): string =>
+    `Tens a sessão iniciada com outra conta. Sai e entra com ${email}, ou cria a conta com esse email.`,
+  joined: (household: string): string => `Entraste na casa ${household}.`,
+};
+
 export const account = {
   title: "A tua conta",
   subtitle: "O teu acesso ao DomiOS e as casas de que fazes parte.",

@@ -2,7 +2,7 @@ import { Busy } from "../components/Busy";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { useState, type FormEvent } from "react";
 import { useLoad } from "../useLoad";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import {
   addMember,
   getHousehold,
@@ -16,12 +16,14 @@ import {
   type MemberDto,
 } from "../api/households";
 import { describeError } from "../auth/errors";
+import { inviteMember, listMemberInvites, revokeMemberInvite, type MemberInviteDto } from "../api/memberInvites";
+import { shortDate } from "../plan/dates";
 import { AvoidedIngredientsPanel, NutritionGoalsPanel } from "../components/MemberPreferencesPanels";
 import { useHouseholds } from "../household/useHouseholds";
 import { householdsChanged } from "../household/currentHousehold";
 import { useSession } from "../auth/useSession";
 import { localeOf, numberFormat } from "../i18n/format";
-import { localized, tr } from "../i18n";
+import { getLanguage, localized, tr } from "../i18n";
 
 const ROLES = [MemberRole.Admin, MemberRole.Adult, MemberRole.Child, MemberRole.Guest];
 
@@ -35,11 +37,18 @@ const MEMBER_ERRORS = localized((t) => ({
 export function HouseholdPage() {
   const { loading, error, households, current, select } = useHouseholds();
   const userId = useSession()?.userId ?? null;
+  // Aviso de quem chega de outro ecrã (ex. depois de aceitar um convite).
+  const arrivalNotice = (useLocation().state as { notice?: string } | null)?.notice;
   const currentId = current?.householdId ?? null;
   const detail = useLoad(currentId ? [currentId] : null, () => getHousehold(currentId!));
   const household = detail.data;
   const detailError = detail.error;
   const setHousehold = (next: HouseholdDto) => detail.update(() => next);
+  // Os convites pendentes só o Admin os vê (a Api recusa aos outros).
+  const adminHere = current?.role === MemberRole.Admin;
+  const invites = useLoad(adminHere && currentId ? [currentId, "invites"] : null, () => listMemberInvites(currentId!));
+  const [inviteNotice, setInviteNotice] = useState<string | null>(null);
+  const inviteByMember = new Map((invites.data ?? []).map((invite) => [invite.memberId, invite] as const));
   // O formulário de novo membro é da casa onde se abriu: ao mudar de casa fecha.
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const adding = addingTo !== null && addingTo === currentId;
@@ -86,6 +95,8 @@ export function HouseholdPage() {
         </div>
       </header>
 
+      {arrivalNotice && <p className="notice">{arrivalNotice}</p>}
+
       {households.length > 1 && (
         <div className="chip-row household-switch" role="group" aria-label={tr().householdPage.yourHouseholds}>
           {households.map((h) => (
@@ -128,6 +139,8 @@ export function HouseholdPage() {
                   member={member}
                   isMe={member.memberId === current?.memberId}
                   isAdmin={isAdmin}
+                  invite={inviteByMember.get(member.memberId) ?? null}
+                  onInvitesChanged={invites.reload}
                   onSaved={setHousehold}
                   onRemoved={(left) => {
                     if (left) {
@@ -146,15 +159,23 @@ export function HouseholdPage() {
                 <li className="member-row member-row-form">
                   <AddMemberForm
                     householdId={household.householdId}
-                    onSaved={(next) => {
+                    existingIds={household.members.map((m) => m.memberId)}
+                    onSaved={(next, inviteFailed) => {
                       setHousehold(next);
                       setAdding(false);
+                      setInviteNotice(inviteFailed ? tr().householdPage.addedButInviteFailed : null);
+                      invites.reload();
                     }}
                     onCancel={() => setAdding(false)}
                   />
                 </li>
               )}
             </ul>
+            {inviteNotice && (
+              <p className="form-error" role="alert">
+                {inviteNotice}
+              </p>
+            )}
             {!isAdmin && (
               <p className="settings-note muted">{tr().householdPage.adminNote}</p>
             )}
@@ -299,19 +320,22 @@ function HouseholdName({ household, onSaved }: { household: HouseholdDto; onSave
   );
 }
 
-type RowMode = "view" | "edit" | "link" | "remove" | "avoid" | "goals";
+type RowMode = "view" | "edit" | "link" | "invite" | "remove" | "avoid" | "goals";
 
 interface MemberRowProps {
   householdId: string;
   member: MemberDto;
   isMe: boolean;
   isAdmin: boolean;
+  /** O convite pendente do membro; só o Admin o recebe. */
+  invite: MemberInviteDto | null;
+  onInvitesChanged: () => void;
   onSaved: (household: HouseholdDto) => void;
   /** `left` quando o próprio saiu da casa. */
   onRemoved: (left: boolean) => void;
 }
 
-function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: MemberRowProps) {
+function MemberRow({ householdId, member, isMe, isAdmin, invite, onInvitesChanged, onSaved, onRemoved }: MemberRowProps) {
   const [mode, setMode] = useState<RowMode>("view");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -361,6 +385,7 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
           </span>
           {age !== null && <span className="visually-hidden">, {tr().householdPage.age(age)}</span>}
           <span>{member.userId ? tr().householdPage.withAccount : tr().householdPage.withoutAccount}</span>
+          {!member.userId && invite && <span>{tr().householdPage.inviteSent(invite.email, shortDate(invite.expiresAt.slice(0, 10)))}</span>}
           {member.defaultPortion !== undefined && member.defaultPortion !== 1 && (
             <span>{tr().householdPage.portion(member.defaultPortion.toLocaleString(localeOf()))}</span>
           )}
@@ -387,6 +412,32 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
           {canEdit && (
             <button type="button" className="link-button" onClick={() => open("edit")}>
               {tr().householdPage.edit}
+            </button>
+          )}
+          {isAdmin && !member.userId && (
+            <button type="button" className="link-button" onClick={() => open("invite")}>
+              {invite ? tr().householdPage.resendInvite : tr().householdPage.invite}
+            </button>
+          )}
+          {isAdmin && !member.userId && invite && (
+            <button
+              type="button"
+              className="link-button"
+              disabled={busy}
+              onClick={async () => {
+                setError(null);
+                setBusy(true);
+                try {
+                  await revokeMemberInvite(householdId, member.memberId);
+                  onInvitesChanged();
+                } catch (err) {
+                  setError(describeError(err, MEMBER_ERRORS));
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              {tr().householdPage.cancelInvite}
             </button>
           )}
           {isAdmin && !member.userId && (
@@ -430,6 +481,19 @@ function MemberRow({ householdId, member, isMe, isAdmin, onSaved, onRemoved }: M
           member={member}
           canEdit={canEdit}
           onClose={() => setMode("view")}
+        />
+      )}
+
+      {mode === "invite" && (
+        <InviteForm
+          householdId={householdId}
+          member={member}
+          initialEmail={invite?.email ?? ""}
+          onInvited={() => {
+            onInvitesChanged();
+            setMode("view");
+          }}
+          onCancel={() => setMode("view")}
         />
       )}
 
@@ -625,14 +689,79 @@ function LinkAccountForm({ householdId, member, onLinked, onCancel }: LinkAccoun
   );
 }
 
+/** "Convidar": envia o link para a pessoa criar a conta (ou entrar) e ficar ligada a este membro. */
+function InviteForm({
+  householdId,
+  member,
+  initialEmail,
+  onInvited,
+  onCancel,
+}: {
+  householdId: string;
+  member: MemberDto;
+  initialEmail: string;
+  onInvited: () => void;
+  onCancel: () => void;
+}) {
+  const [email, setEmail] = useState(initialEmail);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setBusy(true);
+    try {
+      await inviteMember(householdId, member.memberId, email.trim(), getLanguage());
+      onInvited();
+    } catch (err) {
+      setError(
+        describeError(err, {
+          "invalid-argument": tr().auth.invalidEmail,
+          "member-already-linked": tr().householdPage.errors.alreadyLinked,
+          "forbidden-household-role": MEMBER_ERRORS["forbidden-household-role"],
+        }),
+      );
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="member-panel member-form" onSubmit={handleSubmit}>
+      <label className="form-field member-form-wide">
+        <span>{tr().householdPage.inviteEmail(member.name)}</span>
+        <input type="email" required autoFocus autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <small>{tr().householdPage.inviteHint}</small>
+      </label>
+      {error && (
+        <p className="form-error member-form-wide" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="button-row member-form-wide">
+        <button type="submit" className="button-primary" disabled={busy}>
+          {busy ? <Busy>{tr().householdPage.inviting}</Busy> : tr().householdPage.sendInvite}
+        </button>
+        <button type="button" className="button-secondary" onClick={onCancel} disabled={busy}>
+          {tr().common.cancel}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 interface AddMemberFormProps {
   householdId: string;
-  onSaved: (household: HouseholdDto) => void;
+  /** Os membros de antes: o novo é o que não está aqui. */
+  existingIds: string[];
+  /** `inviteFailed`: o membro entrou mas o convite pedido não foi enviado. */
+  onSaved: (household: HouseholdDto, inviteFailed: boolean) => void;
   onCancel: () => void;
 }
 
-function AddMemberForm({ householdId, onSaved, onCancel }: AddMemberFormProps) {
+function AddMemberForm({ householdId, existingIds, onSaved, onCancel }: AddMemberFormProps) {
   const [name, setName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
   const [role, setRole] = useState<MemberRole>(MemberRole.Adult);
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [restrictions, setRestrictions] = useState("");
@@ -644,14 +773,23 @@ function AddMemberForm({ householdId, onSaved, onCancel }: AddMemberFormProps) {
     setError(null);
     setBusy(true);
     try {
-      onSaved(
-        await addMember(householdId, {
-          name: name.trim(),
-          role,
-          dateOfBirth: dateOfBirth || null,
-          dietaryRestrictions: parseRestrictions(restrictions),
-        }),
-      );
+      const next = await addMember(householdId, {
+        name: name.trim(),
+        role,
+        dateOfBirth: dateOfBirth || null,
+        dietaryRestrictions: parseRestrictions(restrictions),
+      });
+      const added = next.members.find((m) => !existingIds.includes(m.memberId));
+      let inviteFailed = false;
+      if (inviteEmail.trim() && added) {
+        try {
+          await inviteMember(householdId, added.memberId, inviteEmail.trim(), getLanguage());
+        } catch {
+          // O membro já existe: fica, e o convite faz-se depois na linha dele.
+          inviteFailed = true;
+        }
+      }
+      onSaved(next, inviteFailed);
     } catch (err) {
       setError(describeError(err, MEMBER_ERRORS));
       setBusy(false);
@@ -689,6 +827,11 @@ function AddMemberForm({ householdId, onSaved, onCancel }: AddMemberFormProps) {
           onChange={(e) => setRestrictions(e.target.value)}
         />
         <small>{tr().householdPage.commaSeparated}</small>
+      </label>
+      <label className="form-field member-form-wide">
+        <span>{tr().householdPage.inviteOptionalEmail}</span>
+        <input type="email" autoComplete="off" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
+        <small>{tr().householdPage.inviteOptionalHint}</small>
       </label>
       <p className="muted member-form-wide">
         {tr().householdPage.noAccountNote}

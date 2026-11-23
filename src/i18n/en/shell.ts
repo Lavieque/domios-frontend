@@ -115,6 +115,21 @@ export const auth: Dict["auth"] = {
   resendConfirmation: "Resend confirmation email",
 };
 
+export const memberInvite: Dict["memberInvite"] = {
+  title: "Household invite",
+  loading: "Opening the invite…",
+  invalid: "This invite is not valid: it expired, was cancelled or was already used. Ask the person who invited you to send it again.",
+  intro: (household, member) => `You were invited to the household ${household}, as ${member}.`,
+  forEmail: (email) => `The invite is for ${email}: only that email can use it.`,
+  createAccount: "Create your account to join the household:",
+  haveAccount: "Already have an account with this email?",
+  signInToAccept: "Sign in to accept",
+  accept: "Accept and join the household",
+  accepting: "Accepting…",
+  wrongAccount: (email) => `You are signed in with another account. Sign out and sign in with ${email}, or create the account with that email.`,
+  joined: (household) => `You joined the household ${household}.`,
+};
+
 export const account: Dict["account"] = {
   title: "Your account",
   subtitle: "Your access to DomiOS and the households you belong to.",

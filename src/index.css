@@ -8136,3 +8136,12 @@ a.price-row:focus-visible .label-name {
     margin-right: 100%;
   }
 }
+
+.participants-fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

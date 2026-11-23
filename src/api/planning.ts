@@ -216,3 +216,8 @@ export function cookPlannedMeal(householdId: string, plannedMealId: string, left
     body: { consumePantry: true, leftoverServings },
   });
 }
+
+/** Quem come a refeição planeada; ao cozinhar, a refeição registada herda esta lista (e dá a parte de cada um na nutrição). */
+export function setPlannedMealParticipants(householdId: string, plannedMealId: string, participantMemberIds: string[]): Promise<PlannedMealDto> {
+  return authedRequest<PlannedMealDto>(`${base(householdId)}/${plannedMealId}`, { method: "PATCH", body: { participantMemberIds } });
+}

@@ -990,6 +990,12 @@ route("POST", "/households/:h/planned-meals", (c) => {
   return plannedDto(pm);
 });
 
+route("PATCH", "/households/:h/planned-meals/:p", (c) => {
+  const pm = plannedMeal(c.m[0], c.m[1]);
+  if (Array.isArray(c.body.participantMemberIds)) pm.participantMemberIds = c.body.participantMemberIds.map(String);
+  return plannedDto(pm);
+});
+
 route("DELETE", "/households/:h/planned-meals/:p", (c) => {
   const pm = plannedMeal(c.m[0], c.m[1]);
   st().planned = st().planned.filter((x) => x !== pm);

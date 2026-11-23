@@ -37,4 +37,8 @@ export const plan = {
   leftoverOption: (n: number): string => (n === 0 ? "nada" : n === 1 ? "1 dose" : `${n} doses`),
   logging: "A registar…",
   log: "Registar",
+  whoEats: "Quem come",
+  whoEatsFor: (title: string) => `Quem come: ${title}`,
+  eatenBy: (names: string) => `Comem: ${names}`,
+  save: "Guardar",
 };

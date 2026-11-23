@@ -2,7 +2,7 @@ import { Busy } from "../components/Busy";
 import { useState } from "react";
 import { useLoad } from "../useLoad";
 import { Link, useSearchParams } from "react-router-dom";
-import type { CallerHouseholdDto } from "../api/households";
+import { getHousehold, type CallerHouseholdDto, type MemberDto } from "../api/households";
 import {
   AvailabilityLineStatus,
   deletePlannedMeal,
@@ -14,6 +14,7 @@ import {
   plannedMealStatusLabels,
   RestrictionResult,
   cookPlannedMeal,
+  setPlannedMealParticipants,
   skipPlannedMeal,
   suggestionReasonLabels,
   unskipPlannedMeal,
@@ -82,6 +83,8 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
   const [allSuggestionsAt, setAllSuggestionsAt] = useState<string | null>(null);
   const allMissing = allMissingAt === monday;
   const allSuggestions = allSuggestionsAt === monday;
+  // Os membros servem para escolher quem come cada refeição; sem eles o plano mostra-se na mesma.
+  const members: MemberDto[] = useLoad([householdId, "members"], () => getHousehold(householdId).then((h) => h.members)).data ?? [];
   // A foto de cada prato vem da receita: o plano só traz o id.
   const images = useRecipeImages(meals.map((meal) => meal.recipeId));
 
@@ -175,12 +178,20 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                           <span className="week-meal-meta">
                             {tr().plan.servings(meal.servings)}
                             {meal.status !== PlannedMealStatus.Planned && ` · ${plannedMealStatusLabels[meal.status]}`}
+                            {eaters(meal, members) && ` · ${tr().plan.eatenBy(eaters(meal, members))}`}
                           </span>
                         </span>
                         {meal.status !== PlannedMealStatus.Cooked && (
                           <span className="week-meal-actions">
                             {meal.status === PlannedMealStatus.Planned && meal.recipeId && day <= now && (
                               <CookButton meal={meal} onCook={(leftovers) => act(() => cookPlannedMeal(householdId, meal.plannedMealId, leftovers))} />
+                            )}
+                            {meal.status === PlannedMealStatus.Planned && members.length > 0 && (
+                              <ParticipantsButton
+                                meal={meal}
+                                members={members}
+                                onSave={(ids) => act(() => setPlannedMealParticipants(householdId, meal.plannedMealId, ids))}
+                              />
                             )}
                             {meal.status === PlannedMealStatus.Planned ? (
                               <button
@@ -332,6 +343,79 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
         </aside>
       </div>
     </div>
+  );
+}
+
+/** Os nomes de quem come a refeição; vazio quando ainda ninguém foi escolhido. */
+function eaters(meal: PlannedMealDto, members: MemberDto[]): string {
+  return members
+    .filter((member) => meal.participantMemberIds.includes(member.memberId))
+    .map((member) => member.name)
+    .join(", ");
+}
+
+/** "Quem come": escolhe os membros da refeição; ao cozinhar, a refeição registada herda-os e a nutrição dá a parte de cada um. */
+function ParticipantsButton({
+  meal,
+  members,
+  onSave,
+}: {
+  meal: PlannedMealDto;
+  members: MemberDto[];
+  onSave: (participantMemberIds: string[]) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [chosen, setChosen] = useState<string[]>(meal.participantMemberIds);
+  const [busy, setBusy] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        className="link-button"
+        onClick={() => {
+          setChosen(meal.participantMemberIds);
+          setOpen(true);
+        }}
+      >
+        {tr().plan.whoEats}
+      </button>
+    );
+  }
+
+  return (
+    <form
+      className="inline-form cook-form"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        setBusy(true);
+        await onSave(chosen);
+        setBusy(false);
+        setOpen(false);
+      }}
+    >
+      <fieldset className="participants-fieldset">
+        <legend className="visually-hidden">{tr().plan.whoEatsFor(meal.title)}</legend>
+        {members.map((member) => (
+          <label key={member.memberId}>
+            <input
+              type="checkbox"
+              checked={chosen.includes(member.memberId)}
+              onChange={(e) =>
+                setChosen(e.target.checked ? [...chosen, member.memberId] : chosen.filter((id) => id !== member.memberId))
+              }
+            />{" "}
+            {member.name}
+          </label>
+        ))}
+      </fieldset>
+      <button type="submit" className="button-primary" disabled={busy}>
+        {busy ? <Busy>{tr().plan.logging}</Busy> : tr().plan.save}
+      </button>
+      <button type="button" className="link-button" onClick={() => setOpen(false)}>
+        {tr().common.cancel}
+      </button>
+    </form>
   );
 }
 

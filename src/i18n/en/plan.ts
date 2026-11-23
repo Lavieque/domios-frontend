@@ -37,4 +37,8 @@ export const plan: Dict["plan"] = {
   leftoverOption: (n) => (n === 0 ? "nothing" : n === 1 ? "1 serving" : `${n} servings`),
   logging: "Logging…",
   log: "Log",
+  whoEats: "Who eats",
+  whoEatsFor: (title) => `Who eats: ${title}`,
+  eatenBy: (names) => `Eating: ${names}`,
+  save: "Save",
 };

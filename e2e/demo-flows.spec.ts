@@ -50,3 +50,17 @@ test("mudar a conta para inglês carrega o dicionário e muda a página", async 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(/pantry/i);
   expect(errors).toEqual([]);
 });
+
+test("escolher quem come uma refeição planeada", async ({ page }) => {
+  const errors = collectErrors(page);
+  await openFilledDemo(page);
+  await page.goto("/plano");
+  await page.getByRole("button", { name: /^Quem come$/ }).first().click();
+  const boxes = page.locator(".participants-fieldset input[type=checkbox]");
+  await boxes.first().uncheck();
+  const kept = await boxes.nth(1).locator("xpath=..").innerText();
+  await page.getByRole("button", { name: /^Guardar$/ }).click();
+  await expect(page.getByText(/Comem:/).first()).toBeVisible();
+  await expect(page.getByText(/Comem:/).first()).toContainText(kept.trim());
+  expect(errors).toEqual([]);
+});

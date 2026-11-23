@@ -64,3 +64,16 @@ test("escolher quem come uma refeição planeada", async ({ page }) => {
   await expect(page.getByText(/Comem:/).first()).toContainText(kept.trim());
   expect(errors).toEqual([]);
 });
+
+test("convidar um membro sem conta", async ({ page }) => {
+  const errors = collectErrors(page);
+  await openFilledDemo(page);
+  await page.goto("/casa");
+  await page.getByRole("button", { name: /^Convidar$/ }).first().click();
+  await page.locator(".member-form input[type=email]").fill("convidado@example.com");
+  await page.getByRole("button", { name: /^Enviar convite$/ }).click();
+  await expect(page.getByText(/Convite enviado para convidado@example.com/).first()).toBeVisible();
+  await page.getByRole("button", { name: /^Cancelar convite$/ }).first().click();
+  await expect(page.getByText(/Convite enviado para/)).toHaveCount(0);
+  expect(errors).toEqual([]);
+});

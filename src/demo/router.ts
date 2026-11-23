@@ -640,6 +640,38 @@ route("POST", "/households/:h/members/:m/link-user", (c) => {
   log(h.householdId, "MemberLinkedToUser", "Household", h.householdId, { name: m.name, memberId: m.memberId });
 });
 
+// Convites de membro: na demo ninguém recebe o email, ficam só em memória para a casa os mostrar.
+const demoInvites = new Map<string, { memberId: string; email: string; expiresAt: string }>();
+
+route("POST", "/households/:h/members/:m/invites", (c) => {
+  const h = household(c.m[0]);
+  const m = member(h, c.m[1]);
+  if (m.userId) throw new DemoHttpError(409, "member-already-linked");
+  const email = String(c.body.email ?? "").trim().toLowerCase();
+  if (!email.includes("@")) throw new DemoHttpError(400, "invalid-argument");
+  const invite = { memberId: m.memberId, email, expiresAt: `${addDays(today(), 7)}T12:00:00Z` };
+  demoInvites.set(`${h.householdId}/${m.memberId}`, invite);
+  log(h.householdId, "MemberInvited", "MemberInvite", m.memberId, { memberId: m.memberId });
+  return invite;
+});
+
+route("DELETE", "/households/:h/members/:m/invites", (c) => {
+  demoInvites.delete(`${c.m[0]}/${c.m[1]}`);
+});
+
+route("GET", "/households/:h/member-invites", (c) => {
+  household(c.m[0]);
+  return [...demoInvites.entries()].filter(([key]) => key.startsWith(`${c.m[0]}/`)).map(([, invite]) => invite);
+});
+
+// Na demo não há links de convite a abrir.
+route("POST", "/member-invites/lookup", () => {
+  throw new DemoHttpError(404, "invalid-invite");
+});
+route("POST", "/member-invites/accept", () => {
+  throw new DemoHttpError(409, "invalid-invite");
+});
+
 const emptyGoals = (memberId: string) => ({
   memberId, isSet: false, energyKcal: null, proteinG: null, carbsG: null, fatG: null, fiberG: null, sugarG: null, saturatesG: null, saltG: null, maxFatPerMealG: null, updatedAt: null,
 });

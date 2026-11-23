@@ -48,6 +48,7 @@ const pageLoaders = {
   NearbyStoresPage: () => import("./pages/NearbyStoresPage").then((m) => ({ default: m.NearbyStoresPage })),
   PantryWastePage: () => import("./pages/PantryWastePage").then((m) => ({ default: m.PantryWastePage })),
   ResetPasswordPage: () => import("./pages/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })),
+  InvitePage: () => import("./pages/InvitePage").then((m) => ({ default: m.InvitePage })),
   VerifyEmailPage: () => import("./pages/VerifyEmailPage").then((m) => ({ default: m.VerifyEmailPage })),
 };
 const AccountPage = lazy(pageLoaders.AccountPage);
@@ -75,6 +76,7 @@ const SpendingPage = lazy(pageLoaders.SpendingPage);
 const NearbyStoresPage = lazy(pageLoaders.NearbyStoresPage);
 const PantryWastePage = lazy(pageLoaders.PantryWastePage);
 const ResetPasswordPage = lazy(pageLoaders.ResetPasswordPage);
+const InvitePage = lazy(pageLoaders.InvitePage);
 const VerifyEmailPage = lazy(pageLoaders.VerifyEmailPage);
 
 function preloadPages() {
@@ -211,6 +213,7 @@ function App() {
           {/* Caminhos fixados pela Api nos links dos emails (AuthEmails.cs). */}
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/convite" element={<InvitePage />} />
         </Routes>
         </Suspense>
       </main>

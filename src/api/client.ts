@@ -15,6 +15,7 @@ import {
   type PriceObservationDto,
   type ProductStoreOfferDto,
   type PromotionDto,
+  type RecipeCostDto,
   type RecipeDto,
   type RecipeSummaryDto,
 } from "./types";
@@ -93,7 +94,16 @@ export interface RecipeFilters {
   dishType?: DishType;
   mainProtein?: MainProtein;
   difficulty?: RecipeDifficulty;
+  /** Só receitas com tempo (preparação + cozedura) até este. */
+  maxMinutes?: number;
+  /** Só receitas com preço fiável por dose até este, em EUR. */
+  maxCostPerServing?: number;
+  sort?: RecipeSort;
 }
+
+export type RecipeSort = "cost" | "time";
+
+const recipeSortNames: Record<RecipeSort, string> = { cost: "Cost", time: "Time" };
 
 export function searchRecipes(
   search: string,
@@ -108,7 +118,15 @@ export function searchRecipes(
     dishType: filters.dishType === undefined ? undefined : dishTypeNames[filters.dishType],
     mainProtein: filters.mainProtein === undefined ? undefined : mainProteinNames[filters.mainProtein],
     difficulty: filters.difficulty === undefined ? undefined : recipeDifficultyNames[filters.difficulty],
+    maxMinutes: filters.maxMinutes,
+    maxCostPerServing: filters.maxCostPerServing,
+    sort: filters.sort === undefined ? undefined : recipeSortNames[filters.sort],
   });
+}
+
+/** O preço esperado calculado na hora, ingrediente a ingrediente (`GET /recipes/{id}/cost`). */
+export function getRecipeCost(recipeId: string): Promise<RecipeCostDto> {
+  return get<RecipeCostDto>(`/recipes/${recipeId}/cost`);
 }
 
 export function getRecipe(recipeId: string): Promise<RecipeDto> {

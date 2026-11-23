@@ -133,9 +133,47 @@ function productDto(product: DemoProduct) {
 }
 
 function recipeSummary(r: DemoRecipe) {
+  const cost = recipeCost(r);
   return {
     recipeId: r.id, ownerHouseholdId: null, title: tx(r.title), difficulty: r.difficulty, status: 1, tags: r.tags.map(tx),
     sourceUrl: null, sourceCategory: null, dishType: r.dishType, mainProtein: r.mainProtein, classificationSource: 2, imageUrl: r.imageUrl,
+    totalMinutes: r.prep + r.cook,
+    cost: cost.ingredientCount === 0 ? null : {
+      perServing: cost.perServing, total: cost.total, pricedIngredientCount: cost.pricedIngredientCount,
+      ingredientCount: cost.ingredientCount, isReliable: cost.isReliable,
+    },
+  };
+}
+
+/** Como a Api (adenda 2026-11-23 de DomiOS_API_Fase1.md): o que a receita usa, ao preço médio das lojas. */
+function recipeCost(r: DemoRecipe) {
+  let total = 0;
+  let required = 0;
+  let priced = 0;
+  const lines = r.ingredients.map((ing, i) => {
+    const base = { recipeIngredientId: `${r.id}-ri${i}`, ingredientId: ing.ingredientId };
+    const empty = { productId: null, productName: null, quantity: null, unit: null, packageQuantity: null, packagePrice: null, cost: null, storeCount: 0 };
+    if (ing.optional || (ing.notes && /q\.?\s*b\.?|to taste/i.test(tx(ing.notes)))) return { ...base, ...empty, missing: null };
+    required += 1;
+    const product = genericProductFor(ing.ingredientId);
+    if (!product) return { ...base, ...empty, missing: "NoProduct" };
+    const offers = offersFor(product);
+    const packBase = product.unit === U.un ? product.qty : toGrams(product.ingredientId, { amount: product.qty, unit: product.unit });
+    const need = product.unit === U.un
+      ? (ing.unit === U.un ? ing.amount : 1)
+      : (ing.unit === U.un ? ing.amount * packBase : toGrams(ing.ingredientId, { amount: ing.amount, unit: ing.unit }));
+    const quantity = round2((need / packBase) * product.qty);
+    const productPart = { productId: product.id, productName: tx(product.name), quantity, unit: product.unit, packageQuantity: product.qty };
+    if (offers.length === 0) return { ...base, ...productPart, packagePrice: null, cost: null, storeCount: 0, missing: "NoPrice" };
+    const average = offers.reduce((sum, o) => sum + o.price, 0) / offers.length;
+    const cost = (need / packBase) * average;
+    total += cost;
+    priced += 1;
+    return { ...base, ...productPart, packagePrice: round2(average), cost: round2(cost), storeCount: offers.length, missing: null };
+  });
+  return {
+    recipeId: r.id, servings: r.servings, total: round2(total), perServing: round2(total / Math.max(1, r.servings)),
+    pricedIngredientCount: priced, ingredientCount: required, isReliable: required > 0 && priced >= required * 0.8, lines,
   };
 }
 
@@ -447,15 +485,24 @@ route("GET", "/recipes", (c) => {
   const dish = c.params.get("dishType");
   const protein = c.params.get("mainProtein");
   const difficulty = c.params.get("difficulty");
+  const maxMinutes = Number(c.params.get("maxMinutes") ?? "") || null;
+  const maxCost = Number(c.params.get("maxCostPerServing") ?? "") || null;
+  const sort = c.params.get("sort");
   const list = recipes.filter((r) =>
     matches(search, tx(r.title), r.title.pt, r.title.en, ...r.tags.map(tx)) &&
     (!dish || r.dishType === dishTypeByName[dish]) &&
     (!protein || r.mainProtein === proteinByName[protein]) &&
-    (!difficulty || r.difficulty === difficultyByName[difficulty]));
-  return paged(list.map(recipeSummary), c);
+    (!difficulty || r.difficulty === difficultyByName[difficulty])).map(recipeSummary)
+    .filter((r) => maxMinutes === null || r.totalMinutes <= maxMinutes)
+    .filter((r) => maxCost === null || (r.cost?.isReliable === true && r.cost.perServing <= maxCost));
+  if (sort === "Cost") list.sort((a, b) => (a.cost?.isReliable ? a.cost.perServing : Infinity) - (b.cost?.isReliable ? b.cost.perServing : Infinity));
+  if (sort === "Time") list.sort((a, b) => a.totalMinutes - b.totalMinutes);
+  return paged(list, c);
 });
 
 route("GET", "/recipes/:id", (c) => recipeDto(recipeOrThrow(c.m[0])));
+
+route("GET", "/recipes/:id/cost", (c) => recipeCost(recipeOrThrow(c.m[0])));
 
 route("GET", "/events", (c) => {
   const type = c.params.get("aggregateType") ?? "";

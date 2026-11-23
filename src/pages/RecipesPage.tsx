@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useLoad } from "../useLoad";
 import { useSearchParams } from "react-router-dom";
 import { CardsSkeleton } from "../components/CardsSkeleton";
-import { searchRecipes } from "../api/client";
+import { searchRecipes, type RecipeSort } from "../api/client";
 import {
   DishType,
   dishTypeLabels,
@@ -28,6 +28,16 @@ const count = numberFormat();
 const dishTypes = Object.values(DishType) as DishType[];
 const proteins = Object.values(MainProtein) as MainProtein[];
 const difficulties = Object.values(RecipeDifficulty) as RecipeDifficulty[];
+/** Os limites dos filtros de tempo (minutos) e de preço por dose (EUR). */
+const MINUTE_LIMITS = [15, 30, 45, 60];
+const PRICE_LIMITS = [1, 2, 3, 5];
+const SORTS: RecipeSort[] = ["cost", "time"];
+const money = numberFormat({ style: "currency", currency: "EUR" });
+
+function parseLimit(value: string | null, allowed: number[]): number | undefined {
+  const n = Number(value);
+  return allowed.includes(n) ? n : undefined;
+}
 
 function parseEnum<T extends number>(value: string | null, allowed: T[]): T | undefined {
   if (value === null) return undefined;
@@ -113,18 +123,29 @@ export function RecipesPage() {
   const dishType = parseEnum(searchParams.get("prato"), dishTypes);
   const mainProtein = parseEnum(searchParams.get("proteina"), proteins);
   const difficulty = parseEnum(searchParams.get("dificuldade"), difficulties);
+  const maxMinutes = parseLimit(searchParams.get("tempo"), MINUTE_LIMITS);
+  const maxCostPerServing = parseLimit(searchParams.get("preco"), PRICE_LIMITS);
+  const sortParam = searchParams.get("ordem");
+  const sort = SORTS.find((s) => s === sortParam);
 
   const cooked = useCookedRecipes();
   // O total anterior fica enquanto a página nova carrega: a contagem e a paginação não piscam.
   const found = useLoad(
-    [search, page, pageSize, dishType, mainProtein, difficulty],
-    () => searchRecipes(search, page, pageSize, { dishType, mainProtein, difficulty }),
+    [search, page, pageSize, dishType, mainProtein, difficulty, maxMinutes, maxCostPerServing, sort],
+    () => searchRecipes(search, page, pageSize, { dishType, mainProtein, difficulty, maxMinutes, maxCostPerServing, sort }),
     { keepPrevious: true },
   );
   const recipes: RecipeSummaryDto[] = found.data?.items ?? [];
   const total = found.data?.total ?? 0;
   const { loading, error } = found;
-  const filtered = search !== "" || dishType !== undefined || mainProtein !== undefined || difficulty !== undefined;
+  const filtered =
+    search !== "" ||
+    dishType !== undefined ||
+    mainProtein !== undefined ||
+    difficulty !== undefined ||
+    maxMinutes !== undefined ||
+    maxCostPerServing !== undefined ||
+    sort !== undefined;
   // A primeira receita vai em destaque; a lista a seguir não a repete.
   const featured = !filtered && page === 1 && !loading && recipes.length > 0;
 
@@ -134,18 +155,27 @@ export function RecipesPage() {
     dishType?: DishType | null;
     mainProtein?: MainProtein | null;
     difficulty?: RecipeDifficulty | null;
+    maxMinutes?: number | null;
+    maxCostPerServing?: number | null;
+    sort?: RecipeSort | null;
   }) {
     const nextSearch = next.search ?? search;
     const nextPage = next.page ?? page;
     const nextDish = next.dishType === undefined ? dishType : next.dishType;
     const nextProtein = next.mainProtein === undefined ? mainProtein : next.mainProtein;
     const nextDifficulty = next.difficulty === undefined ? difficulty : next.difficulty;
+    const nextMinutes = next.maxMinutes === undefined ? maxMinutes : next.maxMinutes;
+    const nextCost = next.maxCostPerServing === undefined ? maxCostPerServing : next.maxCostPerServing;
+    const nextSort = next.sort === undefined ? sort : next.sort;
 
     const params = new URLSearchParams();
     if (nextSearch) params.set("search", nextSearch);
     if (nextDish !== undefined && nextDish !== null) params.set("prato", String(nextDish));
     if (nextProtein !== undefined && nextProtein !== null) params.set("proteina", String(nextProtein));
     if (nextDifficulty !== undefined && nextDifficulty !== null) params.set("dificuldade", String(nextDifficulty));
+    if (nextMinutes !== undefined && nextMinutes !== null) params.set("tempo", String(nextMinutes));
+    if (nextCost !== undefined && nextCost !== null) params.set("preco", String(nextCost));
+    if (nextSort !== undefined && nextSort !== null) params.set("ordem", nextSort);
     if (nextPage > 1) params.set("page", String(nextPage));
     setSearchParams(params, { replace: true });
   }
@@ -225,6 +255,42 @@ export function RecipesPage() {
             </option>
           ))}
         </select>
+        <select
+          className="category-select"
+          aria-label={tr().recipes.time}
+          value={maxMinutes ?? ""}
+          onChange={(e) => applyFilters({ maxMinutes: e.target.value === "" ? null : Number(e.target.value), page: 1 })}
+        >
+          <option value="">{tr().recipes.anyTime}</option>
+          {MINUTE_LIMITS.map((limit) => (
+            <option key={limit} value={limit}>
+              {tr().recipes.upToMinutes(limit)}
+            </option>
+          ))}
+        </select>
+        <select
+          className="category-select"
+          aria-label={tr().recipes.price}
+          value={maxCostPerServing ?? ""}
+          onChange={(e) => applyFilters({ maxCostPerServing: e.target.value === "" ? null : Number(e.target.value), page: 1 })}
+        >
+          <option value="">{tr().recipes.anyPrice}</option>
+          {PRICE_LIMITS.map((limit) => (
+            <option key={limit} value={limit}>
+              {tr().recipes.upToPrice(money.format(limit))}
+            </option>
+          ))}
+        </select>
+        <select
+          className="category-select"
+          aria-label={tr().recipes.sortBy}
+          value={sort ?? ""}
+          onChange={(e) => applyFilters({ sort: e.target.value === "" ? null : (e.target.value as RecipeSort), page: 1 })}
+        >
+          <option value="">{tr().recipes.sortDefault}</option>
+          <option value="cost">{tr().recipes.sortCost}</option>
+          <option value="time">{tr().recipes.sortTime}</option>
+        </select>
       </div>
 
       <div className="chip-row" role="group" aria-label={tr().recipes.mainProtein}>
@@ -269,6 +335,8 @@ export function RecipesPage() {
                     recipe.dishType !== null ? dishTypeLabels[recipe.dishType] : null,
                     recipe.mainProtein !== null ? mainProteinLabels[recipe.mainProtein] : null,
                     recipeDifficultyLabels[recipe.difficulty],
+                    recipe.totalMinutes ? tr().recipes.minutes(recipe.totalMinutes) : null,
+                    recipe.cost?.isReliable ? tr().recipes.perServing(money.format(recipe.cost.perServing)) : null,
                   ]
                     .filter(Boolean)
                     .join(" · ")}

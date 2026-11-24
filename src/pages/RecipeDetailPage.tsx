@@ -3,7 +3,7 @@ import { PageSkeleton } from "../components/PageSkeleton";
 import { useState } from "react";
 import { useLoad } from "../useLoad";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getRecipe } from "../api/client";
+import { getRecipe, getRecipeCost } from "../api/client";
 import type { PlannedMealDto } from "../api/planning";
 import {
   addItemsFromRecipe,
@@ -12,7 +12,14 @@ import {
   listShoppingLists,
   ShoppingListStatus,
 } from "../api/shopping";
-import { dishTypeLabels, mainProteinLabels, measurementUnitLabels, recipeDifficultyLabels } from "../api/types";
+import {
+  dishTypeLabels,
+  mainProteinLabels,
+  measurementUnitLabels,
+  recipeDifficultyLabels,
+  type RecipeCostLineDto,
+  type RecipeCostMissing,
+} from "../api/types";
 import { AddToPlanForm } from "../components/AddToPlanForm";
 import { RecipeAvoidedNotice } from "../components/RecipeAvoidedNotice";
 import { SaveRecipeButton } from "../components/SaveRecipeButton";
@@ -24,6 +31,30 @@ import { numberFormat } from "../i18n/format";
 import { tr } from "../i18n";
 
 const quantityFormat = numberFormat({ maximumFractionDigits: 2 });
+const money = numberFormat({ style: "currency", currency: "EUR" });
+
+function missingLabel(missing: RecipeCostMissing): string {
+  const t = tr().recipes;
+  return missing === "NoProduct" ? t.missingNoProduct : missing === "NoConversion" ? t.missingNoConversion : t.missingNoPrice;
+}
+
+/** O custo de um ingrediente e o produto por onde se calculou; sem preço, a razão. */
+function IngredientCost({ line }: { line: RecipeCostLineDto | undefined }) {
+  if (!line || (line.cost === null && line.missing === null)) return null;
+  const text = line.cost !== null ? tr().recipes.ingredientCost(money.format(line.cost)) : missingLabel(line.missing!);
+  return line.productId ? (
+    <Link
+      to={`/produtos/${line.productId}`}
+      className={line.cost !== null ? "ingredient-cost" : "ingredient-cost is-missing"}
+      title={line.productName ?? undefined}
+      aria-label={tr().recipes.seeProduct(line.productName ?? "")}
+    >
+      {text}
+    </Link>
+  ) : (
+    <span className="ingredient-cost is-missing">{text}</span>
+  );
+}
 
 function sourceHost(url: string): string {
   try {
@@ -56,6 +87,9 @@ function RecipeDetail({ id }: { id: string }) {
   const navigate = useNavigate();
   const { current } = useHouseholds();
   const { data: recipe, error } = useLoad([id], () => getRecipe(id));
+  // O preço é um extra: se falhar, a receita mostra-se na mesma.
+  const cost = useLoad([id, "cost"], () => getRecipeCost(id).catch(() => null)).data ?? null;
+  const costByLine = new Map((cost?.lines ?? []).map((line) => [line.recipeIngredientId, line] as const));
   const [added, setAdded] = useState<PlannedMealDto | null>(null);
   // "Pôr na lista de compras": um clique, o que falta na despensa vai para a lista aberta.
   const [listResult, setListResult] = useState<{ listId: string; name: string; added: number } | null>(null);
@@ -172,6 +206,12 @@ function RecipeDetail({ id }: { id: string }) {
             <dt>{tr().recipe.difficulty}</dt>
             <dd>{recipeDifficultyLabels[recipe.difficulty]}</dd>
           </div>
+          {cost && cost.pricedIngredientCount > 0 && (
+            <div>
+              <dt>{tr().recipes.expectedPrice}</dt>
+              <dd>{tr().recipes.perServing(money.format(cost.perServing))}</dd>
+            </div>
+          )}
         </dl>
 
         <div className="recipe-sheet-body">
@@ -304,6 +344,7 @@ function RecipeDetail({ id }: { id: string }) {
                         </span>
                       )}
                     </label>
+                    <IngredientCost line={costByLine.get(ingredient.recipeIngredientId)} />
                   </li>
                 );
               })}
@@ -313,6 +354,21 @@ function RecipeDetail({ id }: { id: string }) {
             <button type="button" className="link-button" onClick={() => setChecked(new Set())}>
               {tr().recipe.uncheckAll}
             </button>
+          )}
+          {cost && cost.ingredientCount > 0 && (
+            <p className="recipe-cost-note muted">
+              {cost.pricedIngredientCount === 0 ? (
+                tr().recipes.noPrice
+              ) : (
+                <>
+                  <strong>{tr().recipes.expectedTotal(money.format(cost.total), cost.servings)}</strong>
+                  {cost.pricedIngredientCount < cost.ingredientCount &&
+                    ` · ${tr().recipes.pricedOf(cost.pricedIngredientCount, cost.ingredientCount)}`}
+                  {". "}
+                  {tr().recipes.priceHint}
+                </>
+              )}
+            </p>
           )}
         </section>
 

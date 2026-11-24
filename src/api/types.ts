@@ -402,6 +402,48 @@ export interface RecipeSummaryDto {
   mainProtein: MainProtein | null;
   classificationSource: ClassificationSource | null;
   imageUrl: string | null;
+  /** Preparação mais cozedura; null sem nenhuma (adenda 2026-11-23 de DomiOS_API_Fase1.md). */
+  totalMinutes?: number | null;
+  /** Preço esperado guardado; null antes do primeiro cálculo. */
+  cost?: RecipeCostSummaryDto | null;
+}
+
+/** O preço guardado de uma receita: só é "fiável" com 80% dos ingredientes com preço. */
+export interface RecipeCostSummaryDto {
+  perServing: number;
+  total: number;
+  pricedIngredientCount: number;
+  ingredientCount: number;
+  isReliable: boolean;
+}
+
+/** Porque é que uma linha obrigatória não tem custo. */
+export type RecipeCostMissing = "NoProduct" | "NoConversion" | "NoPrice";
+
+/** Uma linha da receita: quantidade na unidade da embalagem; preço médio de uma embalagem. */
+export interface RecipeCostLineDto {
+  recipeIngredientId: string;
+  ingredientId: string;
+  productId: string | null;
+  productName: string | null;
+  quantity: number | null;
+  unit: MeasurementUnit | null;
+  packageQuantity: number | null;
+  packagePrice: number | null;
+  cost: number | null;
+  storeCount: number;
+  missing: RecipeCostMissing | null;
+}
+
+export interface RecipeCostDto {
+  recipeId: string;
+  servings: number;
+  total: number;
+  perServing: number;
+  pricedIngredientCount: number;
+  ingredientCount: number;
+  isReliable: boolean;
+  lines: RecipeCostLineDto[];
 }
 
 export interface RecipeDto {

@@ -8187,3 +8187,29 @@ a.price-row:focus-visible .label-name {
   align-items: center;
   gap: 0.5rem 1rem;
 }
+
+/* Custo de cada ingrediente na receita: liga ao produto por onde se calculou. */
+.ingredient-checklist li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.75rem;
+}
+
+.ingredient-checklist li > label {
+  flex: 1 1 12rem;
+}
+
+.ingredient-cost {
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ingredient-cost.is-missing {
+  color: var(--ink-dim);
+}
+
+.recipe-cost-note {
+  margin-top: 1rem;
+}

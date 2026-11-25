@@ -1062,7 +1062,8 @@ route("POST", "/households/:h/planned-meals", (c) => {
   const pm: PlannedMeal = {
     plannedMealId: nextId("pm"), householdId: h.householdId, date: c.body.date, mealType: Number(c.body.mealType ?? 1),
     recipeId: recipe?.id ?? null, title: c.body.title || recipe?.title || "—", servings: Number(c.body.servings ?? recipe?.servings ?? h.members.length),
-    participantMemberIds: h.members.map((m) => m.memberId), notes: null, status: 0, mealId: null,
+    participantMemberIds: Array.isArray(c.body.participantMemberIds) ? c.body.participantMemberIds.map(String) : h.members.map((m) => m.memberId),
+    notes: null, status: 0, mealId: null,
   };
   st().planned.push(pm);
   log(h.householdId, "PlannedMealCreated", "PlannedMeal", pm.plannedMealId, { title: txt(pm.title), recipeId: pm.recipeId });

@@ -49,6 +49,7 @@ export interface CreatePlannedMealRequest {
   recipeId?: string | null;
   title?: string | null;
   servings?: number | null;
+  participantMemberIds?: string[];
 }
 
 const base = (householdId: string) => `/households/${householdId}/planned-meals`;

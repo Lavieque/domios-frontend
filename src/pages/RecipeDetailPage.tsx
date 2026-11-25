@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLoad } from "../useLoad";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRecipe, getRecipeCost } from "../api/client";
+import { getHousehold } from "../api/households";
 import type { PlannedMealDto } from "../api/planning";
 import {
   addItemsFromRecipe,
@@ -36,6 +37,21 @@ const money = numberFormat({ style: "currency", currency: "EUR" });
 function missingLabel(missing: RecipeCostMissing): string {
   const t = tr().recipes;
   return missing === "NoProduct" ? t.missingNoProduct : missing === "NoConversion" ? t.missingNoConversion : t.missingNoPrice;
+}
+
+/** "Pôr no plano" com os membros da casa, para escolher quem come (todos por omissão). */
+function PlanWithMembers({
+  householdId,
+  recipeId,
+  onAdded,
+}: {
+  householdId: string;
+  recipeId: string;
+  onAdded: (plannedMeal: PlannedMealDto) => void;
+}) {
+  // Sem membros (erro ou ainda a carregar) o formulário funciona na mesma, sem participantes.
+  const members = useLoad([householdId, "members"], () => getHousehold(householdId).then((h) => h.members)).data ?? [];
+  return <AddToPlanForm householdId={householdId} recipeId={recipeId} members={members} defaultDate={today()} onAdded={onAdded} />;
 }
 
 /** O custo de um ingrediente e o produto por onde se calculou; sem preço, a razão. */
@@ -295,12 +311,7 @@ function RecipeDetail({ id }: { id: string }) {
               >
                 {(household) => (
                   <>
-                    <AddToPlanForm
-                      householdId={household.householdId}
-                      recipeId={recipe.recipeId}
-                      defaultDate={today()}
-                      onAdded={setAdded}
-                    />
+                    <PlanWithMembers householdId={household.householdId} recipeId={recipe.recipeId} onAdded={setAdded} />
                     {added && (
                       <p className="notice">
                         {tr().recipe.addedOn(longDate(added.date))}{" "}

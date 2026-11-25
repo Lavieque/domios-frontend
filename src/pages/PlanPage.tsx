@@ -323,6 +323,7 @@ function WeekPlan({ household }: { household: CallerHouseholdDto }) {
                   <AddToPlanForm
                     householdId={householdId}
                     recipeId={suggestion.recipeId}
+                    members={members}
                     defaultDate={suggestionDate}
                     onAdded={reload}
                   />

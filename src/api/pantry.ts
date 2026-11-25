@@ -199,11 +199,20 @@ export function scanPantryItem(
 
 // --- Sobras e desperdício (DomiOS_API_Fase4.md, adenda 2026-11-09, D.3 e D.5) ---
 
-/** Come `servings` doses de um item de sobras: regista a refeição com a nutrição da de origem. */
-export function eatLeftovers(householdId: string, pantryItemId: string, mealType: number, servings = 1): Promise<unknown> {
+/**
+ * Come `servings` doses de um item de sobras: regista a refeição com a nutrição da de origem.
+ * `participantMemberIds`: quem comeu; a nutrição da refeição fica dividida por eles.
+ */
+export function eatLeftovers(
+  householdId: string,
+  pantryItemId: string,
+  mealType: number,
+  servings = 1,
+  participantMemberIds: string[] = [],
+): Promise<unknown> {
   return authedRequest<unknown>(`/households/${householdId}/meals/from-leftovers`, {
     method: "POST",
-    body: { pantryItemId, mealType, servings, eatenAt: null, participantMemberIds: [], notes: null },
+    body: { pantryItemId, mealType, servings, eatenAt: null, participantMemberIds, notes: null },
   });
 }
 

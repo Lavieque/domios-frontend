@@ -230,6 +230,7 @@ function Pantry({ household }: { household: CallerHouseholdDto }) {
                 chains={chains}
                 onAct={act}
                 householdId={householdId}
+                memberId={household.memberId}
               />
             ))}
           </ul>
@@ -246,12 +247,15 @@ function PantryRow({
   product,
   chains,
   householdId,
+  memberId,
   onAct,
 }: {
   item: PantryItemDto;
   product: ProductDto | undefined;
   chains: ChainDto[] | null;
   householdId: string;
+  /** Quem está na app: "Comer 1 dose" conta para esta pessoa. */
+  memberId: string;
   onAct: (action: () => Promise<unknown>) => void;
 }) {
   const [mode, setMode] = useState<"consume" | "discard" | "scan" | null>(null);
@@ -347,7 +351,7 @@ function PantryRow({
               type="button"
               className="row-action"
               title={tr().pantry.eatLeftoversHint}
-              onClick={() => onAct(() => eatLeftovers(householdId, item.pantryItemId, mealTypeNow(), 1))}
+              onClick={() => onAct(() => eatLeftovers(householdId, item.pantryItemId, mealTypeNow(), 1, [memberId]))}
             >
               {tr().pantry.eatLeftovers}
             </button>

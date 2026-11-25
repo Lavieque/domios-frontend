@@ -222,7 +222,7 @@ function RecipeDetail({ id }: { id: string }) {
             <dt>{tr().recipe.difficulty}</dt>
             <dd>{recipeDifficultyLabels[recipe.difficulty]}</dd>
           </div>
-          {cost && cost.pricedIngredientCount > 0 && (
+          {cost?.isReliable && (
             <div>
               <dt>{tr().recipes.expectedPrice}</dt>
               <dd>{tr().recipes.perServing(money.format(cost.perServing))}</dd>

@@ -173,7 +173,7 @@ function recipeCost(r: DemoRecipe) {
   });
   return {
     recipeId: r.id, servings: r.servings, total: round2(total), perServing: round2(total / Math.max(1, r.servings)),
-    pricedIngredientCount: priced, ingredientCount: required, isReliable: required > 0 && priced >= required * 0.8, lines,
+    pricedIngredientCount: priced, ingredientCount: required, isReliable: required > 0 && priced >= required * 0.8 && r.servings <= 24, lines,
   };
 }
 
